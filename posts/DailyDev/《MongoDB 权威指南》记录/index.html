@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>《MongoDB 权威指南》记录 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">《MongoDB 权威指南》记录</h1>
+    <div class="article-meta">
+      <time datetime="2025-03-22">2025-03-22</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daily%20Dev/">Daily Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/MongoDB/">MongoDB</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="mongodb-">《MongoDB 权威指南》记录</h1>
+<h2 id="mongodb--1">MongoDB 简介</h2>
+<p>MongoDB 是面向文档的非关系型数据库。</p>
+<p>MongoDB 具有以下特点：</p>
+<ul>
+<li>易于使用：没有“行记录”的概念，而使用“文档”模型取代之。同时也没有预定义模式，文档键值的类型和大小是动态的。</li>
+<li>易于扩展：MongoDB 采用了横向扩展方式，面向文档的数据模型使得跨多台服务器拆分数据更加容易。</li>
+<li>性能强大：使用了机会锁，提高并发和吞吐量。同时会尽可能多的使用内存作为缓存，并尝试为查询自动选择合适的索引。</li>
+</ul>
+<h2 id="heading">入门指南</h2>
+<h3 id="heading-1">文档</h3>
+<p>文档是一组有序键值的集合，如以下形式：</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span><span class="s2">&#34;q&#34;</span><span class="p">:</span> <span class="s2">&#34;ans&#34;</span><span class="p">}</span>
+</span></span></code></pre><h3 id="heading-2">集合</h3>
+<p>集合就是一组文档，相当于关系型数据库的表结构。</p>
+<p>集合具有动态模式的特性，每个文档的长度大小、键数量都可以不一样。不过开发中并不推荐这样做，还是将“形状”相同的文档存在同一个集合中好，因为这样查询起来性能不会受到影响。</p>
+<p>在 MongoDB 中通常会用 <code>.</code> 字符分隔不同命名空间的子集合，如 <code>blog.posts</code> 。</p>
+<h3 id="heading-3">数据库</h3>
+<p>MongoDB 使用数据库对集合进行分组。</p>
+<h3 id="heading-4">数据类型</h3>
+<ul>
+<li>基本数据类型：除了 int 等，还有 Regex、Array、ObjectID（12字节的文档的唯一ID 标识）、Bytes、JSCode。</li>
+<li>Array： <code>{&quot;things&quot;: [&quot;pie&quot;, 3.14]}</code>，数组内可以混有不同类型的数据。</li>
+<li>内嵌文档：文档作为值。</li>
+<li>ObjectID：每个文档都有一个 <code>_id</code> ，默认是 ObjectID ，这个 ID 在集合内是唯一的。可以看到这个 ID 不是自增的，类似于 UUID，这说明 MongoDB 在设计之初就是作为分布式数据库存在的。以下是它的生成规则：
+<ul>
+<li>前 4 字节为时间戳，中间 5 个字节是随机值，后 3 个字节是计数器（起始值随机）。</li>
+</ul>
+</li>
+</ul>
+<h2 id="heading-5">索引</h2>
+<p>MongoDB 中可以设置单一索引和复合索引，方式如下：</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">db.users.createIndex<span class="o">({</span><span class="s2">&#34;age&#34;</span>: 1, <span class="s2">&#34;username&#34;</span>: 1<span class="o">})</span>  <span class="c1"># 复合索引</span>
+</span></span></code></pre><p>MongoDB 的默认存储引擎是 WiredTiger ，索引是 B+ 树实现的。所以在索引的优化上，可以参照相关关系型数据库的索引优化经验与原则。下面是部分经验：</p>
+<ul>
+<li>等值过滤的键放在最前面。</li>
+<li>用于排序的键应该在多个值的字段之前。</li>
+<li>多值过滤的键应该在最后面。</li>
+</ul>
+<p>同时遵守以下原则：</p>
+<ul>
+<li>选择键的方向：只有基于多个查询条件进行排序时，索引方向就重要了。</li>
+<li>覆盖查询：尽可能的使一个索引覆盖到查询会用到的所有字段。</li>
+<li>使用 in 条件查询，而不是 or 。</li>
+</ul>
+<p>MongoDB 还有以下类型的索引：</p>
+<ul>
+<li>唯一索引：可以单独设置，其中 <code>_id</code> 的唯一索引会自动创建。</li>
+<li>部分索引：MongoDB 的部分索引（Partial Index） 是一种特殊类型的索引，它只对满足特定条件的文档建立索引，而不是对整个集合中的所有文档建立索引。这种索引可以显著减少索引的存储空间，并提高查询性能，尤其是在处理大型集合时。
+<ul>
+<li>部分索引与稀疏索引不同，后者只对存在该字段的文档建立索引、不支持复杂查询条件。</li>
+</ul>
+</li>
+</ul>
+<h2 id="heading-6">特殊的索引和集合类型</h2>
+<h3 id="heading-7">全文搜索索引</h3>
+<p>全文搜索索引（Full-Text Search Index） 是 MongoDB 中用于支持文本搜索功能的一种特殊索引类型。它允许用户对集合中的文本字段进行高效的全文搜索，支持关键词匹配、词干提取、停用词过滤等功能，类似于搜索引擎的查询方式。</p>
+<p>MongoDB 会为每个匹配的文档计算一个文本搜索评分（Text Score），表示文档与查询的相关性。</p>
+<p>同时 MongoDB 支持多种语言的全文搜索，默认语言为英语。可以通过 <code>default_language</code> 参数指定语言。</p>
+<h3 id="-ttl-">固定集合和 TTL 索引</h3>
+<p>固定集合是一种特殊类型的集合，它的大小是固定的，达到上限后会自动覆盖最旧的文档。文档按插入顺序进行存储，类似于队列。由于数据按顺序写入且不可修改，固定集合的写入和读取性能非常高。</p>
+<p>TTL 索引是一种特殊类型的索引，用于自动删除集合中过期的文档。通过为文档的某个日期字段创建 TTL 索引，MongoDB 会自动删除该字段值超过指定时间段的文档。固定集合就使用了 TTL 索引。</p>
+<h3 id="gridfs">GridFS</h3>
+<p>GridFS 是 MongoDB 提供的一种用于存储和检索大文件的规范。它通过将大文件分割成多个小块（chunks）来存储，解决了 MongoDB 单个文档大小限制（16MB）的问题。GridFS 非常适合存储大型二进制文件（如图片、视频、音频等）。</p>
+<p>GridFS 将文件分成以下两部分存储在两个集合中：</p>
+<ol>
+<li><code>fs.files</code> 集合：存储文件的元数据（如文件名、大小、MIME 类型等）。</li>
+<li><code>fs.chunks</code> 集合：存储文件的实际数据，每个 chunk 默认大小为 255KB。</li>
+</ol>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/%e3%80%8aKafka%e6%9d%83%e5%a8%81%e6%8c%87%e5%8d%97%e3%80%8b%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">《Kafka权威指南》记录</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/%e3%80%8aHTTP%e6%9d%83%e5%a8%81%e6%8c%87%e5%8d%97%e3%80%8b%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《HTTP权威指南》记录</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

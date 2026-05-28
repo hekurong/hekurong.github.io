@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>《Efficient Information Extraction in Few-Shot Relation Classification - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "$", right: "$", display: false},
+      {left: "\\(", right: "\\)", display: false},
+      {left: "\\[", right: "\\]", display: true}
+    ]
+  });
+});
+</script>
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">《Efficient Information Extraction in Few-Shot Relation Classification</h1>
+    <div class="article-meta">
+      <time datetime="2024-09-19">2024-09-19</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/PaperNotes/">PaperNotes</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="tag" href="/tags/RE/">RE</a>
+      
+      <a class="tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="link">Link</h2>
+<p>[<a href="https://arxiv.org/abs/2403.16543">2403.16543] Efficient Information Extraction in Few-Shot Relation Classification through Contrastive Representation Learning (arxiv.org)</a></p>
+<p>Accepted NAACL 2024.</p>
+<h2 id="intro">Intro</h2>
+<p>关系分类（Relation Classification, RC）是关系抽取中的一个重要子任务，主要关注在给定文本上下文中识别实体对之间的关系类型。为了实现这一目标，RC 模型必须从句子中提取丰富的信息，包括上下文线索、实体属性和关系特征。虽然语言模型在提取文本表示方面重要，但它们在句子表示中的向量空间使用并不理想。为了改进这一点，最近的研究通过各种技术增强了句子表示。</p>
+<p>关系抽取在许多关系类型上面临数据有限的挑战，并且数据获取成本不成比例。为了解决这一挑战，通过小样本 RC 训练模型以快速适应新关系类型，仅使用少量标记示例。</p>
+<p>由于区分各种关系类型的内在复杂性，RC 应用通常将实体标记令牌的表示作为句子表示。最近的工作在少样本 RC 中使用对比学习以获得更具辨别力的表示。此外，研究表明，通过提示使用 [MASK] 令牌表示句子可以改善句子表示。</p>
+<p>本文贡献如下：</p>
+<ul>
+<li><strong>新方法</strong>：我们引入了一种使用对比学习对齐多重表示的方法，用于小样本关系分类。</li>
+<li><strong>适应性</strong>：我们的方法能够适应各种资源限制，并扩展到包括关系描述在内的额外信息源。</li>
+<li><strong>资源效率</strong>：我们强调了该方法的资源效率，提升了在低资源环境下的性能。</li>
+</ul>
+<blockquote>
+<p><strong>实体标记：</strong></p>
+<ul>
+<li>实体标记技术通过在输入句子中添加标记来指示文本中的实体。例如，句子“他在2006年世界杯上为墨西哥效力”可以被标记为“他在[E1S]2006年世界杯[E1E]上为[E2S]墨西哥[E2E]效力”。</li>
+<li>在 BERT 编码器中，句子的表示是通过连接实体开始标记的表示来构建的。这种方法增强了模型对实体及其关系的理解。</li>
+<li>这种技术有助于模型更好地捕捉句子中的上下文线索、实体属性和关系特征，从而提高关系分类的准确性。</li>
+</ul>
+<p><strong>对比学习：</strong></p>
+<ul>
+<li>对比学习是一种用于增强模型表示能力的方法，特别是在少样本关系分类任务中。</li>
+<li>对比学习的主要目标是使相似的样本在表示空间中更接近，而使不相似的样本更远离。</li>
+<li>在训练过程中，对比学习会创建正样本对（相似样本）和负样本对（不相似样本），并通过优化模型使正样本对的表示更接近，负样本对的表示更远。而表现在损失函数中，对比学习的损失函数旨在最大化同一输入句子不同表示之间的相似性，同时最小化不同输入句子表示之间的相似性。</li>
+<li>在少样本关系分类中，对比学习通过对齐多个句子表示（如[CLS]标记、[MASK]标记和实体标记）来提取补充的判别信息，从而提高模型在低资源环境中的表现。</li>
+</ul>
+</blockquote>
+<h2 id="approach">Approach</h2>
+<p>方法一览：</p>
+<p><figure class="image-figure"><img src="/img/PaperNotes/Efficient_Information_Extraction_in_Few-Shot_Relation_Classification_through_Contrastive_Representation_Learning/img1.png" alt="" loading="lazy"></figure></p>
+<h3 id="sentence-representations">Sentence Representations</h3>
+<p>使用了<strong>平均池化</strong>从BERT编码器生成各种句子表示。</p>
+<ul>
+<li>通过平均 token 表示来计算句子表示。同时，BERT-Base 编码器预训练期间使用 [CLS] 标记作为句子表示，捕捉整个输入序列的信息。实体标记技术通过在文本中标记实体来增强输入句子。这将输入增强为 <span class="math inline">$x = [x_0, …, [E1S], x_i, [E1E], …, x_n]$</span> 。句子表示通过连接实体开始标记表示 [E1S] 和 [E2S] 构建。</li>
+<li>在 Prompt 方法中，RC 任务被重新表述为掩码语言建模问题。使用模板 T，每个输入被转换为包含至少一个 [MASK] 标记的 <span class="math inline">$x_{prompt} = T(x)$</span> 。这个掩码标记表示关系标签，并从上下文中预测，例如 <span class="math inline">$\hat x = [MASK]: x$</span>​ 。</li>
+<li>使用 dropout 掩码生成增强句子表示的方法。由于实体标记表示不适用于关系描述，我们使用提示和[CLS]表示，并使用不同的dropout掩码。</li>
+</ul>
+<blockquote>
+<p><strong>Prompt-Mask Method</strong></p>
+<p>在 Prompt 方法中，关系分类（RC）任务被重新表述为掩码语言建模问题。这意味着将关系分类任务转换为一种填空题的形式，通过掩码语言模型来预测关系标签。具体步骤如下：</p>
+<ol>
+<li><strong>模板转换</strong>：每个输入句子会被转换成一个包含至少一个 <code>[MASK]</code> 标记的模板。例如，原始句子可能是“他在2006年世界杯上为墨西哥队效力”，转换后的模板可能是“[MASK]：他在2006年世界杯上为墨西哥队效力”。</li>
+<li><strong>掩码标记</strong>：在转换后的模板中，<code>[MASK]</code> 标记代表需要预测的关系标签。模型会根据上下文信息来预测这个掩码标记的内容。</li>
+<li><strong>关系预测</strong>：通过上下文信息，模型会预测出 <code>[MASK]</code> 标记应该填入的关系标签，例如“参与者”或“队员”。</li>
+</ol>
+</blockquote>
+<h3 id="contrastive-representation-learning">Contrastive Representation Learning</h3>
+<p>我们的表示-表示对比损失项 (Representation-Representation Contrastive Loss) 的目标是对齐个体表示，以提取关系分类任务的判别信息。</p>
+<p>我们从每个输入句子中提取 <span class="math inline">$M$</span> 个不同的表示，并将这些表示视为正实例对。因此，训练集中其他句子的表示作为负实例对。对于给定的 <span class="math inline">$r_i^m$</span> (<span class="math inline">$m \in M, \ i \in N \times K$</span>) 我们定义正实例 <span class="math inline">$r^+_i $</span> 和负实例 <span class="math inline">$  r^-_i$</span> 如下：</p>
+<p><span class="math display">$$r_i^+=\{ r_i^{k \ne m} \ | \ k \in M \} \\
+r_i^-=\{ r_{j \ne i}^m \ | \ j \in N \times K \}
+$$</span></p>
+<p><figure class="image-figure"><img src="/img/PaperNotes/Efficient_Information_Extraction_in_Few-Shot_Relation_Classification_through_Contrastive_Representation_Learning/img5.png" alt="" loading="lazy"></figure></p>
+<p><figure class="image-figure"><img src="/img/PaperNotes/Efficient_Information_Extraction_in_Few-Shot_Relation_Classification_through_Contrastive_Representation_Learning/img6.png" alt="" loading="lazy"></figure></p>
+<h3 id="relation-classification">Relation Classification</h3>
+<p>我们通过对支持集中 K 个实例表示取平均值来获得 N 个类原型。我们使用向量点积计算查询实例与支持原型之间的相似度，并选择最相似的类原型。</p>
+<p>对于关系描述，我们计算查询实例与关系描述表示 D 之间的相似度。我们将从关系描述中获得的相似度与从类原型中获得的相似度相加，并选择最相似的原型和关系描述。我们计算交叉熵损失 <span class="math inline">$LCE = −log (z_y)$</span>，其中 <span class="math inline">$z_y$</span> 是类 <span class="math inline">$y$</span> 的概率。总损失定义为各个损失项的总和 <span class="math inline">$L = L_{CE} + L_{RCL} + L_{RDCL}$</span> 。</p>
+<h2 id="experiments">Experiments</h2>
+<p>实验结果：</p>
+<p><figure class="image-figure"><img src="/img/PaperNotes/Efficient_Information_Extraction_in_Few-Shot_Relation_Classification_through_Contrastive_Representation_Learning/img2.png" alt="" loading="lazy"></figure></p>
+<p>消融实验：</p>
+<p><figure class="image-figure"><img src="/img/PaperNotes/Efficient_Information_Extraction_in_Few-Shot_Relation_Classification_through_Contrastive_Representation_Learning/img3.png" alt="" loading="lazy"></figure></p>
+<p>对于 N-way K-shot ，增大 N 对模型的影响：</p>
+<p><figure class="image-figure"><img src="/img/PaperNotes/Efficient_Information_Extraction_in_Few-Shot_Relation_Classification_through_Contrastive_Representation_Learning/img4.png" alt="" loading="lazy"></figure></p>
+<blockquote>
+<p>N-way K-shot 评估是一种用于评估机器学习模型在少样本学习（few-shot learning）任务中的性能的方法。具体来说：</p>
+<ul>
+<li><strong>N-way</strong>：表示模型需要在N个不同的类别中进行分类。例如，如果N=5，那么模型需要在5个类别中进行分类。</li>
+<li><strong>K-shot</strong>：表示每个类别中有K个样本用于训练模型。例如，如果K=1，那么每个类别只有一个样本用于训练。</li>
+</ul>
+</blockquote>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/PaperNotes/Making_Pre-trained_Language_Models_Better_Continual_Few-Shot_Relation_Extractors/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">《Making Pre-trained Language Models Better Continual Few-Shot Relation Extractors》笔记</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/PaperNotes/Entity_Concept-enhanced_Few-shot_Relation_Extraction/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《Entity Concept-enhanced Few-shot Relation Extraction》笔记</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

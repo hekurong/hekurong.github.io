@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>Lecture 10: Pretrained Model - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">Lecture 10: Pretrained Model</h1>
+    <div class="article-meta">
+      <time datetime="2024-08-16">2024-08-16</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/CS224N/">CS224N</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="tag" href="/tags/NLP/">NLP</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="word-structure-and-subword-models">Word structure and subword models</h2>
+<p>We assume a fixed vocab of tens of thousands of words, built from the training set. All novel words seen at test time are mapped to a single UNK.</p>
+<p><figure class="image-figure"><img src="/img/CS224N/lesson_10/img1.png" alt="" loading="lazy"></figure></p>
+<p>Finite vocabulary assumptions make even less sense in many languages.  Many languages exhibit complex morphology, or word structure.</p>
+<h3 id="the-byte-pair-encoding-algorithm-bpe">The byte-pair encoding algorithm (BPE)</h3>
+<p>Subword modeling in NLP encompasses a wide range of methods for reasoning about  structure below the word level.</p>
+<ul>
+<li>The dominant modern paradigm is to learn a vocabulary of <strong>parts of words</strong> (subword tokens)</li>
+<li>At training and testing time, each word is split into a sequence of known subwords</li>
+</ul>
+<p><strong>Byte-pair encoding</strong> is a simple, effective strategy for defining a subword vocabulary.</p>
+<ol>
+<li>Start with a vocabulary containing only characters and an “end-of-word” symbol</li>
+<li>Using a corpus of text, find the most common adjacent characters “a,b”; add “ab” as a subword</li>
+<li>Replace instances of the character pair with the new subword; repeat until desired vocab size</li>
+</ol>
+<blockquote>
+<p><strong>字节对编码</strong>（Byte-pair encoding，简称BPE）是一种简单且有效的定义子词词汇的方法。</p>
+<ol>
+<li>从仅包含字符和“词尾”符号的词汇表开始。</li>
+<li>使用一组文本语料，找到最常见的相邻字符对，例如“a,b”；将“ab”添加为一个子词。</li>
+<li>用新的子词替换字符对的实例；重复此过程，直到达到所需的词汇大小。</li>
+</ol>
+<p>这种方法通过逐步合并最常见的字符对，逐渐构建出一个更紧凑和有效的子词词汇表。这在自然语言处理任务中非常有用，因为它可以减少词汇表的大小，同时保持对文本的良好表示能力。</p>
+</blockquote>
+<h2 id="motivating-model-pretraining-from-word-embeddings">Motivating model pretraining from word embeddings</h2>
+<h3 id="the-pretraining--finetuning-paradigm">The Pretraining / Finetuning Paradigm</h3>
+<p>Pretraining can improve NLP applications by serving as parameter initialization.</p>
+<p><figure class="image-figure"><img src="/img/CS224N/lesson_10/img2.png" alt="" loading="lazy"></figure></p>
+<h3 id="stochastic-gradient-descent-and-pretrainfinetune">Stochastic gradient descent and pretrain/finetune</h3>
+<p>Why should pretraining and finetuning help, from a “training neural nets” perspective?</p>
+<ul>
+<li>
+<p>Consider, provides parameters <span class="math inline">$\hat{\theta}$</span> by approximating <span class="math inline">$\underset{\theta}{min} \ L_{pretrain}(\theta)$</span>​ , it‘s pretraining loss</p>
+</li>
+<li>
+<p>Then, finetuning approximates <span class="math inline">$\underset{\theta}{min} \ L_{finetune}(\theta)$</span> , starting at <span class="math inline">$\hat{\theta}$</span> , it’s finetuning loss</p>
+</li>
+<li>
+<p>The pretraining may matter because stochastic gradient descent sticks (relatively)  close to <span class="math inline">$\hat{\theta}$</span> during finetuning</p>
+</li>
+</ul>
+<h2 id="pretraining-for-three-types-of-architectures">Pretraining for three types of architectures</h2>
+<p><figure class="image-figure"><img src="/img/CS224N/lesson_10/img3.png" alt="" loading="lazy"></figure></p>
+<h3 id="pretraining-decoders">Pretraining decoders</h3>
+<p><figure class="image-figure"><img src="/img/CS224N/lesson_10/img4.png" alt="" loading="lazy"></figure></p>
+<p>Decoder-only Models: GPT, GPT2</p>
+<h3 id="pretraining-encoders">Pretraining encoders</h3>
+<p><figure class="image-figure"><img src="/img/CS224N/lesson_10/img5.png" alt="" loading="lazy"></figure></p>
+<p>Why not used pretrained encoders for everything?</p>
+<ul>
+<li>
+<p>If your task involves generating sequences, consider using a pretrained decoder; BERT and other  pretrained encoders don’t naturally lead to nice autoregressive (1-word-at-a-time) generation  methods.</p>
+<p><figure class="image-figure"><img src="/img/CS224N/lesson_10/img6.png" alt="" loading="lazy"></figure></p>
+</li>
+</ul>
+<p>Encoder-only Models: BERT, RoBRETa, SpanBERT…</p>
+<h3 id="pretraining-encoder-decoders">Pretraining encoder-decoders</h3>
+<p><figure class="image-figure"><img src="/img/CS224N/lesson_10/img7.png" alt="" loading="lazy"></figure></p>
+<p>Encoder-Decoder Model: T5</p>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/NLP/BPE/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">BPE算法</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/NLP/Attention-Is-All-You-Need/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">😺 Is All You Need——Transformer补充</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

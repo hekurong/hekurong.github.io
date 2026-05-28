@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>LRU缓存算法题学习记录 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">LRU缓存算法题学习记录</h1>
+    <div class="article-meta">
+      <time datetime="2025-09-20">2025-09-20</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Algorithm%20Learning/">Algorithm Learning</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/LRU/">LRU</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="lru-">LRU 缓存到底要做什么？</h2>
+<p>在动手写代码之前，最重要的一步是明确我们的目标。LRU 缓存机制的核心是：<strong>当缓存满了以后，优先淘汰最久没有被使用过的数据。</strong></p>
+<p>我们来分解一下 <code>LRUCache</code> 需要实现的功能：</p>
+<ol>
+<li><strong><code>Constructor(capacity int)</code></strong>: 初始化一个固定容量的缓存。</li>
+<li><strong><code>Get(key int)</code></strong>:
+<ul>
+<li>如果 <code>key</code> 存在，返回对应的 <code>value</code>。</li>
+<li><strong>关键点</strong>：这次访问使得该 <code>key</code> 成为了“最近使用的”，所以需要更新它的位置。</li>
+<li>如果 <code>key</code> 不存在，返回 <code>-1</code>。</li>
+</ul>
+</li>
+<li><strong><code>Put(key int, value int)</code></strong>:
+<ul>
+<li>如果 <code>key</code> 存在，更新 <code>value</code>。</li>
+<li><strong>关键点</strong>：这次更新也使得该 <code>key</code> 成为了“最近使用的”，需要更新它的位置。</li>
+<li>如果 <code>key</code> 不存在，插入这个新的键值对。</li>
+<li><strong>关键点</strong>：插入后，如果缓存的尺寸超过了 <code>capacity</code>，则必须淘汰“最久未使用的”那个元素。</li>
+</ul>
+</li>
+</ol>
+<p>总结一下，我们需要一个数据结构，它必须同时满足以下几个要求：</p>
+<ul>
+<li><strong>快速查找</strong>：<code>Get</code> 和 <code>Put</code> 都需要快速地判断一个 <code>key</code> 是否存在。</li>
+<li><strong>有序存储</strong>：需要一种机制来记录所有 <code>key</code> 的“新旧”顺序，方便我们找到“最久未使用的”那个。</li>
+<li><strong>快速增删</strong>：当一个 <code>key</code> 被访问（<code>Get</code> 或 <code>Put</code>）时，我们要能快速地将它移动到“最新”的位置。当缓存满了，也要能快速地删除“最旧”的那个。</li>
+</ul>
+<h2 id="--">哈希表 + 双向链表</h2>
+<p>这是本题的<strong>核心套路</strong>。没有任何单一的基础数据结构能同时满足上述所有要求，所以需要组合。</p>
+<ul>
+<li><strong>为什么需要哈希表 (<code>map</code>)？</strong>
+<ul>
+<li>为了实现 <strong>O(1)</strong> 复杂度的快速查找。我们可以用 <code>map[int]*Node</code> 来存储 <code>key</code> 到链表节点的映射。</li>
+</ul>
+</li>
+<li><strong>为什么需要链表？</strong>
+<ul>
+<li>为了维护元素的“新旧”顺序。链表天然有序。我们可以规定，越靠近链表头部的元素，就是“最近使用”的；越靠近链表尾部的，就是“最久未使用”的。</li>
+</ul>
+</li>
+<li><strong>为什么必须是双向链表，而不是单向？</strong>
+<ul>
+<li>因为我们需要 <strong>O(1)</strong> 复杂度的删除操作。想象一下，当我们要删除一个节点（比如缓存满了要淘汰尾部节点，或者 <code>Get</code> 了一个中间节点要把它移动到头部），我们需要修改这个节点<strong>前面那个节点</strong>的 <code>Next</code> 指针。在单向链表中，找到前驱节点需要从头遍历，时间复杂度是 O(n)。而双向链表每个节点都存了 <code>Pre</code> 和 <code>Next</code> 指针，使得我们可以在 O(1) 的时间内完成任意节点的删除。</li>
+</ul>
+</li>
+</ul>
+<p><strong>结论</strong>：<strong>哈希表 (<code>map</code>) + 双向链表 (<code>Doubly Linked List</code>)</strong> 是解决此问题的完美组合。</p>
+<ul>
+<li><strong>哈希表</strong> 负责快速定位 (<code>Get</code>）：<code>map[key] -&gt; Node</code>。</li>
+<li><strong>双向链表</strong> 负责维护顺序和快速增删 (<code>Put</code>/淘汰）：<code>head &lt;-&gt; node1 &lt;-&gt; node2 &lt;-&gt; tail</code>。</li>
+</ul>
+<h2 id="heading">代码实现</h2>
+<h4 id="1-">1. 定义数据结构</h4>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// LRUCache holds the core logic for the cache.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">LRUCache</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">cache</span>      <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span> <span class="c1">// Hash map for O(1) lookups: key -&gt; Node pointer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">*</span><span class="nx">Node</span>          <span class="c1">// Dummy head and tail nodes to handle edge cases
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">cap</span>        <span class="kt">int</span>           <span class="c1">// The capacity of the cache
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Node represents a node in the doubly linked list.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Node</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Val</span><span class="p">,</span> <span class="nx">Key</span>  <span class="kt">int</span>           <span class="c1">// Store both key and value
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Pre</span><span class="p">,</span> <span class="nx">Next</span> <span class="o">*</span><span class="nx">Node</span>         <span class="c1">// Pointers to the previous and next nodes
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre><h4 id="2--constructor">2. 初始化 <code>Constructor</code></h4>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// Constructor initializes a new LRUCache with a given capacity.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">(</span><span class="nx">capacity</span> <span class="kt">int</span><span class="p">)</span> <span class="nx">LRUCache</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">tail</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">head</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">LRUCache</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">cache</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">head</span><span class="p">:</span>  <span class="nx">head</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">tail</span><span class="p">:</span>  <span class="nx">tail</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">cap</span><span class="p">:</span>   <span class="nx">capacity</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h4 id="3-">3. 编写核心辅助函数</h4>
+<p>为了让 <code>Get</code> 和 <code>Put</code> 的逻辑更清晰，我们把链表操作封装成独立的辅助函数。</p>
+<ul>
+<li><code>removeNode(node *Node)</code>: 从链表中移除一个节点。</li>
+<li><code>addToHead(node *Node)</code>: 将一个节点添加到链表头部（<code>head</code> 之后）。</li>
+<li><code>moveToHead(node *Node)</code>: 组合技，先移除再添加到头部，用于更新节点为“最新”。</li>
+</ul>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// removeNode detaches a node from the doubly linked list.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// addToHead adds a node right after the dummy head.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">addToHead</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">head</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">node</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">node</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// moveToHead moves an existing node to the head of the list.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h4 id="4--get--put">4. 实现 <code>Get</code> 和 <code>Put</code></h4>
+<p>有了辅助函数，<code>Get</code> 和 <code>Put</code> 的逻辑就变得非常直观了。</p>
+<p><strong><code>Get(key int)</code> 逻辑:</strong></p>
+<ol>
+<li>用哈希表查找 <code>key</code>。</li>
+<li>如果不存在，返回 <code>-1</code>。</li>
+<li>如果存在，我们拿到了节点 <code>node</code>。这个节点刚刚被访问，所以要把它更新为“最新”。直接调用 <code>moveToHead(node)</code>。</li>
+<li>返回 <code>node.Val</code>。</li>
+</ol>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="c1">// The node was accessed, move it to the head to mark it as recently used.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Key not found.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p><strong><code>Put(key int, value int)</code> 逻辑:</strong></p>
+<ol>
+<li>先用哈希表查找 <code>key</code>，看是“更新”还是“插入”。</li>
+<li><strong>情况一：Key 已存在</strong>。
+<ul>
+<li>更新 <code>node</code> 的 <code>Val</code>。</li>
+<li>因为它被访问了，调用 <code>moveToHead(node)</code> 将其更新为最新。</li>
+</ul>
+</li>
+<li><strong>情况二：Key 不存在</strong>。
+<ul>
+<li><strong>检查容量</strong>：<code>if len(this.cache) == this.cap</code>，如果缓存满了：
+<ul>
+<li>找到最久未使用的节点，也就是哨兵 <code>tail</code> 的前一个节点 <code>tail.Pre</code>。</li>
+<li>从链表中删除它：<code>removeNode(tail.Pre)</code>。</li>
+<li>从哈希表中也删除它：<code>delete(this.cache, tail.Pre.Key)</code>。</li>
+</ul>
+</li>
+<li>创建一个新的 <code>Node</code>。</li>
+<li>将新节点添加到链表头部：<code>addToHead(newNode)</code>。</li>
+<li>将新节点存入哈希表：<code>this.cache[key] = newNode</code>。</li>
+</ul>
+</li>
+</ol>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Case 1: The key already exists.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span> <span class="p">=</span> <span class="nx">value</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="c1">// Mark it as recently used.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Case 2: The key does not exist.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Check if the cache is full.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">)</span> <span class="o">==</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cap</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="c1">// Evict the least recently used element, which is the one before the tail.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="nx">tail</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">tail</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">tail</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Add the new node.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">newNode</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{</span><span class="nx">Key</span><span class="p">:</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">Val</span><span class="p">:</span> <span class="nx">value</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">newNode</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">newNode</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h2 id="lru---ttl">LRU + 过期时间 (TTL)</h2>
+<h3 id="heading-1">需求变更分析</h3>
+<ol>
+<li><strong><code>Constructor(capacity int, ttl int)</code></strong>: 构造函数现在需要接收一个 <code>ttl</code> 参数，单位通常是秒。</li>
+<li><strong><code>Put(key, value)</code></strong>:
+<ul>
+<li>当插入一个<strong>新</strong>的键值对时，需要记录它的过期时间点，即 <code>当前时间 + ttl</code>。</li>
+<li>当更新一个<strong>已存在</strong>的键值对时，同样需要<strong>重置</strong>它的过期时间点。</li>
+</ul>
+</li>
+<li><strong><code>Get(key)</code></strong>:
+<ul>
+<li>在返回一个值之前，<strong>必须检查</strong>它是否已经过期。</li>
+<li>如果已过期，应将其从缓存中<strong>删除</strong>，并返回 <code>-1</code> (表现得好像它不存在一样)。</li>
+<li>如果未过期，才执行标准的 LRU 逻辑：把它移动到链表头部并返回值。</li>
+</ul>
+</li>
+</ol>
+<h3 id="heading-2">核心设计决策：如何处理过期数据？</h3>
+<p>这里有两种主流策略：</p>
+<ol>
+<li><strong>被动删除 (Lazy Eviction)</strong>:
+<ul>
+<li>我们不主动去监控哪些 key 过期了。</li>
+<li>只在 <code>Get</code> 一个 key 的时候，才去检查它的时间戳。如果发现它过期了，就地删除它。</li>
+<li><strong>优点</strong>：实现简单，没有额外的性能开销。</li>
+<li><strong>缺点</strong>：如果一个过期的 key 再也不被访问，它会一直占据着内存，直到被 LRU 规则淘汰出去。</li>
+</ul>
+</li>
+<li><strong>主动删除 (Eager Eviction)</strong>:
+<ul>
+<li>可以通过一个后台的定时任务，周期性地扫描整个缓存，删除所有过期的 key。</li>
+<li>或者，使用一个额外的数据结构（如最小堆或另一个按过期时间排序的链表）来专门管理过期，这样可以快速找到下一个要过期的元素。</li>
+<li><strong>优点</strong>：可以更及时地释放内存。</li>
+<li><strong>缺点</strong>：实现复杂，会引入额外的复杂度和性能开销（例如，后台扫描可能导致锁竞争）。</li>
+</ul>
+</li>
+</ol>
+<p><strong>面试中的选择</strong>：在面试的有限时间内，<strong>被动删除 (Lazy Eviction)</strong> 是最推荐的方案。它清晰地展示了你处理核心逻辑的能力，而不会陷入过于复杂的实现细节中。</p>
+<p>所以，我们的策略是：在 <code>Get</code> 时检查过期，并在 <code>Put</code> 时更新过期时间。</p>
+<h3 id="heading-3">代码实现</h3>
+<h4 id="1--1">1. 升级数据结构</h4>
+<p><code>Node</code> 结构体需要增加一个字段来存储它的“死亡时间”。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Node now includes an expiration timestamp.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Node</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Val</span><span class="p">,</span> <span class="nx">Key</span>  <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Pre</span><span class="p">,</span> <span class="nx">Next</span> <span class="o">*</span><span class="nx">Node</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">ExpiresAt</span> <span class="kt">int64</span> <span class="c1">// Unix timestamp (seconds) when this entry expires.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// The main struct now includes the TTL duration.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">LRUCacheWithTTL</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">cache</span>      <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">*</span><span class="nx">Node</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">cap</span>        <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">ttl</span>        <span class="kt">int64</span> <span class="c1">// Time-to-live in seconds for each entry.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre><h4 id="2--constructor-1">2. 修改 <code>Constructor</code></h4>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// Constructor now accepts a TTL value.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">(</span><span class="nx">capacity</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">ttl</span> <span class="kt">int</span><span class="p">)</span> <span class="nx">LRUCacheWithTTL</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">tail</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">head</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">LRUCacheWithTTL</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">cache</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">head</span><span class="p">:</span>  <span class="nx">head</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">tail</span><span class="p">:</span>  <span class="nx">tail</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">cap</span><span class="p">:</span>   <span class="nx">capacity</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">ttl</span><span class="p">:</span>   <span class="nb">int64</span><span class="p">(</span><span class="nx">ttl</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h4 id="3--get-">3. 修改 <code>Get</code> 方法</h4>
+<p>这是变化最大的地方。在找到节点后，我们必须先检查它的存活状态。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// Get must now check for expiration before returning a value.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCacheWithTTL</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="c1">// Check if the node has expired.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="k">if</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">()</span> <span class="p">&gt;</span> <span class="nx">node</span><span class="p">.</span><span class="nx">ExpiresAt</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">           <span class="c1">// It&#39;s expired. Remove it from the cache.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>           <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">           <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">           <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">// Act as if it doesn&#39;t exist.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">       <span class="c1">// Not expired, proceed with standard LRU logic.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h4 id="4--put-">4. 修改 <code>Put</code> 方法</h4>
+<p><code>Put</code> 的逻辑也需要更新，无论是插入还是更新，都要设置新的过期时间。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// Put must now set or reset the expiration time.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCacheWithTTL</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Calculate the new expiration time.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">newExpiresAt</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">()</span> <span class="o">+</span> <span class="nx">this</span><span class="p">.</span><span class="nx">ttl</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Case 1: The key already exists.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span> <span class="p">=</span> <span class="nx">value</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">ExpiresAt</span> <span class="p">=</span> <span class="nx">newExpiresAt</span> <span class="c1">// Reset its expiration time.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Case 2: The key does not exist.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Check for capacity and evict the LRU element if full.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">)</span> <span class="o">==</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cap</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">tail</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span>
+</span></span><span class="line"><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">tail</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">tail</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Create and add the new node.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">newNode</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">Key</span><span class="p">:</span>       <span class="nx">key</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">Val</span><span class="p">:</span>       <span class="nx">value</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">ExpiresAt</span><span class="p">:</span> <span class="nx">newExpiresAt</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">newNode</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">newNode</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre>
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/AlgorithmLearning/%e4%ba%8c%e5%8f%89%e6%a0%91%e7%9a%84%e4%b8%a4%e9%81%93%e8%b6%85%e9%ab%98%e9%a2%91%e8%80%83%e9%a2%98/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">二叉树的两道超高频考题</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/AlgorithmLearning/%e5%8f%8d%e8%bd%ac%e9%93%be%e8%a1%a8%e4%b8%93%e9%a1%b9%e5%ad%a6%e4%b9%a0%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">反转链表专项学习记录</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

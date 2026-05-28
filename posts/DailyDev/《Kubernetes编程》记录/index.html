@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>《Kubernetes编程》记录 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">《Kubernetes编程》记录</h1>
+    <div class="article-meta">
+      <time datetime="2025-04-09">2025-04-09</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daily%20Dev/">Daily Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="tag" href="/tags/Golang/">Golang</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="kubernetes">《Kubernetes编程》记录</h1>
+<h2 id="heading">概论</h2>
+<h3 id="-operator">控制器和 Operator</h3>
+<p>控制器实现了一个控制循环，通过 API 服务器监测集群中的共享状态，进行必要的变更。Operator 也是一种控制器，但是包含了一些运维逻辑，如应用程序的生命周期管理。</p>
+<p>控制循环的基本流程如下：</p>
+<ol>
+<li>读取资源的状态，通常采用事件驱动模式，使用 Watch 来实现。</li>
+<li>改变集群中的对象状态或集群外部系统的状态。</li>
+<li>通过 API 服务器更新第 1 步中所提到的资源的状态，状态放在 etcd 中。</li>
+<li>循环执行这些逻辑。</li>
+</ol>
+<p>控制器通常会使用以下的数据结构：</p>
+<ul>
+<li>Informer ：Informer 负责观察资源的目标状态，它还负责实现重新同步机制从而保证定时地解决冲突。</li>
+<li>工作队列：事件处理器把状态变化情况放入工作队列。</li>
+</ul>
+<p>多个相互独立的控制循环通过 API 服务器上的对象状态变化相互通信，对象状态的变化由 Informer 以事件的方式通知到控制器。这些通过 Watch 机制发送的事件对用户来说几乎不可见，在 API 服务器的审计机制中也看不到这些事件，只能看到对象更新的动作。控制器在处理事件时，以输出日志的方式记录它做的动作。</p>
+<blockquote>
+<p>Watch 事件：在 API 服务器与控制器之间通过 HTTP 流的方式发送，用于驱动 Informer 。</p>
+<p>Event 对象：是一种用户可见的日志机制，如 kubelet 通过 Event 来汇报 Pod 的生存周期事件。</p>
+</blockquote>
+<h3 id="heading-1">乐观并发</h3>
+<p>Kubernetes 采用乐观并发机制，假设多用户操作同一资源的冲突概率较低，允许并发修改，仅在提交时检测冲突。</p>
+<p>每个 Kubernetes 资源对象（如 Pod、Deployment）的元数据中都有一个 <code>resourceVersion</code> 字段，用于标识资源的当前版本号（由 etcd 生成）。这是乐观并发的核心：</p>
+<ul>
+<li>读取资源时：客户端获取对象的 <code>resourceVersion</code>（例如 <code>123</code>）。</li>
+<li>更新资源时：客户端必须在请求中携带该版本号（通过 <code>metadata.resourceVersion</code> 字段）。</li>
+<li>服务器端校验：API Server 比较请求中的 <code>resourceVersion</code> 与当前存储中的版本：
+<ul>
+<li>匹配：允许更新，<code>resourceVersion</code> 递增。</li>
+<li>不匹配：返回 <code>409 Conflict</code> 错误，拒绝更新（说明资源已被其他客户端修改过）。</li>
+</ul>
+</li>
+</ul>
+<p>当发生冲突时，客户端需重新获取资源的最新状态，然后基于最新数据重新提交修改。</p>
+<h2 id="kubernetes-api-">Kubernetes API 基础</h2>
+<h3 id="api-">API 服务器</h3>
+<p>主控节点上的控制平面由 API 服务器、控制器管理器和调度器组成，API服务器是完成中心管理的实体，也是唯一直接与 etcd 交互的组件。</p>
+<p>API 服务器提供了 RESTful API ，提供 Json 或 Protobuf 格式的数据内容。</p>
+<p>在 API 服务器的上下文中，会使用到以下术语：</p>
+<ul>
+<li>类别（Kind）：一个实体的类型。如一个 Pod 有三种类型，Object 用于系统中的持久化的实体对象、List 是多种实体的列表集、其他特殊类别用于某些特定动作或非持久化实体。</li>
+<li>API 组：一组逻辑上相关的 Kind 。</li>
+</ul>
+<p>大部分 API 对象都区分资源的期望状态和当前状态，规格（Specification, Spec）是对于某种资源的期望状态的完整描述，被持久化到 etcd 中。</p>
+<h2 id="heading-2">使用自定义资源</h2>
+<h3 id="heading-3">核心概念</h3>
+<p>自定义资源（Custom Resource Definition，CRD）是 Kubernetes 的扩展机制，允许用户定义自己的资源类型（如<code>MyApp</code>、<code>Database</code>等），这些资源会像原生资源（如Pod、Deployment）一样通过<code>kubectl</code>或API操作。</p>
+<p>一旦创建 CRD，Kubernetes API 会为其生成对应的 RESTful 端点，并享受与内置资源相同的特性。</p>
+<p>CRD 的关键内容有以下：</p>
+<ul>
+<li>Group/Version：定义 API 分组和版本。</li>
+<li>Kind：资源类型名称。</li>
+<li>Schema：描述资源的数据结构。</li>
+</ul>
+<h3 id="crd-">CRD 应用</h3>
+<p>CRD 可以用来封装复杂应用，例如定义<code>RedisCluster</code>资源，用户只需声明副本数和版本，控制器自动处理配置生成、节点发现等细节。</p>
+<h3 id="crd--1">CRD 的高级特性</h3>
+<ul>
+<li>支持 API 版本演进。</li>
+<li>子资源：
+<ul>
+<li><code>/status</code>：分离用户输入（<code>spec</code>）和系统状态（<code>status</code>）。</li>
+<li><code>/scale</code>：支持HPA自动扩缩容。</li>
+</ul>
+</li>
+<li>验证：支持OpenAPI v3 Schema校验，例如限制字段格式、必填项等。</li>
+<li>默认值：自动填充未指定的字段值，简化用户配置。</li>
+</ul>
+<h2 id="-operator-">编写 Operator 的方案</h2>
+<h3 id="client-go-">client-go 的两种使用场景</h3>
+<p><code>client-go</code> 是 Kubernetes 官方提供的基础编程库，封装了 API Server 通信、资源操作等底层能力。Operator 是基于 <code>client-go</code> 构建的高阶设计模式，它利用<code>client-go</code> 的 <code>Informer</code>、 <code>Workqueue</code> 等机制实现自动化控制循环。</p>
+<p>如果 API 只涉及到简单的一次性操作、仅需原生 API 、无状态工具那只需要简单实用 <code>client-go</code> 即可，无需过度封装。</p>
+<p>但是如果有以下需求：</p>
+<ul>
+<li>需要管理有状态应用。</li>
+<li>需要自定义领域模型。</li>
+<li>需要事件驱动自动化。</li>
+</ul>
+<p>那就是 Operator 的使用场景了。</p>
+<h3 id="operator-">Operator 框架</h3>
+<ul>
+<li>Kubebuilder：Kubernetes 官方维护的 Operator 开发框架，集成 controller-runtime 库，提供完整的脚手架工具链。适合纯 Go 开发。</li>
+<li>Operator SDK：Red Hat 主导的 Operator 框架（底层基于 Kubebuilder），内置与 Operator Lifecycle Manager(OLM) 的集成。适合快速支持非 Go 开发。</li>
+</ul>
+<p>两者之间的差距很小，一般情况下用 Kubebuilder 更多些。</p>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/%e3%80%8a%e9%ab%98%e6%80%a7%e8%83%bdMySQL%e3%80%8b%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">《高性能MySQL》记录</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/%e3%80%8aKafka%e6%9d%83%e5%a8%81%e6%8c%87%e5%8d%97%e3%80%8b%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《Kafka权威指南》记录</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

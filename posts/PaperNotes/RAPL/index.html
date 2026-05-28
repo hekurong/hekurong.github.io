@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>RAPL: A Relation-Aware Prototype Learning Approach for - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">RAPL: A Relation-Aware Prototype Learning Approach for</h1>
+    <div class="article-meta">
+      <time datetime="2024-09-17">2024-09-17</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/PaperNotes/">PaperNotes</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="tag" href="/tags/RE/">RE</a>
+      
+      <a class="tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="link">Link</h2>
+<p>[<a href="https://arxiv.org/abs/2310.15743">2310.15743] RAPL: A Relation-Aware Prototype Learning Approach for Few-Shot Document-Level Relation Extraction (arxiv.org)</a></p>
+<p>Accepted EMNLP 2023.</p>
+<blockquote>
+<p>EMNLP：CCF B</p>
+</blockquote>
+<h2 id="related-works">Related Works</h2>
+<blockquote>
+<p>这一部分内容本来是在论文的最后面，但是考虑到这篇论文也算是打开了新世界的大门，所以把这个放在最前面。</p>
+</blockquote>
+<p>关系抽取（Relation Extraction，RE）大致可以分为三种：</p>
+<ul>
+<li>
+<p><strong>语句级 RE（Sentence-Level RE）</strong>：早期的研究主要集中在预测单个句子内两个实体之间的关系。各种基于模式和神经网络的方法在句子级关系抽取上取得了令人满意的结果。然而，句子级关系抽取在抽取范围和规模上有显著的局限性。</p>
+<blockquote>
+<p>可以说是早期的 RE 大多是这一类别。</p>
+</blockquote>
+</li>
+<li>
+<p><strong>文档级 RE  （Document-Level RE，DocRE）</strong>：现有的大多数文档级关系抽取研究都基于数据驱动的监督场景，通常分为基于图和基于序列的方法。基于图的方法通常通过图结构抽象文档，并使用图神经网络进行推理。基于序列的方法则使用仅包含变压器的架构来编码长距离的上下文依赖关系。这两类方法在文档级关系抽取中都取得了令人印象深刻的结果。然而，这些方法对大规模标注文档的依赖使得它们难以适应低资源场景。</p>
+</li>
+<li>
+<p><strong>小样本文档级 RE （Few-Shot Document-Level RE，FSDLRE）</strong>：为了应对现实世界文档级关系抽取场景中普遍存在的数据稀缺问题，<a href="https://aclanthology.org/2022.naacl-main.421/">Popovic等</a>将文档级关系抽取任务形式化为小样本学习任务。为了完成这一任务，他们提出了多种基于度量的模型，这些模型建立在最先进的监督文档级关系抽取方法和少样本句子级关系抽取方法的基础上，旨在解决不同任务设置的问题。有效的基于度量的少样本文档级关系抽取方法的每个类别的原型应该准确捕捉相应的关系语义。然而，由于现有方法的粗粒度关系原型学习策略和”一刀切”的 NOTA 原型学习策略，这对现有方法来说是一个挑战。</p>
+<blockquote>
+<p>术语解释：</p>
+<ul>
+<li>
+<p>原型学习（Prototype-Based Learning）是一种通过存储一组代表性样本（原型）来进行分类、回归或聚类的学习方法。原型学习的主要步骤包括：</p>
+<ol>
+<li><strong>选择原型</strong>：从训练数据中选择一组代表性的样本作为原型。</li>
+<li><strong>计算距离</strong>：使用距离度量（如欧氏距离、曼哈顿距离等）来确定测试样本与原型之间的相似性。</li>
+<li><strong>分类或聚类</strong>：将测试样本分配给最接近的原型，从而确定其所属的类别或簇。</li>
+</ol>
+</li>
+<li>
+<p><strong>NOTA Prototype</strong> 在本文中指的是 <strong>“None-Of-The-Above”</strong> 原型，用于处理那些不属于任何目标关系类型的实体对。以下是其主要特点：</p>
+<ul>
+<li>
+<p><strong>任务特定</strong>：每个任务生成特定的 NOTA 原型，以更好地捕捉该任务中的 NOTA 语义。</p>
+</li>
+<li>
+<p><strong>基础原型</strong>：引入一组可学习的基础 NOTA 原型，这些原型需要在每个任务中进一步修正。</p>
+</li>
+<li>
+<p><strong>支持实例选择</strong>：从支持文档中选择 NOTA 实例，并将其与基础NOTA原型融合，生成最终的任务特定NOTA 原型。</p>
+</li>
+<li>
+<p><strong>语义捕捉</strong>：通过这种方法，NOTA 原型不仅包含了元学习的通用知识，还能捕捉每个任务中的特定NOTA 语义。</p>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<h2 id="intro">Intro</h2>
+<p>FSDLRE 任务的简单描述：</p>
+<p><figure class="image-figure"><img src="/img/PaperNotes/RAPL/img1.png" alt="" loading="lazy"></figure></p>
+<blockquote>
+<p>Illustration of a 1-Doc FSDLRE task. Entity mentions involved in relation instances are colored and in bold. Other mentions are also in bold for clarity.</p>
+</blockquote>
+<p>基于度量的元学习（Metric-Based Meta Learning）是广泛采用的 FSDLRE 有效框架，它通过构建类原型进行分类。然而，现有工作在获取具有准确关系语义的类原型时往往存在困难：</p>
+<ol>
+<li>为了构建目标关系类型的原型，它们聚合了所有持有该关系的实体对的表示，而这些实体对可能还持有其他关系，从而干扰了原型。</li>
+<li>它们在所有任务中使用一组通用的NOTA（none-of-the-above）原型，忽略了在具有不同目标关系类型的任务中，NOTA语义是不同的。</li>
+</ol>
+<p>基于以上两点，本文提出了<strong>关系感知原型学习方法（Relation-Aware Prototype Learning，RAPL）</strong>。首先，对于支持文档中持有关系的每对实体，我们利用关系描述中的内在关系语义作为指导，推导出每个表达关系的实例级表示，如下图所示。通过聚合所有支持关系实例的表示来构建关系原型，从而更好地聚焦于与关系相关的信息。</p>
+<p><figure class="image-figure"><img src="/img/PaperNotes/RAPL/img2.png" alt="" loading="lazy"></figure></p>
+<blockquote>
+<p>Embedding space illustration of previous methods (left) and our method (right). Task 1&amp;2 are two FSDLRE tasks with different target relation types.</p>
+</blockquote>
+<h2 id="problem-formulation">Problem Formulation</h2>
+<p><figure class="image-figure"><img src="/img/PaperNotes/RAPL/img3.png" alt="" loading="lazy"></figure></p>
+<blockquote>
+<p>The overall architecture of our proposed RAPL method.</p>
+</blockquote>
+<h2 id="methodology">Methodology</h2>
+<h3 id="document-and-entity-encoding">Document and Entity Encoding</h3>
+<p>我们使用预训练语言模型作为文档编码器来编码给定任务中的每个支持或查询文档。对于每个文档，我们首先在每个实体提及的开始和结束位置插入一个特殊标记 “*” 以标记实体提及的位置。然后我们将文档输入编码器以获得上下文的 token embedding 和 cross-token attention 。我们将到每个实体前的“*”标记为止的文本作为 mention embedding 。对于文档中提及的实体，我们通过对 mention embedding 进行log-sumexp 池化来获得 entity embedding 。</p>
+<h3 id="relation-aware-relation-prototype-learning">Relation-Aware Relation Prototype Learning</h3>
+<p>对于给定任务中的每个目标关系类型，我们旨在获得一个能够更好地捕捉相应关系语义的原型表示。为此，我们首先提出基于实例级支持嵌入来构建关系原型，使每个原型能够更专注于支持文档中的关系相关信息。然后，我们提出一种实例级关系加权对比学习方法，进一步优化关系原型。</p>
+<h4 id="instance-based-prototype-construction">Instance-Based Prototype Construction</h4>
+<p>对于支持文档中的关系实例，我们首先计算文档中所有 token 的 pair-level 重要性分布，以捕捉与实体对相关的上下文。同时，我们计算关系级注意力分布，以捕捉与关系相关的上下文。我们使用另一个预训练语言模型作为关系编码器，将关系的名称和描述连接成一个序列，然后将序列输入编码器。我们将“[CLS]”标记的输出嵌入作为 relation embedding 。</p>
+<p>基于 pair-level 和关系级注意力分布，我们进一步计算实例级注意力分布，以捕捉与实例相关的上下文。具体来说，实例级注意力分布的值由 pair-level 和关系级注意力分布的值相加得到。</p>
+<h4 id="contrastive-based-prototype-refining">Contrastive-Based Prototype Refining</h4>
+<p>之前的方法难以与对比目标整合，因为它们仅获得了对支持集实体对的嵌入。实体对的多标签特性使得合理定义正负对变得困难。此外，通过结合关系间的相似性，提出的对比损失更关注于将语义上接近的关系实例嵌入分开，从而有助于更好地区分相应的关系原型。</p>
+<h3 id="relation-aware-nota-prototype-learning">Relation-Aware NOTA Prototype Learning</h3>
+<p>由于大多数查询实体对不持有任何目标关系，NOTA（none-of-the-above）也被视为一个类别。现有方法通常学习一组通用的 NOTA 原型，应用于所有任务，这在某些任务中可能并不理想。为此，我们提出一种任务特定的 NOTA 原型生成策略，以更好地捕捉每个任务中的 NOTA 语义。</p>
+<p>具体来说，我们首先引入一组可学习的向量，作为基础 NOTA 原型。与直接将这组向量视为最终 NOTA 原型不同，我们将其视为需要在每个任务中进一步修正的基础 NOTA 原型。由于支持文档的注释是完整的，我们可以访问支持 support-NOTA 分布，这隐含地表达了 NOTA 语义。因此，我们利用 support-NOTA 实例来捕捉每个特定任务中的 NOTA 语义。</p>
+<h3 id="training-objective">Training Objective</h3>
+<p>给定查询文档中的实体对，我们使用 pair-level 注意力分布并采用类似的方法获得 pair-level 表示。对于任务中的每个目标关系类型，我们计算关系的概率。然后，我们计算分类损失。</p>
+<h2 id="experiments">Experiments</h2>
+<p><figure class="image-figure"><img src="/img/PaperNotes/RAPL/img4.png" alt="" loading="lazy"></figure></p>
+<blockquote>
+<p>Results on FREDo and ReFREDo benchmarks. Reported results are macro averages across relation types. The best and second best performance methods are denoted in bold and underlined respectively.</p>
+</blockquote>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/PaperNotes/Entity_Concept-enhanced_Few-shot_Relation_Extraction/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">《Entity Concept-enhanced Few-shot Relation Extraction》笔记</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/%e3%80%8a%e8%ae%a1%e7%bb%84KG%e3%80%8b%e8%af%be%e9%a2%98%e5%bc%80%e5%8f%91%e8%bf%87%e7%a8%8b%ef%bc%88%e4%ba%8c%ef%bc%89/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《计组KG》课题开发过程（二）</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>
