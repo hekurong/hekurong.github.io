@@ -1689,6 +1689,10 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   position: relative;
   text-align: center;
   padding: 3rem 0 2.5rem;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 2rem;
@@ -1700,7 +1704,8 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.12;
+  object-position: top center;
+  opacity: 0.18;
   pointer-events: none;
 }
 
