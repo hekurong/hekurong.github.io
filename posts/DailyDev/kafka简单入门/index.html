@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>Kafka简单入门 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">Kafka简单入门</h1>
+    <div class="article-meta">
+      <time datetime="2025-09-13">2025-09-13</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daily%20Dev/">Daily Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="tag" href="/tags/Golang/">Golang</a>
+      
+    </div>
+    
+  </header>
+
+  <p>Apache Kafka 是一个开源的分布式事件流平台，被数千家公司用于高性能数据管道、流分析、数据集成和关键任务应用。无论你是后端开发者、数据工程师，还是希望构建实时数据系统的架构师，掌握 Kafka 都是一项至关重要的技能。</p>
+<p>本文将带你系统地学习 Kafka，从核心概念到命令行实战，再到面试高频考点，最后用 Go 语言构建一个简单的生产者和消费者应用。</p>
+<h2 id="kafka-">一、Kafka 核心概念解析</h2>
+<p>要理解 Kafka，首先必须掌握其核心术语。我们可以把 Kafka 想象成一个高度有序、可分区、可复制的数字“邮局系统”。</p>
+<h4 id="1-broker">1. Broker</h4>
+<p>Kafka 集群中的一台服务器就是一个 Broker。你可以把它想象成邮局系统中的一个“邮局分拣中心”。多个 Broker 共同组成一个 Kafka 集群，协同工作，提供高可用和负载均衡。</p>
+<h4 id="2-topic">2. Topic（主题）</h4>
+<p>Topic 是消息的类别。所有发布到 Kafka 集群的消息都有一个指定的 Topic。这就像邮局里的不同“信件类型”，比如“平信”、“挂号信”或“国际邮件”。生产者将消息发送到特定的 Topic，消费者订阅特定的 Topic 来接收消息。</p>
+<h4 id="3-partition">3. Partition（分区）</h4>
+<p>每个 Topic 都可以被分成一个或多个 Partition。Partition 是 Kafka 实现高吞吐量和水平扩展的关键。你可以将 Partition 理解为某个信件类型（Topic）的专用“处理通道”。</p>
+<ul>
+<li><strong>有序性</strong>：在单个 Partition 内，消息是严格有序的。消息被追加到 Partition 的末尾，并被分配一个唯一的、递增的 ID，称为 <strong>Offset</strong>。</li>
+<li><strong>并发性</strong>：不同的 Partition 可以分布在不同的 Broker 上，这使得多个消费者可以并行地从一个 Topic 中读取数据，极大地提高了读取效率。</li>
+</ul>
+<h4 id="4-offset">4. Offset（偏移量）</h4>
+<p>Offset 是 Partition 中每条消息的唯一标识符，是一个单调递增的整数。消费者通过 Offset 来追踪自己已经消费到 Partition 中的哪个位置。这个机制非常强大，因为它允许消费者自由地控制消费进度，可以重复消费或跳过某些消息。</p>
+<h4 id="5-producer">5. Producer（生产者）</h4>
+<p>负责创建消息并将其发布（发送）到 Kafka Topic 的应用程序。生产者在发送消息时，可以指定 Topic，也可以指定消息的 Key。如果指定了 Key，Kafka 会使用哈希算法将这个 Key 映射到某个特定的 Partition，确保所有具有相同 Key 的消息都进入同一个 Partition，从而保证了这部分消息的顺序性。</p>
+<h4 id="6-consumer">6. Consumer（消费者）</h4>
+<p>从 Kafka Topic 订阅并处理消息的应用程序。消费者以“拉（Pull）”模式从 Broker 中拉取消息。</p>
+<h4 id="7-consumer-group">7. Consumer Group（消费者组）</h4>
+<p>多个消费者可以组成一个 Consumer Group 来共同消费一个 Topic。这是 Kafka 实现高可扩展消费的另一大法宝。</p>
+<ul>
+<li>一个 Topic 的一个 Partition 在同一时间只能被同一个 Consumer Group 中的一个 Consumer 消费。</li>
+<li>如果 Consumer 的数量多于 Partition 的数量，多余的 Consumer 将会闲置。</li>
+<li>如果 Consumer 的数量少于 Partition 的数量，某些 Consumer 将会消费多个 Partition。</li>
+<li>当组内成员发生变化（新增、崩溃）时，会触发 <strong>Rebalance（再均衡）</strong>，Partition 会被重新分配给组内的消费者。</li>
+</ul>
+<h4 id="8-zookeeper--kraft">8. Zookeeper / KRaft</h4>
+<ul>
+<li><strong>Zookeeper（传统模式）</strong>：在旧版本中，Kafka 严重依赖 Zookeeper 来管理集群元数据，例如 Broker 列表、Topic 配置、Controller 选举等。</li>
+<li><strong>KRaft（新模式）</strong>：从 Kafka 2.8 版本开始，社区引入了 KRaft 协议，旨在彻底移除对 Zookeeper 的依赖。Kafka 集群自己选举出一个 Controller 节点来管理元数据，从而简化了部署、运维，并提高了性能和可扩展性。目前，KRaft 模式已在生产环境中广泛推荐使用。</li>
+</ul>
+<h2 id="kafka--1">二、Kafka 基本用法（命令行）</h2>
+<p>在本地安装并启动 Kafka 后，你可以使用自带的命令行工具快速体验其工作流程。</p>
+<h4 id="1--topic">1. 创建一个 Topic</h4>
+<p>创建一个名为 <code>golang-test</code> 的 Topic，它有 3 个分区和 1 个副本。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1"># For Kraft mode</span>
+</span></span><span class="line"><span class="cl">kafka-topics.sh --create --topic golang-test --partitions <span class="m">3</span> --bootstrap-server localhost:9092
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># For Zookeeper mode</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># kafka-topics.sh --create --topic golang-test --partitions 3 --replication-factor 1 --zookeeper localhost:2181</span>
+</span></span></code></pre><h4 id="2-">2. 启动一个生产者发送消息</h4>
+<p>在终端启动一个生产者，然后你可以输入一些消息，每行一条。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">kafka-console-producer.sh --topic golang-test --bootstrap-server localhost:9092
+</span></span><span class="line"><span class="cl">&gt;Hello Kafka
+</span></span><span class="line"><span class="cl">&gt;This is a message from CLI
+</span></span><span class="line"><span class="cl">&gt;Learning Golang with Kafka
+</span></span></code></pre><h4 id="3-">3. 启动一个消费者接收消息</h4>
+<p>打开另一个终端，启动一个消费者来接收 <code>golang-test</code> Topic 的消息。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">kafka-console-consumer.sh --topic golang-test --from-beginning --bootstrap-server localhost:9092
+</span></span></code></pre><p><code>--from-beginning</code> 参数会让消费者从头开始消费该 Topic 的所有消息。你会看到生产者发送的三条消息被打印出来。</p>
+<h2 id="kafka--2">三、Kafka 面试高频考点</h2>
+<p>以下是面试中经常被问到的关于 Kafka 的问题，理解它们能帮你更好地掌握 Kafka 的核心设计。</p>
+<h4 id="1-kafka-">1. Kafka 如何保证消息不丢失？</h4>
+<p>这涉及到 Kafka 的数据可靠性机制，主要从三个层面保证：</p>
+<ul>
+<li><strong>生产者（Producer）层面</strong>：
+<ul>
+<li>使用 <code>acks</code> 配置。<code>acks=0</code>（不等待 Broker 确认）、<code>acks=1</code>（Leader 确认即可）、<code>acks=all</code>（所有 ISR 中的副本都确认）。通常设置为 <code>all</code> 以获得最高的数据保证。</li>
+<li>生产者发送失败后可以配置重试机制。</li>
+</ul>
+</li>
+<li><strong>Broker 层面</strong>：
+<ul>
+<li><strong>副本机制（Replication）</strong>：每个 Partition 都有多个副本（Replica），分布在不同的 Broker 上。其中一个是 Leader，其余是 Follower。</li>
+<li><strong>ISR（In-Sync Replicas）</strong>：一个与 Leader 保持同步的 Follower 副本集合。当生产者设置 <code>acks=all</code> 时，消息必须被写入所有 ISR 副本后，才算成功。如果 Leader 宕机，Kafka 会从 ISR 中选举一个新的 Leader，保证数据不丢失。</li>
+</ul>
+</li>
+<li><strong>消费者（Consumer）层面</strong>：
+<ul>
+<li>消费者在消费完消息后，才会向 Broker 提交（Commit）Offset。通过关闭自动提交（<code>enable.auto.commit=false</code>）并采用手动提交的方式，可以确保消息被成功处理后再更新 Offset，避免了消息在处理过程中丢失。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-kafka-">2. Kafka 的消息投递语义是什么？</h4>
+<ul>
+<li><strong>At most once（最多一次）</strong>：消息可能会丢失，但绝不会重复。例如，消费者先提交 Offset 再处理消息，如果处理过程中宕机，这条消息就丢失了。</li>
+<li><strong>At least once（至少一次）</strong>：消息绝不会丢失，但可能会重复。例如，消费者先处理消息再提交 Offset，如果在提交前宕机，重启后会重新消费这条消息。</li>
+<li><strong>Exactly once（精确一次）</strong>：消息既不丢失也不重复，每条消息都被精确处理一次。Kafka 从 0.11 版本开始，通过 <strong>幂等性生产者</strong> 和 <strong>事务（Transactions）</strong> 实现了端到端的 Exactly-once 语义。</li>
+</ul>
+<h4 id="3--1">3. 如何保证消息的顺序性？</h4>
+<p>Kafka 只能保证 <strong>单个 Partition 内的消息是有序的</strong>。</p>
+<ul>
+<li>如果你的业务需要全局有序，那么只能将 Topic 设置为只有一个 Partition，但这会牺牲吞吐量。</li>
+<li>如果你的业务只需要局部有序（例如，同一个用户的所有订单操作需要有序），可以将用户的 ID 作为消息的 Key。这样，所有该用户的消息都会被发送到同一个 Partition，从而保证了顺序性。</li>
+</ul>
+<h4 id="4-kafka-">4. Kafka 为什么这么快？</h4>
+<ul>
+<li><strong>顺序 I/O</strong>：Kafka 将消息追加到磁盘上的日志文件中，这是顺序写操作。相比于随机 I/O，磁盘的顺序 I/O 性能非常高，甚至可以媲美内存操作。</li>
+<li><strong>零拷贝（Zero-Copy）</strong>：在将数据从磁盘发送到网络时，Kafka 利用了操作系统的零拷贝技术（如 <code>sendfile</code>），数据直接从内核空间的页缓存（Page Cache）发送到网卡，避免了在用户空间和内核空间之间的多次数据拷贝，极大地提升了数据传输效率。</li>
+<li><strong>批量处理（Batching）</strong>：生产者可以批量发送消息，消费者可以批量拉取消息。这大大减少了网络开销，提高了吞- 吐量。</li>
+<li><strong>数据压缩</strong>：生产者可以对消息进行压缩（如 Gzip, Snappy, LZ4），减少网络传输的数据量和磁盘存储空间。</li>
+</ul>
+<h2 id="golang--kafka-">四、Golang 实战：构建一个简单的 Kafka 应用</h2>
+<p>我们将使用 <code>confluent-kafka-go</code> 这个库，它是 <code>librdkafka</code>（一个高性能的 C 语言 Kafka 客户端）的 Go 语言封装，性能和稳定性都非常出色。</p>
+<h4 id="heading">准备工作</h4>
+<p>首先，安装 Go 语言环境和 Kafka。然后，获取 <code>confluent-kafka-go</code> 库：</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go get github.com/confluentinc/confluent-kafka-go/v2/kafka
+</span></span></code></pre><h4 id="1-producer">1. 生产者（Producer）代码</h4>
+<p>创建一个名为 <code>producer.go</code> 的文件。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// producer.go
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;strconv&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;github.com/confluentinc/confluent-kafka-go/v2/kafka&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// --- Producer Configuration ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// Create a new producer instance with a configuration map.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// &#39;bootstrap.servers&#39; points to the Kafka broker(s).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">p</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">kafka</span><span class="p">.</span><span class="nf">NewProducer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">kafka</span><span class="p">.</span><span class="nx">ConfigMap</span><span class="p">{</span><span class="s">&#34;bootstrap.servers&#34;</span><span class="p">:</span> <span class="s">&#34;localhost:9092&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Failed to create producer: %s&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">p</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// --- Delivery Report Goroutine ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// This goroutine handles delivery reports from Kafka.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// It&#39;s crucial for knowing if messages were successfully sent.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">for</span> <span class="nx">e</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">p</span><span class="p">.</span><span class="nf">Events</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">switch</span> <span class="nx">ev</span> <span class="o">:=</span> <span class="nx">e</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">case</span> <span class="o">*</span><span class="nx">kafka</span><span class="p">.</span><span class="nx">Message</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">				<span class="k">if</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">TopicPartition</span><span class="p">.</span><span class="nx">Error</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="c1">// Message failed to be delivered.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>					<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Delivery failed: %v\n&#34;</span><span class="p">,</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">TopicPartition</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="c1">// Message was successfully delivered.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>					<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Delivered message to %v\n&#34;</span><span class="p">,</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">TopicPartition</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// --- Message Production ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// Define the topic to which we want to produce messages.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">topic</span> <span class="o">:=</span> <span class="s">&#34;golang-test&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// Prepare the message key and value.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">key</span> <span class="o">:=</span> <span class="s">&#34;key-&#34;</span> <span class="o">+</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">value</span> <span class="o">:=</span> <span class="s">&#34;hello world from golang producer - message &#34;</span> <span class="o">+</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">// Produce the message. This is an asynchronous operation.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="c1">// The delivery report is handled by the goroutine above.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">err</span> <span class="o">:=</span> <span class="nx">p</span><span class="p">.</span><span class="nf">Produce</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">kafka</span><span class="p">.</span><span class="nx">Message</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">TopicPartition</span><span class="p">:</span> <span class="nx">kafka</span><span class="p">.</span><span class="nx">TopicPartition</span><span class="p">{</span><span class="nx">Topic</span><span class="p">:</span> <span class="o">&amp;</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">Partition</span><span class="p">:</span> <span class="nx">kafka</span><span class="p">.</span><span class="nx">PartitionAny</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">Key</span><span class="p">:</span>            <span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">key</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">Value</span><span class="p">:</span>          <span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">value</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">		<span class="p">},</span> <span class="kc">nil</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Failed to produce message: %v\n&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		
+</span></span><span class="line"><span class="cl">		<span class="c1">// Wait for a short duration before sending the next message.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">500</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// --- Flush and Close ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// Wait for all messages in the producer&#39;s queue to be delivered.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// The timeout is set to 15 seconds.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">p</span><span class="p">.</span><span class="nf">Flush</span><span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Producer has finished sending messages.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h4 id="2-consumer">2. 消费者（Consumer）代码</h4>
+<p>创建一个名为 <code>consumer.go</code> 的文件。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// consumer.go
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;os&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;os/signal&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;syscall&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;github.com/confluentinc/confluent-kafka-go/v2/kafka&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// --- Consumer Configuration ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// Create a new consumer instance with a configuration map.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// &#39;bootstrap.servers&#39; points to the Kafka broker(s).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// &#39;group.id&#39; is essential for consumer groups.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// &#39;auto.offset.reset&#39; determines the starting point when no offset is stored.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// &#39;earliest&#39; means start from the beginning of the topic.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">c</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">kafka</span><span class="p">.</span><span class="nf">NewConsumer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">kafka</span><span class="p">.</span><span class="nx">ConfigMap</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="s">&#34;bootstrap.servers&#34;</span><span class="p">:</span> <span class="s">&#34;localhost:9092&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="s">&#34;group.id&#34;</span><span class="p">:</span>          <span class="s">&#34;my-golang-group&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="s">&#34;auto.offset.reset&#34;</span><span class="p">:</span> <span class="s">&#34;earliest&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="p">})</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Failed to create consumer: %s&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// --- Topic Subscription ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// Subscribe to the topic.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">topic</span> <span class="o">:=</span> <span class="s">&#34;golang-test&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">err</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">SubscribeTopics</span><span class="p">([]</span><span class="kt">string</span><span class="p">{</span><span class="nx">topic</span><span class="p">},</span> <span class="kc">nil</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Failed to subscribe to topic: %s&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// --- Graceful Shutdown Setup ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// Set up a channel to listen for OS signals (like Ctrl+C).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">sigchan</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Signal</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">signal</span><span class="p">.</span><span class="nf">Notify</span><span class="p">(</span><span class="nx">sigchan</span><span class="p">,</span> <span class="nx">syscall</span><span class="p">.</span><span class="nx">SIGINT</span><span class="p">,</span> <span class="nx">syscall</span><span class="p">.</span><span class="nx">SIGTERM</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// --- Message Consumption Loop ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">run</span> <span class="o">:=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">run</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">case</span> <span class="nx">sig</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">sigchan</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">// Received a shutdown signal.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Caught signal %v: terminating\n&#34;</span><span class="p">,</span> <span class="nx">sig</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">run</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">		<span class="k">default</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">// Poll for a message. The timeout is set to 100 milliseconds.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="c1">// This is a non-blocking call.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="nx">ev</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">Poll</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="nx">ev</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="k">continue</span> <span class="c1">// No event, continue polling.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="k">switch</span> <span class="nx">e</span> <span class="o">:=</span> <span class="nx">ev</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">case</span> <span class="o">*</span><span class="nx">kafka</span><span class="p">.</span><span class="nx">Message</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">				<span class="c1">// Received a message.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>				<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Received message on %s: Key: %s | Value: %s\n&#34;</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">TopicPartition</span><span class="p">,</span> <span class="nb">string</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">Key</span><span class="p">),</span> <span class="nb">string</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">Value</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">			<span class="k">case</span> <span class="nx">kafka</span><span class="p">.</span><span class="nx">Error</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">				<span class="c1">// Encountered an error.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>				<span class="c1">// This could be a transient error or a fatal one.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>				<span class="nx">fmt</span><span class="p">.</span><span class="nf">Fprintf</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Stderr</span><span class="p">,</span> <span class="s">&#34;%% Error: %v: %v\n&#34;</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nf">Code</span><span class="p">(),</span> <span class="nx">e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="k">if</span> <span class="nx">e</span><span class="p">.</span><span class="nf">IsFatal</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="nx">run</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="k">default</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">				<span class="c1">// Other event types (e.g., stats).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>				<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Ignored event: %v\n&#34;</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Consumer is shutting down.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h4 id="-demo">如何运行 Demo</h4>
+<ol>
+<li>
+<p>确保你的 Kafka 服务正在运行。</p>
+</li>
+<li>
+<p>打开一个终端，启动消费者：</p>
+<p>Bash</p>
+<pre><code>go run consumer.go
+</code></pre>
+<p>消费者会启动并等待消息。</p>
+</li>
+<li>
+<p>打开另一个终端，启动生产者：</p>
+<p>Bash</p>
+<pre><code>go run producer.go
+</code></pre>
+<p>生产者会发送 10 条消息。</p>
+</li>
+<li>
+<p>切换回消费者的终端，你会看到它接收并打印了生产者发送的所有消息。</p>
+</li>
+</ol>
+<h2 id="heading-1">总结</h2>
+<p>Apache Kafka 是一个功能强大且复杂的系统，但其核心设计思想却相当优雅。通过理解其 Broker、Topic、Partition 等基本概念，掌握其数据可靠性和高性能的原理，你就能在系统设计和面试中游刃有余。最后，结合 Go 语言的强大并发能力和 <code>confluent-kafka-go</code> 这样的高性能库，你可以轻松地构建出稳定、高效的实时数据应用。</p>
+<p>希望这篇博客能成为你学习 Kafka 之路上的一个坚实起点。祝你学习愉快！</p>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/xxl-job%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">xxl-job简单入门</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/TCP%e7%9a%84%e4%b8%89%e6%ac%a1%e6%8f%a1%e6%89%8b%e4%b8%8e%e5%9b%9b%e6%ac%a1%e6%8c%a5%e6%89%8b/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">TCP的三次握手与四次挥手</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>apollo简单入门 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">apollo简单入门</h1>
+    <div class="article-meta">
+      <time datetime="2025-09-14">2025-09-14</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daily%20Dev/">Daily Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="tag" href="/tags/Golang/">Golang</a>
+      
+    </div>
+    
+  </header>
+
+  <p>在现代微服务架构中，服务数量的激增使得传统的配置文件管理方式（如本地文件、Git 仓库）变得越来越难以维护。配置的修改、发布、回滚、权限控制以及实时生效等需求，催生了分布式配置中心这一关键中间件。</p>
+<p><a href="https://github.com/apolloconfig/apollo">Apollo (阿波罗)</a> 是由携程框架部门研发的开源配置管理中心，它功能强大、生态丰富，能够集中化管理应用在不同环境、不同集群的配置。本文将带你深入了解 Apollo 的世界，从核心概念到架构原理，再到 Go 语言的实战集成。</p>
+<h2 id="apollo-">一、Apollo 核心概念</h2>
+<p>要用好 Apollo，首先需要理解它的几个核心概念，这些概念构成了其灵活、强大的配置管理模型。</p>
+<h4 id="1-application-">1. <code>Application</code> (应用)</h4>
+<p>这是配置管理的基本单元，代表一个独立的应用或服务。每个应用都有一个全局唯一的 <code>AppId</code>，这是客户端与服务端交互时的身份标识。</p>
+<h4 id="2-environment-">2. <code>Environment</code> (环境)</h4>
+<p>用于隔离不同部署环境的配置，如 <code>DEV</code> (开发环境)、<code>FAT</code> (测试环境)、<code>UAT</code> (预发布环境)、<code>PRO</code> (生产环境)。Apollo 的权限管理也是基于环境的，可以精细控制不同环境的配置修改和发布权限。</p>
+<h4 id="3-cluster-">3. <code>Cluster</code> (集群)</h4>
+<p>一个应用在同一个环境下，可以部署在不同的集群中。这个概念主要用于支持多数据中心（IDC）或者隔离部署。例如，你可以为上海机房和北京机房创建两个不同的 Cluster，为它们配置不同的数据库地址。默认情况下，会有一个 <code>default</code> 集群。</p>
+<h4 id="4-namespace-">4. <code>Namespace</code> (命名空间)</h4>
+<p>这是配置项的集合，是配置隔离的最小单元。通过 Namespace，可以把不同类型的配置分门别类地管理。</p>
+<ul>
+<li><strong>私有 Namespace</strong>：其作用域仅限于当前应用。每个应用创建时都会有一个默认的 <code>application</code> 命名空间。</li>
+<li><strong>公共 Namespace</strong>：可以被多个应用关联和共享。常用于存储一些公共的配置，如数据库连接信息、中间件地址等。</li>
+<li><strong>关联 Namespace (继承)</strong>：应用可以关联（继承）公共 Namespace 的配置，实现配置的复用。如果私有配置与公共配置有相同的 Key，私有配置会覆盖公共配置。</li>
+<li><strong>格式支持</strong>：Namespace 支持多种格式，如 <code>properties</code> (默认)、<code>XML</code>、<code>JSON</code>、<code>YAML</code>、<code>TXT</code>。</li>
+</ul>
+<h4 id="5-release-">5. <code>Release</code> (发布)</h4>
+<p>当一个 Namespace 的配置修改完成后，需要通过“发布”操作才能被客户端感知到。每一次发布都会生成一个唯一的版本号，且发布后的配置是 <strong>不可修改的</strong>。如果需要变更，只能创建一个新的发布。这个机制保证了配置的可追溯和快速回滚。</p>
+<h4 id="6-gray-release-">6. <code>Gray Release</code> (灰度发布)</h4>
+<p>这是 Apollo 的一大亮点。它允许你将新发布的配置先生效于指定的 <strong>部分</strong> 客户端实例上。你可以根据客户端的 IP 地址或预设的标签来圈定灰度范围。待验证无误后，再进行全量发布。这极大地提高了配置发布的安全性。</p>
+<h2 id="apollo--1">二、Apollo 核心架构与工作流程</h2>
+<p>Apollo 的高可用和实时推送能力得益于其精巧的架构设计。</p>
+<h4 id="heading">主要组件</h4>
+<ul>
+<li><strong>Portal</strong>: 用户界面，提供配置的可视化管理、发布、审计等功能。</li>
+<li><strong>Admin Service</strong>: Portal 的后端服务，负责配置的创建、修改、发布等操作，直接与数据库交互。</li>
+<li><strong>Config Service</strong>: 客户端的配置拉取服务。它提供了高性能的接口供客户端获取配置。为了高可用，Config Service 可以水平扩展部署多台。</li>
+<li><strong>Client</strong>: 集成在应用中的 SDK。它负责从 Config Service 拉取配置、在本地缓存配置，并监听配置变化。</li>
+<li><strong>Eureka</strong>: 一个服务注册与发现组件。Admin Service 和 Config Service 都会注册到 Eureka 中，使得 Portal 和 Client 能够动态发现可用的服务实例。</li>
+<li><strong>Database</strong>: Apollo 的核心数据存储，包含 <code>PortalDB</code> 和 <code>ConfigDB</code> 两个库，分别存储用户、权限、审计信息和核心的配置信息。</li>
+</ul>
+<h4 id="heading-1">工作流程：实时更新（核心）</h4>
+<p>Apollo 如何做到配置修改后，客户端能秒级感知的？答案是 <strong>长轮询（Long Polling）</strong>。</p>
+<ol>
+<li><strong>客户端发起请求</strong>：Client 启动后，会向 Config Service 发起一个 HTTP 请求，询问自己关心的 Namespace 是否有更新。</li>
+<li><strong>服务端挂起请求</strong>：Config Service 收到请求后，如果发现配置没有变化，它 <strong>不会</strong> 立即返回，而是将这个请求挂起（hold 住），最长可达 60 秒。</li>
+<li><strong>用户发布配置</strong>：用户在 Portal 上修改并发布了配置。</li>
+<li><strong>服务端通知</strong>：Config Service 有一个独立的线程每秒会扫描一次数据库，发现配置有更新。它会立即通知（release）之前被挂起的那些请求，并告诉它们哪个 Namespace 更新了。</li>
+<li><strong>客户端拉取新配置</strong>：Client 收到响应后，得知配置已更新，会立刻发起另一个请求去拉取最新的配置内容。</li>
+<li><strong>循环往复</strong>：拉取完新配置后，Client 再次发起一个新的长轮询请求，回到第 1 步，如此循环，保证了实时性。</li>
+</ol>
+<p>这种方式相比于传统的定时轮询，既保证了实时性，又大大减少了无效的轮询请求，降低了对客户端和服务端的压力。</p>
+<h2 id="apollo--2">三、Apollo 面试高频考点</h2>
+<h4 id="1-apollo-">1. Apollo 的实时推送原理是什么？</h4>
+<p>这道题直接命中核心。回答要点就是 <strong>长轮询（Long Polling）</strong> 机制。可以详细描述上面提到的工作流程，并强调它与普通轮询（客户端定时拉取）和 WebSocket（全双工通信）的区别与优势。</p>
+<h4 id="2--apollo-server-">2. 如果 Apollo Server 全部宕机，客户端会怎么样？</h4>
+<p>Apollo 客户端有完善的 <strong>容灾设计</strong>。</p>
+<ul>
+<li><strong>本地缓存</strong>：客户端在成功拉取配置后，会在本地文件系统（例如 <code>/opt/data/{appId}/config-cache</code>）中缓存一份配置。</li>
+<li><strong>启动保障</strong>：如果应用启动时无法连接到 Apollo Server，它会读取本地缓存的配置来启动，保证了即使配置中心挂了，应用也能正常启动和运行。</li>
+<li><strong>运行时影响</strong>：正在运行的应用将继续使用内存中最后一次成功的配置，不会受到影响。只是无法再获取到配置的更新。</li>
+</ul>
+<h4 id="3-apollo-">3. Apollo 如何保证高可用？</h4>
+<ul>
+<li><strong>服务无状态与水平扩展</strong>：<code>Config Service</code> 和 <code>Admin Service</code> 都是无状态的，可以部署多个实例组成集群，并通过 Eureka 进行服务发现和负载均衡。单个实例宕机不影响整体服务。</li>
+<li><strong>多数据中心部署</strong>：通过 <code>Cluster</code> 概念，可以将配置服务部署在不同的数据中心，应用就近访问，实现异地容灾。</li>
+<li><strong>客户端容灾</strong>：如上一点所述，客户端的本地缓存机制是最后一道防线。</li>
+</ul>
+<h4 id="4-apollo--nacosspring-cloud-config-">4. Apollo 与 Nacos、Spring Cloud Config 有什么区别？</h4>
+<ul>
+<li><strong>Apollo</strong>: 功能最全面、最完善。拥有强大的可视化界面、精细的权限控制、完整的发布审核、回滚、灰度发布流程。生态支持多语言，架构成熟稳定，适用于对配置管理有高要求的复杂场景。</li>
+<li><strong>Nacos</strong>: &ldquo;多面手&rdquo;。除了配置管理，它还集成了服务发现和动态 DNS 功能。配置管理功能比 Apollo 稍弱（例如灰度发布、审计等流程相对简单），但其多合一的特性在阿里巴巴生态和 Spring Cloud Alibaba 中非常受欢迎，部署和使用更简单。</li>
+<li><strong>Spring Cloud Config</strong>: 设计简单，通常与 Git/SVN/Vault 等后端存储结合。配置的修改和版本控制依赖于后端的存储系统。它没有可视化的管理界面，配置更新通常需要手动触发（例如通过 <code>/actuator/refresh</code> 端点），实时性较差。</li>
+</ul>
+<h2 id="golang--apollo-">四、Golang 实战：集成 Apollo 客户端</h2>
+<p>我们将使用社区维护的 Go 语言客户端 <code>agollo</code> 来演示如何集成。</p>
+<h4 id="heading-2">准备工作</h4>
+<ol>
+<li>
+<p>确保你有一个正在运行的 Apollo 环境。</p>
+</li>
+<li>
+<p>在 Apollo Portal 上创建一个新的应用，获取其 <code>AppId</code>。</p>
+</li>
+<li>
+<p>在该应用默认的 <code>application</code> Namespace 下创建一些配置，例如 <code>timeout=300</code>，并 <strong>发布</strong> 它们。</p>
+</li>
+<li>
+<p>安装 <code>agollo</code> 库：</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go get github.com/apolloconfig/agollo/v4
+</span></span></code></pre></li>
+</ol>
+<h4 id="heading-3">示例代码</h4>
+<p>创建一个 <code>main.go</code> 文件。</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;github.com/apolloconfig/agollo/v4&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;github.com/apolloconfig/agollo/v4/env/config&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;github.com/apolloconfig/agollo/v4/storage&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">CustomChangeListener</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CustomChangeListener</span><span class="p">)</span> <span class="nf">OnChange</span><span class="p">(</span><span class="nx">changeEvent</span> <span class="o">*</span><span class="nx">storage</span><span class="p">.</span><span class="nx">ChangeEvent</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;--- Configuration Change Detected ---&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Namespace: %s\n&#34;</span><span class="p">,</span> <span class="nx">changeEvent</span><span class="p">.</span><span class="nx">Namespace</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">change</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">changeEvent</span><span class="p">.</span><span class="nx">Changes</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Key: %s, ChangeType: %s, OldValue: %s, NewValue: %s\n&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">key</span><span class="p">,</span> <span class="nx">change</span><span class="p">.</span><span class="nx">ChangeType</span><span class="p">,</span> <span class="nx">change</span><span class="p">.</span><span class="nx">OldValue</span><span class="p">,</span> <span class="nx">change</span><span class="p">.</span><span class="nx">NewValue</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;--- End of Change ---&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CustomChangeListener</span><span class="p">)</span> <span class="nf">OnNewestChange</span><span class="p">(</span><span class="nx">event</span> <span class="o">*</span><span class="nx">storage</span><span class="p">.</span><span class="nx">FullChangeEvent</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Newest configurations for namespace %s: %v\n&#34;</span><span class="p">,</span> <span class="nx">event</span><span class="p">.</span><span class="nx">Namespace</span><span class="p">,</span> <span class="nx">event</span><span class="p">.</span><span class="nx">Changes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">clientConfig</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">config</span><span class="p">.</span><span class="nx">AppConfig</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">AppID</span><span class="p">:</span>          <span class="s">&#34;1145141919810&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">Cluster</span><span class="p">:</span>        <span class="s">&#34;default&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">IP</span><span class="p">:</span>             <span class="s">&#34;http://113.44.146.232:8080/&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">NamespaceName</span><span class="p">:</span>  <span class="s">&#34;application&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">IsBackupConfig</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">Secret</span><span class="p">:</span>         <span class="s">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">client</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">agollo</span><span class="p">.</span><span class="nf">StartWithConfig</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">(</span><span class="o">*</span><span class="nx">config</span><span class="p">.</span><span class="nx">AppConfig</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">clientConfig</span><span class="p">,</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl">	<span class="p">})</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Failed to start Apollo client: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Apollo client started successfully.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">listener</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">CustomChangeListener</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">client</span><span class="p">.</span><span class="nf">AddChangeListener</span><span class="p">(</span><span class="nx">listener</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Registered a change listener.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kd">const</span> <span class="nx">namespace</span> <span class="p">=</span> <span class="s">&#34;application&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">const</span> <span class="nx">defaultTimeout</span> <span class="p">=</span> <span class="s">&#34;100&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">timeout</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">GetConfig</span><span class="p">(</span><span class="nx">namespace</span><span class="p">).</span><span class="nf">GetStringValue</span><span class="p">(</span><span class="s">&#34;timeout&#34;</span><span class="p">,</span> <span class="nx">defaultTimeout</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Initial value for &#39;timeout&#39;: %s\n&#34;</span><span class="p">,</span> <span class="nx">timeout</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Application is running... Try changing the &#39;timeout&#39; value in the Apollo portal.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Press Ctrl+C to exit.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">currentTimeout</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">GetConfig</span><span class="p">(</span><span class="nx">namespace</span><span class="p">).</span><span class="nf">GetStringValue</span><span class="p">(</span><span class="s">&#34;timeout&#34;</span><span class="p">,</span> <span class="nx">defaultTimeout</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Heartbeat: Current &#39;timeout&#39; is %s\n&#34;</span><span class="p">,</span> <span class="nx">currentTimeout</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h4 id="-demo">如何运行 Demo</h4>
+<ol>
+<li>
+<p>将代码中的 <code>YOUR_APP_ID</code> 替换成你在 Apollo Portal 中创建的 AppId。</p>
+</li>
+<li>
+<p>将 <code>IP</code> 字段的值 <code>http://localhost:8080</code> 替换成你的 Apollo Meta Server (即 Config Service) 的地址。</p>
+</li>
+<li>
+<p>运行程序：</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go run main.go
+</span></span></code></pre></li>
+<li>
+<p>程序启动后，会打印出初始的 <code>timeout</code> 值。</p>
+</li>
+<li>
+<p>现在，去 Apollo Portal 界面，修改 <code>timeout</code> 的值并 <strong>发布</strong>。</p>
+</li>
+<li>
+<p>你会立刻在运行程序的终端上看到 <code>CustomChangeListener</code> 打印出的配置变更通知。</p>
+</li>
+</ol>
+<h2 id="heading-4">总结</h2>
+<p>Apollo 凭借其成熟的架构、强大的功能和对多语言的良好支持，已经成为构建大规模分布式系统中不可或缺的一环。它不仅仅是一个配置存储，更是一套完整的配置管理、发布和治理解决方案。通过本文的学习，相信你已经对 Apollo 的核心思想有了深入的理解，并能熟练地将其应用在你的 Go 语言项目中，从而极大地提升系统的灵活性和可维护性。</p>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/golang%e5%8d%95%e5%85%83%e6%b5%8b%e8%af%95%e4%b8%8e%e5%86%92%e7%83%9f%e6%b5%8b%e8%af%95%e5%85%a5%e9%97%a8/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">golang单元测试与冒烟测试入门</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/xxl-job%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">xxl-job简单入门</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

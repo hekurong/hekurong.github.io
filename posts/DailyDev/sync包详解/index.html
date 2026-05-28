@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>sync包详解 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">sync包详解</h1>
+    <div class="article-meta">
+      <time datetime="2025-08-30">2025-08-30</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daily%20Dev/">Daily Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Golang/">Golang</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="sync-">一、<code>sync</code> 包概述</h2>
+<p><code>sync</code> 包是 Go 标准库中用于处理并发和同步的核心工具包。在 Go 语言中，我们通过 Goroutine 实现并发，而当多个 Goroutine 需要访问共享资源时，为了避免数据竞争（Data Race）等问题，就需要使用 <code>sync</code> 包提供的同步原语来保证并发安全。</p>
+<p>面试官通过 <code>sync</code> 包相关的问题，主要考察你对 Go 并发模型的理解、处理并发问题的能力以及对底层原理的掌握程度。</p>
+<h2 id="syncmutexsyncrwmutex-">二、<code>sync.Mutex</code>与<code>sync.RWMutex</code> (互斥锁与读写锁)</h2>
+<h3 id="1-">1. 作用与目的</h3>
+<p>这是最基础和最常用的同步原语。</p>
+<ul>
+<li><strong><code>sync.Mutex</code> (互斥锁)</strong>: 保证在同一时刻，只有一个 Goroutine 可以访问被其保护的共享资源。当一个 Goroutine 获取了锁，其他试图获取该锁的 Goroutine 都会被阻塞，直到锁被释放。</li>
+<li><strong><code>sync.RWMutex</code> (读写锁)</strong>: <code>Mutex</code> 的一种更细粒度的实现，它将访问分为“读”和“写”。
+<ul>
+<li><strong>多个读</strong>：可以共存，多个 Goroutine 可以同时获取读锁。</li>
+<li><strong>写与任何操作</strong>：互斥，当一个 Goroutine 获取了写锁后，其他任何 Goroutine（无论是读还是写）都必须等待。</li>
+</ul>
+</li>
+</ul>
+<p><strong>核心解决的问题：</strong> <code>RWMutex</code> 旨在优化“读多写少”的场景。如果共享资源的读取频率远高于写入频率，使用 <code>RWMutex</code> 可以显著提高并发性能，因为它允许多个读操作并行执行。</p>
+<h3 id="2-">2. 实现原理简介</h3>
+<ul>
+<li><strong><code>Mutex</code></strong>: 内部通过一个 <code>state</code> 字段和信号量 <code>sema</code> 实现。<code>state</code> 字段的比特位分别表示锁的锁定状态、是否有被唤醒的 Goroutine、是否有等待的 Goroutine，以及是否处于<strong>饥饿模式</strong>。
+<ul>
+<li><strong>正常模式</strong>: 新来的 Goroutine 会和等待队列头部的 Goroutine 竞争锁，这种模式吞吐量高，但可能导致队列中的 Goroutine 长时间等待（饥饿）。</li>
+<li><strong>饥饿模式</strong>: 当一个 Goroutine 等待锁超过 1ms，锁会切换到饥饿模式。在此模式下，锁会直接交给等待队列头部的 Goroutine，保证公平。</li>
+</ul>
+</li>
+<li><strong><code>RWMutex</code></strong>: 内部组合了一个 <code>sync.Mutex</code>。它通过一个整型变量来作为读操作的计数器。当计数器大于0时，表示有读锁存在，此时写操作会被阻塞。</li>
+</ul>
+<h3 id="3-">3. 应用场景</h3>
+<ol>
+<li><strong><code>Mutex</code></strong>: 任何需要保证原子性操作的场景。例如，对共享变量的修改、对原生 <code>map</code> 的并发读写、对共享缓冲区的操作等。</li>
+<li><strong><code>RWMutex</code></strong>: 读多写少的场景。例如，服务的全局配置，它在启动时被写入一次，之后会被大量的请求 Goroutine 读取。</li>
+</ol>
+<h3 id="4-">4. 面试要点</h3>
+<ul>
+<li><strong>锁的粒度</strong>: 锁保护的代码范围应尽可能小，仅包含对共享资源的操作，避免将耗时操作（如 I/O）放入锁内，影响并发性能。</li>
+<li><strong>死锁 (Deadlock)</strong>: 常见的死锁场景是两个或多个 Goroutine 相互持有对方需要的锁。避免方法包括：按固定顺序加锁、使用 <code>TryLock</code>、避免在锁内再加其他锁。</li>
+<li><strong><code>defer m.Unlock()</code></strong>: 这是一个非常好的实践，可以确保即使在函数发生 <code>panic</code> 或有多个返回路径时，锁也能被正确释放。</li>
+</ul>
+<h2 id="syncmap">三、<code>sync.Map</code></h2>
+<h3 id="1--1">1. 作用与目的</h3>
+<p><code>sync.Map</code> 是 Go 1.9 版本引入的一个并发安全的 map。它并非旨在替代所有场景下的 <code>map + Mutex</code> 组合，而是针对特定场景做了专门优化。</p>
+<p><strong>核心解决的问题：</strong> 优化“读多写少”场景下的并发性能。在传统 <code>map + RWMutex</code> 的模式中，即使是多个读操作也需要竞争读锁，在高并发读时会产生性能瓶颈。<code>sync.Map</code> 通过“空间换时间”和类似“读写分离”的机制，使得高并发的读操作几乎不需要锁的参与，从而大幅提升性能。</p>
+<h3 id="2--1">2. 实现原理</h3>
+<p><code>sync.Map</code> 的核心是内部维护的两个 map：<code>read</code> 和 <code>dirty</code>。</p>
+<ol>
+<li><strong><code>read</code> map (只读)</strong>:
+<ul>
+<li>类型是 <code>readOnly</code> 结构体，其中包含一个原生的 <code>map[interface{}]*entry</code>。</li>
+<li>它是一个线程安全的只读数据结构。对它的访问通过原子操作（<code>atomic.Load</code>）直接读取，<strong>不需要加锁</strong>，这是其高性能读的关键。</li>
+<li>其中存储的数据可能不是最新的。</li>
+</ul>
+</li>
+<li><strong><code>dirty</code> map (读写)</strong>:
+<ul>
+<li>类型是 <code>map[interface{}]*entry</code>。</li>
+<li>它包含了 <code>read</code> map 中没有的最新数据。</li>
+<li>对 <code>dirty</code> map 的所有访问都 <strong>必须加锁</strong> (<code>mu Mutex</code>)。</li>
+</ul>
+</li>
+</ol>
+<p><strong>读操作 (<code>Load</code>) 流程：</strong></p>
+<ol>
+<li>首先，不加锁，直接从 <code>read</code> map 中原子地查找 key。</li>
+<li>如果找到了，并且 entry 没有被标记为“已删除”，则直接返回。这是最快的路径（Fast Path）。</li>
+<li>如果在 <code>read</code> 中没找到，则必须加锁，去 <code>dirty</code> map 中查找。</li>
+<li>如果在 <code>dirty</code> 中找到了，则返回结果。同时，为了优化未来的读，会将 <code>dirty</code> map 中的部分数据“提升”到 <code>read</code> map 中。</li>
+</ol>
+<p><strong>写操作 (<code>Store</code>) 流程：</strong></p>
+<ol>
+<li>首先检查 <code>read</code> map 中是否存在这个 key。</li>
+<li>如果存在，并且 entry 没有被标记为“已驱逐”，那么尝试直接对这个 entry 进行原子更新（CAS），这个过程也<strong>无需加锁</strong>。</li>
+<li>如果不满足上述条件（例如 key 不在 <code>read</code> 中，或已被驱逐），则必须加锁，操作 <code>dirty</code> map。</li>
+<li>将新的 key-value 写入 <code>dirty</code> map。</li>
+</ol>
+<p><strong>删除操作 (<code>Delete</code>) 流程：</strong></p>
+<ul>
+<li>删除是“懒删除”（Lazy Deletion）。它并不会立即从 <code>read</code> map 中移除，而是将 entry 标记为 <code>nil</code>。真正的物理删除发生在后续 <code>dirty</code> map 提升为 <code>read</code> map 的过程中。</li>
+</ul>
+<h3 id="3--1">3. 应用场景</h3>
+<ol>
+<li><strong>缓存系统</strong>: 例如，缓存需要频繁读取的元数据或配置信息，而这些数据的写入和更新操作相对较少。</li>
+<li><strong>稳定的数据集</strong>: 当一个 key 被写入后，会经历大量的读取，很少被更新或删除。例如，一个服务中注册的插件或模块列表。</li>
+</ol>
+<p><strong>面试要点：</strong> 一定要说明白 <code>sync.Map</code> 并非万能，它不适用于写多读少的场景。因为频繁的写入会导致 <code>dirty</code> map 不断膨胀和频繁的锁竞争，性能反而会低于 <code>map + RWMutex</code>。</p>
+<h2 id="syncwaitgroup">四、<code>sync.WaitGroup</code></h2>
+<h3 id="1--2">1. 作用与目的</h3>
+<p><code>WaitGroup</code> 用于等待一组 Goroutine 全部执行完成。它就像一个并发任务的计数器，主 Goroutine 可以阻塞等待，直到所有子任务 Goroutine 都完成为止。</p>
+<h3 id="2--2">2. 实现原理</h3>
+<p><code>WaitGroup</code> 的核心是一个 <code>state</code> 字段（一个 <code>uint64</code> 整数）和一个信号量 <code>sema</code>。</p>
+<ul>
+<li><strong><code>state</code> 字段</strong>: 这个 64 位的整数被拆分为两部分：
+<ul>
+<li>高 32 位：作为<strong>计数器</strong>，记录了当前还未完成的 Goroutine 数量。</li>
+<li>低 32 位：作为<strong>等待者计数器</strong>，记录了有多少个 Goroutine 正在调用 <code>Wait()</code> 方法等待。</li>
+</ul>
+</li>
+<li><strong><code>Add(delta int)</code></strong>: 使用原子操作，将 <code>delta</code> 加到高 32 位的计数器上。</li>
+<li><strong><code>Done()</code></strong>: 等价于 <code>Add(-1)</code>，也是原子地将计数器减 1。当计数器减到 0 时，它会通过信号量 <code>sema</code> 唤醒所有正在等待的 Goroutine。</li>
+<li><strong><code>Wait()</code></strong>:
+<ol>
+<li>首先，原子地增加低 32 位的等待者数量。</li>
+<li>然后，进入一个循环，检查高 32 位的计数器是否为 0。</li>
+<li>如果计数器不为 0，则调用 <code>runtime_Semacquire</code>（信号量）使当前 Goroutine 进入休眠等待状态。</li>
+<li>当计数器变为 0 时，<code>Done()</code> 方法会释放相应数量的信号量，<code>Wait()</code> 中的 Goroutine 被唤醒，退出循环。</li>
+</ol>
+</li>
+</ul>
+<h3 id="3--2">3. 应用场景</h3>
+<ol>
+<li><strong>并发任务协同</strong>: 主 Goroutine 开启多个子 Goroutine 去执行并行的子任务（如并发下载多个文件、并发处理一批数据），并需要等待所有子任务完成后再进行下一步操作（如数据汇总）。</li>
+<li><strong>服务优雅关闭</strong>: 在服务停止时，等待所有正在处理的请求 Goroutine 执行完毕。</li>
+</ol>
+<p><strong>面试要点：</strong></p>
+<ul>
+<li><code>Add()</code> 的调用应该在启动子 Goroutine <strong>之前</strong>，以防止子 Goroutine 在 <code>Add</code> 调用前就执行完 <code>Done</code>，导致主协程过早退出。</li>
+<li><code>WaitGroup</code> 不可复用。一旦计数器归零，就不应再调用 <code>Add</code> 增加计数，否则会引发 <code>panic</code>。</li>
+</ul>
+<h2 id="synconce">五、<code>sync.Once</code></h2>
+<h3 id="1--3">1. 作用与目的</h3>
+<p><code>sync.Once</code> 提供了一种机制，确保某个函数在程序生命周期内，无论从多少个 Goroutine 中调用，都<strong>只执行一次</strong>。</p>
+<h3 id="2--3">2. 实现原理</h3>
+<p><code>Once</code> 的结构非常简单，只包含两个字段：</p>
+<ul>
+<li><code>done uint32</code>: 一个原子标志位，<code>0</code> 表示未执行，<code>1</code> 表示已执行。</li>
+<li><code>m Mutex</code>: 一个互斥锁。</li>
+</ul>
+<p><strong><code>Do(f func())</code> 方法执行流程：</strong></p>
+<ol>
+<li>
+<p><strong>快速检查路径</strong>: 首先，通过原子操作 <code>atomic.LoadUint32</code> 检查 <code>done</code> 标志位。如果为 <code>1</code>，说明函数已经执行过，直接返回。这是绝大多数调用的路径，非常高效。</p>
+</li>
+<li>
+<p>加锁慢速路径: 如果 done 标志位为 0，则进入 doSlow 逻辑：</p>
+<p>a.  获取互斥锁 m.Lock()。</p>
+<p>b.  双重检查（Double-Checking）: 再次检查 done 标志位。这一步至关重要，因为可能有多个 Goroutine 同时通过了第一步检查并在此等待锁。第一个获取锁的 Goroutine 会执行函数，后续的 Goroutine 获取锁后，通过这次检查发现 done 已经为 1，就会直接解锁并返回，避免了函数的重复执行。</p>
+<p>c.  如果 done 仍为 0，则执行传入的函数 f()。</p>
+<p>d.  执行完毕后，通过原子操作 atomic.StoreUint32 将 done 设置为 1。</p>
+<p>e.  释放互斥锁 m.Unlock()。</p>
+</li>
+</ol>
+<h3 id="3--3">3. 应用场景</h3>
+<ol>
+<li><strong>单例模式（Singleton）</strong>: 在并发环境下安全地初始化一个单例对象。</li>
+<li><strong>一次性初始化</strong>: 初始化全局配置、数据库连接池、日志系统等只需要执行一次的资源。</li>
+<li><strong>惰性加载（Lazy Loading）</strong>: 某个资源在第一次被使用时才进行初始化。</li>
+</ol>
+<p><strong>面试要点：</strong> 一定要能清晰地讲出“双重检查”机制的作用和必要性。</p>
+<h2 id="synccond">六、<code>sync.Cond</code></h2>
+<h3 id="1--4">1. 作用与目的</h3>
+<p><code>Cond</code>（条件变量）是一种同步原语，它允许 Goroutine 在满足某个特定条件之前挂起（等待），并在条件满足后被唤醒。<code>Cond</code> 总是与一个 <code>Locker</code>（通常是 <code>*sync.Mutex</code>）配合使用。</p>
+<h3 id="2--4">2. 实现原理</h3>
+<p><code>Cond</code> 的核心是维护一个等待队列，用于存放所有正在等待条件的 Goroutine。</p>
+<ul>
+<li><code>L *Locker</code>: 关联一个锁，用于保护条件。</li>
+<li><code>Wait()</code>:
+<ol>
+<li><strong>原子操作</strong>: <code>Wait</code> 方法会<strong>原子地</strong>执行两个操作：<strong>释放 <code>L</code> 锁</strong> 和 <strong>将当前 Goroutine 加入等待队列并挂起</strong>。这个原子性是关键，它防止了在“检查条件”和“进入等待”之间的间隙发生条件变化，从而避免“丢失唤醒”信号。</li>
+<li>当被唤醒后，<code>Wait</code> 方法会在返回前<strong>重新获取 <code>L</code> 锁</strong>。</li>
+</ol>
+</li>
+<li><code>Signal()</code>: 唤醒<strong>一个</strong>正在等待队列中的 Goroutine。选择哪一个是不确定的。</li>
+<li><code>Broadcast()</code>: 唤醒等待队列中的<strong>所有</strong> Goroutine。</li>
+</ul>
+<h3 id="3--4">3. 应用场景</h3>
+<ol>
+<li><strong>生产者-消费者模型</strong>:
+<ul>
+<li>当队列为空时，所有消费者 Goroutine 调用 <code>cond.Wait()</code> 等待。</li>
+<li>当生产者向队列中添加元素后，调用 <code>cond.Signal()</code> 或 <code>cond.Broadcast()</code> 唤醒一个或多个消费者。</li>
+</ul>
+</li>
+<li><strong>多任务阶段同步</strong>: 一组工作 Goroutine 必须等待某个条件达成（例如，配置加载完毕）后才能继续执行。当条件满足时，通过 <code>Broadcast</code> 通知所有 Goroutine 同时开始工作。</li>
+</ol>
+<p><strong>面试要点：</strong></p>
+<ul>
+<li>
+<p><strong>必须</strong>与 <code>Locker</code> 配合使用。</p>
+</li>
+<li>
+<p><code>Wait()</code> 的调用<strong>必须</strong>放在一个 <code>for</code> 循环中，以检查条件是否真正满足。这是为了处理“<strong>惊群效应</strong>”或“<strong>虚假唤醒</strong>”。</p>
+<pre><code>// 正确的使用姿势
+c.L.Lock()
+for !condition { // 使用 for 循环检查条件
+    c.Wait()
+}
+// ... 执行业务逻辑 ...
+c.L.Unlock()
+</code></pre>
+</li>
+</ul>
+<h2 id="syncpool-">七、<code>sync.Pool</code> (对象池)</h2>
+<h3 id="1--5">1. 作用与目的</h3>
+<p><code>sync.Pool</code> 是一个可伸缩的、并发安全的对象临时存储池。它的核心目的不是做缓存或连接池，而是<strong>重用对象，减少内存分配，降低 GC（垃圾回收）压力</strong>。</p>
+<h3 id="2--5">2. 实现原理</h3>
+<p><code>sync.Pool</code> 的高性能秘诀在于它为每个 <code>P</code> (Processor) 都维护了一个本地池，极大地避免了锁竞争。</p>
+<ul>
+<li><code>Get()</code> 流程:
+<ol>
+<li>优先尝试从当前 Goroutine 所在 <code>P</code> 的本地私有池 (<code>private</code>) 获取对象，无锁。</li>
+<li>如果失败，尝试从当前 <code>P</code> 的本地共享池 (<code>shared</code>) 获取，无锁。</li>
+<li>如果仍失败，尝试从其他 <code>P</code> 的共享池中“偷取”一个，此时需要加锁。</li>
+<li>如果最终还是失败，则调用用户定义的 <code>New</code> 函数创建一个新对象返回。</li>
+</ol>
+</li>
+<li><code>Put(x)</code> 流程:
+<ol>
+<li>将对象 <code>x</code> 放入当前 <code>P</code> 的本地私有池中。如果私有池已有对象，则移入本地共享池。</li>
+</ol>
+</li>
+<li><strong>与 GC 的关系</strong>: <code>sync.Pool</code> 中的对象生命周期很短，在每次 GC 时，池中的所有对象都可能被回收。这意味着 <code>Pool</code> 不适合存放有状态的、需要长期保持的对象（如数据库连接）。Go 1.13 后通过引入 <code>victim cache</code> 机制，使得一部分对象可以“幸存”一次 GC，缓解了此问题，但其本质不变。</li>
+</ul>
+<h3 id="3--5">3. 应用场景</h3>
+<p>适用于那些需要频繁创建和销毁、生命周期短暂的、并且创建成本较高的对象。</p>
+<ol>
+<li><strong><code>[]byte</code> 或 <code>bytes.Buffer</code> 的重用</strong>: 在网络编程或 I/O 操作中，可以重用缓冲区，避免频繁的内存分配。</li>
+<li><strong>大型结构体的重用</strong>: 例如，日志库中的日志事件对象、编解码中的上下文对象等。</li>
+</ol>
+<h3 id="4--1">4. 面试要点</h3>
+<ul>
+<li>明确 <code>sync.Pool</code> <strong>不是缓存</strong>，不能保证放入的对象一定能被取出来。</li>
+<li>从 <code>Pool</code> 中 <code>Get</code> 出来的对象可能是“脏”的（包含上一次使用后的数据），必须在使用前进行<strong>重置</strong>或清零操作。</li>
+<li>放入的对象最好是大小相似的，避免因对象大小不一导致内存碎片化。</li>
+</ul>
+<h2 id="heading">八、总结</h2>
+<p><code>sync</code> 包是 Go 并发编程的基石。在面试中，除了能够清晰地阐述各个原语的作用和使用场景外，更进一步地理解其实现原理（如 <code>Mutex</code> 的饥饿模式、<code>Map</code> 的读写分离、<code>Once</code> 的双重检查、<code>Pool</code> 的本地池等）是展示你技术深度的关键。正确地选择和使用这些工具，是编写高性能、高并发 Go 服务的必备技能。</p>
+<p>希望这份总结能帮助你在面试中脱颖而出！</p>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/TCP%e7%9a%84%e4%b8%89%e6%ac%a1%e6%8f%a1%e6%89%8b%e4%b8%8e%e5%9b%9b%e6%ac%a1%e6%8c%a5%e6%89%8b/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">TCP的三次握手与四次挥手</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/%e6%90%9e%e6%87%82BIO%e4%b8%8eAIO/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">搞懂BIO与AIO</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

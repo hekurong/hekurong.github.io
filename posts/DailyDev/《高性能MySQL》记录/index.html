@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>《高性能MySQL》记录 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">《高性能MySQL》记录</h1>
+    <div class="article-meta">
+      <time datetime="2025-04-12">2025-04-12</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daliy%20Dev/">Daliy Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/MySQL/">MySQL</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="mysql">《高性能MySQL》记录</h1>
+<h2 id="heading">创建高性能的索引</h2>
+<h3 id="heading-1">索引基础</h3>
+<h4 id="b-tree-">B-Tree 索引</h4>
+<p>InnoDB 引擎的默认索引类型是 B+ Tree，按照原数据格式进行存储。</p>
+<p>B-Tree 意味着所有的值都是按顺序存储的，并且每一个叶子到根的距离相同。B-Tree 索引能够加快访问数据的速度，通过根节点的指针不断向下比较查找，最终存储引擎要么找到对应的值，要么记录不存在。B-Tree 对索引列的顺序存储结构适合查找范围数据，如全值匹配、匹配最左前缀、匹配范围值等。除了按值查找，索引还可以用于 <code>ORDER BY</code> 操作。</p>
+<p>B-Tree 索引存在以下限制：</p>
+<ul>
+<li>如果不是按照索引的最左列开始查找，则无法使用索引。对于复合索引(A,B,C)，查询条件必须包含A列才能有效使用该索引。如果查询只使用B或C列，索引通常不会被使用。</li>
+<li>不能跳过索引中的列，必须按照索引定义的列顺序使用。</li>
+<li>如果查询中有某个列的范围查询，则其右边所有列都无法使用索引优化查询。</li>
+</ul>
+<h4 id="heading-2">哈希索引</h4>
+<p>哈希索引是基于哈希表实现的索引类型，通过哈希函数将索引列值转换为哈希码来快速定位数据行。在MySQL中，只有MEMORY存储引擎显式支持哈希索引，并且这是MEMORY引擎的默认索引类型。</p>
+<p>哈希索引是无序存储，而且只支持精确匹配。哈希索引的限制如下：</p>
+<ul>
+<li>不支持范围查询，如<code>&gt;</code>、<code>&lt;</code>、<code>BETWEEN</code>等。</li>
+<li>不支持部分列匹配，必须使用索引的所有列才能生效，因为哈希索引始终是使用索引项的全部内容来计算哈希值的。</li>
+<li>哈希冲突问题，不同值可能产生相同哈希值，需要额外处理。</li>
+</ul>
+<p>InnoDB 有一个自适应哈希索引，InnoDB 引擎会自动监控查询模式，对频繁访问的索引值创建自适应哈希索引。这实际上是 B-Tree 索引上的优化层，使用哈希值而非键本身进行查找。</p>
+<h4 id="r-tree">空间数据索引（R-Tree）</h4>
+<p>空间数据索引是一种专门用于处理多维空间数据(如地理坐标、几何图形等)的索引技术，主要解决传统 B-Tree 索引无法有效处理空间数据的问题。</p>
+<h4 id="heading-3">全文索引</h4>
+<p>全文索引是专门为文本内容搜索设计的索引技术，通过建立倒排索引实现高效文本检索。</p>
+<h3 id="heading-4">高性能的索引策略</h3>
+<h4 id="heading-5">独立的列</h4>
+<p>索引列必须作为独立的表达式存在，不能参与计算或作为函数参数，否则索引会失效。MySQL 无法解析包含运算或函数的表达式，必须将列单独提取为查询条件，才能触发索引优化。</p>
+<h4 id="heading-6">前缀索引与索引选择性</h4>
+<p>针对长字符串或文本类型，通过截取前 N 个字符建立索引，减少存储空间和 I/O 消耗。</p>
+<p>关于如何选择合适的前缀长度，可以通过计算选择性进行评估：</p>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span><span class="w"> </span><span class="k">LEFT</span><span class="p">(</span><span class="k">column</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">table</span><span class="p">;</span><span class="w">  
+</span></span></span></code></pre><p>选择接近完整列选择性的最短前缀（如对邮箱地址反转后建前缀索引）。</p>
+<h4 id="heading-7">复合索引与最左前缀原则</h4>
+<p>最左前缀原则：查询必须从复合索引的最左列开始，且不能跳过中间列。示例：索引 <code>(A,B,C)</code> 支持 <code>A=1 AND B=2</code> ，但不支持 <code>B=2</code> 或 <code>B=2 AND C=3</code> 。使用复合索引时要注意范围查询限制，若某一列使用范围查询，其右侧的列无法使用索引优化。</p>
+<p>关于复合索引的列选择，选择性高的列放左侧、优先筛选更多数据。若需 <code>ORDER BY A,B</code> ，索引顺序应为 <code>(A,B)</code> 。</p>
+<h4 id="heading-8">聚簇索引</h4>
+<p>聚簇索引并非独立的索引类型，而是 InnoDB 的数据存储方式，将 B-Tree 索引和数据行合并存储在同一个结构中。数据行按主键顺序物理存储，叶子节点包含完整数据。聚簇索引优先选择自增主键，若无主键，选择首个唯一非空索引。两者均无时，InnoDB 隐式创建包含 <code>rowid </code>的聚簇索引。</p>
+<p>聚簇索引有以下优点：</p>
+<ul>
+<li>数据局部性：相关数据（如用户ID关联的邮件）物理相邻存储，减少磁盘 I/O 。</li>
+<li>查询性能：索引与数据共存于 B-Tree，避免二次查找。覆盖索引扫描可直接利用节点中的主键值。</li>
+</ul>
+<p>聚簇索引的缺点：</p>
+<ul>
+<li>
+<p>同时也导致了插入和更新的代价比较高：</p>
+<ul>
+<li>
+<p>主键顺序插入最快，乱序插入易引发页分裂，需 <code>OPTIMIZE TABLE</code> 优化。</p>
+</li>
+<li>
+<p>更新聚簇索引列会强制移动行位置，增加 I/O 开销。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>存储问题：</p>
+<ul>
+<li>页分裂导致空间碎片化，全表扫描效率降低。</li>
+<li>二级索引体积较大，需回表查询。</li>
+</ul>
+</li>
+</ul>
+<h4 id="heading-9">覆盖索引</h4>
+<p>索引包含查询所需的所有字段，无需回表，显著减少I/O和锁竞争。高频查询字段较少时，可将这些字段加入索引。InnoDB的二级索引会隐式包含主键值，因此若查询包含主键和索引列，也可能触发覆盖索引。通过 <code>EXPLAIN</code> 的 <code>Extra</code> 列显示 <code>Using index</code> 时即表示使用了覆盖索引。</p>
+<h4 id="heading-10">使用索引扫描排序</h4>
+<p>MySQL可通过两种方式排序：</p>
+<ol>
+<li>文件排序（Filesort）：临时磁盘排序，性能较差。</li>
+<li>索引扫描排序：按索引顺序直接返回结果，<code>EXPLAIN</code> 的 <code>type</code> 列为 <code>index</code> 。</li>
+</ol>
+<p>要使用索引扫描排序，必须满足以下所有条件：</p>
+<ul>
+<li>列顺序一样：<code>ORDER BY</code> 子句的列顺序与索引定义完全一致。</li>
+<li>排序方向一样：所有列均为升序（ASC）或降序（DESC），混合方向需文件排序。</li>
+<li>最左匹配原则。</li>
+</ul>
+<p>当出现以下情况时会失效：</p>
+<ul>
+<li>范围查询。</li>
+<li>包含非索引列。</li>
+<li>多表关联：仅当 <code>ORDER BY</code> 列全部来自关联的第一个表时才生效。</li>
+</ul>
+<h4 id="heading-11">把索引压缩</h4>
+<p>通过压缩算法减少索引占用的存储空间，主要应用于MyISAM引擎（InnoDB的压缩机制不同）：</p>
+<ul>
+<li>压缩前缀索引：默认仅压缩字符串，通过截取列值的前缀减少空间。</li>
+<li>整数压缩：需手动启用，对整数值进行差分编码或位压缩。</li>
+</ul>
+<p>压缩索引可以节省存储同时提高 I/O 吞吐量，但是解压会增加计算负担（不适合 CPU 计算密集型场景），同时还会增加索引的更新代价。</p>
+<h4 id="heading-12">冗余索引和重复索引</h4>
+<p>概念：</p>
+<ul>
+<li>
+<p>重复索引：在相同列上按相同顺序创建的相同类型索引（如对列 <code>A</code> 同时创建两个 B-Tree 索引）。MySQL 需单独维护每个重复索引，优化器需逐个评估，影响性能。</p>
+</li>
+<li>
+<p>冗余索引：若已有联合索引 <code>(A,B)</code> ，再创建 <code>(A)</code> 则为冗余索引（因 <code>(A,B)</code> 可替代 <code>(A)</code> 的功能）。但 <code>(B)</code> 或 <code>(B,A)</code> 不冗余。</p>
+</li>
+</ul>
+<p>这两种索引增加存储占用，且额外增加更新代价，降低性能。</p>
+<p>若扩展已有索引会导致索引过大（如从 <code>INT</code> 列扩展为 <code>INT+VARCHAR</code> ），可保留冗余索引以兼顾不同查询性能。</p>
+<h4 id="heading-13">索引和锁</h4>
+<p>InnoDB 行锁依赖索引：锁定的行通过索引定位。若查询使用索引，仅锁定符合条件的行；否则退化为全表扫描并锁定更多行。</p>
+<p>锁类型：</p>
+<ul>
+<li>记录锁（Record Lock）：锁定索引中的具体记录。</li>
+<li>间隙锁（Gap Lock）：在可重复读（RR）隔离级别下，防止其他事务在索引间隙插入数据（解决幻读）。</li>
+</ul>
+<p>性能影响：</p>
+<ul>
+<li>索引优化锁粒度：有效索引减少锁定行数，降低锁竞争，提高并发性。</li>
+<li>无索引的代价：若 <code>WHERE</code> 条件无法利用索引，InnoDB 会锁定全表或大量行，导致阻塞。</li>
+</ul>
+<h2 id="heading-14">查询性能优化</h2>
+<h2 id="mysql-">MySQL 高级特性</h2>
+<h2 id="heading-15">优化服务器设置</h2>
+<h2 id="heading-16">复制</h2>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/%e3%80%8aRedis%e6%b7%b1%e5%ba%a6%e5%8e%86%e9%99%a9%e3%80%8b%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">《Redis深度历险》记录</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/%e3%80%8aKubernetes%e7%bc%96%e7%a8%8b%e3%80%8b%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《Kubernetes编程》记录</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>《gRPC与云原生应用开发》记录 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">《gRPC与云原生应用开发》记录</h1>
+    <div class="article-meta">
+      <time datetime="2024-11-30">2024-11-30</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daily%20Dev/">Daily Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="tag" href="/tags/Golang/">Golang</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="grpc">《gRPC与云原生应用开发》记录</h1>
+<h2 id="grpc-">gRPC 入门</h2>
+<h3 id="grpc--1">gRPC 的定义</h3>
+<p>gRPC 是一项进程间通信技术，可以用来连接、调用、操作和调试分布式异构应用程序。</p>
+<p>开发 gRPC 应用程序时，要先定义服务接口：消费者消费信息的方式、消费者能够远程调用的方法以及调用方法所使用的参数和消息格式等。在服务定义中使用的语言叫作接口定义语言（IDL）。</p>
+<p>下面是使用 protocol buffers 作为 IDL 来定义服务接口：</p>
+<ul>
+<li>
+<p>服务定义</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// ProductInfo.proto
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">syntax</span> <span class="o">=</span> <span class="s">&#34;proto3&#34;</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kn">package</span> <span class="nn">ecommerce</span><span class="p">;</span>  <span class="c1">// 防止协议消息类型之间发生命名冲突
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 定义服务接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">service</span> <span class="n">ProductInfo</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">addProduct</span><span class="p">(</span><span class="n">Product</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">ProductID</span><span class="p">);</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">getProduct</span><span class="p">(</span><span class="n">ProductID</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">Product</span><span class="p">);</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 定义消息格式
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">message</span> <span class="nc">Product</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">name</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">description</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kd">message</span> <span class="nc">ProductID</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></li>
+<li>
+<p>上面定义完成之后，就使用 protocol buffers 编译器 protoc 生成服务器端和客户端代码。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>gRPC 服务端</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;.../proto&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// ProductInfo 的 go 实现
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 业务逻辑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">getProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 业务逻辑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span></code></pre></li>
+<li>
+<p>gRPC 服务端要做两件事：</p>
+<ul>
+<li>
+<p>通过重载服务基类，实现所生成的服务器端骨架的逻辑</p>
+</li>
+<li>
+<p>运行 gRPC 服务器，监听来自客户端的请求并返回服务响应</p>
+<pre><code class="language- go">func main() {
+  lis, _ := net.listen(&quot;tcp&quot;. port)
+  s := grpc.NewServer()
+  pb.RegisterProductInfoServer(s, &amp;server())
+  if err := s.Serve(lis); err != nil {
+    log.Fatalf(&quot;failed to serve: %v&quot;, err)
+  }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>gRPC 客户端</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// 使用远程服务器地址创建通道
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ManagedChannel</span> <span class="nx">channel</span> <span class="p">=</span> <span class="nx">ManagedChannelBuiler</span><span class="p">.</span><span class="nf">forAddress</span><span class="p">(</span><span class="s">&#34;localhost&#34;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">.</span><span class="nf">usePlaintext</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">.</span><span class="nf">build</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用通道初始化阻塞式存根
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ProductInfoGrpc</span><span class="p">.</span><span class="nx">ProductInfoBlockingStub</span> <span class="nx">stub</span> <span class="p">=</span> <span class="nx">ProductInfoGrpc</span><span class="p">.</span><span class="nf">newBlockingStub</span><span class="p">(</span><span class="nx">channel</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用阻塞式存根调用远程方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">StringValue</span> <span class="nx">ProductID</span> <span class="p">=</span> <span class="nx">stub</span><span class="p">.</span><span class="nf">addProduct</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Product</span><span class="p">.</span><span class="nf">newBuiler</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="p">.</span><span class="nf">setName</span><span class="p">(</span><span class="s">&#34;Apple&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">.</span><span class="nf">setDescription</span><span class="p">(</span><span class="s">&#34;Apple&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">.</span><span class="nf">build</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></li>
+<li>
+<p>可以使用服务定义生成客户端存根，它提供了与服务端类似的方法，供客户端进行调用。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>客户端-服务端的消息流：当调用 gRPC服务时，客户端的 gRPC 库会使用 protpcol buffers，并将 RPC 的请求编排（marshal）为 protocol buffers 格式，然后将其通过 HTTP/2 进行发送。在服务端，请求会被解排（unmarshal），对应的过程调用会使用 protocol buffers 来执行。</p>
+</li>
+</ul>
+<h3 id="rpc-">RPC 演进</h3>
+<ul>
+<li>传统的 RPC：通用对象请求代理体系结构（CORBA）和 Java 远程方法调用（RMI）。基于 TCP 构建，很复杂，且限制较多；</li>
+<li>简单对象访问协议（SOAP）：在服务之间基于 XML 交换数据，并能基于任意的底层通信协议进行通信，如HTTP。但是消息格式复杂、规范复杂；</li>
+<li>描述性状态迁移（REST）：基于 HTTP 实现。REST 架构风格已经成为构建微服务的标准方法了，但是其仍然有局限性：
+<ul>
+<li>基于文本的低效消息协议：使用 json 等人类可读形式的文本类型在服务间通信时是低效的；</li>
+<li>应用程序之间缺乏强类型接口：不同语言构建的服务通过网络进行交互，导致缺乏明确定义和强类型的服务接口成为了使用 RESTful 服务的主要阻碍；</li>
+<li>REST 架构风格难以强制实施：虽然有一些“好的实践”，而且只有遵循这些实践才能构建真正的 RESTful 服务。但是 REST 架构不是强制性的。且那些实践难以实施。</li>
+</ul>
+</li>
+<li>gRPC：2015年由Google开源。真神降临 😊</li>
+</ul>
+<p>gRPC 的优势所在：</p>
+<ul>
+<li>高效的进程间通信：使用基于 HTTP/2 的 protocol buffers 进行进程间通信；</li>
+<li>简单且定义良好的服务接口和模式：使用 IDL 定义服务接口，可以保证简单但一致、可靠且可扩展的开发体验；</li>
+<li>属于强类型：明确了服务接口的输入、返回的消息类型，属于强类型；</li>
+<li>支持多语言（语言中立）；</li>
+<li>支持全双工：可以开发流服务或流客户端；</li>
+<li>具备多种特性：支持认证、加密、弹性、负载均衡、服务发现等；</li>
+<li>与云原生的集成：是 CNCF 的一部分，大多数现代框架和技术都提供了对 gRPC 的原生支持。</li>
+</ul>
+<h2 id="-grpc">开始使用 gRPC</h2>
+<h3 id="heading">创建服务定义</h3>
+<p>正如一开始的“gRPC 入门”篇章中的代码片段，先定义消息类型、服务接口。完成服务定义后，就是生成代码并进行实现了。</p>
+<h3 id="go-">Go 实现</h3>
+<ul>
+<li>
+<p>gRPC 服务端：</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;errors&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;github.com/gofrs/uuid&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 中间件交互的抽象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">server</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">productMap</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">out</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nf">NewV4</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">Internal</span><span class="p">,</span> <span class="s">&#34;Error while generating Product ID&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">in</span><span class="p">.</span><span class="nx">Id</span> <span class="p">=</span> <span class="nx">out</span><span class="p">.</span><span class="nf">String</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">s</span><span class="p">.</span><span class="nx">productMap</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">s</span><span class="p">.</span><span class="nx">ProductMap</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">s</span><span class="p">.</span><span class="nx">productMap</span><span class="p">[</span><span class="nx">in</span><span class="p">.</span><span class="nx">Id</span><span class="p">]</span> <span class="p">=</span> <span class="nx">in</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">{</span><span class="nx">Value</span><span class="p">:</span> <span class="nx">in</span><span class="p">.</span><span class="nx">Id</span><span class="p">},</span> <span class="nx">status</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">OK</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">).</span><span class="nf">Err</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></li>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;net&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">port</span> <span class="p">=</span> <span class="s">&#34;:50051&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">lis</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">.</span> <span class="nx">port</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to listen: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 创建服务器并监听
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">s</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">pb</span><span class="p">.</span><span class="nf">RegisterProductInfoServer</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="nf">server</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Starting gRPC listener on port &#34;</span><span class="o">+</span> <span class="nx">port</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">lis</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to serve: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></li>
+</ul>
+</li>
+<li>
+<p>gRPC 客户端：</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">address</span> <span class="p">=</span> <span class="s">&#34;localhost:50051&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">conn</span><span class="p">,</span> <span class="nx">errr</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="nx">address</span><span class="p">.</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithInsecure</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;did not connect: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">defer</span> <span class="nx">conn</span><span class="p">.</span><span class="nb">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewProductInfoClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">defer</span> <span class="nf">cancel</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">name</span> <span class="o">:=</span> <span class="s">&#34;Apple 11&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">description</span> <span class="o">:=</span> <span class="s">&#34;Apple 11&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">price</span> <span class="o">:=</span> <span class="nb">float32</span><span class="p">(</span><span class="mf">1000.0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">r</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">Description</span><span class="p">:</span> <span class="nx">description</span><span class="p">,</span> <span class="nx">Price</span><span class="p">:</span> <span class="nx">price</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Could not add product: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Product ID: %s added successfully&#34;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Value</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">product</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">GetProduct</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nf">ProductID</span><span class="p">(</span><span class="nx">Value</span><span class="p">:</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Value</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Could not get product: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Product: &#34;</span><span class="p">,</span> <span class="nx">Product</span><span class="p">.</span><span class="nf">String</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></li>
+</ul>
+</li>
+</ul>
+<h2 id="grpc--2">gRPC 的通信模式</h2>
+<h3 id="-rpc-">一元 RPC 模式</h3>
+<p>前面出现的示例就是一元 RPC 模式，一个服务端、一个客户端，通信时始终只有一个请求和一个响应。这种方式适用于大多数的进程间通信。</p>
+<h3 id="-rpc--1">服务端流 RPC 模式</h3>
+<p>在服务端流 RPC 模式，服务端接收到客户端的请求消息后，会发回一个响应的序列，这个序列叫做“流”。在将所有的服务端响应发送结束后，服务端会以 trailer 元数据的形式将其状态发送给客户端，从而标记流的结束。</p>
+<p>使用方式：</p>
+<ul>
+<li>
+<p>服务定义：返回是 stream 类型</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">service</span> <span class="n">OrderManagement</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">searchOrders</span><span class="p">(</span><span class="n">google.protobuf.StringValue</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">stream</span> <span class="n">Order</span><span class="p">);</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></li>
+</ul>
+</li>
+<li>
+<p>服务端实现：</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SearchOrders</span><span class="p">(</span><span class="nx">searchQuery</span> <span class="o">*</span><span class="nx">wrappers</span><span class="p">.</span><span class="nx">StringValue</span><span class="p">,</span> <span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">OrderManagement_SearchOrdersServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 业务逻辑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="o">...</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">order</span><span class="p">)</span>  <span class="c1">// 通过 send 发送到流中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span> 	<span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></li>
+<li>
+<p>接收 stream 的响应，最后返回 nil 来标记流已经结束。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>客户端实现：</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewOrderManagementClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="nx">searchStream</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">SearchOrders</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">wrapper</span><span class="p">.</span><span class="nx">StringValue</span><span class="p">{</span><span class="nx">Value</span><span class="p">:</span> <span class="s">&#34;Google&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">searchOrder</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">searchStream</span><span class="p">.</span><span class="nf">Recv</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span> <span class="p">{</span>  <span class="c1">// 流已经结束
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">break</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Search Result: &#34;</span><span class="p">,</span> <span class="nx">searchOrder</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></li>
+</ul>
+</li>
+</ul>
+<h3 id="-rpc--2">客户端流 RPC 模式</h3>
+<p>在客户端流 RPC 模式，客户端会发送多个请求给服务端，服务端会发送一个响应给客户端。但是服务端不一定要等到客户端接收到所有消息后才发送响应。</p>
+<p>使用方式：</p>
+<ul>
+<li>
+<p>服务定义：请求是 stream 类型</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">service</span> <span class="n">OrderManagement</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">updateOrders</span><span class="p">(</span><span class="n">stream</span> <span class="n">Order</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">google.protobuf.StringValue</span><span class="p">);</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></li>
+</ul>
+</li>
+<li>
+<p>服务端实现：</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">UpdateOrders</span><span class="p">(</span><span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">OrderManagement_UpdateOrdersServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="o">...</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">order</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Recv</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="o">...</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">SendAndClose</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>  <span class="c1">// 服务端通过该方法发送响应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></li>
+</ul>
+</li>
+<li>
+<p>客户端实现：</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewOrderManagementClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">updateStream</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">upOrder1</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>  <span class="c1">// 客户端通过 Send 连续发送多条请求
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="nx">updateRes</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">updateStream</span><span class="p">.</span><span class="nf">CloseAndRecv</span><span class="p">()</span>  <span class="c1">// 接收响应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="o">...</span>
+</span></span></code></pre></li>
+</ul>
+</li>
+</ul>
+<h3 id="-rpc--3">双向流 RPC 模式</h3>
+<p>在双向流 RPC 模式中，客户端以消息流的形式发送请求到服务端，服务端也以消息流形式响应。</p>
+<p>流的操作完全独立，客户端和服务端可以按照任意顺序进行读取和写入。一旦建立连接，通信模式就完全取决于客户端和服务端本身。</p>
+<h2 id="grpc--3">gRPC 的底层原理</h2>
+<h3 id="rpc--1">RPC 流</h3>
+<p>一个基本的 gRPC 过程，以 getProduct 方法为例：</p>
+<ol>
+<li>客户端通过生成的存根调用 getProduct方法；</li>
+<li>客户端存根使用已编码的消息创建 POST 请求。在 gRPC 中所有的请求都是 PSOT，并且 content-type 的值为 application/grpc ；</li>
+<li>HTTP 请求消息通过网络发送到服务端；</li>
+<li>接收到消息后，服务端检查消息头消息，确定要调用的方法，然后将消息传递给服务端骨架；</li>
+<li>服务端骨架将消息解析成特定的数据结构；</li>
+<li>借助解析后的消息，服务发起对 getProduct 方法的本地调用。</li>
+</ol>
+<p>gRPC 的这些步骤与其他 RPC 方式很相似，而主要区别在与消息的编码方式。gRPC 采用 protocol buffers。</p>
+<h3 id="-protocol-buffers-">使用 protocol buffers 编码消息</h3>
+<p>对于 protocol buffers 中的消息定义：</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">ProductID</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></li>
+<li>
+<p>消息在经过编码后的字节流：消息字段1、消息字段2、….、结束标志。</p>
+<ul>
+<li>每个消息字段由标签、值两部分组成，标签由字段索引和线路类型（wire type）组成，字段索引就是上面消息定义里的“1”，线路类型则是该消息字段所属数据结构的类型，如 string 属于 “2:基于长度分隔”，那么其线路类型就是 2。值的编码会根据数据类型而不同。</li>
+</ul>
+</li>
+</ul>
+<h3 id="heading-1">基于长度前缀的消息分帧</h3>
+<p>长度前缀分帧是指在写入消息本身之前，写入长度信息，来表明每条消息的大小。</p>
+<p>在 gRPC 通信中，每条消息都有额外的4字节用来设置其大小，这表示 gRPC 通信可以处理大小不超过 4GB 的所有消息。</p>
+<p>除了消息的大小外，还有单字节的无符号整数，用于表明数据是否进行了压缩。</p>
+<h3 id="-http2--grpc">基于 HTTP/2 的 gRPC</h3>
+<ul>
+<li>请求消息：请求消息包含请求头信息、以长度作为前缀的消息、流结束标记 EOS。远程调用会在客户端发送请求信息之后就会初始化，然后发送以长度作为前缀的消息，最后发送 EOS 标记。</li>
+<li>响应消息：响应消息包含响应头消息、以长度作为前缀的消息、trailer，这个也是发送顺序。</li>
+</ul>
+<p>那么，从这个角度再来重新看下 gRPC 的通信模式：</p>
+<ul>
+<li>一元 RPC 模式：就是以上面消息原始的方式互相发出去；</li>
+<li>服务端流 RPC 模式：请求消息不变，响应消息中以长度作为前缀的消息可以是多个；</li>
+<li>客户端流 RPC 模式：响应消息不变，请求消息中以长度作为前缀的消息可以是多个；</li>
+<li>双向流 RPC 模式：两种消息的以长度作为前缀的消息都可以是多个。</li>
+</ul>
+<p>至此，gRPC 在 HTTP/2 层的原理介绍就到这了。</p>
+<h2 id="grpc-1">gRPC：超越基础知识</h2>
+<p>这一部分就不看了，就简单的把 gRPC 还能干啥写出来：</p>
+<ul>
+<li>拦截器</li>
+<li>截止时间</li>
+<li>取消</li>
+<li>错误处理</li>
+<li>多路复用</li>
+<li>元数据</li>
+<li>负载均衡</li>
+</ul>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/%e3%80%8a%e9%ab%98%e6%95%88%e4%bd%bf%e7%94%a8Redis%e3%80%8b%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">《高效使用Redis》记录</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/%e3%80%8a%e6%b7%b1%e5%85%a5RabbitMQ%e3%80%8b%e8%ae%b0%e5%bd%95/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《深入RabbitMQ》记录</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>《计组KG》课题开发过程（一） - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">《计组KG》课题开发过程（一）</h1>
+    <div class="article-meta">
+      <time datetime="2024-08-01">2024-08-01</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daily%20Dev/">Daily Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="heading">前言</h2>
+<p>开发该课题也有一个月了，整个过程并不是很顺利，很多细节部分如果没有得到及时梳理，对以后的研究和论文写作也有坏处。基于以上和其他原因，遂决定分阶段进行记录。</p>
+<h2 id="heading-1">数据集</h2>
+<p>深度学习项目的良好开端就是有一个优良标注的数据集。而由于本课题起源于一个极小领域下，导致数据集必须完全自建。所有工作由我一人进行，工作量不可避免的大。所以必须尽可能的减少工作量，尽量实现在课题的中后期的所有标注工作都由程序自动化解决。</p>
+<p>计组数据集的构建分为了以下几个过程：</p>
+<ul>
+<li>计组数据集来源</li>
+<li>数据预处理</li>
+<li>数据集的预标注</li>
+<li>基于词典的多次迭代标注</li>
+<li>数据集格式的转换</li>
+</ul>
+<p>接下来对每一个部分进行详述。</p>
+<h3 id="heading-2">计组数据集来源</h3>
+<p>目前数据的来源如下：</p>
+<ul>
+<li>计算机组成原理第6版 (白中英)，pdf 转 txt</li>
+<li>计算机组成原理第6版 (白中英) 课件，ppt 转 txt</li>
+</ul>
+<h3 id="heading-3">数据预处理</h3>
+<p>以下是大概的预处理过程：</p>
+<ol>
+<li>将所有的文本合并到一个文件，方便后续操作；</li>
+<li>手工去掉一些与课题无关的文本和小部分错误内容；</li>
+<li>去掉所有的空白字符（空格、换行符、制表符等）；</li>
+<li>去掉所有的特殊字符（数字、半角符号、特殊字符）；</li>
+<li>以中文句号进行分割，分别以整句、分词的形式输出到 json 文件中。</li>
+</ol>
+<p>处理结果：</p>
+<ul>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// 整句
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;0&#34;</span><span class="p">:</span> <span class="s2">&#34;\u8ba1\u7b97\u673a\u7cfb\u7edf\u4e0d\u540c\u4e8e\u4e00\u822c\u7684\u7535\u5b50\u8bbe\u5907\uff0c\u5b83\u662f\u4e00\u4e2a\u7531\u786c\u4ef6\u3001\u8f6f\u4ef6\u7ec4\u6210\u7684\u590d\u6742\u7684\u81ea\u52a8\u5316\u8bbe\u5907&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></li>
+<li>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// 分词
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;0&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;\u8ba1&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7b97&#34;</span><span class="p">,</span> <span class="s2">&#34;\u673a&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7cfb&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7edf&#34;</span><span class="p">,</span> <span class="s2">&#34;\u4e0d&#34;</span><span class="p">,</span> <span class="s2">&#34;\u540c&#34;</span><span class="p">,</span> <span class="s2">&#34;\u4e8e&#34;</span><span class="p">,</span> <span class="s2">&#34;\u4e00&#34;</span><span class="p">,</span> <span class="s2">&#34;\u822c&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7684&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7535&#34;</span><span class="p">,</span> <span class="s2">&#34;\u5b50&#34;</span><span class="p">,</span> <span class="s2">&#34;\u8bbe&#34;</span><span class="p">,</span> <span class="s2">&#34;\u5907&#34;</span><span class="p">,</span> <span class="s2">&#34;\uff0c&#34;</span><span class="p">,</span> <span class="s2">&#34;\u5b83&#34;</span><span class="p">,</span> <span class="s2">&#34;\u662f&#34;</span><span class="p">,</span> <span class="s2">&#34;\u4e00&#34;</span><span class="p">,</span> <span class="s2">&#34;\u4e2a&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7531&#34;</span><span class="p">,</span> <span class="s2">&#34;\u786c&#34;</span><span class="p">,</span> <span class="s2">&#34;\u4ef6&#34;</span><span class="p">,</span> <span class="s2">&#34;\u3001&#34;</span><span class="p">,</span> <span class="s2">&#34;\u8f6f&#34;</span><span class="p">,</span> <span class="s2">&#34;\u4ef6&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7ec4&#34;</span><span class="p">,</span> <span class="s2">&#34;\u6210&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7684&#34;</span><span class="p">,</span> <span class="s2">&#34;\u590d&#34;</span><span class="p">,</span> <span class="s2">&#34;\u6742&#34;</span><span class="p">,</span> <span class="s2">&#34;\u7684&#34;</span><span class="p">,</span> <span class="s2">&#34;\u81ea&#34;</span><span class="p">,</span> <span class="s2">&#34;\u52a8&#34;</span><span class="p">,</span> <span class="s2">&#34;\u5316&#34;</span><span class="p">,</span> <span class="s2">&#34;\u8bbe&#34;</span><span class="p">,</span> <span class="s2">&#34;\u5907&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></li>
+</ul>
+<h3 id="heading-4">数据集的预标注</h3>
+<p>以上所有数据处理完后，共得到5632条文本。如果要自己一条条的标注，真就是整一个月啥也别干，所以还是要用比较省力的方式进行标注。我选择用一个在中文语料集上训练过的预训练模型进行第一轮标注，也就是预标注。</p>
+<p>我选择了 <a href="https://modelscope.cn/models/iic/nlp_raner_named-entity-recognition_chinese-large-generic">RaNER命名实体识别-中文-通用领域-large</a> 作为预标注阶段的预训练模型。该模型的标签如下：</p>
+<table>
+<thead>
+<tr>
+<th>实体类型</th>
+<th>英文名</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公司名</td>
+<td>CORP</td>
+</tr>
+<tr>
+<td>创作名</td>
+<td>CW</td>
+</tr>
+<tr>
+<td>其他组织名</td>
+<td>GRP</td>
+</tr>
+<tr>
+<td>地名</td>
+<td>LOC</td>
+</tr>
+<tr>
+<td>人名</td>
+<td>PER</td>
+</tr>
+<tr>
+<td>消费品</td>
+<td>PROD</td>
+</tr>
+</tbody>
+</table>
+<p>为什么要选择这个模型呢？我当时认为有以下几点可以考虑：</p>
+<ul>
+<li>标签覆盖范围广：其他的预训练模型只对 PER、LOC、ORG 这三种基本实体有所覆盖，如 CPU、内存这类实体反而识别不出来。相比以上，该模型能成功将计组教材中的大部分实体识别出来，并赋予 PROD、CW、GRP、CORP、PER等标签；</li>
+<li>中文平台 ModelScope：因为 ModelScope 在国内，所以各种工具使用起来相对方便。</li>
+</ul>
+<p>整个预标注过程如下：</p>
+<ol>
+<li>读取以整句进行分割的语料集；</li>
+<li>构建 Pytorch 的 Dataset 、DataLoader ，方便后续分批加载数据；</li>
+<li>创建 ModelScope 的 Pipeline ；</li>
+<li>将数据顺序输入到 Pipeline 中，由模型进行推理；</li>
+<li>将结果输出到 txt 文件中。</li>
+</ol>
+<pre><code>文本：计算机系统不同于一般的电子设备，它是一个由硬件、软件组成的复杂的自动化设备。
+预标注结果：{'output': [{'type': 'PROD', 'start': 0, 'end': 5, 'prob': 0.12411527, 'span': '计算机系统'}]}
+</code></pre>
+<p>可以从上面的结果中看到，计算机系统这个实体被识别了出来，并被标注为 PROD 消费品。但是硬件、软件这两个概念实体没有识别出来，说明预标注的结果只能在一定程度上减少工作量，其余的大部分工作仍需要更高精度的校对。</p>
+<p>（标注的结果分析：在所有数据集都处理完成之后才能进行这一步）</p>
+<h3 id="heading-5">基于词典的多次迭代标注</h3>
+<p>预标注的准确率极为有限，出现了大量识别错漏的情况。这伴随而来的是超大工作量，想要在短时间内修复绝大部分错误几乎是不可能的。那有没有什么方法可以半自动，甚至在之后可以全自动的解决这些问题呢？我想到的是基于词典的多次迭代标注方法。</p>
+<p>为了能快速准确的校对大量数据，引入了词典。所谓词典就是 Python 的字典数据结构，由大量键值对组成。为了方便进行迭代标注，我做了以下三个工作：</p>
+<ul>
+<li>
+<p>分割数据集：数据集以训练集 : 验证集 : 测试集 = 8 : 1 : 1 的比例进行划分，而训练集又分成了 5 份；</p>
+</li>
+<li>
+<p>细分标签：</p>
+<ul>
+<li>将计组实体分为了以下十一类：
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Meaning</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>COMP</td>
+<td>组件</td>
+<td>用于标注计算机系统的具体组件，如“寄存器”、“总线”、“控制单元”等</td>
+</tr>
+<tr>
+<td>DATA</td>
+<td>数据</td>
+<td>用于标注数据类型和格式，如“二进制数据”、“十六进制数据”等</td>
+</tr>
+<tr>
+<td>ARCH</td>
+<td>架构</td>
+<td>用于标注计算机体系结构相关的实体，如冯·诺依曼架构、RISC等</td>
+</tr>
+<tr>
+<td>PROG</td>
+<td>程序与软件</td>
+<td>用于标注具体的程序或软件，如“操作系统”、“编译器”等</td>
+</tr>
+<tr>
+<td>PROT</td>
+<td>网络协议</td>
+<td>用于标注网络协议或通信协议，如“TCP/IP”、“HTTP”等</td>
+</tr>
+<tr>
+<td>PERF</td>
+<td>性能指标</td>
+<td>用于标注与计算机性能相关的实体，如处理速度、吞吐量、延迟、响应时间等</td>
+</tr>
+<tr>
+<td>STOR</td>
+<td>存储器</td>
+<td>用于标注各种存储类型和技术，如“RAM”、“ROM”、“闪存”等</td>
+</tr>
+<tr>
+<td>ALG</td>
+<td>算法</td>
+<td>用于标注算法相关的实体，如排序算法、加密算法</td>
+</tr>
+<tr>
+<td>IO</td>
+<td>IO设备</td>
+<td>用于标注与输入输出设备相关的实体，如键盘、鼠标、显示器、打印机等</td>
+</tr>
+<tr>
+<td>TECH</td>
+<td>技术</td>
+<td>用于标注计算机科学技术和概念，如“虚拟内存”、“流水线”、“缓存”等</td>
+</tr>
+<tr>
+<td>INST</td>
+<td>指令</td>
+<td>用于标注具体的指令或指令集，如“ADD指令”、“MIPS指令集”等</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</li>
+<li>
+<p>最长匹配原则：</p>
+<ul>
+<li>以“页式虚拟存储系统中，虚地址空间被分成等长的页，称为逻辑页”为例；</li>
+<li>地址空间、虚地址空间都被标记为 DATA 实体。在这里标记地址空间为 DATA 不完整的，而遵循最长匹配原则，虚地址空间被标记为 DATA 。</li>
+</ul>
+</li>
+</ul>
+<p>以上部分完成后，才正式开始迭代标注，以下是一个大致过程：</p>
+<ol>
+<li>以第一份数据集的校对结果构建初始词典；</li>
+<li>在其他份数据集校对前先用词典进行一次快速校对；</li>
+<li>每次人工校对完一份数据集，就以其标注结果更新词典；</li>
+<li>重复 1~3 ，直到基于完整数据集的词典更新完毕，得到最终版本词典。</li>
+</ol>
+<p>值得一提的是，第一份训练集、验证集、测试集都参与了初始词典的构建，主要采用人工校对。标注平台选用开源库 <a href="https://labelstud.io/">Open Source Data Labeling | Label Studio</a> 在本地进行标注。</p>
+<p>最终版本的词典精确率和召回率都很高，明显高于没有微调的预训练模型。之后还有什么文本，直接用以上方法进行一次快速标注。</p>
+<h3 id="heading-6">数据集格式的转换</h3>
+<p>模型训练的数据格式有两种：</p>
+<ul>
+<li>
+<p>json-tag</p>
+<pre><code>{&quot;words&quot;: [&quot;痛&quot;, &quot;1&quot;, &quot;天&quot;, &quot;。&quot;], &quot;ner&quot;: [&quot;B-SIGNS&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;]}
+</code></pre>
+</li>
+<li>
+<p>conll</p>
+<pre><code>当	O
+一	O
+c	B-STOR
+a	I-STOR
+c	I-STOR
+h	I-STOR
+e	I-STOR
+行	E-STOR
+已	O
+授	O
+</code></pre>
+</li>
+</ul>
+<p>把标注过的数据转换为以上格式，就得到用于训练的标准数据集了。</p>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/PaperNotes/%e5%9f%ba%e4%ba%8eMRC%e7%9a%84%e8%ae%be%e5%a4%87%e6%95%85%e9%9a%9c%e5%91%bd%e5%90%8d%e5%ae%9e%e4%bd%93%e8%af%86%e5%88%ab%e6%96%b9%e6%b3%95_%e5%be%90%e9%b9%8f/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">《基于MRC的设备故障命名实体识别方法》笔记</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/PaperNotes/%e5%9f%ba%e4%ba%8e%e9%a2%84%e8%ae%ad%e7%bb%83%e6%a8%a1%e5%9e%8b%e7%9a%84%e5%8c%bb%e8%8d%af%e8%af%b4%e6%98%8e%e4%b9%a6%e5%ae%9e%e4%bd%93%e6%8a%bd%e5%8f%96%e6%96%b9%e6%b3%95%e7%a0%94%e7%a9%b6_%e9%99%88%e4%bb%b2%e6%b0%b8/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《基于预训练模型的医药说明书实体抽取方法研究》笔记</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>

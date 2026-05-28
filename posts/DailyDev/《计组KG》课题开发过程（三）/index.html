@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#f7f4ef">
+<meta name="color-scheme" content="light dark">
+<title>《计组KG》课题开发过程（三） - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+  </nav>
+</div>
+
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">《计组KG》课题开发过程（三）</h1>
+    <div class="article-meta">
+      <time datetime="2024-11-04">2024-11-04</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/Daily%20Dev/">Daily Dev</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="heading">牢骚</h2>
+<p>时隔一个多月才完成了基本的可视化系统的搭建，中间有着各种各样的原因：Vue3第一次用、Django-Ninja不熟悉等等再加上一些闲杂原因就一直拖到了现在，效率多少有点堪忧。</p>
+<p>总之不算怎么说，也算是曲折的完成了原定计划，下面将从后端、前端的技术选择、功能介绍、成品展示等几个章节大致的讲述下。</p>
+<h2 id="heading-1">后端</h2>
+<h3 id="heading-2">项目地址</h3>
+<p><a href="https://github.com/KurongTohsaka/PCCKGVisualization/tree/main">KurongTohsaka/PCCKGVisualization</a></p>
+<h3 id="heading-3">技术栈</h3>
+<p>Web 框架自然是选相对擅长且好用的 Django ，但是 Django 本身使用起来又过于繁重，不太适合开发Restful类型的接口，所以一般会搭配着 Django REST Framework (DRF) 使用。但是这一次我打算尝试一个新的 Django 扩展，它是 FastAPI 的 Django 版：Django-Ninja 。</p>
+<p>Web 框架订好了以后，就该选数据库了。既然是存储图数据，那肯定是 Neo4j 。而网站数据就使用简单的 Sqlite 吧，主要就是省事。</p>
+<h3 id="heading-4">功能与接口</h3>
+<p><strong>下面的所有接口的最上级请求路径：<code>pcc_kg_vs</code></strong></p>
+<p>功能主要分为两部分：认证和可视化。</p>
+<p>首先是认证，包含以下基本功能：</p>
+<ul>
+<li>用户认证：用户登陆、注册、登出</li>
+<li>API 鉴权：token 验证</li>
+<li>CSRF 验证：CSRF token 验证</li>
+</ul>
+<p>下面是简易的接口标准：</p>
+<ul>
+<li>
+<p>登陆</p>
+<ul>
+<li>
+<p>先检查该用户是否已注册，若注册则从数据库中根据信息查询到用户，然后登陆该用户。若未注册则登陆失败</p>
+</li>
+<li>
+<pre><code>{
+  &quot;method&quot;: &quot;POST&quot;,
+  &quot;path&quot;: &quot;/login&quot;,
+  &quot;params&quot;: {
+    &quot;username&quot;: &quot;&quot;,
+    &quot;password&quot;: &quot;&quot;  
+  },
+  &quot;return&quot;: {
+    &quot;successful&quot;: bool,
+    &quot;code&quot;: int,
+    &quot;token&quot;: str,  //登陆令牌
+    'info': str
+  }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>登出 HTTPBearer</p>
+<ul>
+<li>
+<p>检查用户信息，然后登出该用户</p>
+</li>
+<li>
+<pre><code>{
+  &quot;method&quot;: &quot;GET&quot;,
+  &quot;path&quot;: &quot;/logout&quot;,
+  &quot;params&quot;: {},
+  &quot;return&quot;: {
+    &quot;successful&quot;: bool,
+    &quot;code&quot;: int,
+  	&quot;info&quot;: str
+  }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>申请</p>
+<ul>
+<li>
+<p>根据信息注册用户，注意不要和数据库中用户重叠。申请成功后直接登陆</p>
+</li>
+<li>
+<pre><code>{
+  &quot;method&quot;: &quot;POST&quot;,
+  &quot;path&quot;: &quot;/register&quot;,
+  &quot;params&quot;: {
+    &quot;username&quot;: str, 
+    &quot;password&quot;: str 
+  },
+  &quot;return&quot;: {
+    &quot;successful&quot;: bool,
+    &quot;code&quot;: int,
+    &quot;token&quot;: str,
+  	&quot;info&quot;: str
+  }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<p>然后是可视化功能，目前只包含知识图谱可视化。考虑到本次课题只涉及到了知识图谱的可视化，但是又不得不为以后的接口扩展做考虑，所以接口做成了一个通用接口。</p>
+<p>下面是接口标准：</p>
+<ul>
+<li>
+<p>可视化 HTTPBearer</p>
+<ul>
+<li>
+<pre><code>{
+  &quot;method&quot;: &quot;POST&quot;,
+  &quot;path&quot;: &quot;common_visual&quot;,
+  &quot;params&quot;: {
+    &quot;vs_type&quot;: &quot;graph&quot;,  //可视化样式
+    &quot;data&quot;: []  //可视化数据
+    ...
+  },
+  &quot;return&quot;: {
+        &quot;successful&quot;: bool,
+        &quot;code&quot;: int,
+        &quot;chart&quot;: {
+          &quot;graph&quot;: ...  //vs_type对应的值
+        },
+      	&quot;info&quot;: str
+      }
+}
+</code></pre>
+</li>
+<li>
+<p>neo4j 的图可视化请求参数：</p>
+</li>
+<li>
+<pre><code>{
+	&quot;vs_type&quot;: &quot;graph&quot;,
+  &quot;data&quot;: {
+    &quot;node_ids&quot; : [],  //要可视化的节点ID
+    &quot;relation_ids&quot;: []  //要可视化的关系ID
+  }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="heading-5">前端</h2>
+<h3 id="heading-6">项目地址</h3>
+<p><a href="https://github.com/KurongTohsaka/pcc-kg-vs-frontend">KurongTohsaka/pcc-kg-vs-frontend</a></p>
+<h3 id="heading-7">基本功能</h3>
+<p>包含了三个基本页面：</p>
+<ul>
+<li>用户登陆</li>
+<li>用户注册</li>
+<li>仪表盘 Dashboard</li>
+</ul>
+<blockquote>
+<p>没啥可介绍的，看看页面就能明白有啥用。</p>
+</blockquote>
+<h3 id="heading-8">成品展示</h3>
+<ul>
+<li>
+<p>用户登陆：</p>
+<p><figure class="image-figure"><img src="/img/DailyDev/img1.png" alt="" loading="lazy"></figure></p>
+</li>
+<li>
+<p>用户注册：</p>
+<p><figure class="image-figure"><img src="/img/DailyDev/img2.png" alt="" loading="lazy"></figure></p>
+</li>
+<li>
+<p>仪表盘：</p>
+<p><figure class="image-figure"><img src="/img/DailyDev/img3.png" alt="" loading="lazy"></figure></p>
+</li>
+</ul>
+<h2 id="heading-9">总结</h2>
+<p>系统还有许多可以优化的地方，在之后的几个月或许会不断的修修补补。</p>
+<p>总之，先告一段落了，接下来重新回到算法优化和写作上啊（叹气）。</p>
+
+</article>
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/%e5%8d%8e%e4%b8%ba%e4%ba%91%e9%83%a8%e7%bd%b2%e8%b8%a9%e5%9d%91/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">华为云部署踩坑</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/%e9%85%8d%e7%bd%aenep4j%e8%bf%87%e7%a8%8b/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">MAC上用docker配置neo4j以及apoc扩展的过程</span>
+  </a>
+  
+</nav>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">Agent三大经典范式学习</a>
+        <span class="sidebar-post-date">2026-02-27</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">lubancat5折腾记录</a>
+        <span class="sidebar-post-date">2026-01-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a>
+        <span class="sidebar-post-date">2025-11-14</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">信也实习内容整理</a>
+        <span class="sidebar-post-date">2025-10-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">几道反复做了好几遍的一维DP</a>
+        <span class="sidebar-post-date">2025-09-28</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/search.js"></script>
+</body>
+</html>
