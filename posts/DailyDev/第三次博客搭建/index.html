@@ -10,7 +10,7 @@
 
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
-<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/style.css?v=2">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
@@ -220,12 +220,6 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>块级公式：</p>
 <p><span class="math display">$$\int_{0}^{1} x^2 dx = \frac{1}{3}
 $$</span></p>
-<pre class="mermaid">graph LR
-    A[Markdown] --&amp;gt; B[Goldmark]
-    B --&amp;gt; C[HTML]
-    C --&amp;gt; D[模板渲染]
-    D --&amp;gt; E[静态站点]
-</pre>
 <ul>
 <li>KaTeX CDN 自动注入（检测到 <code>$</code> 或 <code>$$</code> 时加载）</li>
 <li>Mermaid CDN 自动注入（检测到 <code>class=&quot;mermaid&quot;</code> 时加载）</li>
