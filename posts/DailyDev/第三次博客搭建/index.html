@@ -216,13 +216,11 @@ document.addEventListener("DOMContentLoaded", function() {
 </span></span></span></code></pre><p>三种类型分别渲染为不同的 CSS 样式。还加入了分页、Favicon、标签云五级字号。</p>
 <h3 id="v030--markdown-">v0.3.0 — Markdown 渲染完整性</h3>
 <p>这是最重要的一次更新。之前 KaTeX 和 Mermaid 只保留了分隔符但没有真正渲染。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">行内公式：<span class="s">$</span><span class="nb">E</span><span class="o">=</span><span class="nb">mc^</span><span class="m">2</span><span class="s">$</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">块级公式：
-</span></span><span class="line"><span class="cl"><span class="sb">$$</span><span class="nb">
-</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="nv">\int</span><span class="nb">_{</span><span class="m">0</span><span class="nb">}^{</span><span class="m">1</span><span class="nb">} x^</span><span class="m">2</span><span class="nb"> dx </span><span class="o">=</span><span class="nb"> </span><span class="nv">\frac</span><span class="nb">{</span><span class="m">1</span><span class="nb">}{</span><span class="m">3</span><span class="nb">}
-</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="s">$$</span>
-</span></span></code></pre><pre class="mermaid">graph LR
+<p>行内公式：<span class="math inline">$E=mc^2$</span></p>
+<p>块级公式：</p>
+<p><span class="math display">$$\int_{0}^{1} x^2 dx = \frac{1}{3}
+$$</span></p>
+<pre class="mermaid">graph LR
     A[Markdown] --&amp;gt; B[Goldmark]
     B --&amp;gt; C[HTML]
     C --&amp;gt; D[模板渲染]

@@ -1085,6 +1085,71 @@ body.dark .chroma .w { color: #555 }
   height: auto;
 }
 
+/* Admonition callout boxes */
+.admonition {
+  margin: 1.5em 0;
+  padding: 1rem 1.2rem;
+  border-radius: 6px;
+  border-left: 4px solid;
+  background: var(--color-bg-alt);
+}
+.admonition-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.92rem;
+  margin-bottom: 0.5em;
+}
+.admonition-content > *:last-child { margin-bottom: 0; }
+
+.admonition-note {
+  border-left-color: #0969da;
+  background: #ddf4ff;
+}
+.admonition-note .admonition-title { color: #0969da; }
+
+.admonition-warning {
+  border-left-color: #bf8700;
+  background: #fff8c5;
+}
+.admonition-warning .admonition-title { color: #9a6700; }
+
+.admonition-tip {
+  border-left-color: #1a7f37;
+  background: #dafbe1;
+}
+.admonition-tip .admonition-title { color: #1a7f37; }
+
+.admonition-danger {
+  border-left-color: #cf222e;
+  background: #ffebe9;
+}
+.admonition-danger .admonition-title { color: #cf222e; }
+
+/* Dark mode admonition overrides */
+body.dark .admonition-note {
+  background: rgba(9, 105, 218, 0.15);
+  border-left-color: #58a6ff;
+}
+body.dark .admonition-note .admonition-title { color: #58a6ff; }
+
+body.dark .admonition-warning {
+  background: rgba(191, 135, 0, 0.15);
+  border-left-color: #d29922;
+}
+body.dark .admonition-warning .admonition-title { color: #d29922; }
+
+body.dark .admonition-tip {
+  background: rgba(26, 127, 55, 0.15);
+  border-left-color: #3fb950;
+}
+body.dark .admonition-tip .admonition-title { color: #3fb950; }
+
+body.dark .admonition-danger {
+  background: rgba(207, 34, 46, 0.15);
+  border-left-color: #f85149;
+}
+body.dark .admonition-danger .admonition-title { color: #f85149; }
+
 /* ----------------------------------------------------------------- */
 /*  12. Tag Cloud                                                     */
 /* ----------------------------------------------------------------- */
