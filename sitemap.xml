@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>/</loc></url>
+  <url><loc>/posts/DailyDev/新文章/</loc></url>
   <url><loc>/posts/DailyDev/Agent三大经典范式学习/</loc></url>
   <url><loc>/posts/DailyDev/lubancat5折腾记录/</loc></url>
   <url><loc>/posts/DailyDev/面试漫谈：缓存的三大场景与分布式锁/</loc></url>
