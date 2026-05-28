@@ -111,6 +111,18 @@
     "date": "2025-09-19"
   },
   {
+    "title": "apollo简单入门",
+    "url": "/posts/DailyDev/apollo简单入门/",
+    "content": "在现代微服务架构中，服务数量的激增使得传统的配置文件管理方式（如本地文件、Git 仓库）变得越来越难以维护。配置的修改、发布、回滚、权限控制以及实时生效等需求，催生了分布式配置中心这一关键中间件。\n\n[Apollo (阿波罗)](https://github.com/apolloconfig/apollo) 是由携程框架部门研发的开源配置管理中心，它功能强大、生态丰富，能够集中化管理应用在不同环境、不同集群的配置。本文将带你深入了解 Apollo 的世界，从核心概念到架构原理，再到 Go 语言的实战集成。\n\n## 一、Apollo 核心概念\n\n要用好 Apollo，首先需要理解它的几个核心概念，这些概念构成了其灵活、强大的配置管理模型。\n\n#### 1. `Application` (应用)\n\n这是配置管理的基本单元，代表一个独立的应用或服务。每个应用都有一个全局唯一的 `AppId`，这是客户端与服务端交互时的身份标识。\n\n#### 2. `Environment` (环境)\n\n用于隔离不同部署环境的配置，如 `DEV` (开发环境)、`FAT` (测试环境)、`UAT` (预发布环...",
+    "summary": "",
+    "tags": [
+      "Apollo",
+      "Golang"
+    ],
+    "category": "Daily Dev",
+    "date": "2025-09-14"
+  },
+  {
     "title": "golang单元测试与冒烟测试入门",
     "url": "/posts/DailyDev/golang单元测试与冒烟测试入门/",
     "content": "## 概念解析：单元测试 vs. 冒烟测试\n\n### 1. 单元测试 (Unit Testing)\n\n**单元测试**是针对程序中最小的可测试单元进行的测试。在 Go 语言中，这个“单元”通常指一个函数（Function）或一个方法（Method）。\n\n- **核心目标**：验证单个函数或方法的逻辑是否正确。它确保给定特定的输入，该函数能返回预期的输出。\n- **关键原则**：**隔离**。单元测试应该与其依赖项（如数据库、文件系统、外部API等）隔离开来。如果一个函数依赖了这些外部服务，我们通常会使用“模拟（Mock）”技术来创建一个假的依赖项，从而保证测试的稳定性和速度。\n- **特点**：\n  - **速度快**：因为不涉及外部I/O操作，通常毫秒级就能完成。\n  - **粒度细**：精确到每个函数，能够快速定位问题。\n  - **编写频繁**：是开发过程中最常编写的测试类型。\n\n### 2. 冒烟测试 (Smoke Testing)\n\n**冒烟测试**，又称“构建验证测试（Build Verification Test）”，是一种非常基础的测试，用于确定软件的关键功能是否能够正...",
@@ -119,18 +131,6 @@
       "Golang",
       "Unit Testing",
       "Mock Testing"
-    ],
-    "category": "Daily Dev",
-    "date": "2025-09-14"
-  },
-  {
-    "title": "apollo简单入门",
-    "url": "/posts/DailyDev/apollo简单入门/",
-    "content": "在现代微服务架构中，服务数量的激增使得传统的配置文件管理方式（如本地文件、Git 仓库）变得越来越难以维护。配置的修改、发布、回滚、权限控制以及实时生效等需求，催生了分布式配置中心这一关键中间件。\n\n[Apollo (阿波罗)](https://github.com/apolloconfig/apollo) 是由携程框架部门研发的开源配置管理中心，它功能强大、生态丰富，能够集中化管理应用在不同环境、不同集群的配置。本文将带你深入了解 Apollo 的世界，从核心概念到架构原理，再到 Go 语言的实战集成。\n\n## 一、Apollo 核心概念\n\n要用好 Apollo，首先需要理解它的几个核心概念，这些概念构成了其灵活、强大的配置管理模型。\n\n#### 1. `Application` (应用)\n\n这是配置管理的基本单元，代表一个独立的应用或服务。每个应用都有一个全局唯一的 `AppId`，这是客户端与服务端交互时的身份标识。\n\n#### 2. `Environment` (环境)\n\n用于隔离不同部署环境的配置，如 `DEV` (开发环境)、`FAT` (测试环境)、`UAT` (预发布环...",
-    "summary": "",
-    "tags": [
-      "Apollo",
-      "Golang"
     ],
     "category": "Daily Dev",
     "date": "2025-09-14"
@@ -160,12 +160,13 @@
     "date": "2025-09-13"
   },
   {
-    "title": "TCP的三次握手与四次挥手",
-    "url": "/posts/DailyDev/TCP的三次握手与四次挥手/",
-    "content": "# 深入理解TCP：三次握手与四次挥手（含面试高频考点）\n\nTCP (Transmission Control Protocol) 作为互联网核心协议簇中的基石，保证了数据传输的可靠性和顺序性。而要理解 TCP 的可靠性，就必须掌握其经典的连接管理机制——**三次握手**与**四次挥手**。\n\n本文将用通俗易懂的比喻和清晰的技术图解，带你彻底搞懂这两个过程，并深入剖析面试中关于它们的高频考点。\n\n## 一、三次握手：建立可靠的连接\n\n在进行数据传输之前，通信双方（客户端和服务器）必须建立一个可靠的连接。这个建立连接的过程，就是“三次握手”。\n\n### 一个生动的比喻：打电话\n\n想象一下你给朋友打电话确认双方都能正常通信的过程：\n\n\u003e 1. **你**：“喂，能听到我说话吗？” (发送 `SYN`)\n\u003e 2. **朋友**：“我能听到你，你能听到我吗？” (回复 `SYN+ACK`)\n\u003e 3. **你**：“我也能听到你，那我们可以开始聊天了。” (发送 `ACK`)\n\n经过这三步，双方都确认了彼此的发送和接收能力都正常，通话（连接）才正式建立。\n\n### 技术流程详解\n\n- **第一次...",
+    "title": "搞懂BIO与AIO",
+    "url": "/posts/DailyDev/搞懂BIO与AIO/",
+    "content": "# 彻底搞懂 AIO 与 epoll\n\n## 维度一：必须厘清的两个核心概念\n\n在深入 I/O 模型之前，我们必须先区分两组完全独立的概念，很多人在这里就已混淆：\n\n1. **阻塞 (Blocking) vs. 非阻塞 (Non-blocking)**\n   - **关注点**：**应用程序**在等待结果时的**状态**。\n   - **阻塞**：发起 I/O 操作后，如果数据未就绪，当前线程会被挂起，直到操作完成。\n   - **非阻塞**：发起 I/O 操作后，如果数据未就绪，函数会立刻返回一个错误码，线程不会被挂起，可以继续执行其他任务。\n2. **同步 (Synchronous) vs. 异步 (Asynchronous)**\n   - **关注点**：**内核与应用程序**之间如何**交付 I/O 结果**。\n   - **同步**：应用程序**自己**负责发起 I/O 操作，并且**主动**去查询或等待结果。即便是非阻塞轮询，只要是“我”去问内核“好了没”，都算同步。\n   - **异步**：应用程序发起 I/O 操作后便立即返回。**内核会独立完成整个 I/O 过程**（...",
     "summary": "",
     "tags": [
-      "TCP"
+      "IO",
+      "epoll"
     ],
     "category": "Daily Dev",
     "date": "2025-08-30"
@@ -182,18 +183,6 @@
     "date": "2025-08-30"
   },
   {
-    "title": "搞懂BIO与AIO",
-    "url": "/posts/DailyDev/搞懂BIO与AIO/",
-    "content": "# 彻底搞懂 AIO 与 epoll\n\n## 维度一：必须厘清的两个核心概念\n\n在深入 I/O 模型之前，我们必须先区分两组完全独立的概念，很多人在这里就已混淆：\n\n1. **阻塞 (Blocking) vs. 非阻塞 (Non-blocking)**\n   - **关注点**：**应用程序**在等待结果时的**状态**。\n   - **阻塞**：发起 I/O 操作后，如果数据未就绪，当前线程会被挂起，直到操作完成。\n   - **非阻塞**：发起 I/O 操作后，如果数据未就绪，函数会立刻返回一个错误码，线程不会被挂起，可以继续执行其他任务。\n2. **同步 (Synchronous) vs. 异步 (Asynchronous)**\n   - **关注点**：**内核与应用程序**之间如何**交付 I/O 结果**。\n   - **同步**：应用程序**自己**负责发起 I/O 操作，并且**主动**去查询或等待结果。即便是非阻塞轮询，只要是“我”去问内核“好了没”，都算同步。\n   - **异步**：应用程序发起 I/O 操作后便立即返回。**内核会独立完成整个 I/O 过程**（...",
-    "summary": "",
-    "tags": [
-      "IO",
-      "epoll"
-    ],
-    "category": "Daily Dev",
-    "date": "2025-08-30"
-  },
-  {
     "title": "WebSocket面试详解",
     "url": "/posts/DailyDev/WebSocket面试详解/",
     "content": "## 第一部分：核心概念\n\n### 1.1 什么是 WebSocket？\n\nWebSocket 是一种在单个 TCP 连接上进行**全双工通信**的协议。它诞生于 HTML5，旨在解决浏览器与服务器之间低延迟、实时、双向通信的需求。\n\n- **全双工 (Full-duplex)**：与 HTTP 的“请求-响应”模式不同，WebSocket 连接一旦建立，客户端和服务器双方可以随时主动向对方发送数据，无需等待对方的请求。\n- **单个 TCP 连接**：所有通信都在一个 TCP 连接上完成，减少了重复建立和关闭连接的开销。\n- **协议标识符**：WebSocket 的 URL 方案是 `ws://`（非加密）和 `wss://`（加密，运行在 TLS 之上）。\n\n### 1.2 为什么需要 WebSocket？(解决了什么问题？)\n\n在 WebSocket 出现之前，为了模拟实时通信，开发者通常采用以下技术，但它们都有明显的缺陷：\n\n1. **轮询 (Polling)**：客户端定时向服务器发送 HTTP 请求，询问是否有新数据。\n   - **缺点**：大量无效请求，浪费带宽和服务...",
@@ -205,16 +194,15 @@
     "date": "2025-08-30"
   },
   {
-    "title": "pprof 指南",
-    "url": "/posts/DailyDev/pprof指南/",
-    "content": "## Go 性能分析利器 pprof 指南 \n\n`pprof` 是 Go 语言生态中功能最强大的性能分析工具，它内置于 Go 的标准库中，能够帮助开发者精准定位程序中的性能瓶颈，无论是 CPU 的过度消耗、内存的异常增长，还是并发程序中的各种“慢”问题。\n\n本文将在 kurongtohsaka 的 `pprof` 指南基础上，深入探讨两个额外的关键领域：**Goroutine 泄漏** 和 **锁竞争**。\n\n### **第一部分：PProf 基础与开启**\n\n要在 Web 服务中开启 `pprof`，我们只需引入 `net/http/pprof` 包。对于使用 Gin 等框架的服务，可以将其 Handler 包装后注册到路由中。\n\n一个关键的准备步骤是，为了能分析到 **阻塞** 和 **锁竞争**，我们需要在程序启动时设置采样率。如果不设置，相关的 profile 文件将是空的。\n\n```go\npackage main\n\nimport (\n\t\"log\"\n\t\"net/http\"\n\t_ \"net/http/pprof\" // 关键：匿名导入pprof包，它会自动注册handler\n\t\"...",
+    "title": "TCP的三次握手与四次挥手",
+    "url": "/posts/DailyDev/TCP的三次握手与四次挥手/",
+    "content": "# 深入理解TCP：三次握手与四次挥手（含面试高频考点）\n\nTCP (Transmission Control Protocol) 作为互联网核心协议簇中的基石，保证了数据传输的可靠性和顺序性。而要理解 TCP 的可靠性，就必须掌握其经典的连接管理机制——**三次握手**与**四次挥手**。\n\n本文将用通俗易懂的比喻和清晰的技术图解，带你彻底搞懂这两个过程，并深入剖析面试中关于它们的高频考点。\n\n## 一、三次握手：建立可靠的连接\n\n在进行数据传输之前，通信双方（客户端和服务器）必须建立一个可靠的连接。这个建立连接的过程，就是“三次握手”。\n\n### 一个生动的比喻：打电话\n\n想象一下你给朋友打电话确认双方都能正常通信的过程：\n\n\u003e 1. **你**：“喂，能听到我说话吗？” (发送 `SYN`)\n\u003e 2. **朋友**：“我能听到你，你能听到我吗？” (回复 `SYN+ACK`)\n\u003e 3. **你**：“我也能听到你，那我们可以开始聊天了。” (发送 `ACK`)\n\n经过这三步，双方都确认了彼此的发送和接收能力都正常，通话（连接）才正式建立。\n\n### 技术流程详解\n\n- **第一次...",
     "summary": "",
     "tags": [
-      "pprof",
-      "golang"
+      "TCP"
     ],
     "category": "Daily Dev",
-    "date": "2025-08-27"
+    "date": "2025-08-30"
   },
   {
     "title": "常见linux命令",
@@ -223,6 +211,18 @@
     "summary": "",
     "tags": [
       "Linux"
+    ],
+    "category": "Daily Dev",
+    "date": "2025-08-27"
+  },
+  {
+    "title": "pprof 指南",
+    "url": "/posts/DailyDev/pprof指南/",
+    "content": "## Go 性能分析利器 pprof 指南 \n\n`pprof` 是 Go 语言生态中功能最强大的性能分析工具，它内置于 Go 的标准库中，能够帮助开发者精准定位程序中的性能瓶颈，无论是 CPU 的过度消耗、内存的异常增长，还是并发程序中的各种“慢”问题。\n\n本文将在 kurongtohsaka 的 `pprof` 指南基础上，深入探讨两个额外的关键领域：**Goroutine 泄漏** 和 **锁竞争**。\n\n### **第一部分：PProf 基础与开启**\n\n要在 Web 服务中开启 `pprof`，我们只需引入 `net/http/pprof` 包。对于使用 Gin 等框架的服务，可以将其 Handler 包装后注册到路由中。\n\n一个关键的准备步骤是，为了能分析到 **阻塞** 和 **锁竞争**，我们需要在程序启动时设置采样率。如果不设置，相关的 profile 文件将是空的。\n\n```go\npackage main\n\nimport (\n\t\"log\"\n\t\"net/http\"\n\t_ \"net/http/pprof\" // 关键：匿名导入pprof包，它会自动注册handler\n\t\"...",
+    "summary": "",
+    "tags": [
+      "pprof",
+      "golang"
     ],
     "category": "Daily Dev",
     "date": "2025-08-27"
@@ -701,6 +701,17 @@
     "date": "2024-08-13"
   },
   {
+    "title": "Encoder-Decoder 架构",
+    "url": "/posts/NLP/Encoder-Decoder/",
+    "content": "## 原理\n\nEncoder-Decoder架构通常由两个主要部分组成：编码器（Encoder）和解码器（Decoder）。\n\n1. **编码器（Encoder）**：编码器的任务是将输入序列（如一句话）转换为一个固定长度的上下文向量（context vector）。这个过程通常通过递归神经网络（RNN）、长短期记忆网络（LSTM）或门控循环单元（GRU）来实现。编码器逐步读取输入序列的每个元素，并将其信息压缩到上下文向量中。\n2. **解码器（Decoder）**：解码器接收编码器生成的上下文向量，并将其转换为输出序列。解码器同样可以使用RNN、LSTM或GRU。解码器在生成每个输出元素时，会考虑上下文向量以及之前生成的输出元素。\n\n\n\n## 作用\n\nEncoder-Decoder架构主要用于处理需要将一个序列转换为另一个序列的任务，例如：\n\n- **机器翻译**：将一种语言的句子翻译成另一种语言。\n- **文本摘要**：将长文本压缩成简短摘要。\n- **对话系统**：生成对用户输入的响应。\n\n近年来，基于Transformer的Encoder-Decoder架构（如BERT、GPT...",
+    "summary": "",
+    "tags": [
+      "NLP"
+    ],
+    "category": "NLP",
+    "date": "2024-08-11"
+  },
+  {
     "title": "残差连接",
     "url": "/posts/NLP/残差连接/",
     "content": "## 原理\n\n残差连接（Residual Connection）最早由何凯明等人在2015年提出的 ResNet 中引入。ResNet 通过引入残差块，使得网络可以扩展到更深的层数，并在 ImageNet 比赛中取得了显著的成功。\n\n残差连接的核心思想是引入跳跃连接，将输入信号直接传递到网络的后续层，从而构建了一条捷径路径。这种结构允许网络学习输入和输出之间的残差，而不是直接学习输出。\n\n残差连接可以表示为：\n$$\ny=F(x)+x\n$$\n其中，$x$ 表示输入，$F(x)$ 表示经过非线性变换后的输出。\n\n\n\n## 作用\n\n- 解决梯度消失和梯度爆炸问题\n- 提高训练效率\n- 增强模型的泛化性能\n\n\n\n## 例子\n\n下图是 Transformer 论文中的模型结构图。\n\n![](/img/NLP/img14.png)\n\n可以看到在每一个 Attention Layer 中都有一个 `Add` ，原输入和 Multi-head 变换后的输出做了一个简单的相加操作，而这就是所谓的残差连接。",
@@ -720,17 +731,6 @@
       "WeeklyWorking"
     ],
     "category": "WeeklyWorking",
-    "date": "2024-08-11"
-  },
-  {
-    "title": "Encoder-Decoder 架构",
-    "url": "/posts/NLP/Encoder-Decoder/",
-    "content": "## 原理\n\nEncoder-Decoder架构通常由两个主要部分组成：编码器（Encoder）和解码器（Decoder）。\n\n1. **编码器（Encoder）**：编码器的任务是将输入序列（如一句话）转换为一个固定长度的上下文向量（context vector）。这个过程通常通过递归神经网络（RNN）、长短期记忆网络（LSTM）或门控循环单元（GRU）来实现。编码器逐步读取输入序列的每个元素，并将其信息压缩到上下文向量中。\n2. **解码器（Decoder）**：解码器接收编码器生成的上下文向量，并将其转换为输出序列。解码器同样可以使用RNN、LSTM或GRU。解码器在生成每个输出元素时，会考虑上下文向量以及之前生成的输出元素。\n\n\n\n## 作用\n\nEncoder-Decoder架构主要用于处理需要将一个序列转换为另一个序列的任务，例如：\n\n- **机器翻译**：将一种语言的句子翻译成另一种语言。\n- **文本摘要**：将长文本压缩成简短摘要。\n- **对话系统**：生成对用户输入的响应。\n\n近年来，基于Transformer的Encoder-Decoder架构（如BERT、GPT...",
-    "summary": "",
-    "tags": [
-      "NLP"
-    ],
-    "category": "NLP",
     "date": "2024-08-11"
   },
   {
@@ -768,6 +768,17 @@
     "date": "2024-08-01"
   },
   {
+    "title": "7.22-7.28：一周总结",
+    "url": "/posts/WeeklyWorking/2024_07_22-2024_07_28/",
+    "content": "## 本周任务\n\n本周主要还是做计组知识图谱课题。以下为本周具体进度：\n\n- 把数据集分割为了训练集、验证集、测试集，对训练集以随机抽样进行进一步分割，以减小工作量\n- 第一次标注采用预标注，之后用词典不断迭代标注\n- 完成了第一份训练集1000条和验证集、测试集的标注，总共2000余条语料，用新标签PCC 标注\n- 用 Adaseq 训练模型，但是遇到了诸多问题，尚未解决\n\n\n\n## 课题下周改进\n\n- PCC 标签过于笼统，下周对标签进一步细化，并去除少部分无用标签\n- 弃用 Adaseq ，国产的玩意是真不如 Transformers 好用\n- 找一个新的预训练模型进行训练（其实已经找到了）\n- 多模型对比训练\n\n以上修改标签预计最少3天，用 Transformers 训练最少2天，多模型能做多少算多少\n\n\n\n## 本周反思\n\n- 每一步的数据尽可能的量化并记录，方便日后发论文\n- 对课题各个工作部分理解浅显，应当在阅读部分文献后再进行",
+    "summary": "",
+    "tags": [
+      "WeeklyWorking"
+    ],
+    "category": "WeeklyWorking",
+    "date": "2024-07-28"
+  },
+  {
     "title": "《基于预训练模型的医药说明书实体抽取方法研究》笔记",
     "url": "/posts/PaperNotes/基于预训练模型的医药说明书实体抽取方法研究_陈仲永/",
     "content": "## 基于预训练模型的部分标签命名实体识别模型\n\n![](/img/PaperNotes/基于预训练模型的医药说明书实体抽取方法研究_陈仲永/img1.png)\n\n对于输入的药品说明书文本先利用少量样本微调的预训练模型进行实体抽取，如上图所示，“云南白药成分：三七、麝香、草乌等”通过预训练模型识别出 “麝香”和“草乌”两个“成分”类型的实体。由于受标注样本数量限制，预训练模型经少量样本微调后，其召回率不高，如例子中“云南白药”“三七”两个实体未能识别，但把预训练模型识别出的部分实体及该实体的类型标签作为一种提示信息输入到后面的部分标签模型，这将有助于部分标签模型进行实体抽取任务。\n\n部分标签模型采用平面格结构对输入文本及预训练语言模型识别的部分实体进行整合，整合信息包括字符或实体词 token、标签 tag、头部位置标记 head 和尾部位置标记 tail。部分标签模型使用 Transformer 建模平面格结构的编码输入，通过 Transformer 的自注意力机制使字符可以与潜在实体词直接交互。最后将 Transformer 提取特征表示，输入到 CRF层预测实体标签。\n\n## 训...",
@@ -780,15 +791,16 @@
     "date": "2024-07-28"
   },
   {
-    "title": "7.22-7.28：一周总结",
-    "url": "/posts/WeeklyWorking/2024_07_22-2024_07_28/",
-    "content": "## 本周任务\n\n本周主要还是做计组知识图谱课题。以下为本周具体进度：\n\n- 把数据集分割为了训练集、验证集、测试集，对训练集以随机抽样进行进一步分割，以减小工作量\n- 第一次标注采用预标注，之后用词典不断迭代标注\n- 完成了第一份训练集1000条和验证集、测试集的标注，总共2000余条语料，用新标签PCC 标注\n- 用 Adaseq 训练模型，但是遇到了诸多问题，尚未解决\n\n\n\n## 课题下周改进\n\n- PCC 标签过于笼统，下周对标签进一步细化，并去除少部分无用标签\n- 弃用 Adaseq ，国产的玩意是真不如 Transformers 好用\n- 找一个新的预训练模型进行训练（其实已经找到了）\n- 多模型对比训练\n\n以上修改标签预计最少3天，用 Transformers 训练最少2天，多模型能做多少算多少\n\n\n\n## 本周反思\n\n- 每一步的数据尽可能的量化并记录，方便日后发论文\n- 对课题各个工作部分理解浅显，应当在阅读部分文献后再进行",
+    "title": "Lecture 8: Attention",
+    "url": "/posts/CS224N/lesson_8/",
+    "content": "## Sequence-to-sequence with attention\n\n![](/img/CS224N/lesson_8/img1.png)\n\n### Attention: in equations\n\n- We have encoder hidden states $h_1,...,h_N \\in \\R^h$\n\n- On timestep $t$​ , we have decoder hidden state $s_t \\in \\R^h$\n\n- We get the attention scores  $e^t$ for this step:\n  $$\n  e^t=[s^T_th_1,...,s^T_th_N] \\in \\R^N\n  $$\n\n- We take softmax to get the attention distribution $\\alpha^t$​ for this step (this is a probability distribution and  sums to 1)\n  $$\n  \\alpha^t=softmax(e^t) \\in \\R^N\n  $...",
     "summary": "",
     "tags": [
-      "WeeklyWorking"
+      "CS224N",
+      "NLP"
     ],
-    "category": "WeeklyWorking",
-    "date": "2024-07-28"
+    "category": "CS224N",
+    "date": "2024-07-27"
   },
   {
     "title": "《中文命名实体识别研究综述》笔记",
@@ -800,18 +812,6 @@
       "NER"
     ],
     "category": "PaperNotes",
-    "date": "2024-07-27"
-  },
-  {
-    "title": "Lecture 8: Attention",
-    "url": "/posts/CS224N/lesson_8/",
-    "content": "## Sequence-to-sequence with attention\n\n![](/img/CS224N/lesson_8/img1.png)\n\n### Attention: in equations\n\n- We have encoder hidden states $h_1,...,h_N \\in \\R^h$\n\n- On timestep $t$​ , we have decoder hidden state $s_t \\in \\R^h$\n\n- We get the attention scores  $e^t$ for this step:\n  $$\n  e^t=[s^T_th_1,...,s^T_th_N] \\in \\R^N\n  $$\n\n- We take softmax to get the attention distribution $\\alpha^t$​ for this step (this is a probability distribution and  sums to 1)\n  $$\n  \\alpha^t=softmax(e^t) \\in \\R^N\n  $...",
-    "summary": "",
-    "tags": [
-      "CS224N",
-      "NLP"
-    ],
-    "category": "CS224N",
     "date": "2024-07-27"
   },
   {
@@ -862,18 +862,6 @@
     "date": "2024-07-06"
   },
   {
-    "title": "Lecture 5: Language Models and Recurrent Neural Network",
-    "url": "/posts/CS224N/lesson_5/",
-    "content": "## Basic Tricks on NN\n\n### L2 Regularization\n\nA full loss function includes regularization over all parameters $\\theta$ , e.g., L2 regularization:\n$$\nJ(\\theta)=f(x)+\\lambda \\sum_k \\theta^2_k\n$$\nRegularization produces models that generalize well when we have a “big” model.\n\n### Dropout\n\n- Training time: at each instance of evaluation (in online SGD-training), randomly set  50% of the inputs to each neuron to 0\n- Test time: halve the model weights (now twice as many)\n- This prevents feature co-ad...",
-    "summary": "",
-    "tags": [
-      "CS224N",
-      "NLP"
-    ],
-    "category": "CS224N",
-    "date": "2024-07-05"
-  },
-  {
     "title": "Named Entity Recognition 相关概念与技术",
     "url": "/posts/NLP/NER/",
     "content": "## 基本概念\n\n1. **实体**：通常指文本中具有特定意义或指代性强的词或短语，如人名、地名、机构名等。\n2. **边界识别**：确定实体在文本中的起始和结束位置。\n3. **分类**：将识别出的实体归类到预定义的类别，如人名、地名、组织名、时间表达式、数量、货币值、百分比等。\n4. **序列标注**：NER任务中常用的一种方法，将文本中的每个词标注为实体的一部分或非实体。\n5. **特征提取**：从文本中提取有助于实体识别的特征，如词性、上下文信息等。\n6. **评估指标**：用于衡量NER系统性能的指标，常见的有精确率（Precision）、召回率（Recall）和F1分数。\n\n\n\n## 分类命名方法\n\n1. **BIO**：这是最基本的标注方法，其中\"B\"代表实体的开始（Begin），\"I\"代表实体的内部（Inside），而\"O\"代表非实体（Outside）。\n2. **BIOES**：这种方法在BIO的基础上增加了\"E\"表示实体的结束（End），和\"S\"表示单独的实体（Single）。\n3. **BMES**：这种方法使用\"B\"表示实体的开始，\"M\"表示实体的中间（Midd...",
@@ -884,6 +872,18 @@
       "KnowledgeGraph"
     ],
     "category": "NLP",
+    "date": "2024-07-05"
+  },
+  {
+    "title": "Lecture 5: Language Models and Recurrent Neural Network",
+    "url": "/posts/CS224N/lesson_5/",
+    "content": "## Basic Tricks on NN\n\n### L2 Regularization\n\nA full loss function includes regularization over all parameters $\\theta$ , e.g., L2 regularization:\n$$\nJ(\\theta)=f(x)+\\lambda \\sum_k \\theta^2_k\n$$\nRegularization produces models that generalize well when we have a “big” model.\n\n### Dropout\n\n- Training time: at each instance of evaluation (in online SGD-training), randomly set  50% of the inputs to each neuron to 0\n- Test time: halve the model weights (now twice as many)\n- This prevents feature co-ad...",
+    "summary": "",
+    "tags": [
+      "CS224N",
+      "NLP"
+    ],
+    "category": "CS224N",
     "date": "2024-07-05"
   },
   {
@@ -935,42 +935,31 @@
     "date": "2024-06-27"
   },
   {
+    "title": "GoogleNet V1",
+    "url": "/posts/ClassicPaperTranslation/GoogleNetV1/",
+    "content": "# GoogleNet V1\n\n## Abstract\n\n本文作者在ImageNet大规模视觉识别挑战赛2014（ILSVRC14）上提出了一种代号为Inception的深度卷积神经网络结构，并在分类和检测上取得了新的最好结果。这个架构的主要特点是提高了网络内部计算资源的利用率。通过精心的手工设计，在增加了网络深度和广度的同时保持了计算预算不变。为了优化质量，架构的设计以赫布理论和多尺度处理直觉为基础。作者在ILSVRC14提交中应用的一个特例被称为GoogLeNet，一个22层的深度网络，其质量在分类和检测的背景下进行了评估。\n\n\n\n## 1. Introduction\n\n过去三年中，由于深度学习和卷积网络的发展[10]，目标分类和检测能力得到了显著提高。一个令人鼓舞的消息是，大部分的进步不仅仅是更强大硬件、更大数据集、更大模型的结果，而主要是新的想法、算法和网络结构改进的结果。例如，ILSVRC 2014竞赛中最靠前的输入除了用于检测目的的分类数据集之外，没有使用新的数据资源。本文在ILSVRC 2014中的GoogLeNet提交实际使用的参数只有两年前Krizhevsky等人[9...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "SQL",
+    "url": "/posts/DailyDev/Mysql必知必会读书笔记/",
+    "content": "## 第一章：数据库基础\n\n----------------\n\n数据库：保存有组织的数据的容器（通常是一个文件或一组文件）\n\n数据库软件（DBMS）：MySql，Oracle，MongoDB之类。人们通常用数据库来代替数据库软件的名称\n\n表（table）：某种特定类型数据的结构化清单\n\n模式：关于数据库和表的布局及特性的信息\n\n列（column）：表中的一个字段（该列由字段来唯一标识），所有表都是由一个或多个列组成的，每一列都有自己的数据类型\n\n行（row）：表中的一条数据是由行来存储的\n\n主键（primary key）：唯一标识表中每行的这个列就是主键，应该总是定义主键\n\n\u003e 关于主键：\n\u003e\n\u003e - 任意两行都不具有相同的主键值\n\u003e - 每个行都必须有一个主键值\n\nSQL：结构化查询语言\n\n\n\n## 第二章：MySQL简介\n\n--------\n\n略\n\n\n\n## 第三章：使用MySQL\n\n-------\n\n1. 登录数据库\n\n   默认主机名：localhost\n\n   默认端口：3306\n\n   ```shell\n   mysql -u root -p\n   # 然后输入密码\n   ...",
+    "summary": "",
+    "tags": [
+      "MySQL"
+    ],
+    "category": "Daily Dev",
+    "date": "2024-06-26"
+  },
+  {
     "title": "VGG",
     "url": "/posts/ClassicPaperTranslation/VGG/",
     "content": "# VGG\n\n## ABSTRACT\n\n本文研究了卷积网络深度在大规模的图像识别环境下对准确性的影响。主要贡献是使用非常小的（3×3）卷积滤波器架构对网络深度的增加进行了全面评估，这表明通过将深度推到16-19加权层可以实现对现有技术配置的显著改进。这些发现是ImageNet Challenge 2014提交的基础，本文作者团队在定位和分类过程中分别获得了第一名和第二名。\n\n\n\n## 1 INTRODUCTION\n\n随着ConvNets在计算机视觉领域越来越商品化，为了达到更好的准确性，已经进行了许多尝试来改进Krizhevsky等人（2012）最初的架构。例如，ILSVRC-2013（Zeiler＆Fergus，2013；Sermanet等，2014）表现最佳的提交使用了更小的感受窗口尺寸和更小的第一卷积层步长。另一条改进措施在整个图像和多个尺度上对网络进行密集地训练和测试（Sermanet等，2014；Howard，2014）。在本文中，解决了ConvNet架构设计的另一个重要方面——其深度。为此修正了架构的其它参数，并通过添加更多的卷积层来稳定地增加网络的深度，这是可行的，因为在...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "Inception V3",
-    "url": "/posts/ClassicPaperTranslation/InceptionV3/",
-    "content": "# Inception V3\n\n## Abstract\n\n对许多任务而言，卷积网络是目前最新的计算机视觉解决方案的核心。从2014年开始，深度卷积网络开始变成主流，在各种基准数据集上都取得了实质性成果。对于大多数任务而言，虽然增加的模型大小和计算成本都趋向于转化为直接的质量收益（只要提供足够的标注数据去训练），但计算效率和低参数计数仍是各种应用场景的限制因素，例如移动视觉和大数据场景。目前，我们正在探索增大网络的方法，目标是通过适当的分解卷积和积极的正则化来尽可能地有效利用增加的计算。我们在ILSVRC 2012分类挑战赛的验证集上评估了我们的方法，结果证明我们的方法超过了目前最先进的方法并取得了实质性收益：对于单一框架评估错误率为：`21.2% top-1`和`5.6% top-5`，使用的网络计算代价为每次推断需要进行50亿次乘加运算并使用不到2500万的参数。通过四个模型组合和多次评估，我们报告了`3.5% top-5`和`17.3% top-1`的错误率。\n\n\n\n## 1. Introduction\n\n从2012年Krizhevsky等人[9]赢得了ImageNet竞赛[16]...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "NIN",
-    "url": "/posts/ClassicPaperTranslation/NIN/",
-    "content": "# NIN\n\n## Abstract\n\n本文提出了一种新的网络结构，称为 \"网络中的网络\"(NIN)，以提高模型对感受野内局部图块的可辨别性。传统的卷积层使用线性滤波器和非线性激活函数来扫描输入。相反，本文建立了结构更复杂的微神经网络，以抽象出感受野内的数据。本文用MLP来实例化微神经网络，MLP是一个有效的函数近似器。通过类似CNN的方式在输入上滑动微网络来提取特征图，然后将它们送入下一层。深度NIN可以通过堆叠多个上述结构来实现。通过微网络加强局部建模，能够在分类层中利用全局平均池化的特征图，这比传统的全连接层更容易解释，也更不容易过拟合。本文在CIFAR-10和CIFAR-100上用NIN取得了最先进的分类性能，其在SVHN和MNIST数据集上也有合理的表现。\n\n\n\n## 1 Introduction\n\n卷积神经网络[1]由交替的卷积层和池化层组成。卷积层采取线性滤波器和底层感受野的内积，然后在输入的每个局部使用非线性激活函数，由此产生的输出称为特征图。\n\nCNN中的卷积滤波器是基础数据块的广义线性模型（GLM），本文认为GLM的抽象程度很低。这里所说的抽象性是指特征对同一概念的...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "GoogleNet V2",
-    "url": "/posts/ClassicPaperTranslation/GoogLeNetV2/",
-    "content": "# GoogLeNet V2\n\n## Abstract\n\n训练深度神经网络的复杂性在于，每层输入的分布在训练过程中会发生变化，因为前面的层的参数会发生变化。通过要求较低的学习率和仔细的参数初始化减慢了训练，并且使具有饱和非线性的模型训练起来非常困难。本文将这种现象称为*内部协变量转移*，并通过标准化层输入来解决这个问题。本文力图使标准化成为模型架构的一部分，并为*每个训练小批量数据*执行标准化。批标准化使我们能够使用更高的学习率，并且不用太注意初始化。它也作为一个正则化项，在某些情况下不需要Dropout。将批量标准化应用到最先进的图像分类模型上，批标准化在取得相同的精度的情况下，减少了14倍的训练步骤，并以显著的差距击败了原始模型。使用批标准化网络的组合，我们改进了在ImageNet分类上公布的最佳结果：达到了`4.9％ top-5`的验证误差（和`4.8％`测试误差），超过了人类评估者的准确性。\n\n\n\n## 1. Introduction\n\n随机梯度下降（SGD）已经被证明是训练深度网络的有效方式，并且已经使用诸如动量（Sutskever等，2013）和Adagrad（Duchi等...",
     "summary": "",
     "tags": [
       "NN"
@@ -990,9 +979,42 @@
     "date": "2024-06-26"
   },
   {
-    "title": "GoogleNet V1",
-    "url": "/posts/ClassicPaperTranslation/GoogleNetV1/",
-    "content": "# GoogleNet V1\n\n## Abstract\n\n本文作者在ImageNet大规模视觉识别挑战赛2014（ILSVRC14）上提出了一种代号为Inception的深度卷积神经网络结构，并在分类和检测上取得了新的最好结果。这个架构的主要特点是提高了网络内部计算资源的利用率。通过精心的手工设计，在增加了网络深度和广度的同时保持了计算预算不变。为了优化质量，架构的设计以赫布理论和多尺度处理直觉为基础。作者在ILSVRC14提交中应用的一个特例被称为GoogLeNet，一个22层的深度网络，其质量在分类和检测的背景下进行了评估。\n\n\n\n## 1. Introduction\n\n过去三年中，由于深度学习和卷积网络的发展[10]，目标分类和检测能力得到了显著提高。一个令人鼓舞的消息是，大部分的进步不仅仅是更强大硬件、更大数据集、更大模型的结果，而主要是新的想法、算法和网络结构改进的结果。例如，ILSVRC 2014竞赛中最靠前的输入除了用于检测目的的分类数据集之外，没有使用新的数据资源。本文在ILSVRC 2014中的GoogLeNet提交实际使用的参数只有两年前Krizhevsky等人[9...",
+    "title": "NIN",
+    "url": "/posts/ClassicPaperTranslation/NIN/",
+    "content": "# NIN\n\n## Abstract\n\n本文提出了一种新的网络结构，称为 \"网络中的网络\"(NIN)，以提高模型对感受野内局部图块的可辨别性。传统的卷积层使用线性滤波器和非线性激活函数来扫描输入。相反，本文建立了结构更复杂的微神经网络，以抽象出感受野内的数据。本文用MLP来实例化微神经网络，MLP是一个有效的函数近似器。通过类似CNN的方式在输入上滑动微网络来提取特征图，然后将它们送入下一层。深度NIN可以通过堆叠多个上述结构来实现。通过微网络加强局部建模，能够在分类层中利用全局平均池化的特征图，这比传统的全连接层更容易解释，也更不容易过拟合。本文在CIFAR-10和CIFAR-100上用NIN取得了最先进的分类性能，其在SVHN和MNIST数据集上也有合理的表现。\n\n\n\n## 1 Introduction\n\n卷积神经网络[1]由交替的卷积层和池化层组成。卷积层采取线性滤波器和底层感受野的内积，然后在输入的每个局部使用非线性激活函数，由此产生的输出称为特征图。\n\nCNN中的卷积滤波器是基础数据块的广义线性模型（GLM），本文认为GLM的抽象程度很低。这里所说的抽象性是指特征对同一概念的...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "Inception V3",
+    "url": "/posts/ClassicPaperTranslation/InceptionV3/",
+    "content": "# Inception V3\n\n## Abstract\n\n对许多任务而言，卷积网络是目前最新的计算机视觉解决方案的核心。从2014年开始，深度卷积网络开始变成主流，在各种基准数据集上都取得了实质性成果。对于大多数任务而言，虽然增加的模型大小和计算成本都趋向于转化为直接的质量收益（只要提供足够的标注数据去训练），但计算效率和低参数计数仍是各种应用场景的限制因素，例如移动视觉和大数据场景。目前，我们正在探索增大网络的方法，目标是通过适当的分解卷积和积极的正则化来尽可能地有效利用增加的计算。我们在ILSVRC 2012分类挑战赛的验证集上评估了我们的方法，结果证明我们的方法超过了目前最先进的方法并取得了实质性收益：对于单一框架评估错误率为：`21.2% top-1`和`5.6% top-5`，使用的网络计算代价为每次推断需要进行50亿次乘加运算并使用不到2500万的参数。通过四个模型组合和多次评估，我们报告了`3.5% top-5`和`17.3% top-1`的错误率。\n\n\n\n## 1. Introduction\n\n从2012年Krizhevsky等人[9]赢得了ImageNet竞赛[16]...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "neo4j常用命令",
+    "url": "/posts/DailyDev/neo4j/",
+    "content": "## neo4j启动与访问\n\n启动neo4j\n\n```bash\ndocker start test_neo4j\ndocker exec -it test_neo4j /bin/bash\n```\n\n访问browser\n\n```\nhttp://localhost:7474/browser/\n```\n\n访问database\n\n```\nneo4j://localhost:7687\nauth: neo4j\npw: 5225400599\n```\n\n\n\n## CQL语法\n\n### create 创建节点\n\n```cypher\nCREATE (\n   \u003cnode-name\u003e:\u003clabel-name\u003e\n   { \t\n      \u003cProperty1-name\u003e:\u003cProperty1-Value\u003e\n      ........\n      \u003cPropertyn-name\u003e:\u003cPropertyn-Value\u003e\n   }\n)\n```\n\n\n\n### match 查询节点或属性\n\n```cypher\n# 查询Dept下的内容\nMATCH (dept:Dept) return dept\n\n# 查询Employee标...",
+    "summary": "",
+    "tags": [
+      "Neo4j"
+    ],
+    "category": "Daily Dev",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "GoogleNet V2",
+    "url": "/posts/ClassicPaperTranslation/GoogLeNetV2/",
+    "content": "# GoogLeNet V2\n\n## Abstract\n\n训练深度神经网络的复杂性在于，每层输入的分布在训练过程中会发生变化，因为前面的层的参数会发生变化。通过要求较低的学习率和仔细的参数初始化减慢了训练，并且使具有饱和非线性的模型训练起来非常困难。本文将这种现象称为*内部协变量转移*，并通过标准化层输入来解决这个问题。本文力图使标准化成为模型架构的一部分，并为*每个训练小批量数据*执行标准化。批标准化使我们能够使用更高的学习率，并且不用太注意初始化。它也作为一个正则化项，在某些情况下不需要Dropout。将批量标准化应用到最先进的图像分类模型上，批标准化在取得相同的精度的情况下，减少了14倍的训练步骤，并以显著的差距击败了原始模型。使用批标准化网络的组合，我们改进了在ImageNet分类上公布的最佳结果：达到了`4.9％ top-5`的验证误差（和`4.8％`测试误差），超过了人类评估者的准确性。\n\n\n\n## 1. Introduction\n\n随机梯度下降（SGD）已经被证明是训练深度网络的有效方式，并且已经使用诸如动量（Sutskever等，2013）和Adagrad（Duchi等...",
     "summary": "",
     "tags": [
       "NN"
@@ -1007,28 +1029,6 @@
     "summary": "",
     "tags": [
       "Regular Expression"
-    ],
-    "category": "Daily Dev",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "SQL",
-    "url": "/posts/DailyDev/Mysql必知必会读书笔记/",
-    "content": "## 第一章：数据库基础\n\n----------------\n\n数据库：保存有组织的数据的容器（通常是一个文件或一组文件）\n\n数据库软件（DBMS）：MySql，Oracle，MongoDB之类。人们通常用数据库来代替数据库软件的名称\n\n表（table）：某种特定类型数据的结构化清单\n\n模式：关于数据库和表的布局及特性的信息\n\n列（column）：表中的一个字段（该列由字段来唯一标识），所有表都是由一个或多个列组成的，每一列都有自己的数据类型\n\n行（row）：表中的一条数据是由行来存储的\n\n主键（primary key）：唯一标识表中每行的这个列就是主键，应该总是定义主键\n\n\u003e 关于主键：\n\u003e\n\u003e - 任意两行都不具有相同的主键值\n\u003e - 每个行都必须有一个主键值\n\nSQL：结构化查询语言\n\n\n\n## 第二章：MySQL简介\n\n--------\n\n略\n\n\n\n## 第三章：使用MySQL\n\n-------\n\n1. 登录数据库\n\n   默认主机名：localhost\n\n   默认端口：3306\n\n   ```shell\n   mysql -u root -p\n   # 然后输入密码\n   ...",
-    "summary": "",
-    "tags": [
-      "MySQL"
-    ],
-    "category": "Daily Dev",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "neo4j常用命令",
-    "url": "/posts/DailyDev/neo4j/",
-    "content": "## neo4j启动与访问\n\n启动neo4j\n\n```bash\ndocker start test_neo4j\ndocker exec -it test_neo4j /bin/bash\n```\n\n访问browser\n\n```\nhttp://localhost:7474/browser/\n```\n\n访问database\n\n```\nneo4j://localhost:7687\nauth: neo4j\npw: 5225400599\n```\n\n\n\n## CQL语法\n\n### create 创建节点\n\n```cypher\nCREATE (\n   \u003cnode-name\u003e:\u003clabel-name\u003e\n   { \t\n      \u003cProperty1-name\u003e:\u003cProperty1-Value\u003e\n      ........\n      \u003cPropertyn-name\u003e:\u003cPropertyn-Value\u003e\n   }\n)\n```\n\n\n\n### match 查询节点或属性\n\n```cypher\n# 查询Dept下的内容\nMATCH (dept:Dept) return dept\n\n# 查询Employee标...",
-    "summary": "",
-    "tags": [
-      "Neo4j"
     ],
     "category": "Daily Dev",
     "date": "2024-06-26"
