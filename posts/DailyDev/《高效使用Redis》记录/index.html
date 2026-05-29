@@ -11,12 +11,12 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
 <script>
-(function(){var m=localStorage.getItem('zhenhai-color-mode')||'dark';if(m==='dark'||(!m&&matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark');}})();
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
 </script>
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=10">
+<link rel="stylesheet" href="/assets/css/style.css?v=11">
 
 
 
@@ -1844,5 +1844,6 @@ save 60 10000 # 60秒（1分钟）内如果至少有10000个key被修改就触�
 
 <script defer src="/assets/js/main.js"></script>
 <script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>
 </html>

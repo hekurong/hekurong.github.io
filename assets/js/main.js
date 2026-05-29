@@ -18,35 +18,36 @@
   /*  1. Dark/Light Mode Toggle                                       */
   /* ================================================================ */
 
-  const STORAGE_KEY = "zhenhai-color-mode";
+  var STORAGE_KEY = "zhenhai-color-mode";
 
-  function getPreferredTheme() {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "dark" || stored === "light") return stored;
-    // Respect system preference
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
-    return "light";
+  function getTheme() {
+    return document.body.classList.contains("dark") ? "dark" : "light";
   }
 
-  function setTheme(mode) {
+  function setTheme(mode, save) {
     document.body.classList.toggle("dark", mode === "dark");
-    localStorage.setItem(STORAGE_KEY, mode);
-    // Dispatch custom event for Mermaid and other listeners
+    if (save !== false) {
+      localStorage.setItem(STORAGE_KEY, mode);
+    }
     document.dispatchEvent(new CustomEvent("zhenhai-theme-change", { detail: { mode: mode } }));
   }
 
   function toggleTheme() {
-    const next = document.body.classList.contains("dark") ? "light" : "dark";
+    var next = getTheme() === "dark" ? "light" : "dark";
     setTheme(next);
   }
 
-  // Init theme on page load
-  setTheme(getPreferredTheme());
+  // Init: only set localStorage if explicitly stored (not auto)
+  var stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === "dark" || stored === "light") {
+    setTheme(stored, false); // don't re-save, already stored
+  }
 
-  // Listen for system preference changes
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
+  // Listen for system changes — always active
+  var sysDark = window.matchMedia("(prefers-color-scheme: dark)");
+  sysDark.addEventListener("change", function (e) {
     if (!localStorage.getItem(STORAGE_KEY)) {
-      setTheme(e.matches ? "dark" : "light");
+      setTheme(e.matches ? "dark" : "light", false);
     }
   });
 
@@ -387,5 +388,34 @@
 
     // Delay Mermaid init slightly to ensure DOM is fully rendered
     setTimeout(initMermaid, 100);
+
+    /* Image lightbox — click to enlarge */
+    document.querySelectorAll('.article-content figure img').forEach(function(img) {
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', function() {
+        var overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        var clone = img.cloneNode(true);
+        clone.style.cursor = 'zoom-out';
+        overlay.appendChild(clone);
+        var escHandler = function(e) {
+          if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', escHandler); }
+        };
+        overlay.addEventListener('click', function() { overlay.remove(); document.removeEventListener('keydown', escHandler); });
+        document.addEventListener('keydown', escHandler);
+        document.body.appendChild(overlay);
+      });
+    });
+
+    /* Back to top */
+    var backToTop = document.getElementById('back-to-top');
+    if (backToTop) {
+      window.addEventListener('scroll', function() {
+        backToTop.classList.toggle('visible', window.scrollY > 400);
+      }, { passive: true });
+      backToTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
   });
 })();
