@@ -743,6 +743,11 @@ li {
   border-radius: 6px 6px 0 0;
 }
 
+.article-content pre.chroma .code-filename {
+  margin-left: -2.2rem;
+  margin-right: -1rem;
+}
+
 /* Copy button */
 .copy-btn {
   position: absolute;
@@ -782,7 +787,8 @@ pre:hover .copy-btn {
 
 /* Line numbers - handled via highlight class from Goldmark */
 .article-content pre.chroma {
-  padding-left: 4rem;
+  padding-left: 2.2rem;
+  padding-right: 1rem;
 }
 
 .article-content pre.chroma .ln {
@@ -1753,6 +1759,11 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
 @keyframes hero-fade-in {
   from { opacity: 0; }
   to { opacity: 0.18; }
+}
+
+/* Dark mode: override hero placeholder background for text contrast */
+body.dark .site-hero {
+  background: #1a1d2e;
 }
 
 /* ----------------------------------------------------------------- */
