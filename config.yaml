@@ -21,7 +21,7 @@ menu:
 markup:
   highlight:
     style: "github"
-    lineNumbers: false
+    lineNumbers: true
   math:
     engine: "katex"
   mermaid: true
