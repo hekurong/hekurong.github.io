@@ -797,11 +797,27 @@ pre:hover .copy-btn {
   -webkit-user-select: none;
   color: var(--color-text-secondary);
   opacity: 0.5;
+  min-width: 1.5em;
+  text-align: right;
   margin-right: 1em;
+  padding-right: 0.6em;
   position: sticky;
   left: 0;
   background: var(--color-code-bg);
-  z-index: 1;
+  z-index: 2;
+}
+
+.article-content pre.chroma .ln::after {
+  content: "";
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 6px;
+  background: linear-gradient(to right, rgba(0,0,0,0.04), transparent);
+  pointer-events: none;
+}
+
+body.dark .article-content pre.chroma .ln::after {
+  background: linear-gradient(to right, rgba(255,255,255,0.04), transparent);
 }
 
 /* Line highlight — driven by data-hl-lines attribute + JS */
