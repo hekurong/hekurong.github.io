@@ -785,49 +785,80 @@ pre:hover .copy-btn {
   border-color: var(--color-tip-border);
 }
 
-/* Line numbers — sticky on horizontal scroll */
-.article-content pre.chroma {
-  padding-left: 2.2rem;
-  padding-right: 1rem;
+/* Two-column code layout — line numbers fixed, code scrolls horizontally */
+.code-wrapper {
+  display: flex;
+  background: var(--color-code-bg);
+  border: 1px solid var(--color-code-border);
+  border-radius: 6px;
+  margin: 1.5em 0;
+  position: relative;
 }
 
-.article-content pre.chroma .ln {
-  display: inline-block;
+.code-ln {
+  flex-shrink: 0;
   user-select: none;
   -webkit-user-select: none;
+  border-right: 1px solid var(--color-code-border);
+  background: var(--color-code-filename-bg);
+}
+
+.code-ln pre,
+.code-ln code {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
   color: var(--color-text-secondary);
   opacity: 0.5;
-  min-width: 1.5em;
   text-align: right;
-  margin-right: 1em;
-  padding-right: 0.6em;
-  position: sticky;
-  left: 0;
-  background: var(--color-code-bg);
-  z-index: 2;
+  white-space: pre;
 }
 
-.article-content pre.chroma .ln::after {
-  content: "";
-  position: absolute;
-  top: 0; right: 0; bottom: 0;
-  width: 6px;
-  background: linear-gradient(to right, rgba(0,0,0,0.04), transparent);
-  pointer-events: none;
+.code-ln pre {
+  padding: 1rem 0.5rem;
 }
 
-body.dark .article-content pre.chroma .ln::after {
-  background: linear-gradient(to right, rgba(255,255,255,0.04), transparent);
+.code-body {
+  flex: 1;
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.code-body pre.chroma {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 1rem;
+  background: none;
+}
+
+/* Copy button on wrapper */
+.code-wrapper .copy-btn {
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.code-wrapper:hover .copy-btn {
+  opacity: 1;
 }
 
 /* Line highlight — driven by data-hl-lines attribute + JS */
-.article-content pre.chroma[data-hl-lines] .hl {
+.code-body pre.chroma[data-hl-lines] .hl {
   display: inline-block;
   width: 100%;
   background: var(--color-hl-line-bg);
   border-left: 3px solid var(--color-link);
-  margin-left: -0.5rem;
-  padding-left: calc(0.5rem - 3px);
+  margin-left: -1rem;
+  padding-left: calc(1rem - 3px);
+}
+
+body.dark .code-body pre.chroma[data-hl-lines] .hl {
+  background: rgba(212, 175, 55, 0.12);
+  border-left-color: var(--color-link);
 }
 
 body.dark .article-content pre.chroma[data-hl-lines] .hl {

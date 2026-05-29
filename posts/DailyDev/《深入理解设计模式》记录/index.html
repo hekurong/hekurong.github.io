@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=9">
+<link rel="stylesheet" href="/assets/css/style.css?v=10">
 
 
 
@@ -131,262 +131,494 @@
 </ul>
 <h3 id="heading-2">懒汉模式</h3>
 <p>特点：延迟实例化，首次调用时创建实例，需处理线程安全问题。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">singleton</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="s">&#34;sync&#34;</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kd">type</span> <span class="nx">lazySingleton</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kd">var</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">	<span class="nx">instance</span> <span class="o">*</span><span class="nx">lazySingleton</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="nx">once</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Once</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="kd">func</span> <span class="nf">GetLazyInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">lazySingleton</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="nx">once</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="nx">instance</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">lazySingleton</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">  <span class="p">})</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">  <span class="k">return</span> <span class="nx">instance</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre><h3 id="heading-3">饿汉模式</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">singleton</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;sync&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">lazySingleton</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">instance</span> <span class="o">*</span><span class="nx">lazySingleton</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">once</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Once</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">GetLazyInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">lazySingleton</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">once</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">instance</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">lazySingleton</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">instance</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><h3 id="heading-3">饿汉模式</h3>
 <p>特点：在包加载时直接初始化实例，无需考虑线程安全。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">singleton</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kd">type</span> <span class="nx">eagerSingleton</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kd">var</span> <span class="nx">instance</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">eagerSingleton</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kd">func</span> <span class="nf">GetEagerInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">eagerSingleton</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="k">return</span> <span class="nx">instance</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre><h3 id="heading-4">懒汉模式的另一实现形式：静态内部类</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">singleton</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">eagerSingleton</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">instance</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">eagerSingleton</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">GetEagerInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">eagerSingleton</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">instance</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><h3 id="heading-4">懒汉模式的另一实现形式：静态内部类</h3>
 <p>特点：通过嵌套结构体延迟加载，结合 <code>sync.Once</code> 实现线程安全。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">singleton</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="s">&#34;sync&#34;</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kd">type</span> <span class="nx">holderSingleton</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kd">var</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nx">holderInstance</span> <span class="o">*</span><span class="nx">holderSingleton</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="nx">holderOnce</span>     <span class="nx">sync</span><span class="p">.</span><span class="nx">Once</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1">// 嵌套结构体（模拟静态内部类）
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">holder</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">h</span> <span class="o">*</span><span class="nx">holder</span><span class="p">)</span> <span class="nf">getInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">holderSingleton</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="nx">holderOnce</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="nx">holderInstance</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">holderSingleton</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="p">})</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="k">return</span> <span class="nx">holderInstance</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">
-</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1">// GetHolderInstance 对外暴露访问方法
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">GetHolderInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">holderSingleton</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="o">&amp;</span><span class="nx">holder</span><span class="p">{}).</span><span class="nf">getInstance</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre><h3 id="heading-5">枚举类</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">singleton</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;sync&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">holderSingleton</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">holderInstance</span> <span class="o">*</span><span class="nx">holderSingleton</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">holderOnce</span>     <span class="nx">sync</span><span class="p">.</span><span class="nx">Once</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 嵌套结构体（模拟静态内部类）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">holder</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">h</span> <span class="o">*</span><span class="nx">holder</span><span class="p">)</span> <span class="nf">getInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">holderSingleton</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">holderOnce</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">holderInstance</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">holderSingleton</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">holderInstance</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// GetHolderInstance 对外暴露访问方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">GetHolderInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">holderSingleton</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="o">&amp;</span><span class="nx">holder</span><span class="p">{}).</span><span class="nf">getInstance</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><h3 id="heading-5">枚举类</h3>
 <p>特点：利用 Go 的 <code>init</code> 函数和常量模拟枚举单例。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">singleton</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kd">type</span> <span class="nx">enumSingleton</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="c1">// 定义单例结构体字段
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="nx">InstanceKey</span> <span class="p">=</span> <span class="s">&#34;singleton&#34;</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">var</span> <span class="nx">instances</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{})</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="kd">func</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="nx">instances</span><span class="p">[</span><span class="nx">InstanceKey</span><span class="p">]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">enumSingleton</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// GetEnumInstance 通过键名获取单例
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">GetEnumInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">enumSingleton</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">return</span> <span class="nx">instances</span><span class="p">[</span><span class="nx">InstanceKey</span><span class="p">].(</span><span class="o">*</span><span class="nx">enumSingleton</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre><h2 id="heading-6">工厂模式</h2>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">singleton</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">enumSingleton</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 定义单例结构体字段
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">InstanceKey</span> <span class="p">=</span> <span class="s">&#34;singleton&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">instances</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">instances</span><span class="p">[</span><span class="nx">InstanceKey</span><span class="p">]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">enumSingleton</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// GetEnumInstance 通过键名获取单例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">GetEnumInstance</span><span class="p">()</span> <span class="o">*</span><span class="nx">enumSingleton</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">instances</span><span class="p">[</span><span class="nx">InstanceKey</span><span class="p">].(</span><span class="o">*</span><span class="nx">enumSingleton</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><h2 id="heading-6">工厂模式</h2>
 <p>工厂模式是一种创建型设计模式，其核心思想是通过工厂类封装对象的创建过程，降低代码耦合度，提升扩展性。</p>
 <h3 id="heading-7">简单工厂模式</h3>
 <p>特点：由一个工厂类根据参数决定创建哪种具体产品，客户端无需直接实例化对象。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1">// 产品接口
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Product</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nf">Use</span><span class="p">()</span> <span class="kt">string</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 具体产品A
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">ConcreteProductA</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">ConcreteProductA</span><span class="p">)</span> <span class="nf">Use</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;Product A&#34;</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1">// 具体产品B
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">ConcreteProductB</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">ConcreteProductB</span><span class="p">)</span> <span class="nf">Use</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;Product B&#34;</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">// 工厂类
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Factory</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">
-</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">Factory</span><span class="p">)</span> <span class="nf">CreateProduct</span><span class="p">(</span><span class="nx">typ</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">Product</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="k">switch</span> <span class="nx">typ</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="k">case</span> <span class="s">&#34;A&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">        <span class="k">return</span> <span class="o">&amp;</span><span class="nx">ConcreteProductA</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="k">case</span> <span class="s">&#34;B&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="k">return</span> <span class="o">&amp;</span><span class="nx">ConcreteProductB</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="k">default</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="k">return</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">
-</span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1">// 使用示例
-</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="nx">factory</span> <span class="o">:=</span> <span class="nx">Factory</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">    <span class="nx">productA</span> <span class="o">:=</span> <span class="nx">factory</span><span class="p">.</span><span class="nf">CreateProduct</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">    <span class="nb">println</span><span class="p">(</span><span class="nx">productA</span><span class="p">.</span><span class="nf">Use</span><span class="p">())</span> <span class="c1">// 输出：Product A
-</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><h3 id="heading-8">工厂方法模式</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 产品接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Product</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Use</span><span class="p">()</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体产品A
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">ConcreteProductA</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">ConcreteProductA</span><span class="p">)</span> <span class="nf">Use</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;Product A&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体产品B
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">ConcreteProductB</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">ConcreteProductB</span><span class="p">)</span> <span class="nf">Use</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;Product B&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 工厂类
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Factory</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">Factory</span><span class="p">)</span> <span class="nf">CreateProduct</span><span class="p">(</span><span class="nx">typ</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">Product</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="nx">typ</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="s">&#34;A&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">&amp;</span><span class="nx">ConcreteProductA</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="s">&#34;B&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">&amp;</span><span class="nx">ConcreteProductB</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">default</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用示例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">factory</span> <span class="o">:=</span> <span class="nx">Factory</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">productA</span> <span class="o">:=</span> <span class="nx">factory</span><span class="p">.</span><span class="nf">CreateProduct</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">println</span><span class="p">(</span><span class="nx">productA</span><span class="p">.</span><span class="nf">Use</span><span class="p">())</span> <span class="c1">// 输出：Product A
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><h3 id="heading-8">工厂方法模式</h3>
 <p>特点：定义抽象工厂接口，由子类决定实例化的具体产品，符合开闭原则。只有一个抽象产品接口、抽象工厂接口。</p>
 <p>适用场景：产品类型较多且可能扩展，需分离创建逻辑与业务逻辑。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1">// 产品接口
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Transport</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nf">Deliver</span><span class="p">()</span> <span class="kt">string</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 具体产品：卡车
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Truck</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">Truck</span><span class="p">)</span> <span class="nf">Deliver</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;Delivering by land&#34;</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1">// 具体产品：轮船
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Ship</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Ship</span><span class="p">)</span> <span class="nf">Deliver</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;Delivering by sea&#34;</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">// 抽象工厂接口
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">LogisticsFactory</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="nf">CreateTransport</span><span class="p">()</span> <span class="nx">Transport</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">
-</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// 卡车工厂
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TruckFactory</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">
-</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">tf</span> <span class="o">*</span><span class="nx">TruckFactory</span><span class="p">)</span> <span class="nf">CreateTransport</span><span class="p">()</span> <span class="nx">Transport</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">Truck</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">
-</span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1">// 轮船工厂
-</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">ShipFactory</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">
-</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">sf</span> <span class="o">*</span><span class="nx">ShipFactory</span><span class="p">)</span> <span class="nf">CreateTransport</span><span class="p">()</span> <span class="nx">Transport</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">Ship</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">
-</span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1">// 使用示例
-</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">    <span class="nx">truckFactory</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TruckFactory</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="nx">truck</span> <span class="o">:=</span> <span class="nx">truckFactory</span><span class="p">.</span><span class="nf">CreateTransport</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">    <span class="nb">println</span><span class="p">(</span><span class="nx">truck</span><span class="p">.</span><span class="nf">Deliver</span><span class="p">())</span> <span class="c1">// 输出：Delivering by land
-</span></span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><h3 id="heading-9">抽象工厂模式</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 产品接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Transport</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Deliver</span><span class="p">()</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体产品：卡车
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Truck</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">Truck</span><span class="p">)</span> <span class="nf">Deliver</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;Delivering by land&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体产品：轮船
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Ship</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Ship</span><span class="p">)</span> <span class="nf">Deliver</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;Delivering by sea&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 抽象工厂接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">LogisticsFactory</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CreateTransport</span><span class="p">()</span> <span class="nx">Transport</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 卡车工厂
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TruckFactory</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">tf</span> <span class="o">*</span><span class="nx">TruckFactory</span><span class="p">)</span> <span class="nf">CreateTransport</span><span class="p">()</span> <span class="nx">Transport</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">Truck</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 轮船工厂
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">ShipFactory</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">sf</span> <span class="o">*</span><span class="nx">ShipFactory</span><span class="p">)</span> <span class="nf">CreateTransport</span><span class="p">()</span> <span class="nx">Transport</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">Ship</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用示例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">truckFactory</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TruckFactory</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">truck</span> <span class="o">:=</span> <span class="nx">truckFactory</span><span class="p">.</span><span class="nf">CreateTransport</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">println</span><span class="p">(</span><span class="nx">truck</span><span class="p">.</span><span class="nf">Deliver</span><span class="p">())</span> <span class="c1">// 输出：Delivering by land
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><h3 id="heading-9">抽象工厂模式</h3>
 <p>特点：创建多个相关或依赖的产品族（如不同品牌的全套产品），强调产品之间的关联性。由多个抽象产品接口、一个抽象工厂接口。
 适用场景：需要生产一组配套对象（如不同风格的UI组件、品牌的全套硬件）。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1">// 产品接口：手机
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Phone</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nf">Call</span><span class="p">()</span> <span class="kt">string</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// 华为手机
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">HuaweiPhone</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">h</span> <span class="o">*</span><span class="nx">HuaweiPhone</span><span class="p">)</span> <span class="nf">Call</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;Huawei phone calling&#34;</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1">// 苹果手机
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">IPhone</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">i</span> <span class="o">*</span><span class="nx">IPhone</span><span class="p">)</span> <span class="nf">Call</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;iPhone calling&#34;</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">// 产品接口：电脑
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Computer</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="nf">Work</span><span class="p">()</span> <span class="kt">string</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">
-</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// 华为电脑
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">HuaweiComputer</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">
-</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">h</span> <span class="o">*</span><span class="nx">HuaweiComputer</span><span class="p">)</span> <span class="nf">Work</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;Huawei computer working&#34;</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">
-</span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1">// 苹果电脑
-</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">MacBook</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">
-</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">MacBook</span><span class="p">)</span> <span class="nf">Work</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;MacBook working&#34;</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">
-</span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="c1">// 抽象工厂接口
-</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TechFactory</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">    <span class="nf">CreatePhone</span><span class="p">()</span> <span class="nx">Phone</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="nf">CreateComputer</span><span class="p">()</span> <span class="nx">Computer</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">
-</span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="c1">// 华为工厂
-</span></span></span><span class="line"><span class="ln">48</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">HuaweiFactory</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">
-</span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">hf</span> <span class="o">*</span><span class="nx">HuaweiFactory</span><span class="p">)</span> <span class="nf">CreatePhone</span><span class="p">()</span> <span class="nx">Phone</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">HuaweiPhone</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">53</span><span class="cl">
-</span></span><span class="line"><span class="ln">54</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">hf</span> <span class="o">*</span><span class="nx">HuaweiFactory</span><span class="p">)</span> <span class="nf">CreateComputer</span><span class="p">()</span> <span class="nx">Computer</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">HuaweiComputer</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">
-</span></span><span class="line"><span class="ln">58</span><span class="cl"><span class="c1">// 苹果工厂
-</span></span></span><span class="line"><span class="ln">59</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">AppleFactory</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">60</span><span class="cl">
-</span></span><span class="line"><span class="ln">61</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">af</span> <span class="o">*</span><span class="nx">AppleFactory</span><span class="p">)</span> <span class="nf">CreatePhone</span><span class="p">()</span> <span class="nx">Phone</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">IPhone</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">63</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">64</span><span class="cl">
-</span></span><span class="line"><span class="ln">65</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">af</span> <span class="o">*</span><span class="nx">AppleFactory</span><span class="p">)</span> <span class="nf">CreateComputer</span><span class="p">()</span> <span class="nx">Computer</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">66</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">MacBook</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">67</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">68</span><span class="cl">
-</span></span><span class="line"><span class="ln">69</span><span class="cl"><span class="c1">// 使用示例
-</span></span></span><span class="line"><span class="ln">70</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">71</span><span class="cl">    <span class="nx">factory</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">HuaweiFactory</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">72</span><span class="cl">    <span class="nx">phone</span> <span class="o">:=</span> <span class="nx">factory</span><span class="p">.</span><span class="nf">CreatePhone</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">73</span><span class="cl">    <span class="nx">computer</span> <span class="o">:=</span> <span class="nx">factory</span><span class="p">.</span><span class="nf">CreateComputer</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">74</span><span class="cl">    <span class="nb">println</span><span class="p">(</span><span class="nx">phone</span><span class="p">.</span><span class="nf">Call</span><span class="p">(),</span> <span class="nx">computer</span><span class="p">.</span><span class="nf">Work</span><span class="p">())</span> <span class="c1">// 输出：Huawei phone calling Huawei computer working
-</span></span></span><span class="line"><span class="ln">75</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><h2 id="heading-10">原型模式</h2>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 产品接口：手机
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Phone</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Call</span><span class="p">()</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 华为手机
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">HuaweiPhone</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">h</span> <span class="o">*</span><span class="nx">HuaweiPhone</span><span class="p">)</span> <span class="nf">Call</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;Huawei phone calling&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 苹果手机
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">IPhone</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">i</span> <span class="o">*</span><span class="nx">IPhone</span><span class="p">)</span> <span class="nf">Call</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;iPhone calling&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 产品接口：电脑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Computer</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Work</span><span class="p">()</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 华为电脑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">HuaweiComputer</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">h</span> <span class="o">*</span><span class="nx">HuaweiComputer</span><span class="p">)</span> <span class="nf">Work</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;Huawei computer working&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 苹果电脑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">MacBook</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">MacBook</span><span class="p">)</span> <span class="nf">Work</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;MacBook working&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 抽象工厂接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TechFactory</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CreatePhone</span><span class="p">()</span> <span class="nx">Phone</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CreateComputer</span><span class="p">()</span> <span class="nx">Computer</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 华为工厂
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">HuaweiFactory</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">hf</span> <span class="o">*</span><span class="nx">HuaweiFactory</span><span class="p">)</span> <span class="nf">CreatePhone</span><span class="p">()</span> <span class="nx">Phone</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">HuaweiPhone</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">hf</span> <span class="o">*</span><span class="nx">HuaweiFactory</span><span class="p">)</span> <span class="nf">CreateComputer</span><span class="p">()</span> <span class="nx">Computer</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">HuaweiComputer</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 苹果工厂
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">AppleFactory</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">af</span> <span class="o">*</span><span class="nx">AppleFactory</span><span class="p">)</span> <span class="nf">CreatePhone</span><span class="p">()</span> <span class="nx">Phone</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">IPhone</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">af</span> <span class="o">*</span><span class="nx">AppleFactory</span><span class="p">)</span> <span class="nf">CreateComputer</span><span class="p">()</span> <span class="nx">Computer</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">MacBook</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用示例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">factory</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">HuaweiFactory</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">phone</span> <span class="o">:=</span> <span class="nx">factory</span><span class="p">.</span><span class="nf">CreatePhone</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">computer</span> <span class="o">:=</span> <span class="nx">factory</span><span class="p">.</span><span class="nf">CreateComputer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">println</span><span class="p">(</span><span class="nx">phone</span><span class="p">.</span><span class="nf">Call</span><span class="p">(),</span> <span class="nx">computer</span><span class="p">.</span><span class="nf">Work</span><span class="p">())</span> <span class="c1">// 输出：Huawei phone calling Huawei computer working
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><h2 id="heading-10">原型模式</h2>
 <p>原型模式（Prototype Pattern）是一种创建型设计模式，其核心思想是通过复制现有对象（原型）来生成新对象，而非通过传统的类实例化方式（如<code>new</code>关键字）。</p>
 <p>原型模式通过克隆机制创建对象，允许一个对象作为原型，基于其生成新实例。这种方式避免了重复初始化带来的性能损耗，尤其当对象包含复杂数据结构或依赖外部资源时。</p>
 <p>原型模式的实现有两种：</p>
@@ -404,107 +636,202 @@
 </ul>
 <p>适配器模式适合应用于整合旧系统、第三方库兼容等场景，能提高代码复用性。</p>
 <h3 id="heading-12">类适配器</h3>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1">// --- 目标接口 ---
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">USB</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nf">Connect</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">// --- 被适配者 ---
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TypeC</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">TypeC</span><span class="p">)</span> <span class="nf">TypeCConnect</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;TypeC connected.&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1">// --- 适配器（对象适配器，通过组合实现）---
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TypeCToUSBAdapter</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="nx">typeC</span> <span class="o">*</span><span class="nx">TypeC</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="kd">func</span> <span class="nf">NewTypeCToUSBAdapter</span><span class="p">(</span><span class="nx">typeC</span> <span class="o">*</span><span class="nx">TypeC</span><span class="p">)</span> <span class="o">*</span><span class="nx">TypeCToUSBAdapter</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">TypeCToUSBAdapter</span><span class="p">{</span><span class="nx">typeC</span><span class="p">:</span> <span class="nx">typeC</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">
-</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="o">*</span><span class="nx">TypeCToUSBAdapter</span><span class="p">)</span> <span class="nf">Connect</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="nx">a</span><span class="p">.</span><span class="nx">typeC</span><span class="p">.</span><span class="nf">TypeCConnect</span><span class="p">()</span> <span class="c1">// 调用被适配者的方法
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">
-</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1">// 使用示例
-</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="nx">typeC</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TypeC</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="nx">usbAdapter</span> <span class="o">:=</span> <span class="nf">NewTypeCToUSBAdapter</span><span class="p">(</span><span class="nx">typeC</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="nx">usbAdapter</span><span class="p">.</span><span class="nf">Connect</span><span class="p">()</span> <span class="c1">// 输出: TypeC connected.
-</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><h2 id="heading-13">装饰器模式</h2>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 目标接口 ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">USB</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Connect</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 被适配者 ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TypeC</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">TypeC</span><span class="p">)</span> <span class="nf">TypeCConnect</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;TypeC connected.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 适配器（对象适配器，通过组合实现）---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TypeCToUSBAdapter</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">typeC</span> <span class="o">*</span><span class="nx">TypeC</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">NewTypeCToUSBAdapter</span><span class="p">(</span><span class="nx">typeC</span> <span class="o">*</span><span class="nx">TypeC</span><span class="p">)</span> <span class="o">*</span><span class="nx">TypeCToUSBAdapter</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">TypeCToUSBAdapter</span><span class="p">{</span><span class="nx">typeC</span><span class="p">:</span> <span class="nx">typeC</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="o">*</span><span class="nx">TypeCToUSBAdapter</span><span class="p">)</span> <span class="nf">Connect</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">a</span><span class="p">.</span><span class="nx">typeC</span><span class="p">.</span><span class="nf">TypeCConnect</span><span class="p">()</span> <span class="c1">// 调用被适配者的方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用示例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">typeC</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TypeC</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">usbAdapter</span> <span class="o">:=</span> <span class="nf">NewTypeCToUSBAdapter</span><span class="p">(</span><span class="nx">typeC</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">usbAdapter</span><span class="p">.</span><span class="nf">Connect</span><span class="p">()</span> <span class="c1">// 输出: TypeC connected.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><h2 id="heading-13">装饰器模式</h2>
 <p>装饰器模式通过动态地给对象添加额外的职责，提供比继承更灵活的扩展方式。</p>
 <p>装饰器模式灵活扩展对象功能，支持运行时动态组合，且符合单一职责原则（每个装饰器只关注一个功能）。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1">// --- 组件接口 ---
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Coffee</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nf">Cost</span><span class="p">()</span> <span class="kt">float64</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="nf">Description</span><span class="p">()</span> <span class="kt">string</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">// --- 具体组件 ---
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">BlackCoffee</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">BlackCoffee</span><span class="p">)</span> <span class="nf">Cost</span><span class="p">()</span> <span class="kt">float64</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="k">return</span> <span class="mf">2.0</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">BlackCoffee</span><span class="p">)</span> <span class="nf">Description</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">return</span> <span class="s">&#34;Black Coffee&#34;</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">// --- 装饰器基类（通过嵌套接口实现）---
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">CoffeeDecorator</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="nx">coffee</span> <span class="nx">Coffee</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">
-</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">d</span> <span class="o">*</span><span class="nx">CoffeeDecorator</span><span class="p">)</span> <span class="nf">Cost</span><span class="p">()</span> <span class="kt">float64</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">coffee</span><span class="p">.</span><span class="nf">Cost</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">
-</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">d</span> <span class="o">*</span><span class="nx">CoffeeDecorator</span><span class="p">)</span> <span class="nf">Description</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">coffee</span><span class="p">.</span><span class="nf">Description</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">
-</span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1">// --- 具体装饰器：加牛奶 ---
-</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">MilkDecorator</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="nx">CoffeeDecorator</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">
-</span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="kd">func</span> <span class="nf">NewMilkDecorator</span><span class="p">(</span><span class="nx">coffee</span> <span class="nx">Coffee</span><span class="p">)</span> <span class="o">*</span><span class="nx">MilkDecorator</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">MilkDecorator</span><span class="p">{</span><span class="nx">CoffeeDecorator</span><span class="p">{</span><span class="nx">coffee</span><span class="p">:</span> <span class="nx">coffee</span><span class="p">}}</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">
-</span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">MilkDecorator</span><span class="p">)</span> <span class="nf">Cost</span><span class="p">()</span> <span class="kt">float64</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">    <span class="k">return</span> <span class="nx">m</span><span class="p">.</span><span class="nx">coffee</span><span class="p">.</span><span class="nf">Cost</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.5</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">
-</span></span><span class="line"><span class="ln">48</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">MilkDecorator</span><span class="p">)</span> <span class="nf">Description</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">    <span class="k">return</span> <span class="nx">m</span><span class="p">.</span><span class="nx">coffee</span><span class="p">.</span><span class="nf">Description</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#34;, Milk&#34;</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">
-</span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="c1">// 使用示例
-</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">    <span class="kd">var</span> <span class="nx">coffee</span> <span class="nx">Coffee</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">    <span class="nx">coffee</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">BlackCoffee</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">56</span><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Cost: %.1f, Description: %s\n&#34;</span><span class="p">,</span> <span class="nx">coffee</span><span class="p">.</span><span class="nf">Cost</span><span class="p">(),</span> <span class="nx">coffee</span><span class="p">.</span><span class="nf">Description</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">    <span class="c1">// 输出: Cost: 2.0, Description: Black Coffee
-</span></span></span><span class="line"><span class="ln">58</span><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="ln">59</span><span class="cl">    <span class="nx">coffee</span> <span class="p">=</span> <span class="nf">NewMilkDecorator</span><span class="p">(</span><span class="nx">coffee</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">60</span><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Cost: %.1f, Description: %s\n&#34;</span><span class="p">,</span> <span class="nx">coffee</span><span class="p">.</span><span class="nf">Cost</span><span class="p">(),</span> <span class="nx">coffee</span><span class="p">.</span><span class="nf">Description</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">61</span><span class="cl">    <span class="c1">// 输出: Cost: 2.5, Description: Black Coffee, Milk
-</span></span></span><span class="line"><span class="ln">62</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><h2 id="heading-14">代理模式</h2>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 组件接口 ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Coffee</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Cost</span><span class="p">()</span> <span class="kt">float64</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Description</span><span class="p">()</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 具体组件 ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">BlackCoffee</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">BlackCoffee</span><span class="p">)</span> <span class="nf">Cost</span><span class="p">()</span> <span class="kt">float64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mf">2.0</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">BlackCoffee</span><span class="p">)</span> <span class="nf">Description</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s">&#34;Black Coffee&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 装饰器基类（通过嵌套接口实现）---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">CoffeeDecorator</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">coffee</span> <span class="nx">Coffee</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">d</span> <span class="o">*</span><span class="nx">CoffeeDecorator</span><span class="p">)</span> <span class="nf">Cost</span><span class="p">()</span> <span class="kt">float64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">coffee</span><span class="p">.</span><span class="nf">Cost</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">d</span> <span class="o">*</span><span class="nx">CoffeeDecorator</span><span class="p">)</span> <span class="nf">Description</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">coffee</span><span class="p">.</span><span class="nf">Description</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 具体装饰器：加牛奶 ---
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">MilkDecorator</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">CoffeeDecorator</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">NewMilkDecorator</span><span class="p">(</span><span class="nx">coffee</span> <span class="nx">Coffee</span><span class="p">)</span> <span class="o">*</span><span class="nx">MilkDecorator</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">MilkDecorator</span><span class="p">{</span><span class="nx">CoffeeDecorator</span><span class="p">{</span><span class="nx">coffee</span><span class="p">:</span> <span class="nx">coffee</span><span class="p">}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">MilkDecorator</span><span class="p">)</span> <span class="nf">Cost</span><span class="p">()</span> <span class="kt">float64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">m</span><span class="p">.</span><span class="nx">coffee</span><span class="p">.</span><span class="nf">Cost</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.5</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">MilkDecorator</span><span class="p">)</span> <span class="nf">Description</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">m</span><span class="p">.</span><span class="nx">coffee</span><span class="p">.</span><span class="nf">Description</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#34;, Milk&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用示例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">coffee</span> <span class="nx">Coffee</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">coffee</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">BlackCoffee</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Cost: %.1f, Description: %s\n&#34;</span><span class="p">,</span> <span class="nx">coffee</span><span class="p">.</span><span class="nf">Cost</span><span class="p">(),</span> <span class="nx">coffee</span><span class="p">.</span><span class="nf">Description</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 输出: Cost: 2.0, Description: Black Coffee
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="nx">coffee</span> <span class="p">=</span> <span class="nf">NewMilkDecorator</span><span class="p">(</span><span class="nx">coffee</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Cost: %.1f, Description: %s\n&#34;</span><span class="p">,</span> <span class="nx">coffee</span><span class="p">.</span><span class="nf">Cost</span><span class="p">(),</span> <span class="nx">coffee</span><span class="p">.</span><span class="nf">Description</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 输出: Cost: 2.5, Description: Black Coffee, Milk
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><h2 id="heading-14">代理模式</h2>
 <p>代理模式是一种结构型设计模式，通过引入一个代理对象来控制对真实对象的访问，实现功能增强或访问控制。其核心在于解耦客户端与真实对象，代理对象与真实对象实现相同接口，客户端通过代理间接操作真实对象。</p>
 <p>代理模式的结构如下：</p>
 <ul>
@@ -514,111 +841,208 @@
 <li>客户端。</li>
 </ul>
 <p>使用代理模式可以使代码职责清晰、扩展性强（如新增日志功能无需修改真实对象）、保护真实对象，缺陷就是可能增加类数量（静态代理）、动态代理需反射机制可能影响性能。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1">// 接口定义
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Vehicle</span> <span class="kd">interface</span> <span class="p">{</span> <span class="nf">Drive</span><span class="p">()</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 真实对象
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Car</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Car</span><span class="p">)</span> <span class="nf">Drive</span><span class="p">()</span> <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Car is being driven&#34;</span><span class="p">)</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">// 代理对象
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">CarProxy</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="nx">vehicle</span> <span class="nx">Vehicle</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="nx">driver</span>  <span class="o">*</span><span class="nx">Driver</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="kd">type</span> <span class="nx">Driver</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">Age</span> <span class="kt">int</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="kd">func</span> <span class="nf">NewCarProxy</span><span class="p">(</span><span class="nx">driver</span> <span class="o">*</span><span class="nx">Driver</span><span class="p">)</span> <span class="o">*</span><span class="nx">CarProxy</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">CarProxy</span><span class="p">{</span><span class="o">&amp;</span><span class="nx">Car</span><span class="p">{},</span> <span class="nx">driver</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">
-</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">CarProxy</span><span class="p">)</span> <span class="nf">Drive</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="k">if</span> <span class="nx">p</span><span class="p">.</span><span class="nx">driver</span><span class="p">.</span><span class="nx">Age</span> <span class="o">&gt;=</span> <span class="mi">16</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="nx">p</span><span class="p">.</span><span class="nx">vehicle</span><span class="p">.</span><span class="nf">Drive</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Driver too young!&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">
-</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1">// 客户端
-</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="nx">proxy</span> <span class="o">:=</span> <span class="nf">NewCarProxy</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Driver</span><span class="p">{</span><span class="mi">12</span><span class="p">})</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="nx">proxy</span><span class="p">.</span><span class="nf">Drive</span><span class="p">()</span> <span class="c1">// 输出: Driver too young!
-</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="c1"></span>    
-</span></span><span class="line"><span class="ln">36</span><span class="cl">    <span class="nx">proxy</span> <span class="p">=</span> <span class="nf">NewCarProxy</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Driver</span><span class="p">{</span><span class="mi">22</span><span class="p">})</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="nx">proxy</span><span class="p">.</span><span class="nf">Drive</span><span class="p">()</span> <span class="c1">// 输出: Car is being driven
-</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><h2 id="heading-15">策略模式</h2>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 接口定义
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Vehicle</span> <span class="kd">interface</span> <span class="p">{</span> <span class="nf">Drive</span><span class="p">()</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 真实对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Car</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Car</span><span class="p">)</span> <span class="nf">Drive</span><span class="p">()</span> <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Car is being driven&#34;</span><span class="p">)</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 代理对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">CarProxy</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">vehicle</span> <span class="nx">Vehicle</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">driver</span>  <span class="o">*</span><span class="nx">Driver</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Driver</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">Age</span> <span class="kt">int</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">NewCarProxy</span><span class="p">(</span><span class="nx">driver</span> <span class="o">*</span><span class="nx">Driver</span><span class="p">)</span> <span class="o">*</span><span class="nx">CarProxy</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">CarProxy</span><span class="p">{</span><span class="o">&amp;</span><span class="nx">Car</span><span class="p">{},</span> <span class="nx">driver</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">CarProxy</span><span class="p">)</span> <span class="nf">Drive</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">p</span><span class="p">.</span><span class="nx">driver</span><span class="p">.</span><span class="nx">Age</span> <span class="o">&gt;=</span> <span class="mi">16</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">p</span><span class="p">.</span><span class="nx">vehicle</span><span class="p">.</span><span class="nf">Drive</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Driver too young!&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 客户端
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">proxy</span> <span class="o">:=</span> <span class="nf">NewCarProxy</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Driver</span><span class="p">{</span><span class="mi">12</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">proxy</span><span class="p">.</span><span class="nf">Drive</span><span class="p">()</span> <span class="c1">// 输出: Driver too young!
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="nx">proxy</span> <span class="p">=</span> <span class="nf">NewCarProxy</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Driver</span><span class="p">{</span><span class="mi">22</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">proxy</span><span class="p">.</span><span class="nf">Drive</span><span class="p">()</span> <span class="c1">// 输出: Car is being driven
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><h2 id="heading-15">策略模式</h2>
 <p>策略模式是一种行为型设计模式，将一组算法封装为独立策略类，使客户端能动态切换算法。其核心是通过组合而非继承实现行为的灵活扩展。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1">// 策略接口
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">PricingStrategy</span> <span class="kd">interface</span> <span class="p">{</span> <span class="nf">CalculatePrice</span><span class="p">(</span><span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 具体策略
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">RegularStrategy</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">RegularStrategy</span><span class="p">)</span> <span class="nf">CalculatePrice</span><span class="p">(</span><span class="nx">p</span> <span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">p</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">type</span> <span class="nx">VIPStrategy</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">VIPStrategy</span><span class="p">)</span> <span class="nf">CalculatePrice</span><span class="p">(</span><span class="nx">p</span> <span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">p</span> <span class="o">*</span> <span class="mf">0.9</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1">// 上下文
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">PricingService</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">strategy</span> <span class="nx">PricingStrategy</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">PricingService</span><span class="p">)</span> <span class="nf">SetStrategy</span><span class="p">(</span><span class="nx">strategy</span> <span class="nx">PricingStrategy</span><span class="p">)</span> <span class="p">{</span> <span class="nx">s</span><span class="p">.</span><span class="nx">strategy</span> <span class="p">=</span> <span class="nx">strategy</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">PricingService</span><span class="p">)</span> <span class="nf">Calculate</span><span class="p">(</span><span class="nx">p</span> <span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">s</span><span class="p">.</span><span class="nx">strategy</span><span class="p">.</span><span class="nf">CalculatePrice</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1">// 客户端
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="nx">service</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">PricingService</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">    
-</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="nx">service</span><span class="p">.</span><span class="nf">SetStrategy</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">RegularStrategy</span><span class="p">{})</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">service</span><span class="p">.</span><span class="nf">Calculate</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span> <span class="c1">// 输出: 100
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span>    
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="nx">service</span><span class="p">.</span><span class="nf">SetStrategy</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">VIPStrategy</span><span class="p">{})</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">service</span><span class="p">.</span><span class="nf">Calculate</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span> <span class="c1">// 输出: 90
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><h2 id="heading-16">命令模式</h2>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 策略接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">PricingStrategy</span> <span class="kd">interface</span> <span class="p">{</span> <span class="nf">CalculatePrice</span><span class="p">(</span><span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体策略
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">RegularStrategy</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">RegularStrategy</span><span class="p">)</span> <span class="nf">CalculatePrice</span><span class="p">(</span><span class="nx">p</span> <span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">p</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">VIPStrategy</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">VIPStrategy</span><span class="p">)</span> <span class="nf">CalculatePrice</span><span class="p">(</span><span class="nx">p</span> <span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">p</span> <span class="o">*</span> <span class="mf">0.9</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 上下文
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">PricingService</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">strategy</span> <span class="nx">PricingStrategy</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">PricingService</span><span class="p">)</span> <span class="nf">SetStrategy</span><span class="p">(</span><span class="nx">strategy</span> <span class="nx">PricingStrategy</span><span class="p">)</span> <span class="p">{</span> <span class="nx">s</span><span class="p">.</span><span class="nx">strategy</span> <span class="p">=</span> <span class="nx">strategy</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">PricingService</span><span class="p">)</span> <span class="nf">Calculate</span><span class="p">(</span><span class="nx">p</span> <span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">s</span><span class="p">.</span><span class="nx">strategy</span><span class="p">.</span><span class="nf">CalculatePrice</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 客户端
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">service</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">PricingService</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nx">service</span><span class="p">.</span><span class="nf">SetStrategy</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">RegularStrategy</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">service</span><span class="p">.</span><span class="nf">Calculate</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span> <span class="c1">// 输出: 100
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="nx">service</span><span class="p">.</span><span class="nf">SetStrategy</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">VIPStrategy</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">service</span><span class="p">.</span><span class="nf">Calculate</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span> <span class="c1">// 输出: 90
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><h2 id="heading-16">命令模式</h2>
 <p>命令模式是一种行为型设计模式，将请求封装为对象，支持请求的排队、撤销和日志记录。核心在于解耦请求发送者与接收者，通过命令对象统一管理操作。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1">// 命令接口
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Command</span> <span class="kd">interface</span><span class="p">{</span> <span class="nf">Execute</span><span class="p">()</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// 具体命令
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TVOnCommand</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">tv</span> <span class="o">*</span><span class="nx">TV</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">TVOnCommand</span><span class="p">)</span> <span class="nf">Execute</span><span class="p">()</span> <span class="p">{</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tv</span><span class="p">.</span><span class="nf">On</span><span class="p">()</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">type</span> <span class="nx">TVOffCommand</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">tv</span> <span class="o">*</span><span class="nx">TV</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">TVOffCommand</span><span class="p">)</span> <span class="nf">Execute</span><span class="p">()</span> <span class="p">{</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tv</span><span class="p">.</span><span class="nf">Off</span><span class="p">()</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1">// 接收者
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TV</span> <span class="kd">struct</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">TV</span><span class="p">)</span> <span class="nf">On</span><span class="p">()</span>  <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;TV on&#34;</span><span class="p">)</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">TV</span><span class="p">)</span> <span class="nf">Off</span><span class="p">()</span> <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;TV off&#34;</span><span class="p">)</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1">// 调用者
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">RemoteControl</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">cmd</span> <span class="nx">Command</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RemoteControl</span><span class="p">)</span> <span class="nf">SetCommand</span><span class="p">(</span><span class="nx">cmd</span> <span class="nx">Command</span><span class="p">)</span> <span class="p">{</span> <span class="nx">r</span><span class="p">.</span><span class="nx">cmd</span> <span class="p">=</span> <span class="nx">cmd</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RemoteControl</span><span class="p">)</span> <span class="nf">Press</span><span class="p">()</span>                 <span class="p">{</span> <span class="nx">r</span><span class="p">.</span><span class="nx">cmd</span><span class="p">.</span><span class="nf">Execute</span><span class="p">()</span> <span class="p">}</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">
-</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1">// 客户端
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="nx">tv</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TV</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="nx">remote</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">RemoteControl</span><span class="p">{}</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">    
-</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="nx">remote</span><span class="p">.</span><span class="nf">SetCommand</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">TVOnCommand</span><span class="p">{</span><span class="nx">tv</span><span class="p">})</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="nx">remote</span><span class="p">.</span><span class="nf">Press</span><span class="p">()</span> <span class="c1">// 输出: TV on
-</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="c1"></span>    
-</span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="nx">remote</span><span class="p">.</span><span class="nf">SetCommand</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">TVOffCommand</span><span class="p">{</span><span class="nx">tv</span><span class="p">})</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="nx">remote</span><span class="p">.</span><span class="nf">Press</span><span class="p">()</span> <span class="c1">// 输出: TV off
-</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 命令接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Command</span> <span class="kd">interface</span><span class="p">{</span> <span class="nf">Execute</span><span class="p">()</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体命令
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TVOnCommand</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">tv</span> <span class="o">*</span><span class="nx">TV</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">TVOnCommand</span><span class="p">)</span> <span class="nf">Execute</span><span class="p">()</span> <span class="p">{</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tv</span><span class="p">.</span><span class="nf">On</span><span class="p">()</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">TVOffCommand</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">tv</span> <span class="o">*</span><span class="nx">TV</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">TVOffCommand</span><span class="p">)</span> <span class="nf">Execute</span><span class="p">()</span> <span class="p">{</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tv</span><span class="p">.</span><span class="nf">Off</span><span class="p">()</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 接收者
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">TV</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">TV</span><span class="p">)</span> <span class="nf">On</span><span class="p">()</span>  <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;TV on&#34;</span><span class="p">)</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">TV</span><span class="p">)</span> <span class="nf">Off</span><span class="p">()</span> <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;TV off&#34;</span><span class="p">)</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 调用者
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">RemoteControl</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">cmd</span> <span class="nx">Command</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RemoteControl</span><span class="p">)</span> <span class="nf">SetCommand</span><span class="p">(</span><span class="nx">cmd</span> <span class="nx">Command</span><span class="p">)</span> <span class="p">{</span> <span class="nx">r</span><span class="p">.</span><span class="nx">cmd</span> <span class="p">=</span> <span class="nx">cmd</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RemoteControl</span><span class="p">)</span> <span class="nf">Press</span><span class="p">()</span>                 <span class="p">{</span> <span class="nx">r</span><span class="p">.</span><span class="nx">cmd</span><span class="p">.</span><span class="nf">Execute</span><span class="p">()</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 客户端
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">tv</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">TV</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">remote</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">RemoteControl</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nx">remote</span><span class="p">.</span><span class="nf">SetCommand</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">TVOnCommand</span><span class="p">{</span><span class="nx">tv</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">remote</span><span class="p">.</span><span class="nf">Press</span><span class="p">()</span> <span class="c1">// 输出: TV on
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="nx">remote</span><span class="p">.</span><span class="nf">SetCommand</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">TVOffCommand</span><span class="p">{</span><span class="nx">tv</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">remote</span><span class="p">.</span><span class="nf">Press</span><span class="p">()</span> <span class="c1">// 输出: TV off
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div>
 </article>
 
 

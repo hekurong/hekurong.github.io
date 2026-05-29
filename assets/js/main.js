@@ -136,10 +136,11 @@
   /* ================================================================ */
 
   function initCopyButtons() {
-    document.querySelectorAll("pre > code").forEach(function (codeBlock) {
-      var pre = codeBlock.parentElement;
-      // Skip if already has a copy button
-      if (pre.querySelector(".copy-btn")) return;
+    document.querySelectorAll(".code-wrapper, .article-content pre:not(.code-ln pre)").forEach(function (wrapper) {
+      if (wrapper.querySelector(".copy-btn")) return;
+
+      var codeBlock = wrapper.querySelector("code");
+      if (!codeBlock) return;
 
       var btn = document.createElement("button");
       btn.className = "copy-btn";
@@ -167,8 +168,8 @@
         }
       });
 
-      pre.style.position = "relative";
-      pre.appendChild(btn);
+      wrapper.style.position = "relative";
+      wrapper.appendChild(btn);
     });
   }
 

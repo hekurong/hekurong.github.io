@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=9">
+<link rel="stylesheet" href="/assets/css/style.css?v=10">
 
 
 
@@ -275,27 +275,43 @@
 </table>
 <h4 id="1">配置方式1：临时使用</h4>
 <p>直接使用，直接拿镜像<a href="https://cloud.tencent.com/act/pro/domain-sales?from_column=20065&amp;from=20065">域名</a>拼接上官方镜像名，例如要拉去镜像<code>istio/distroless</code>，可以用下面写法（不要带 <code>https://</code>）</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">docker pull docker.unsee.tech/istio/distroless
-</span></span></code></pre><h4 id="2">配置方式2：长久有效</h4>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker pull docker.unsee.tech/istio/distroless
+</span></span></code></pre></div></div><h4 id="2">配置方式2：长久有效</h4>
 <p>修改文件 <code>/etc/docker/daemon.json</code>（如果不存在则需要创建创建，注意不要写入中文，要带<code>https://</code>），并重启服务。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 创建目录</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">sudo mkdir -p /etc/docker
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 写入配置文件</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">sudo tee /etc/docker/daemon.json <span class="s">&lt;&lt;-&#39;EOF&#39;
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="s">{
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="s">    &#34;registry-mirrors&#34;: [
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="s">    	&#34;https://docker.unsee.tech&#34;,
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="s">        &#34;https://dockerpull.org&#34;,
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="s">        &#34;docker.1panel.live&#34;,
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="s">        &#34;https://dockerhub.icu&#34;
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="s">    ]
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="s">}
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="s">EOF</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"># 重启docker服务</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">sudo systemctl daemon-reload <span class="o">&amp;&amp;</span> sudo systemctl restart docker
-</span></span></code></pre><h3 id="ubuntu--docker">Ubuntu 安装 Docker</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 创建目录</span>
+</span></span><span class="line"><span class="cl">sudo mkdir -p /etc/docker
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 写入配置文件</span>
+</span></span><span class="line"><span class="cl">sudo tee /etc/docker/daemon.json <span class="s">&lt;&lt;-&#39;EOF&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s">{
+</span></span></span><span class="line"><span class="cl"><span class="s">    &#34;registry-mirrors&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">    	&#34;https://docker.unsee.tech&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;https://dockerpull.org&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;docker.1panel.live&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;https://dockerhub.icu&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">    ]
+</span></span></span><span class="line"><span class="cl"><span class="s">}
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 重启docker服务</span>
+</span></span><span class="line"><span class="cl">sudo systemctl daemon-reload <span class="o">&amp;&amp;</span> sudo systemctl restart docker
+</span></span></code></pre></div></div><h3 id="ubuntu--docker">Ubuntu 安装 Docker</h3>
 <h4 id="1-">1. 更新系统包索引</h4>
 <p>首先更新系统包索引，以确保所有软件包是最新的：</p>
 <pre><code>sudo apt update
@@ -325,23 +341,23 @@ sudo systemctl enable docker
 <h3 id="docker-">Docker 容器打包</h3>
 <p>先写好Dockerfile，怎么写可以根据需要问chatgpt，它的本质作用是只在镜像化的时候才会调用。</p>
 <p>下面是使用 commit 命令直接把容器打包成镜像：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">docker commit <span class="o">[</span>容器ID或名称<span class="o">]</span> new_image_name
-</span></span></code></pre><p>这里的打包尤其要注意不同系统的指令集架构不同，会导致打包的镜像不可用。比如 MacOS 为 arm64，而Ubuntu 用的 amd64，不过这个可以在创建镜像或容器实例化时指定。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker commit <span class="o">[</span>容器ID或名称<span class="o">]</span> new_image_name
+</span></span></code></pre></div></div><p>这里的打包尤其要注意不同系统的指令集架构不同，会导致打包的镜像不可用。比如 MacOS 为 arm64，而Ubuntu 用的 amd64，不过这个可以在创建镜像或容器实例化时指定。</p>
 <p>然后用 save 命令输出到指定路径，方便上传：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">docker save -o image_name.tar your_image_name
-</span></span></code></pre><p>可以使用 load 指令还原镜像：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">docker load -i image_name.tar
-</span></span></code></pre><p>如果用Dockerfile创建镜像的话，可以参考下面的指令：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">docker build --progress<span class="o">=</span>plain -t kg-vs-backend-latest -f ./.devcontainer/Dockerfile /usr/Project/PCCKGVisualization
-</span></span></code></pre><p>-t 后面是镜像名，-f 后面是 Dockerfile 位置，最后面的路径为指定 Dockerfile 的上下文。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker save -o image_name.tar your_image_name
+</span></span></code></pre></div></div><p>可以使用 load 指令还原镜像：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker load -i image_name.tar
+</span></span></code></pre></div></div><p>如果用Dockerfile创建镜像的话，可以参考下面的指令：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker build --progress<span class="o">=</span>plain -t kg-vs-backend-latest -f ./.devcontainer/Dockerfile /usr/Project/PCCKGVisualization
+</span></span></code></pre></div></div><p>-t 后面是镜像名，-f 后面是 Dockerfile 位置，最后面的路径为指定 Dockerfile 的上下文。</p>
 <p>实例化一个容器并配置转发接口、挂载位置：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">docker run -d -p 8000:8000 -v ./PCCKGVisualization:/IdeaProjects/PCCKGVisualization kg-vs-backend
-</span></span></code></pre><h3 id="macos-">MacOS 服务器连接</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker run -d -p 8000:8000 -v ./PCCKGVisualization:/IdeaProjects/PCCKGVisualization kg-vs-backend
+</span></span></code></pre></div></div><h3 id="macos-">MacOS 服务器连接</h3>
 <ol>
 <li>
 <p>ssh 连接：先设置好服务器密码，默认用户名是 root 。然后用</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">ssh root@公网IP
-</span></span></code></pre><p>连接，然后输入密码即可。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">ssh root@公网IP
+</span></span></code></pre></div></div><p>连接，然后输入密码即可。</p>
 </li>
 <li>
 <p>vscode 的 remote-ssh 连接：不解释，很简答。</p>
@@ -351,12 +367,12 @@ sudo systemctl enable docker
 <ul>
 <li>
 <p>下载：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">scp root@139.x.x.x:/home/test.txt /home/
-</span></span></code></pre></li>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">scp root@139.x.x.x:/home/test.txt /home/
+</span></span></code></pre></div></div></li>
 <li>
 <p>上传：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">scp /home/test.txt root@139.x.x.x:/home
-</span></span></code></pre></li>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">scp /home/test.txt root@139.x.x.x:/home
+</span></span></code></pre></div></div></li>
 </ul>
 
 </article>

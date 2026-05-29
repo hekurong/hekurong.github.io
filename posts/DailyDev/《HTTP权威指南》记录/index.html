@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=9">
+<link rel="stylesheet" href="/assets/css/style.css?v=10">
 
 
 
@@ -198,11 +198,14 @@
 <ul>
 <li>需要一种机制来追踪报文经过了那些节点，此时报文中的 <code>via</code> 字段就是一个描述报文在代理中逐级传输的过程中所经过代理的方式，格式如下：</li>
 </ul>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="err">	</span><span class="nf">GET</span> <span class="nn">/index.html</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">	<span class="l">Accept: text/html</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">	<span class="l">Host: www.joes-hardware.com</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">	<span class="l">Via: 1.1 proxy-62.irenes-isp.net,1.0 cache.joes-hardware.com</span>
-</span></span></code></pre><p><code>via</code> 字符告诉我们报文流经了两个代理。这个字符串说明第一个代理名为 proxy-62.irenes-isp.net ,它实现了 HTTP/1.1 ，第二个代理被称为 cache.joes-hardware.com, 实现了 HTTP/1.0 。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="err">	</span><span class="nf">GET</span> <span class="nn">/index.html</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+</span></span><span class="line"><span class="cl">	<span class="l">Accept: text/html</span>
+</span></span><span class="line"><span class="cl">	<span class="l">Host: www.joes-hardware.com</span>
+</span></span><span class="line"><span class="cl">	<span class="l">Via: 1.1 proxy-62.irenes-isp.net,1.0 cache.joes-hardware.com</span>
+</span></span></code></pre></div></div><p><code>via</code> 字符告诉我们报文流经了两个代理。这个字符串说明第一个代理名为 proxy-62.irenes-isp.net ,它实现了 HTTP/1.1 ，第二个代理被称为 cache.joes-hardware.com, 实现了 HTTP/1.0 。</p>
 <h2 id="heading-4">缓存</h2>
 <h3 id="heading-5">带宽瓶颈与瞬间拥塞</h3>
 <ul>

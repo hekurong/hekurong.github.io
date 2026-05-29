@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=9">
+<link rel="stylesheet" href="/assets/css/style.css?v=10">
 
 
 
@@ -215,72 +215,126 @@
 </ul>
 <p>这里选择的是 XLM-RoBERTa，预训练模型选择的是 <a href="https://huggingface.co/FacebookAI/xlm-roberta-large-finetuned-conll03-english">FacebookAI/xlm-roberta-large-finetuned-conll03-english · Hugging Face</a></p>
 <p>模型代码如下：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">class</span> <span class="nc">XLMRobertaForNER</span><span class="p">(</span><span class="n">XLMRobertaPreTrainedModel</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">use_bilstm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_crf</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">        <span class="nb">super</span><span class="p">(</span><span class="n">XLMRobertaForNER</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">use_bilstm</span> <span class="o">=</span> <span class="n">use_bilstm</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">use_crf</span> <span class="o">=</span> <span class="n">use_crf</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">xlm_robert</span> <span class="o">=</span> <span class="n">XLMRobertaModel</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">add_pooling_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">num_labels</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_bilstm</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">bilstm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">                <span class="n">input_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">                <span class="n">hidden_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">                <span class="n">num_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">                <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">                <span class="n">bidirectional</span><span class="o">=</span><span class="kc">True</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_crf</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">          	<span class="bp">self</span><span class="o">.</span><span class="n">crf</span> <span class="o">=</span> <span class="n">CRF</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">num_labels</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">          	<span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">
-</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">init_weights</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlm_robert</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="n">sequence_output</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">
-</span></span><span class="line"><span class="ln">28</span><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_bilstm</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">            <span class="n">bilstm_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bilstm</span><span class="p">(</span><span class="n">sequence_output</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">            <span class="n">sequence_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">sequence_output</span><span class="p">,</span> <span class="n">bilstm_output</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># 合并BiLSTM的输出和初始输入</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="n">sequence_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">sequence_output</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="n">emissions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">(</span><span class="n">sequence_output</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">
-</span></span><span class="line"><span class="ln">35</span><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_crf</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">            <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">                <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span><span class="o">==-</span><span class="mi">100</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">                <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">crf</span><span class="p">(</span><span class="n">emissions</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="o">.</span><span class="n">byte</span><span class="p">(),</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">                <span class="k">return</span> <span class="n">loss</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">            <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">              	<span class="n">prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crf</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">emissions</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="o">.</span><span class="n">byte</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">              	<span class="k">return</span> <span class="n">prediction</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">        <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">            <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">emissions</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">            <span class="k">return</span> <span class="n">logits</span>
-</span></span></code></pre><h3 id="heading-2">训练过程</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">XLMRobertaForNER</span><span class="p">(</span><span class="n">XLMRobertaPreTrainedModel</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">use_bilstm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_crf</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">super</span><span class="p">(</span><span class="n">XLMRobertaForNER</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">use_bilstm</span> <span class="o">=</span> <span class="n">use_bilstm</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">use_crf</span> <span class="o">=</span> <span class="n">use_crf</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">xlm_robert</span> <span class="o">=</span> <span class="n">XLMRobertaModel</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">add_pooling_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">num_labels</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_bilstm</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">bilstm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="n">input_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">hidden_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">num_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">bidirectional</span><span class="o">=</span><span class="kc">True</span>
+</span></span><span class="line"><span class="cl">            <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_crf</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">          	<span class="bp">self</span><span class="o">.</span><span class="n">crf</span> <span class="o">=</span> <span class="n">CRF</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">num_labels</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">          	<span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">init_weights</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlm_robert</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sequence_output</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_bilstm</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bilstm_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bilstm</span><span class="p">(</span><span class="n">sequence_output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">sequence_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">sequence_output</span><span class="p">,</span> <span class="n">bilstm_output</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># 合并BiLSTM的输出和初始输入</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">sequence_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">sequence_output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">emissions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">(</span><span class="n">sequence_output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_crf</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span><span class="o">==-</span><span class="mi">100</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">crf</span><span class="p">(</span><span class="n">emissions</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="o">.</span><span class="n">byte</span><span class="p">(),</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="n">loss</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">              	<span class="n">prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crf</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">emissions</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="o">.</span><span class="n">byte</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">              	<span class="k">return</span> <span class="n">prediction</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">emissions</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">logits</span>
+</span></span></code></pre></div></div><h3 id="heading-2">训练过程</h3>
 <ol>
 <li>初始化 DataLoader、Tokenizer ；</li>
 <li>修改 Model Config、Training Params ；</li>
 <li>初始化 Model，启动训练 Loop 。</li>
 </ol>
 <p>以下是本次训练所选取的各项参数：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="n">training_params</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="s1">&#39;model_name&#39;</span><span class="p">:</span> <span class="n">xlm_roberta_model_name</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="s1">&#39;weight_decay&#39;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="s1">&#39;warmup_steps&#39;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="s1">&#39;warmup_proportion&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="mf">5e-5</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="s1">&#39;adam_beta1&#39;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="s1">&#39;adam_beta2&#39;</span><span class="p">:</span> <span class="mf">0.999</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="s1">&#39;adam_epsilon&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="s1">&#39;num_train_epochs&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>Loss 函数的计算方式在代码中：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">crf</span><span class="p">(</span><span class="n">emissions</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="o">.</span><span class="n">byte</span><span class="p">(),</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
-</span></span></code></pre><p>Optimizer 选择的是 AdamW，同时运用了 Learning Rate Scheduler 来完成暖机。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">training_params</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;model_name&#39;</span><span class="p">:</span> <span class="n">xlm_roberta_model_name</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;weight_decay&#39;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;warmup_steps&#39;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;warmup_proportion&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="mf">5e-5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;adam_beta1&#39;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;adam_beta2&#39;</span><span class="p">:</span> <span class="mf">0.999</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;adam_epsilon&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;num_train_epochs&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><p>Loss 函数的计算方式在代码中：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">crf</span><span class="p">(</span><span class="n">emissions</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="o">.</span><span class="n">byte</span><span class="p">(),</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+</span></span></code></pre></div></div><p>Optimizer 选择的是 AdamW，同时运用了 Learning Rate Scheduler 来完成暖机。</p>
 <h3 id="heading-3">验证结果</h3>
 <p><strong>关于这部分，数据不保证准确、全面，因此只作为参考，切勿用于其他用途。</strong></p>
 <p>只使用1000条小批次 NER 训练集，经过16轮训练后，各 base 模型在 NER 测试集上的泛化性能：</p>

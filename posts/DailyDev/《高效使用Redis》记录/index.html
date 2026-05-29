@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=9">
+<link rel="stylesheet" href="/assets/css/style.css?v=10">
 
 
 
@@ -123,15 +123,22 @@
 <h2 id="heading">基础数据结构解析</h2>
 <h3 id="heading-1">对象</h3>
 <p>Redis中的 RedisObject 的 c 定义：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="cp">#define LRU_BITS 24
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="cp"></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">redisObject</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="kt">unsigned</span> <span class="nl">type</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span>  <span class="c1">// 数据类型
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="nl">encoding</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span>  <span class="c1">// 底层数据结构
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="nl">lru</span><span class="p">:</span><span class="n">LRU_BITS</span><span class="p">;</span>  <span class="c1">// 缓存淘汰时使用
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">refcount</span><span class="p">;</span>  <span class="c1">// 引用计数
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">;</span>  <span class="c1">// 指向实际存储位置
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">robj</span><span class="p">;</span>
-</span></span></code></pre><p>RedisObject 是 Redis 中数据结构的一个抽象，用它来存储所有的 key-value 数据。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="cp">#define LRU_BITS 24
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">redisObject</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="nl">type</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span>  <span class="c1">// 数据类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="nl">encoding</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span>  <span class="c1">// 底层数据结构
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="nl">lru</span><span class="p">:</span><span class="n">LRU_BITS</span><span class="p">;</span>  <span class="c1">// 缓存淘汰时使用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">refcount</span><span class="p">;</span>  <span class="c1">// 引用计数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">;</span>  <span class="c1">// 指向实际存储位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">robj</span><span class="p">;</span>
+</span></span></code></pre></div></div><p>RedisObject 是 Redis 中数据结构的一个抽象，用它来存储所有的 key-value 数据。</p>
 <p>下面是结构体中各个属性的。说明：</p>
 <ul>
 <li>
@@ -145,12 +152,16 @@
 <ul>
 <li>
 <p>以 GET 命令为例，简单看看 Redis 中的 LRU 实现。使用 GET 后，会执行这段代码更新对象的 lru 属性：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">maxmemory_policy</span> <span class="o">&amp;</span> <span class="n">MAXMEMORY_FLAG_LRU</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="n">uodateLFU</span><span class="p">(</span><span class="n">val</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="n">val</span><span class="o">-&gt;</span><span class="n">lru</span> <span class="o">=</span> <span class="n">LRU_CLOCK</span><span class="p">();</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>LRU_CLOCK 用于获取当前时间，但并不是实时获取。Redis 每 1s 执行系统调用来获取精确时间，然后存储在全局变量 server.lruclock 中，LRU_CLOCK 只是获取该缓存时间。updateLFU 用于更新对象的上次访问时间和访问次数。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">maxmemory_policy</span> <span class="o">&amp;</span> <span class="n">MAXMEMORY_FLAG_LRU</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">uodateLFU</span><span class="p">(</span><span class="n">val</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">val</span><span class="o">-&gt;</span><span class="n">lru</span> <span class="o">=</span> <span class="n">LRU_CLOCK</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><p>LRU_CLOCK 用于获取当前时间，但并不是实时获取。Redis 每 1s 执行系统调用来获取精确时间，然后存储在全局变量 server.lruclock 中，LRU_CLOCK 只是获取该缓存时间。updateLFU 用于更新对象的上次访问时间和访问次数。</p>
 </li>
 </ul>
 </li>
@@ -164,12 +175,16 @@
 <h3 id="heading-2">字符串</h3>
 <p>简单动态字符串（sds）是 Redis 的基本数据结构，用于存储字符串和整型数据。</p>
 <p>首先是 sds 的一个简单设计：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">struct</span> <span class="n">sds</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="kt">int</span> <span class="n">free</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>在 Redis 3.2 之前，sds 就是这样设计的：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">sds</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">len</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">free</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><p>在 Redis 3.2 之前，sds 就是这样设计的：</p>
 <ul>
 <li>内容存储在柔性数组 buf 中，因为柔性数组的地址和结构体是连续的，所以一是可以满足随机存取的要求，二是可以直接通过首地址偏移得到结构体的首地址，进而获取其他变量；</li>
 <li>由于有 len ，在读写字符串时不依赖“\0”终止符，保证了二进制安全。</li>
@@ -178,20 +193,28 @@
 <ul>
 <li>
 <p>结构体：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span><span class="n">sdshdr5</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span>  <span class="c1">// 低 3 位标识字符串类型，高 5 位用于存储字符串长度
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>  <span class="c1">// 柔性数组，存放实际内容 
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre></li>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span><span class="n">sdshdr5</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span>  <span class="c1">// 低 3 位标识字符串类型，高 5 位用于存储字符串长度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>  <span class="c1">// 柔性数组，存放实际内容 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div></li>
 </ul>
 <p>对于长度大于 31B 的字符串，Redis 会把 len 和 free 单独存放，所以除了 sdshdr5 之外的字符串类型结构相同。以 sdshdr16 为例：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span><span class="n">sdshdr16</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="kt">uint16_t</span> <span class="n">len</span><span class="p">;</span>  <span class="c1">// 2B 存储 buf 中已占用字节数
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>  <span class="kt">uint16_t</span> <span class="n">alloc</span><span class="p">;</span>  <span class="c1">// 2B 存储 buf 已分配字节数
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
-</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre><h3 id="heading-3">列表</h3>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span><span class="n">sdshdr16</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint16_t</span> <span class="n">len</span><span class="p">;</span>  <span class="c1">// 2B 存储 buf 中已占用字节数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint16_t</span> <span class="n">alloc</span><span class="p">;</span>  <span class="c1">// 2B 存储 buf 已分配字节数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><h3 id="heading-3">列表</h3>
 <p>Redis 列表对象的底层数据结构是 quicklist。在 Redis 3.2 之前 Redis 用 ziplist（压缩链表） 及 adlist（双向链表） 作为 list 的底层实现。当元素较少且元素长度较小时，Redis 会用 ziplist ，其他条件会用 adlist。而 quicklist 由 list 和 ziplist 结合而成。</p>
 <ul>
 <li>
@@ -217,64 +240,104 @@
 <li>
 <p>quicklist：是一个由 ziplist 作为节点的双向链表。</p>
 <p>结构体定义：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklist</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="n">quicklistnode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">count</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="kt">int</span> <span class="nl">fill</span><span class="p">:</span><span class="mi">16</span><span class="p">;</span>  <span class="c1">// 指明每个节点的 ziplist 长度
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">compress</span><span class="p">:</span><span class="mi">16</span><span class="p">;</span>  <span class="c1">// 节点压缩深度
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span>  <span class="c1">// ...
-</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">quicklist</span><span class="p">;</span>
-</span></span></code></pre><p>节点结构体定义：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklistNode</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="k">struct</span> <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="k">struct</span> <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">zl</span><span class="p">;</span>  <span class="c1">// 该节点对应的 ziplist
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">sz</span><span class="p">;</span>  <span class="c1">// 整个 ziplist 的大小
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">count</span><span class="p">:</span><span class="mi">16</span><span class="p">;</span> 
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">encoding</span><span class="p">:</span><span class="mi">2</span><span class="p">;</span>  <span class="c1">// 表示是否采用 LZF 压缩算法
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">container</span><span class="p">:</span><span class="mi">2</span><span class="p">;</span>  <span class="c1">// 为 quicklistNode 节点 zl 指向的容器类型：1为 none，2为使用 ziplist
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">recompress</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span>  <span class="c1">// 用于表示该节点之前是否被压缩过
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">quicklistNode</span><span class="p">;</span>
-</span></span></code></pre><p>当使用 LZF 算法压缩时，quicklistNode 节点指向的结构是 quciklistLZF：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklistLZF</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">sz</span><span class="p">;</span>  <span class="c1">// 被 LZF 算法压缩后的 ziplist 大小
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>  <span class="kt">char</span> <span class="n">compressed</span><span class="p">[];</span>  <span class="c1">// 保存压缩后的数组
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">quicklistLZF</span><span class="p">;</span>
-</span></span></code></pre><p>关于 LZF 算法内容，略。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklist</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">quicklistnode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">count</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="nl">fill</span><span class="p">:</span><span class="mi">16</span><span class="p">;</span>  <span class="c1">// 指明每个节点的 ziplist 长度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">compress</span><span class="p">:</span><span class="mi">16</span><span class="p">;</span>  <span class="c1">// 节点压缩深度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">quicklist</span><span class="p">;</span>
+</span></span></code></pre></div></div><p>节点结构体定义：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklistNode</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">quicklistNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">zl</span><span class="p">;</span>  <span class="c1">// 该节点对应的 ziplist
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">sz</span><span class="p">;</span>  <span class="c1">// 整个 ziplist 的大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">count</span><span class="p">:</span><span class="mi">16</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">encoding</span><span class="p">:</span><span class="mi">2</span><span class="p">;</span>  <span class="c1">// 表示是否采用 LZF 压缩算法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">container</span><span class="p">:</span><span class="mi">2</span><span class="p">;</span>  <span class="c1">// 为 quicklistNode 节点 zl 指向的容器类型：1为 none，2为使用 ziplist
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nl">recompress</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span>  <span class="c1">// 用于表示该节点之前是否被压缩过
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">quicklistNode</span><span class="p">;</span>
+</span></span></code></pre></div></div><p>当使用 LZF 算法压缩时，quicklistNode 节点指向的结构是 quciklistLZF：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">quicklistLZF</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">sz</span><span class="p">;</span>  <span class="c1">// 被 LZF 算法压缩后的 ziplist 大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">char</span> <span class="n">compressed</span><span class="p">[];</span>  <span class="c1">// 保存压缩后的数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">quicklistLZF</span><span class="p">;</span>
+</span></span></code></pre></div></div><p>关于 LZF 算法内容，略。</p>
 </li>
 </ul>
 <h3 id="heading-4">字典</h3>
 <p>Redis 的字典是通过 Hash 来实现的。</p>
 <p>结构体定义：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictht</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="n">dictEntry</span> <span class="o">**</span><span class="n">table</span><span class="p">;</span>  <span class="c1">// 指针数组，存储键值对
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">size</span><span class="p">;</span>  <span class="c1">// table 数组的大小
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">sizemask</span><span class="p">;</span>  <span class="c1">// 恒定值，掩码 = size - 1
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">used</span><span class="p">;</span>  <span class="c1">// 已存储的元素个数 
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><p>sizemask 属性用来计算 key 的索引值，值恒为 size - 1。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictht</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dictEntry</span> <span class="o">**</span><span class="n">table</span><span class="p">;</span>  <span class="c1">// 指针数组，存储键值对
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">size</span><span class="p">;</span>  <span class="c1">// table 数组的大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">sizemask</span><span class="p">;</span>  <span class="c1">// 恒定值，掩码 = size - 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">used</span><span class="p">;</span>  <span class="c1">// 已存储的元素个数 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><p>sizemask 属性用来计算 key 的索引值，值恒为 size - 1。</p>
 <p>Hash 元素结构体定义：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictEntry</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="k">union</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">val</span><span class="p">;</span>  <span class="c1">// db.dict 中的 val
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span>    <span class="kt">uint64_t</span> <span class="n">u64</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="kt">int64_t</span> <span class="n">s64</span><span class="p">;</span>  <span class="c1">// db.expires 中存储了过期时间
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>    <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="p">}</span> <span class="n">v</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="k">struct</span> <span class="n">dictEntry</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>  <span class="c1">// Hash 冲突时指向冲突的元素
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">dictEntry</span><span class="p">;</span>
-</span></span></code></pre><p>dict 结构体定义：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dict</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="n">dictType</span> <span class="o">*</span><span class="n">type</span><span class="p">;</span>  <span class="c1">// 该字典对应的特定操作函数
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">;</span>  <span class="c1">// 该字典所依赖的数据
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>  <span class="n">dictht</span> <span class="n">ht</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>  <span class="c1">// Hash 表
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>  <span class="kt">long</span> <span class="n">rehasidx</span><span class="p">;</span>  <span class="c1">// rehash 标志，默认值为 -1，表示不进行rehash操作
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>  <span class="kt">int16_t</span> <span class="n">pauserehash</span><span class="p">;</span>  <span class="c1">// 当前运行的安全迭代器数
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><p>关于字典的扩容：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictEntry</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">union</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">val</span><span class="p">;</span>  <span class="c1">// db.dict 中的 val
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">uint64_t</span> <span class="n">u64</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int64_t</span> <span class="n">s64</span><span class="p">;</span>  <span class="c1">// db.expires 中存储了过期时间
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="n">v</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">dictEntry</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>  <span class="c1">// Hash 冲突时指向冲突的元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">dictEntry</span><span class="p">;</span>
+</span></span></code></pre></div></div><p>dict 结构体定义：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dict</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dictType</span> <span class="o">*</span><span class="n">type</span><span class="p">;</span>  <span class="c1">// 该字典对应的特定操作函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">;</span>  <span class="c1">// 该字典所依赖的数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">dictht</span> <span class="n">ht</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>  <span class="c1">// Hash 表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">long</span> <span class="n">rehasidx</span><span class="p">;</span>  <span class="c1">// rehash 标志，默认值为 -1，表示不进行rehash操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int16_t</span> <span class="n">pauserehash</span><span class="p">;</span>  <span class="c1">// 当前运行的安全迭代器数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><p>关于字典的扩容：</p>
 <ol>
 <li>申请一块新内存，初次申请默认大小为4个 dictEntry，非首次申请的大小则为当前 Hash 表容量的 1 倍；</li>
 <li>把新申请的内存地址赋值给 ht[1] ，并把字典的 rehashidx 标志位改为 0，表示之后需要进行 rehash 操作。</li>
@@ -282,12 +345,16 @@
 <h3 id="heading-5">集合</h3>
 <p>Redis 的集合底层基于 dict 和 intset 实现，当集合类型的元素都处于 64 位有符号整数范围之内时用 intset 存储，其他情况用 dict 存储。</p>
 <p>intset 是一个有序的、存储整型数据的结构，结构体定义如下：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">intset</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="kt">uint32_t</span> <span class="n">encoding</span><span class="p">;</span>  <span class="c1">// 编码类型，决定每个元素占用几个字节
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>  <span class="kt">uint32_t</span> <span class="n">length</span><span class="p">;</span>  <span class="c1">// 元素个数
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>  <span class="kt">int8_t</span> <span class="n">contents</span><span class="p">[];</span>  <span class="c1">// 柔性数组
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">intset</span><span class="p">;</span>
-</span></span></code></pre><p>intset 会根据待插入的值决定是否需要进行扩容，扩容会修改 encoding 属性的值，进而需要扩展 contents 中原来的元素。可以得到集合的一个简单结论，只要引起了扩容，这个待插入值一定是最值。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">intset</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="n">encoding</span><span class="p">;</span>  <span class="c1">// 编码类型，决定每个元素占用几个字节
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint32_t</span> <span class="n">length</span><span class="p">;</span>  <span class="c1">// 元素个数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int8_t</span> <span class="n">contents</span><span class="p">[];</span>  <span class="c1">// 柔性数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">intset</span><span class="p">;</span>
+</span></span></code></pre></div></div><p>intset 会根据待插入的值决定是否需要进行扩容，扩容会修改 encoding 属性的值，进而需要扩展 contents 中原来的元素。可以得到集合的一个简单结论，只要引起了扩容，这个待插入值一定是最值。</p>
 <h3 id="heading-6">有序集合</h3>
 <p>Redis 的有序集合没有使用平衡树或红黑树实现，而是跳跃表。跳跃表的效率与红黑树相似，但实现要简单很多。</p>
 <p>跳跃表是一种有序链表的升级版，通过额外的“跳跃层”提高查找效率，接近于二分查找的性能。它的基本结构是：</p>
@@ -312,23 +379,38 @@
 </li>
 </ul>
 <p>跳跃表的结构体定义：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="n">sds</span> <span class="n">ele</span><span class="p">;</span>  <span class="c1">// 存储字符串类型数据
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"></span>  <span class="kt">double</span> <span class="n">score</span><span class="p">;</span>  <span class="c1">// 存储用于排序的分值
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">backward</span><span class="p">;</span>  <span class="c1">// 回溯指针，指向当前节点最底层的前一个节点。从后向前遍历时使用
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">zskiplistLevel</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">forward</span><span class="p">;</span>  <span class="c1">// 指向本层下一个节点
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">span</span><span class="p">;</span>  <span class="c1">// forward 指针指向的节点与本节点之间的元素个数，值越大，跳过的节点个数越多
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>  <span class="p">}</span> <span class="n">level</span><span class="p">[];</span>  <span class="c1">// level 数组，柔性数组
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">zskiplistNode</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">// 表头
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplist</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">header</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">length</span><span class="p">;</span>  <span class="c1">// 跳跃表长度
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">level</span><span class="p">;</span>  <span class="c1">// 跳跃表的层高
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre><p>zskiplist 的 header 指针指向跳跃表的 head 节点。head 节点的 level 数组元素个数为 32，head 节点不存储任何 member、score值，ele 值为 NULL，score 值为 0 ，也不计入总长度的计算。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sds</span> <span class="n">ele</span><span class="p">;</span>  <span class="c1">// 存储字符串类型数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">double</span> <span class="n">score</span><span class="p">;</span>  <span class="c1">// 存储用于排序的分值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">backward</span><span class="p">;</span>  <span class="c1">// 回溯指针，指向当前节点最底层的前一个节点。从后向前遍历时使用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">struct</span> <span class="n">zskiplistLevel</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">forward</span><span class="p">;</span>  <span class="c1">// 指向本层下一个节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">span</span><span class="p">;</span>  <span class="c1">// forward 指针指向的节点与本节点之间的元素个数，值越大，跳过的节点个数越多
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span> <span class="n">level</span><span class="p">[];</span>  <span class="c1">// level 数组，柔性数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">zskiplistNode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 表头
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplist</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">header</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">length</span><span class="p">;</span>  <span class="c1">// 跳跃表长度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="n">level</span><span class="p">;</span>  <span class="c1">// 跳跃表的层高
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div></div><p>zskiplist 的 header 指针指向跳跃表的 head 节点。head 节点的 level 数组元素个数为 32，head 节点不存储任何 member、score值，ele 值为 NULL，score 值为 0 ，也不计入总长度的计算。</p>
 <h2 id="stream-">stream 简介</h2>
 <p>Redis 的 Stream 是一种高效的、功能强大的数据结构，适用于消息队列、日志管理和实时数据处理等场景。它在 Redis 5.0 中引入，提供了一种基于时间序列的数据模型，类似于 Kafka 等消息队列系统，但具有 Redis 的高性能和易用性。</p>
 <p>stream 的基本特性：</p>
@@ -395,16 +477,24 @@
 </ol>
 <h3 id="heading-7">事件处理</h3>
 <p>事件都封装在 aeEventLoop 中，它的定义如下：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">aeEventLoop</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="kt">int</span> <span class="n">stop</span><span class="p">;</span>  <span class="c1">// 标志事件结束
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>  <span class="n">aeFileEvent</span> <span class="o">*</span><span class="n">events</span><span class="p">;</span>  <span class="c1">// 文件事件数组
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>  <span class="n">aeFiredEvent</span> <span class="o">*</span><span class="n">fired</span><span class="p">;</span>  <span class="c1">// 已触发事件数组
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>  <span class="n">aeTimeEvent</span> <span class="o">*</span><span class="n">timeEventHead</span><span class="p">;</span>  <span class="c1">// 时间事件链表头节点
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">apidata</span><span class="p">;</span>  <span class="c1">// 多路复用的底层实现相关数据
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span>  <span class="n">aeBeforeSleepProc</span> <span class="o">*</span><span class="n">beforesleep</span><span class="p">;</span>  <span class="c1">// 事件循环前执行的钩子函数
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span>  <span class="n">aeBeforeSleepProc</span> <span class="o">*</span><span class="n">aftersleep</span><span class="p">;</span>  <span class="c1">// 事件循环后执行的钩子函数
-</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">aeEventLoop</span><span class="p">;</span>
-</span></span></code></pre><p>Redis 的事件驱动模型是基于事件循环的，它将所有任务分为两类：文件事件（File Event）和时间事件（Time Event），并通过事件循环依次处理这些事件。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">aeEventLoop</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">stop</span><span class="p">;</span>  <span class="c1">// 标志事件结束
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">aeFileEvent</span> <span class="o">*</span><span class="n">events</span><span class="p">;</span>  <span class="c1">// 文件事件数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">aeFiredEvent</span> <span class="o">*</span><span class="n">fired</span><span class="p">;</span>  <span class="c1">// 已触发事件数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">aeTimeEvent</span> <span class="o">*</span><span class="n">timeEventHead</span><span class="p">;</span>  <span class="c1">// 时间事件链表头节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="o">*</span><span class="n">apidata</span><span class="p">;</span>  <span class="c1">// 多路复用的底层实现相关数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">aeBeforeSleepProc</span> <span class="o">*</span><span class="n">beforesleep</span><span class="p">;</span>  <span class="c1">// 事件循环前执行的钩子函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">aeBeforeSleepProc</span> <span class="o">*</span><span class="n">aftersleep</span><span class="p">;</span>  <span class="c1">// 事件循环后执行的钩子函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">aeEventLoop</span><span class="p">;</span>
+</span></span></code></pre></div></div><p>Redis 的事件驱动模型是基于事件循环的，它将所有任务分为两类：文件事件（File Event）和时间事件（Time Event），并通过事件循环依次处理这些事件。</p>
 <p>Redis 的事件循环通过函数 aeMain 实现，大致流程如下：</p>
 <ol>
 <li>检查是否需要退出：通过 stop 标志判断是否需要退出事件循环；</li>
@@ -472,13 +562,18 @@
 <p>在 Redis 的事件循环机制中，&ldquo;文件事件（File Event）&rdquo; 是对可读写的文件描述符（File Descriptor, FD）进行异步处理的核心手段。虽然名为“文件事件”，但实际应用中，它更多用于处理网络套接字（如客户端连接的 TCP Socket）的读写，这与传统的 UNIX 网络编程中“文件描述符既可代表文件又可代表套接字”的概念相呼应。Redis 基本上是通过文件事件来实现非阻塞、单线程的网络 I/O 处理，从而在不依赖多线程的情况下实现高吞吐和低延迟。</p>
 <p>Redis 单线程运行中，为了同时处理众多客户端请求，需要在不阻塞主线程的前提下对 I/O 操作（如读写套接字）进行管理。文件事件模型就是为了解决这个问题而设计的。通过将每一个套接字（客户端连接）注册到事件循环中，当该套接字可读或可写时，事件循环会获悉并调用相应的回调函数进行处理。文件事件基于操作系统的多路复用机制（select、epoll、kqueue），以非阻塞方式高效地管理多个 I/O 通道。</p>
 <p>aeFileEvent 是文件事件的核心结构，它的结构体定义：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">aeFileEvent</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kt">int</span> <span class="n">mask</span><span class="p">;</span>                 <span class="c1">// 事件类型掩码，可以是 AE_READABLE 或 AE_WRITABLE 或两者的组合
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>    <span class="n">aeFileProc</span> <span class="o">*</span><span class="n">rfileProc</span><span class="p">;</span>    <span class="c1">// 可读事件的回调函数
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>    <span class="n">aeFileProc</span> <span class="o">*</span><span class="n">wfileProc</span><span class="p">;</span>    <span class="c1">// 可写事件的回调函数
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="o">*</span><span class="n">clientData</span><span class="p">;</span>         <span class="c1">// 用户数据，可以传递给回调函数
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">aeFileEvent</span><span class="p">;</span>
-</span></span></code></pre><p>文件事件有几个实现的关键点：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">aeFileEvent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">mask</span><span class="p">;</span>                 <span class="c1">// 事件类型掩码，可以是 AE_READABLE 或 AE_WRITABLE 或两者的组合
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">aeFileProc</span> <span class="o">*</span><span class="n">rfileProc</span><span class="p">;</span>    <span class="c1">// 可读事件的回调函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">aeFileProc</span> <span class="o">*</span><span class="n">wfileProc</span><span class="p">;</span>    <span class="c1">// 可写事件的回调函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="o">*</span><span class="n">clientData</span><span class="p">;</span>         <span class="c1">// 用户数据，可以传递给回调函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">aeFileEvent</span><span class="p">;</span>
+</span></span></code></pre></div></div><p>文件事件有几个实现的关键点：</p>
 <ul>
 <li>事件注册与管理：
 <ul>
@@ -519,16 +614,24 @@
 <h3 id="heading-9">时间事件</h3>
 <p>时间事件是基于定时触发的回调机制，用于在特定时间点或周期性地执行特定任务。例如，Redis 中的一些周期性操作（如服务器内部维护、过期键清理、统计信息更新）都是通过时间事件来实现的。</p>
 <p>Redis 使用一个单向链表管理所有注册的时间事件，头指针就是 aeEventLoop 中的 timeEventHead 属性。时间事件的核心结构是 aeTimeEvent：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">aeTimeEvent</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="kt">long</span> <span class="kt">long</span> <span class="n">id</span><span class="p">;</span>  <span class="c1">// 时间事件的唯一标识符
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>    <span class="kt">long</span> <span class="n">whenSec</span><span class="p">;</span>  <span class="c1">// 事件触发的时间（秒级）
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>    <span class="kt">long</span> <span class="n">whenMs</span><span class="p">;</span>   <span class="c1">// 事件触发的时间（毫秒级，与 whenSec 合用可表示一个精确时间点）
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>    <span class="n">aeTimeProc</span> <span class="o">*</span><span class="n">timeProc</span><span class="p">;</span>  <span class="c1">// 时间事件的回调函数
-</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>    <span class="n">aeEventFinalizerProc</span> <span class="o">*</span><span class="n">finalizerProc</span><span class="p">;</span>  <span class="c1">// 可选的清理回调函数，当时间事件删除时调用
-</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span>    <span class="k">struct</span> <span class="n">aeTimeEvent</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>  <span class="c1">// 下一个时间事件的指针
-</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">aeTimeEvent</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">9</span><span class="cl">
-</span></span></code></pre><p>时间事件的触发与处理流程：</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">aeTimeEvent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">long</span> <span class="kt">long</span> <span class="n">id</span><span class="p">;</span>  <span class="c1">// 时间事件的唯一标识符
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">long</span> <span class="n">whenSec</span><span class="p">;</span>  <span class="c1">// 事件触发的时间（秒级）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">long</span> <span class="n">whenMs</span><span class="p">;</span>   <span class="c1">// 事件触发的时间（毫秒级，与 whenSec 合用可表示一个精确时间点）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">aeTimeProc</span> <span class="o">*</span><span class="n">timeProc</span><span class="p">;</span>  <span class="c1">// 时间事件的回调函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">aeEventFinalizerProc</span> <span class="o">*</span><span class="n">finalizerProc</span><span class="p">;</span>  <span class="c1">// 可选的清理回调函数，当时间事件删除时调用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">struct</span> <span class="n">aeTimeEvent</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>  <span class="c1">// 下一个时间事件的指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">aeTimeEvent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span></code></pre></div></div><p>时间事件的触发与处理流程：</p>
 <ol>
 <li>
 <p>事件检查与触发时机：</p>

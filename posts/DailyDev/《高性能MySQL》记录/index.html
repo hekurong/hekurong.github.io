@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=9">
+<link rel="stylesheet" href="/assets/css/style.css?v=10">
 
 
 
@@ -150,8 +150,8 @@
 <h4 id="heading-6">前缀索引与索引选择性</h4>
 <p>针对长字符串或文本类型，通过截取前 N 个字符建立索引，减少存储空间和 I/O 消耗。</p>
 <p>关于如何选择合适的前缀长度，可以通过计算选择性进行评估：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span><span class="w"> </span><span class="k">LEFT</span><span class="p">(</span><span class="k">column</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">table</span><span class="p">;</span><span class="w">  
-</span></span></span></code></pre><p>选择接近完整列选择性的最短前缀（如对邮箱地址反转后建前缀索引）。</p>
+<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span><span class="w"> </span><span class="k">LEFT</span><span class="p">(</span><span class="k">column</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">table</span><span class="p">;</span><span class="w">  
+</span></span></span></code></pre></div></div><p>选择接近完整列选择性的最短前缀（如对邮箱地址反转后建前缀索引）。</p>
 <h4 id="heading-7">复合索引与最左前缀原则</h4>
 <p>最左前缀原则：查询必须从复合索引的最左列开始，且不能跳过中间列。示例：索引 <code>(A,B,C)</code> 支持 <code>A=1 AND B=2</code> ，但不支持 <code>B=2</code> 或 <code>B=2 AND C=3</code> 。使用复合索引时要注意范围查询限制，若某一列使用范围查询，其右侧的列无法使用索引优化。</p>
 <p>关于复合索引的列选择，选择性高的列放左侧、优先筛选更多数据。若需 <code>ORDER BY A,B</code> ，索引顺序应为 <code>(A,B)</code> 。</p>
