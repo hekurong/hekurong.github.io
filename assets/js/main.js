@@ -140,7 +140,13 @@
     document.querySelectorAll(".code-wrapper, .article-content pre:not(.code-ln pre)").forEach(function (wrapper) {
       if (wrapper.querySelector(".copy-btn")) return;
 
-      var codeBlock = wrapper.querySelector("code");
+      // For code-wrapper, only copy code column (exclude line numbers)
+      var codeBlock;
+      if (wrapper.classList.contains("code-wrapper")) {
+        codeBlock = wrapper.querySelector(".code-body code");
+      } else {
+        codeBlock = wrapper.querySelector("code");
+      }
       if (!codeBlock) return;
 
       var btn = document.createElement("button");
@@ -362,6 +368,27 @@
   });
 
   /* ================================================================ */
+  /*  7.5. Heading Anchor Links                                        */
+  /* ================================================================ */
+
+  function initHeadingAnchors() {
+    document.querySelectorAll('.article-content h2[id], .article-content h3[id], .article-content h4[id]').forEach(function (h) {
+      var a = document.createElement('a');
+      a.className = 'heading-anchor';
+      a.href = '#' + h.id;
+      a.textContent = '#';
+      a.setAttribute('aria-label', 'Link to this heading');
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        history.replaceState(null, '', a.href);
+        navigator.clipboard.writeText(location.origin + location.pathname + a.href).catch(function () {});
+        h.scrollIntoView({ behavior: 'smooth' });
+      });
+      h.appendChild(a);
+    });
+  }
+
+  /* ================================================================ */
   /*  8. Initialization on DOM ready                                  */
   /* ================================================================ */
 
@@ -380,6 +407,7 @@
     });
 
     initTOC();
+    initHeadingAnchors();
     initCopyButtons();
     initHighlightLines();
     initArchiveToggle();

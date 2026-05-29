@@ -676,6 +676,27 @@ li {
   visibility: hidden;
 }
 
+.heading-anchor {
+  display: inline-block;
+  margin-left: 0.3em;
+  color: var(--color-link);
+  opacity: 0;
+  font-size: 0.85em;
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+  vertical-align: middle;
+}
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+h4:hover .heading-anchor {
+  opacity: 0.6;
+}
+.heading-anchor:hover {
+  opacity: 1 !important;
+  text-decoration: none;
+  color: var(--color-link-hover);
+}
+
 .article-content a {
   word-break: break-word;
 }
