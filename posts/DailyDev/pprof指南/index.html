@@ -124,42 +124,42 @@
 <h3 id="pprof-"><strong>第一部分：PProf 基础与开启</strong></h3>
 <p>要在 Web 服务中开启 <code>pprof</code>，我们只需引入 <code>net/http/pprof</code> 包。对于使用 Gin 等框架的服务，可以将其 Handler 包装后注册到路由中。</p>
 <p>一个关键的准备步骤是，为了能分析到 <strong>阻塞</strong> 和 <strong>锁竞争</strong>，我们需要在程序启动时设置采样率。如果不设置，相关的 profile 文件将是空的。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;log&#34;</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;net/http&#34;</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">_</span> <span class="s">&#34;net/http/pprof&#34;</span> <span class="c1">// 关键：匿名导入pprof包，它会自动注册handler
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="s">&#34;runtime&#34;</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;github.com/gin-gonic/gin&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// --- 关键设置 ---
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// 开启对阻塞操作的跟踪，每发生一次阻塞都会记录
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">runtime</span><span class="p">.</span><span class="nf">SetBlockProfileRate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 
-</span></span><span class="line"><span class="cl">	<span class="c1">// 开启对锁竞争的跟踪，记录持有锁超过 20ns 的情况
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">runtime</span><span class="p">.</span><span class="nf">SetMutexProfileFraction</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">gin</span><span class="p">.</span><span class="nf">Default</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// 注册 pprof 路由
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">pprofGroup</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">Group</span><span class="p">(</span><span class="s">&#34;/debug/pprof&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="c1">// ... （此处省略了 gin 包装 pprof handler 的代码，为简洁起见）
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="c1">// 在独立端口或默认 Mux 上开启 pprof 更简单
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    <span class="c1">// ... 注册你的业务路由 ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// 推荐：为 pprof 单独启动一个 HTTP 服务，不与业务服务混用
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">(</span><span class="s">&#34;localhost:6060&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;业务服务运行在 :8080&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">r</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">	<span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">	<span class="s">&#34;net/http&#34;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">	<span class="nx">_</span> <span class="s">&#34;net/http/pprof&#34;</span> <span class="c1">// 关键：匿名导入pprof包，它会自动注册handler
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>	<span class="s">&#34;runtime&#34;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">	<span class="s">&#34;github.com/gin-gonic/gin&#34;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">	<span class="c1">// --- 关键设置 ---
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span>	<span class="c1">// 开启对阻塞操作的跟踪，每发生一次阻塞都会记录
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span>	<span class="nx">runtime</span><span class="p">.</span><span class="nf">SetBlockProfileRate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 
+</span></span><span class="line"><span class="ln">15</span><span class="cl">	<span class="c1">// 开启对锁竞争的跟踪，记录持有锁超过 20ns 的情况
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span>	<span class="nx">runtime</span><span class="p">.</span><span class="nf">SetMutexProfileFraction</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl">	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">gin</span><span class="p">.</span><span class="nf">Default</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">
+</span></span><span class="line"><span class="ln">20</span><span class="cl">	<span class="c1">// 注册 pprof 路由
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1"></span>	<span class="nx">pprofGroup</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">Group</span><span class="p">(</span><span class="s">&#34;/debug/pprof&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">		<span class="c1">// ... （此处省略了 gin 包装 pprof handler 的代码，为简洁起见）
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span>		<span class="c1">// 在独立端口或默认 Mux 上开启 pprof 更简单
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1"></span>	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">    
+</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="c1">// ... 注册你的业务路由 ...
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">	<span class="c1">// 推荐：为 pprof 单独启动一个 HTTP 服务，不与业务服务混用
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span>	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">(</span><span class="s">&#34;localhost:6060&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">	<span class="p">}()</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">
+</span></span><span class="line"><span class="ln">34</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;业务服务运行在 :8080&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">	<span class="nx">r</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p><strong>最佳实践</strong>：将 <code>pprof</code> 服务运行在一个独立的端口（如 <code>6060</code>），与主业务端口（如 <code>8080</code>）分离，这样即使业务服务因请求压力过大而响应缓慢，我们依然能通过 <code>pprof</code> 端口来分析程序状态。</p>
 <h3 id="heading"><strong>第二部分：实战排查五大典型性能问题</strong></h3>
 <p>接下来，我们将通过具体的“坏代码”案例，演示如何使用 <code>pprof</code> 定位问题。</p>
@@ -168,12 +168,12 @@
 <ul>
 <li>
 <p><strong>问题代码</strong>：模拟一个非常耗时的计算任务。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// 在你的 handler 中
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">cpuIntensiveTask</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">100000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">_</span> <span class="p">=</span> <span class="nx">sha256</span><span class="p">.</span><span class="nf">Sum256</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;some-data&#34;</span> <span class="o">+</span> <span class="nb">string</span><span class="p">(</span><span class="nx">i</span><span class="p">)))</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// 在你的 handler 中
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">cpuIntensiveTask</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">100000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">        <span class="nx">_</span> <span class="p">=</span> <span class="nx">sha256</span><span class="p">.</span><span class="nf">Sum256</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;some-data&#34;</span> <span class="o">+</span> <span class="nb">string</span><span class="p">(</span><span class="nx">i</span><span class="p">)))</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 <li>
 <p><strong>排查步骤</strong>：</p>
@@ -183,7 +183,7 @@
 </li>
 <li>
 <p>在终端执行命令，采集 30 秒的 CPU 数据：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/profile?seconds=30&#39;</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/profile?seconds=30&#39;</span>
 </span></span></code></pre></li>
 <li>
 <p>进入 pprof 交互界面后，使用 <code>top</code> 命令查看最耗 CPU 的函数。</p>
@@ -208,12 +208,12 @@ Showing nodes accounting for 4.50s, 98.90% of 4.55s total
 <ul>
 <li>
 <p><strong>问题代码</strong>：模拟创建一个全局的大对象。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">bigCache</span> <span class="p">[]</span><span class="kt">byte</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">memoryHogTask</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 每次调用都向全局 slice 追加 10MB 数据
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">bigCache</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">bigCache</span><span class="p">,</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="p">)</span><span class="o">...</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">var</span> <span class="nx">bigCache</span> <span class="p">[]</span><span class="kt">byte</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="kd">func</span> <span class="nf">memoryHogTask</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="c1">// 每次调用都向全局 slice 追加 10MB 数据
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>    <span class="nx">bigCache</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">bigCache</span><span class="p">,</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="p">)</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 <li>
 <p><strong>排查步骤</strong>：</p>
@@ -223,7 +223,7 @@ Showing nodes accounting for 4.50s, 98.90% of 4.55s total
 </li>
 <li>
 <p>采集 heap profile。我们可以分析当前正在使用的内存 (<code>inuse_space</code>) 或分析自程序启动以来总共分配过的内存 (<code>alloc_space</code>)。排查内存泄漏通常用前者。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/heap&#39;</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/heap&#39;</span>
 </span></span></code></pre></li>
 <li>
 <p>使用 <code>top</code> 查看内存分配大户。</p>
@@ -244,9 +244,9 @@ Showing nodes accounting for 50MB, 100% of 50MB total
 <ul>
 <li>
 <p><strong>问题代码</strong>：模拟一个耗时的数据库查询。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">blockingTask</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span> <span class="c1">// 模拟 IO 等待
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span> <span class="nf">blockingTask</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span> <span class="c1">// 模拟 IO 等待
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></li>
 <li>
 <p><strong>排查步骤</strong>：</p>
@@ -281,15 +281,15 @@ Showing nodes accounting for 4s, 100% of 4s total
 </li>
 <li>
 <p><strong>问题代码</strong>：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// API Handler, 每次调用都会泄漏一个 Goroutine
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">leakGoroutineTask</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span> <span class="c1">// 创建一个无缓冲 Channel
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Goroutine started, but will be leaked...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="c1">// 永远阻塞在这里，因为没有地方会向 ch 发送数据
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="o">&lt;-</span><span class="nx">ch</span> 
-</span></span><span class="line"><span class="cl">    <span class="p">}()</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// API Handler, 每次调用都会泄漏一个 Goroutine
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">leakGoroutineTask</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span> <span class="c1">// 创建一个无缓冲 Channel
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>    <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Goroutine started, but will be leaked...&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">        <span class="c1">// 永远阻塞在这里，因为没有地方会向 ch 发送数据
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"></span>        <span class="o">&lt;-</span><span class="nx">ch</span> 
+</span></span><span class="line"><span class="ln">8</span><span class="cl">    <span class="p">}()</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 <li>
 <p><strong>排查步骤</strong>：</p>
@@ -300,7 +300,7 @@ Showing nodes accounting for 4s, 100% of 4s total
 <li>
 <p><strong>采集快照</strong>：使用 <code>go tool pprof</code> 进行分析。</p>
 <p>Bash</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/goroutine&#39;</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/goroutine&#39;</span>
 </span></span></code></pre></li>
 <li>
 <p><strong>分析数据</strong>：</p>
@@ -344,20 +344,20 @@ ROUTINE ======================== main.leakGoroutineTask.func1 in .../main.go
 </li>
 <li>
 <p><strong>问题代码</strong>：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">var</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">data</span>      <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">dataMutex</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span><span class="p">{}</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">mutexContentionTask</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">dataMutex</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">dataMutex</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// 关键错误：在持有锁的情况下执行耗时操作！
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nx">data</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">value</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">var</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="nx">data</span>      <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">dataMutex</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span><span class="p">{}</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kd">func</span> <span class="nf">mutexContentionTask</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nx">dataMutex</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="k">defer</span> <span class="nx">dataMutex</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="c1">// 关键错误：在持有锁的情况下执行耗时操作！
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"></span>    <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="nx">data</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">value</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 <li>
 <p><strong>排查步骤</strong>：</p>
@@ -368,7 +368,7 @@ ROUTINE ======================== main.leakGoroutineTask.func1 in .../main.go
 <li>
 <p><strong>采集快照</strong>：</p>
 <p>Bash</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/mutex&#39;</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/mutex&#39;</span>
 </span></span></code></pre></li>
 <li>
 <p><strong>分析数据</strong>：</p>

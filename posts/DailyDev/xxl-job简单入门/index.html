@@ -214,66 +214,66 @@
 </li>
 <li>
 <p>安装 Go client 库：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go get github.com/xxl-job/xxl-job-executor-go
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">go get github.com/xxl-job/xxl-job-executor-go
 </span></span></code></pre></li>
 </ol>
 <h4 id="heading-1">示例代码</h4>
 <p>创建一个 <code>main.go</code> 文件。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;context&#34;</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;fmt&#34;</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;github.com/xxl-job/xxl-job-executor-go&#34;</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;log&#34;</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;time&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">exec</span> <span class="o">:=</span> <span class="nx">xxl</span><span class="p">.</span><span class="nf">NewExecutor</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">ServerAddr</span><span class="p">(</span><span class="s">&#34;http://113.44.146.232:8080/xxl-job-admin&#34;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">AccessToken</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">ExecutorIp</span><span class="p">(</span><span class="s">&#34;127.0.0.1&#34;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">ExecutorPort</span><span class="p">(</span><span class="s">&#34;9999&#34;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">RegistryKey</span><span class="p">(</span><span class="s">&#34;xxl-job-executor-golang&#34;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">	<span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">exec</span><span class="p">.</span><span class="nf">Init</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">exec</span><span class="p">.</span><span class="nf">RegTask</span><span class="p">(</span><span class="s">&#34;task.simple&#34;</span><span class="p">,</span> <span class="nx">simpleTask</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">exec</span><span class="p">.</span><span class="nf">RegTask</span><span class="p">(</span><span class="s">&#34;task.sharding&#34;</span><span class="p">,</span> <span class="nx">shardingTask</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;XXL-JOB Go executor is starting...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">err</span> <span class="o">:=</span> <span class="nx">exec</span><span class="p">.</span><span class="nf">Run</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Failed to start the executor: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">simpleTask</span><span class="p">(</span><span class="nx">cxt</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">param</span> <span class="o">*</span><span class="nx">xxl</span><span class="p">.</span><span class="nx">RunReq</span><span class="p">)</span> <span class="p">(</span><span class="nx">msg</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Executing simple task with param: %s&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">ExecutorParams</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Log ID: %d, Job ID: %d&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">LogID</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">JobID</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Simple task executed successfully.&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="s">&#34;Simple task ran successfully&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">shardingTask</span><span class="p">(</span><span class="nx">cxt</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">param</span> <span class="o">*</span><span class="nx">xxl</span><span class="p">.</span><span class="nx">RunReq</span><span class="p">)</span> <span class="p">(</span><span class="nx">msg</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;--- Executing Sharding Task ---&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Sharding Index: %d&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastIndex</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Sharding Total: %d&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastTotal</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nb">int64</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">i</span><span class="o">%</span><span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastTotal</span> <span class="o">==</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastIndex</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Instance %d is processing data slice %d&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastIndex</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;--- Sharding Task Finished ---&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;Shard %d/%d finished.&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastIndex</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastTotal</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">	<span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">	<span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">	<span class="s">&#34;github.com/xxl-job/xxl-job-executor-go&#34;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">	<span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">	<span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">	<span class="nx">exec</span> <span class="o">:=</span> <span class="nx">xxl</span><span class="p">.</span><span class="nf">NewExecutor</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">ServerAddr</span><span class="p">(</span><span class="s">&#34;http://113.44.146.232:8080/xxl-job-admin&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">AccessToken</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">ExecutorIp</span><span class="p">(</span><span class="s">&#34;127.0.0.1&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">ExecutorPort</span><span class="p">(</span><span class="s">&#34;9999&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">		<span class="nx">xxl</span><span class="p">.</span><span class="nf">RegistryKey</span><span class="p">(</span><span class="s">&#34;xxl-job-executor-golang&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">	<span class="p">)</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">	<span class="nx">exec</span><span class="p">.</span><span class="nf">Init</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">
+</span></span><span class="line"><span class="ln">21</span><span class="cl">	<span class="nx">exec</span><span class="p">.</span><span class="nf">RegTask</span><span class="p">(</span><span class="s">&#34;task.simple&#34;</span><span class="p">,</span> <span class="nx">simpleTask</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">	<span class="nx">exec</span><span class="p">.</span><span class="nf">RegTask</span><span class="p">(</span><span class="s">&#34;task.sharding&#34;</span><span class="p">,</span> <span class="nx">shardingTask</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">
+</span></span><span class="line"><span class="ln">24</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;XXL-JOB Go executor is starting...&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">
+</span></span><span class="line"><span class="ln">26</span><span class="cl">	<span class="nx">err</span> <span class="o">:=</span> <span class="nx">exec</span><span class="p">.</span><span class="nf">Run</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">		<span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Failed to start the executor: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="kd">func</span> <span class="nf">simpleTask</span><span class="p">(</span><span class="nx">cxt</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">param</span> <span class="o">*</span><span class="nx">xxl</span><span class="p">.</span><span class="nx">RunReq</span><span class="p">)</span> <span class="p">(</span><span class="nx">msg</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Executing simple task with param: %s&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">ExecutorParams</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Log ID: %d, Job ID: %d&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">LogID</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">JobID</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">
+</span></span><span class="line"><span class="ln">36</span><span class="cl">	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl">
+</span></span><span class="line"><span class="ln">38</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Simple task executed successfully.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl">	<span class="k">return</span> <span class="s">&#34;Simple task ran successfully&#34;</span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">
+</span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="kd">func</span> <span class="nf">shardingTask</span><span class="p">(</span><span class="nx">cxt</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">param</span> <span class="o">*</span><span class="nx">xxl</span><span class="p">.</span><span class="nx">RunReq</span><span class="p">)</span> <span class="p">(</span><span class="nx">msg</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;--- Executing Sharding Task ---&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">44</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Sharding Index: %d&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastIndex</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Sharding Total: %d&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastTotal</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl">
+</span></span><span class="line"><span class="ln">47</span><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nb">int64</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">48</span><span class="cl">		<span class="k">if</span> <span class="nx">i</span><span class="o">%</span><span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastTotal</span> <span class="o">==</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastIndex</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">49</span><span class="cl">			<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Instance %d is processing data slice %d&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastIndex</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">50</span><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="ln">51</span><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">52</span><span class="cl">
+</span></span><span class="line"><span class="ln">53</span><span class="cl">	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;--- Sharding Task Finished ---&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">54</span><span class="cl">	<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;Shard %d/%d finished.&#34;</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastIndex</span><span class="p">,</span> <span class="nx">param</span><span class="p">.</span><span class="nx">BroadcastTotal</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">55</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><h4 id="-demo">如何运行 Demo</h4>
 <ol>
 <li>
@@ -291,7 +291,7 @@
 </li>
 <li>
 <p>运行 Go 程序：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">go run main.go
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">go run main.go
 </span></span></code></pre></li>
 <li>
 <p>观察 Admin 界面，你会看到 <code>xxl-job-executor-golang</code> 执行器下有一个实例注册上来。</p>

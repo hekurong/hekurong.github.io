@@ -153,39 +153,39 @@ LubanCat5的讲解：
 <ol>
 <li>
 <p>安装docker。这里以Ubuntu为例：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">sudo apt-get update
-</span></span><span class="line"><span class="cl">sudo apt-get install -y <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    ca-certificates <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    curl <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    gnupg <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    lsb-release
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># Add Docker&#39;s official GPG key</span>
-</span></span><span class="line"><span class="cl">sudo install -m <span class="m">0755</span> -d /etc/apt/keyrings
-</span></span><span class="line"><span class="cl">curl -fsSL https://download.docker.com/linux/ubuntu/gpg <span class="p">|</span> sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-</span></span><span class="line"><span class="cl">sudo chmod a+r /etc/apt/keyrings/docker.gpg
-</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  <span class="s2">&#34;deb [arch=</span><span class="k">$(</span>dpkg --print-architecture<span class="k">)</span><span class="s2"> signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-</span></span></span><span class="line"><span class="cl"><span class="s2">  </span><span class="k">$(</span>. /etc/os-release <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$VERSION_CODENAME</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2"> stable&#34;</span> <span class="p">|</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># Update the index again</span>
-</span></span><span class="line"><span class="cl">sudo apt-get update
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># Define the target version</span>
-</span></span><span class="line"><span class="cl"><span class="nv">VERSION_STR</span><span class="o">=</span><span class="s2">&#34;5:20.10.15~3-0~ubuntu-focal&#34;</span>
-</span></span><span class="line"><span class="cl">sudo apt-get install -y <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    docker-ce<span class="o">=</span><span class="nv">$VERSION_STR</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    docker-ce-cli<span class="o">=</span><span class="nv">$VERSION_STR</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    containerd.io <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    docker-compose-plugin <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    docker-buildx-plugin
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># Prevent Docker from being upgraded automatically</span>
-</span></span><span class="line"><span class="cl">sudo apt-mark hold docker-ce docker-ce-cli
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># Start Docker service</span>
-</span></span><span class="line"><span class="cl">sudo systemctl <span class="nb">enable</span> --now docker
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl">sudo apt-get update
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">sudo apt-get install -y <span class="se">\
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="se"></span>    ca-certificates <span class="se">\
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="se"></span>    curl <span class="se">\
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="se"></span>    gnupg <span class="se">\
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="se"></span>    lsb-release
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"># Add Docker&#39;s official GPG key</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">sudo install -m <span class="m">0755</span> -d /etc/apt/keyrings
+</span></span><span class="line"><span class="ln">10</span><span class="cl">curl -fsSL https://download.docker.com/linux/ubuntu/gpg <span class="p">|</span> sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+</span></span><span class="line"><span class="ln">11</span><span class="cl">sudo chmod a+r /etc/apt/keyrings/docker.gpg
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="nb">echo</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="se"></span>  <span class="s2">&#34;deb [arch=</span><span class="k">$(</span>dpkg --print-architecture<span class="k">)</span><span class="s2"> signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="s2">  </span><span class="k">$(</span>. /etc/os-release <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$VERSION_CODENAME</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2"> stable&#34;</span> <span class="p">|</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="se"></span>  sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"># Update the index again</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">sudo apt-get update
+</span></span><span class="line"><span class="ln">19</span><span class="cl">
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"># Define the target version</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="nv">VERSION_STR</span><span class="o">=</span><span class="s2">&#34;5:20.10.15~3-0~ubuntu-focal&#34;</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">sudo apt-get install -y <span class="se">\
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="se"></span>    docker-ce<span class="o">=</span><span class="nv">$VERSION_STR</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="se"></span>    docker-ce-cli<span class="o">=</span><span class="nv">$VERSION_STR</span> <span class="se">\
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="se"></span>    containerd.io <span class="se">\
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="se"></span>    docker-compose-plugin <span class="se">\
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="se"></span>    docker-buildx-plugin
+</span></span><span class="line"><span class="ln">28</span><span class="cl">
+</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1"># Prevent Docker from being upgraded automatically</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">sudo apt-mark hold docker-ce docker-ce-cli
+</span></span><span class="line"><span class="ln">31</span><span class="cl">
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="c1"># Start Docker service</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">sudo systemctl <span class="nb">enable</span> --now docker
 </span></span></code></pre></li>
 <li>
 <p>按照手册进行操作，完成镜像的加载、启动，并访问<code>localhost:8081/admin/index</code>验证。</p>
@@ -193,95 +193,95 @@ LubanCat5的讲解：
 </ol>
 <h2 id="roothmi-datadbfile">定时清理/root/hmi_data/db/file文件夹的脚本</h2>
 <p>假设脚本放在<code>/home/cat/Downloads/manage_file.sh</code>：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/bash
-</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
-</span></span><span class="line"><span class="cl"><span class="c1"># ----------------------------------------------------------------              </span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Script Location: /home/cat/Downloads/manage_file.sh</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Description: Monitor DIRECTORY size and clean contents if &gt; 1GB.</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Target: /root/hmi_data/db/file (Directory)</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># ----------------------------------------------------------------</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 1. Configuration</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># The target is now explicitly treated as a DIRECTORY</span>
-</span></span><span class="line"><span class="cl"><span class="nb">readonly</span> <span class="nv">TARGET_PARENT</span><span class="o">=</span><span class="s2">&#34;/root/hmi_data/db&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="nb">readonly</span> <span class="nv">TARGET_DIR</span><span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">TARGET_PARENT</span><span class="si">}</span><span class="s2">/file&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 1GB in bytes</span>
-</span></span><span class="line"><span class="cl"><span class="nb">readonly</span> <span class="nv">MAX_SIZE</span><span class="o">=</span><span class="m">1073741824</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Safe guard to prevent deleting wrong paths</span>
-</span></span><span class="line"><span class="cl"><span class="nb">readonly</span> <span class="nv">MIN_PATH_LEN</span><span class="o">=</span><span class="m">15</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># Commands</span>
-</span></span><span class="line"><span class="cl"><span class="nb">readonly</span> <span class="nv">CMD_DU</span><span class="o">=</span><span class="s2">&#34;/usr/bin/du&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="nb">readonly</span> <span class="nv">CMD_RM</span><span class="o">=</span><span class="s2">&#34;/usr/bin/rm&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="nb">readonly</span> <span class="nv">CMD_DATE</span><span class="o">=</span><span class="s2">&#34;/usr/bin/date&#34;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 2. Logging</span>
-</span></span><span class="line"><span class="cl">log<span class="o">()</span> <span class="o">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="k">$(</span><span class="nv">$CMD_DATE</span> <span class="s1">&#39;+%Y-%m-%d %H:%M:%S&#39;</span><span class="k">)</span><span class="s2">] </span><span class="nv">$1</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="o">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 3. Path Validation &amp; Initialization</span>
-</span></span><span class="line"><span class="cl">ensure_directory<span class="o">()</span> <span class="o">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1"># Ensure parent exists</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">[</span> ! -d <span class="s2">&#34;</span><span class="nv">$TARGET_PARENT</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span></span><span class="line"><span class="cl">        mkdir -p <span class="s2">&#34;</span><span class="nv">$TARGET_PARENT</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">fi</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1"># Ensure target directory exists</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">[</span> ! -d <span class="s2">&#34;</span><span class="nv">$TARGET_DIR</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span></span><span class="line"><span class="cl">        mkdir -p <span class="s2">&#34;</span><span class="nv">$TARGET_DIR</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl">        log <span class="s2">&#34;[INFO] Created directory: </span><span class="nv">$TARGET_DIR</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">fi</span>
-</span></span><span class="line"><span class="cl"><span class="o">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 4. Core Logic</span>
-</span></span><span class="line"><span class="cl">monitor_and_clean<span class="o">()</span> <span class="o">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1"># Calculate directory size in bytes (-s: summary, -b: bytes)</span>
-</span></span><span class="line"><span class="cl">    <span class="c1"># cut -f1 extracts just the number</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">local</span> dir_size
-</span></span><span class="line"><span class="cl">    <span class="nv">dir_size</span><span class="o">=</span><span class="k">$(</span><span class="nv">$CMD_DU</span> -sb <span class="s2">&#34;</span><span class="nv">$TARGET_DIR</span><span class="s2">&#34;</span> <span class="p">|</span> cut -f1<span class="k">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1"># Check if calculation succeeded</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">[[</span> ! <span class="s2">&#34;</span><span class="nv">$dir_size</span><span class="s2">&#34;</span> <span class="o">=</span>~ ^<span class="o">[</span>0-9<span class="o">]</span>+$ <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-</span></span><span class="line"><span class="cl">        log <span class="s2">&#34;[ERROR] Failed to calculate size. Output: </span><span class="nv">$dir_size</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl">        <span class="nb">exit</span> <span class="m">1</span>
-</span></span><span class="line"><span class="cl">    <span class="k">fi</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$dir_size</span><span class="s2">&#34;</span> -ge <span class="s2">&#34;</span><span class="nv">$MAX_SIZE</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span></span><span class="line"><span class="cl">        log <span class="s2">&#34;[WARN] Directory size (</span><span class="nv">$dir_size</span><span class="s2"> bytes) exceeds limit.&#34;</span>
-</span></span><span class="line"><span class="cl">        
-</span></span><span class="line"><span class="cl">        <span class="c1"># SAFETY CHECK: Never run rm -rf on short variables or root</span>
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="si">${#</span><span class="nv">TARGET_DIR</span><span class="si">}</span><span class="s2">&#34;</span> -lt <span class="s2">&#34;</span><span class="nv">$MIN_PATH_LEN</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span></span><span class="line"><span class="cl">             log <span class="s2">&#34;[FATAL] Path length sanity check failed. Aborting delete.&#34;</span>
-</span></span><span class="line"><span class="cl">             <span class="nb">exit</span> <span class="m">1</span>
-</span></span><span class="line"><span class="cl">        <span class="k">fi</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="c1"># Execute Clean: Delete everything INSIDE the directory, but keep the directory itself</span>
-</span></span><span class="line"><span class="cl">        <span class="c1"># rm -rf /root/hmi_data/db/file/*</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">$CMD_RM</span> -rf <span class="s2">&#34;</span><span class="si">${</span><span class="nv">TARGET_DIR</span><span class="p">:?</span><span class="si">}</span><span class="s2">&#34;</span>/*
-</span></span><span class="line"><span class="cl">        
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span></span><span class="line"><span class="cl">            log <span class="s2">&#34;[INFO] Directory contents cleaned successfully.&#34;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">else</span>
-</span></span><span class="line"><span class="cl">            log <span class="s2">&#34;[ERROR] Failed to clean directory.&#34;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">fi</span>
-</span></span><span class="line"><span class="cl">    <span class="k">else</span>
-</span></span><span class="line"><span class="cl">        log <span class="s2">&#34;[INFO] Directory size: </span><span class="nv">$dir_size</span><span class="s2"> bytes. No action taken.&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">fi</span>
-</span></span><span class="line"><span class="cl"><span class="o">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 5. Execution</span>
-</span></span><span class="line"><span class="cl">main<span class="o">()</span> <span class="o">{</span>
-</span></span><span class="line"><span class="cl">    ensure_directory
-</span></span><span class="line"><span class="cl">    monitor_and_clean
-</span></span><span class="line"><span class="cl"><span class="o">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">main <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"># ----------------------------------------------------------------              </span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># Script Location: /home/cat/Downloads/manage_file.sh</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"># Description: Monitor DIRECTORY size and clean contents if &gt; 1GB.</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"># Target: /root/hmi_data/db/file (Directory)</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># ----------------------------------------------------------------</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"># 1. Configuration</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># The target is now explicitly treated as a DIRECTORY</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="nb">readonly</span> <span class="nv">TARGET_PARENT</span><span class="o">=</span><span class="s2">&#34;/root/hmi_data/db&#34;</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="nb">readonly</span> <span class="nv">TARGET_DIR</span><span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">TARGET_PARENT</span><span class="si">}</span><span class="s2">/file&#34;</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># 1GB in bytes</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nb">readonly</span> <span class="nv">MAX_SIZE</span><span class="o">=</span><span class="m">1073741824</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"># Safe guard to prevent deleting wrong paths</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="nb">readonly</span> <span class="nv">MIN_PATH_LEN</span><span class="o">=</span><span class="m">15</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"># Commands</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="nb">readonly</span> <span class="nv">CMD_DU</span><span class="o">=</span><span class="s2">&#34;/usr/bin/du&#34;</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="nb">readonly</span> <span class="nv">CMD_RM</span><span class="o">=</span><span class="s2">&#34;/usr/bin/rm&#34;</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="nb">readonly</span> <span class="nv">CMD_DATE</span><span class="o">=</span><span class="s2">&#34;/usr/bin/date&#34;</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"># 2. Logging</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">log<span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="k">$(</span><span class="nv">$CMD_DATE</span> <span class="s1">&#39;+%Y-%m-%d %H:%M:%S&#39;</span><span class="k">)</span><span class="s2">] </span><span class="nv">$1</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1"># 3. Path Validation &amp; Initialization</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">ensure_directory<span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="c1"># Ensure parent exists</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="k">if</span> <span class="o">[</span> ! -d <span class="s2">&#34;</span><span class="nv">$TARGET_PARENT</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">        mkdir -p <span class="s2">&#34;</span><span class="nv">$TARGET_PARENT</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="k">fi</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">
+</span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="c1"># Ensure target directory exists</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">    <span class="k">if</span> <span class="o">[</span> ! -d <span class="s2">&#34;</span><span class="nv">$TARGET_DIR</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl">        mkdir -p <span class="s2">&#34;</span><span class="nv">$TARGET_DIR</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl">        log <span class="s2">&#34;[INFO] Created directory: </span><span class="nv">$TARGET_DIR</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl">    <span class="k">fi</span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">
+</span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="c1"># 4. Core Logic</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl">monitor_and_clean<span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="c1"># Calculate directory size in bytes (-s: summary, -b: bytes)</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl">    <span class="c1"># cut -f1 extracts just the number</span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl">    <span class="nb">local</span> dir_size
+</span></span><span class="line"><span class="ln">47</span><span class="cl">    <span class="nv">dir_size</span><span class="o">=</span><span class="k">$(</span><span class="nv">$CMD_DU</span> -sb <span class="s2">&#34;</span><span class="nv">$TARGET_DIR</span><span class="s2">&#34;</span> <span class="p">|</span> cut -f1<span class="k">)</span>
+</span></span><span class="line"><span class="ln">48</span><span class="cl">
+</span></span><span class="line"><span class="ln">49</span><span class="cl">    <span class="c1"># Check if calculation succeeded</span>
+</span></span><span class="line"><span class="ln">50</span><span class="cl">    <span class="k">if</span> <span class="o">[[</span> ! <span class="s2">&#34;</span><span class="nv">$dir_size</span><span class="s2">&#34;</span> <span class="o">=</span>~ ^<span class="o">[</span>0-9<span class="o">]</span>+$ <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="ln">51</span><span class="cl">        log <span class="s2">&#34;[ERROR] Failed to calculate size. Output: </span><span class="nv">$dir_size</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">52</span><span class="cl">        <span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="ln">53</span><span class="cl">    <span class="k">fi</span>
+</span></span><span class="line"><span class="ln">54</span><span class="cl">
+</span></span><span class="line"><span class="ln">55</span><span class="cl">    <span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$dir_size</span><span class="s2">&#34;</span> -ge <span class="s2">&#34;</span><span class="nv">$MAX_SIZE</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="ln">56</span><span class="cl">        log <span class="s2">&#34;[WARN] Directory size (</span><span class="nv">$dir_size</span><span class="s2"> bytes) exceeds limit.&#34;</span>
+</span></span><span class="line"><span class="ln">57</span><span class="cl">        
+</span></span><span class="line"><span class="ln">58</span><span class="cl">        <span class="c1"># SAFETY CHECK: Never run rm -rf on short variables or root</span>
+</span></span><span class="line"><span class="ln">59</span><span class="cl">        <span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="si">${#</span><span class="nv">TARGET_DIR</span><span class="si">}</span><span class="s2">&#34;</span> -lt <span class="s2">&#34;</span><span class="nv">$MIN_PATH_LEN</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="ln">60</span><span class="cl">             log <span class="s2">&#34;[FATAL] Path length sanity check failed. Aborting delete.&#34;</span>
+</span></span><span class="line"><span class="ln">61</span><span class="cl">             <span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="ln">62</span><span class="cl">        <span class="k">fi</span>
+</span></span><span class="line"><span class="ln">63</span><span class="cl">
+</span></span><span class="line"><span class="ln">64</span><span class="cl">        <span class="c1"># Execute Clean: Delete everything INSIDE the directory, but keep the directory itself</span>
+</span></span><span class="line"><span class="ln">65</span><span class="cl">        <span class="c1"># rm -rf /root/hmi_data/db/file/*</span>
+</span></span><span class="line"><span class="ln">66</span><span class="cl">        <span class="nv">$CMD_RM</span> -rf <span class="s2">&#34;</span><span class="si">${</span><span class="nv">TARGET_DIR</span><span class="p">:?</span><span class="si">}</span><span class="s2">&#34;</span>/*
+</span></span><span class="line"><span class="ln">67</span><span class="cl">        
+</span></span><span class="line"><span class="ln">68</span><span class="cl">        <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="ln">69</span><span class="cl">            log <span class="s2">&#34;[INFO] Directory contents cleaned successfully.&#34;</span>
+</span></span><span class="line"><span class="ln">70</span><span class="cl">        <span class="k">else</span>
+</span></span><span class="line"><span class="ln">71</span><span class="cl">            log <span class="s2">&#34;[ERROR] Failed to clean directory.&#34;</span>
+</span></span><span class="line"><span class="ln">72</span><span class="cl">        <span class="k">fi</span>
+</span></span><span class="line"><span class="ln">73</span><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="ln">74</span><span class="cl">        log <span class="s2">&#34;[INFO] Directory size: </span><span class="nv">$dir_size</span><span class="s2"> bytes. No action taken.&#34;</span>
+</span></span><span class="line"><span class="ln">75</span><span class="cl">    <span class="k">fi</span>
+</span></span><span class="line"><span class="ln">76</span><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="ln">77</span><span class="cl">
+</span></span><span class="line"><span class="ln">78</span><span class="cl"><span class="c1"># 5. Execution</span>
+</span></span><span class="line"><span class="ln">79</span><span class="cl">main<span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="ln">80</span><span class="cl">    ensure_directory
+</span></span><span class="line"><span class="ln">81</span><span class="cl">    monitor_and_clean
+</span></span><span class="line"><span class="ln">82</span><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="ln">83</span><span class="cl">
+</span></span><span class="line"><span class="ln">84</span><span class="cl">main <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
 </span></span></code></pre><p>由于脚本涉及 <code>/root</code> 路径的操作，脚本必须以 <code>root</code> 权限执行。</p>
 <ol>
 <li>
 <p><strong>设置脚本执行权限</strong>：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">chmod +x /home/cat/Downloads/manage_file.sh
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">chmod +x /home/cat/Downloads/manage_file.sh
 </span></span></code></pre></li>
 <li>
 <p><strong>配置 Crontab</strong>： 执行 <code>sudo crontab -e</code> 并添加以下行（设定每 5 分钟检查一次）：</p>
@@ -304,14 +304,14 @@ sudo fallocate -l 1100M /root/hmi_data/db/file/test_data.img
 <li>再用 <code>ls</code> 检查，那个 1.1GB 的文件应该消失了。</li>
 </ul>
 <h2 id="heading-3">快捷方式</h2>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1"># 1. 赋予普通用户对该路径的读取和执行权限 (rx)</span>
-</span></span><span class="line"><span class="cl">sudo chmod <span class="m">755</span> /root
-</span></span><span class="line"><span class="cl">sudo chmod <span class="m">755</span> /root/hmi_data
-</span></span><span class="line"><span class="cl">sudo chmod <span class="m">755</span> /root/hmi_data/db
-</span></span><span class="line"><span class="cl">sudo chmod <span class="m">777</span> /root/hmi_data/db/file
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 2. 创建软链接到桌面 (名字叫 HMI_Data)</span>
-</span></span><span class="line"><span class="cl">ln -s /root/hmi_data/db/file /home/cat/Desktop/HMI_Data
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 1. 赋予普通用户对该路径的读取和执行权限 (rx)</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">sudo chmod <span class="m">755</span> /root
+</span></span><span class="line"><span class="ln">3</span><span class="cl">sudo chmod <span class="m">755</span> /root/hmi_data
+</span></span><span class="line"><span class="ln">4</span><span class="cl">sudo chmod <span class="m">755</span> /root/hmi_data/db
+</span></span><span class="line"><span class="ln">5</span><span class="cl">sudo chmod <span class="m">777</span> /root/hmi_data/db/file
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"># 2. 创建软链接到桌面 (名字叫 HMI_Data)</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">ln -s /root/hmi_data/db/file /home/cat/Desktop/HMI_Data
 </span></span></code></pre>
 </article>
 

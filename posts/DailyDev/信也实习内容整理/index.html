@@ -273,15 +273,15 @@
 <p>其设计采用了典型的组合与继承模式，通过混入（Mixin）多个功能类（如<code>DataSourceSelector</code>, <code>ResultSender</code>, <code>ResultRecordSaver</code>等）来赋予自身丰富的能力，包括数据源选择、结果发送、结果持久化等。这种设计使得<code>RiskFlow</code>成为了一个功能强大的“上帝对象”，控制着风控流程的每一个环节。</p>
 <h4 id="pipeline"><code>Pipeline</code>机制：责任链模式的实现</h4>
 <p><code>RiskFlow</code>的核心驱动力来自于其内部的<code>Pipeline</code>（管道）机制。如下面的代码所示，系统通过一个工厂函数<code>make_flow</code>，根据不同的业务类型（<code>FlowType</code>），创建出包含不同<code>Pipeline</code>的<code>RiskFlow</code>实例：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">make_flow</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">FlowType</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">BaseInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RiskFlow</span><span class="p">:</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">#...</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">FlowType</span><span class="o">.</span><span class="n">NEW</span><span class="p">:</span> <span class="c1"># 新客授信流程</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">RiskFlow</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">            <span class="n">p</span><span class="o">=</span><span class="n">Pipeline</span><span class="p">(),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="c1">#...</span>
-</span></span><span class="line"><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">#...</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="k">def</span> <span class="nf">make_flow</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">FlowType</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">BaseInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RiskFlow</span><span class="p">:</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="c1">#...</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">FlowType</span><span class="o">.</span><span class="n">NEW</span><span class="p">:</span> <span class="c1"># 新客授信流程</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">        <span class="k">return</span> <span class="n">RiskFlow</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">            <span class="n">p</span><span class="o">=</span><span class="n">Pipeline</span><span class="p">(),</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">            <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">            <span class="c1">#...</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl">    <span class="c1">#...</span>
 </span></span></code></pre><p>这里的<code>Pipeline</code>接收一个处理单元（<code>Pipelineable</code>）的列表，并按顺序依次执行。<code>PhiNewVars()</code>负责计算新客场景所需的所有变量，<code>PhiNewModels()</code>负责调用所有新客模型，而<code>PhiNewDroolsFlow()</code>则负责执行新客的规则集。</p>
 <p>这种实现方式本质上是<strong>责任链模式</strong>（Chain of Responsibility）的一种体现。每个处理单元（<code>Vars</code>, <code>Models</code>, <code>Drools</code>）都是链上的一环，它们接收上一环的输出作为输入，完成自己的处理后，再将结果传递给下一环。这种设计极大地提高了流程的可扩展性，增加一个新的处理步骤，只需实现一个新的<code>Pipelineable</code>类并将其加入到列表中即可。</p>
 <h4 id="heading-5">变量计算框架：基于依赖图的动态执行</h4>
@@ -292,16 +292,16 @@
 <li><code>VarLogic</code>: 也继承自<code>BaseDataSource</code>，专门用于执行<strong>计算逻辑</strong>，它将一个或多个<code>DataSource</code>或其他<code>VarLogic</code>的输出作为输入，生成新的衍生变量。</li>
 </ul>
 <p>一个变量的计算逻辑通过在其<code>VarLogic</code>子类中定义<code>dependons</code>属性来声明其依赖项。例如，<code>MobileWallaBlackListVarLogic</code>依赖于<code>MobileWallaBlacklist</code>这个<code>DataSource</code>：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MobileWallaBlacklist</span><span class="p">(</span><span class="n">PataGeneralDataSource</span><span class="p">):</span> <span class="c1"># DataSource</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">#... 获取原始黑名单数据</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MobileWallaBlackListVarLogic</span><span class="p">(</span><span class="n">VarLogic</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">    <span class="n">output_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;mobilewalla_blacklist&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">    <span class="n">dependons</span> <span class="o">=</span> <span class="c1"># 声明依赖</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="nf">runner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">common_query_params</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">        <span class="c1">#... 计算逻辑，args即为MobileWallaBlacklist的返回结果</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;mobilewalla_blacklist&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">class</span> <span class="nc">MobileWallaBlacklist</span><span class="p">(</span><span class="n">PataGeneralDataSource</span><span class="p">):</span> <span class="c1"># DataSource</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="c1">#... 获取原始黑名单数据</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="k">class</span> <span class="nc">MobileWallaBlackListVarLogic</span><span class="p">(</span><span class="n">VarLogic</span><span class="p">):</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="n">output_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;mobilewalla_blacklist&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="n">dependons</span> <span class="o">=</span> <span class="c1"># 声明依赖</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="nf">runner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">common_query_params</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="c1">#... 计算逻辑，args即为MobileWallaBlacklist的返回结果</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;mobilewalla_blacklist&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">}</span>
 </span></span></code></pre><p>当<code>irs</code>服务收到一批变量的计算请求时，它会解析所有相关<code>VarLogic</code>的<code>dependons</code>属性，在内存中构建出一个有向无环图（DAG）。然后，它采用拓扑排序的方式执行这个图，确保在计算任何一个变量之前，其所有依赖的原始数据和前置变量都已经被计算出来。这种基于依赖图的自动编排和执行机制，极大地简化了复杂特征的开发和维护。</p>
 <h3 id="32-gorisk-common">3.2 新一代Go架构：“Risk-Common”范式</h3>
 <p>随着业务规模的扩大和多国家部署需求的日益增长，Python架构在性能、资源消耗和维护性方面的短板逐渐显现。因此，团队启动了向Go语言的技术栈迁移，其核心思想是从灵活的框架转向标准化的平台。</p>

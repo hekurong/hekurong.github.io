@@ -121,7 +121,7 @@
 <h3 id="heading-1">分布式锁</h3>
 <p>分布式锁用于高并发或分布式事务中保护临界资源。</p>
 <p>最常见的实现方式是使用 SET 命令的 NX (不存在时设置)和 PX (设置过期时间)选项：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">SET lock_name my_random_value NX PX <span class="m">30000</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">SET lock_name my_random_value NX PX <span class="m">30000</span>
 </span></span></code></pre><ul>
 <li><code>lock_name</code> : 锁的名称。</li>
 <li><code>my_random_value</code> : 唯一标识(通常使用 UUID)。</li>
@@ -206,17 +206,17 @@
 <h3 id="heading-4">位图</h3>
 <p>位图就是 <code>[]byte</code> ，即字符数组。</p>
 <p>位图的操作如下：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1"># 设置指定位的值</span>
-</span></span><span class="line"><span class="cl">SETBIT key offset value  <span class="c1"># value 只能是 0 或 1</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 获取指定位的值</span>
-</span></span><span class="line"><span class="cl">GETBIT key offset
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 统计值为 1 的位数</span>
-</span></span><span class="line"><span class="cl">BITCOUNT key <span class="o">[</span>start end<span class="o">]</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 查找第一个设置为 0/1 的位</span>
-</span></span><span class="line"><span class="cl">BITPOS key bit <span class="o">[</span>start<span class="o">]</span> <span class="o">[</span>end<span class="o">]</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># 设置指定位的值</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">SETBIT key offset value  <span class="c1"># value 只能是 0 或 1</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># 获取指定位的值</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">GETBIT key offset
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># 统计值为 1 的位数</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">BITCOUNT key <span class="o">[</span>start end<span class="o">]</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># 查找第一个设置为 0/1 的位</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">BITPOS key bit <span class="o">[</span>start<span class="o">]</span> <span class="o">[</span>end<span class="o">]</span>
 </span></span></code></pre><p>同时位图还支持位运算（AND 等逻辑运算）。</p>
 <p>位图的应用场景：</p>
 <ul>
@@ -421,16 +421,16 @@
 <li>传输大 Key 消耗带宽，客户端处理耗时增加。</li>
 </ul>
 <p>可以用 <code>redis-cli</code> 命令检测大 Key ：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1"># 扫描大Key</span>
-</span></span><span class="line"><span class="cl">redis-cli --bigkeys
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 内存分析</span>
-</span></span><span class="line"><span class="cl">redis-cli --memkeys
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 扫描大Key</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">redis-cli --bigkeys
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># 内存分析</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">redis-cli --memkeys
 </span></span></code></pre><p>可以使用 SCAN 命令：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1"># 自定义扫描大Key</span>
-</span></span><span class="line"><span class="cl">redis-cli --scan --pattern <span class="s1">&#39;*&#39;</span> --count <span class="m">1000</span> <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> key<span class="p">;</span> <span class="k">do</span> <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$key</span><span class="s2">: </span><span class="k">$(</span>redis-cli memory usage <span class="nv">$key</span><span class="k">)</span><span class="s2">&#34;</span><span class="p">;</span> <span class="k">done</span> <span class="p">|</span> sort -n -k2 -t: <span class="p">|</span> tail -n <span class="m">20</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 自定义扫描大Key</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">redis-cli --scan --pattern <span class="s1">&#39;*&#39;</span> --count <span class="m">1000</span> <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> key<span class="p">;</span> <span class="k">do</span> <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$key</span><span class="s2">: </span><span class="k">$(</span>redis-cli memory usage <span class="nv">$key</span><span class="k">)</span><span class="s2">&#34;</span><span class="p">;</span> <span class="k">done</span> <span class="p">|</span> sort -n -k2 -t: <span class="p">|</span> tail -n <span class="m">20</span>
 </span></span></code></pre><p>也可以使用 MEMORY USAGE 命令：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">MEMORY USAGE key_name
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl">MEMORY USAGE key_name
 </span></span></code></pre><p>大 Key 有几种解决方法：</p>
 <ul>
 <li>拆分大 Key。</li>
@@ -543,9 +543,9 @@
 <p>解决方法：用 Hash Tag  <code>{}</code> 强制 key 映射到同一槽位。</p>
 </li>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1"># 以下两个 key 会被分配到相同槽位（仅计算 &#34;user&#34; 的 CRC16）</span>
-</span></span><span class="line"><span class="cl">user:<span class="o">{</span>1000<span class="o">}</span>:profile
-</span></span><span class="line"><span class="cl">user:<span class="o">{</span>1000<span class="o">}</span>:orders
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 以下两个 key 会被分配到相同槽位（仅计算 &#34;user&#34; 的 CRC16）</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">user:<span class="o">{</span>1000<span class="o">}</span>:profile
+</span></span><span class="line"><span class="ln">3</span><span class="cl">user:<span class="o">{</span>1000<span class="o">}</span>:orders
 </span></span></code></pre></li>
 </ul>
 </li>

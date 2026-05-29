@@ -117,34 +117,34 @@
   </header>
 
   <h2 id="200----leetcodehttpsleetcodecnproblemsnumber-of-islandsdescriptionenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/number-of-islands/description/?envType=study-plan-v2&amp;envId=top-interview-150">200. 岛屿数量 - 力扣（LeetCode）</a></h2>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">numIslands</span><span class="p">(</span><span class="nx">grid</span> <span class="p">[][]</span><span class="kt">byte</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">m</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">grid</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="nx">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl">	<span class="kd">var</span> <span class="nx">dfs</span> <span class="kd">func</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="kt">int</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">ans</span> <span class="o">:=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">dfs</span> <span class="p">=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">x</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">y</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">x</span> <span class="o">&gt;=</span> <span class="nx">m</span> <span class="o">||</span> <span class="nx">y</span> <span class="o">&gt;=</span> <span class="nx">n</span> <span class="o">||</span> <span class="nx">grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39;1&#39;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="k">return</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="p">=</span> <span class="mi">2</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">		<span class="nf">dfs</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">dfs</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">dfs</span><span class="p">(</span><span class="nx">x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">dfs</span><span class="p">(</span><span class="nx">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">row</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">grid</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="k">for</span> <span class="nx">j</span><span class="p">,</span> <span class="nx">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">row</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="nx">c</span> <span class="o">==</span> <span class="sc">&#39;1&#39;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">				<span class="nf">dfs</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">j</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">				<span class="nx">ans</span><span class="o">++</span>
-</span></span><span class="line"><span class="cl">			<span class="p">}</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">ans</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span> <span class="nf">numIslands</span><span class="p">(</span><span class="nx">grid</span> <span class="p">[][]</span><span class="kt">byte</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">	<span class="nx">m</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">grid</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="nx">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">	<span class="kd">var</span> <span class="nx">dfs</span> <span class="kd">func</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="kt">int</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">	<span class="nx">ans</span> <span class="o">:=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">	<span class="nx">dfs</span> <span class="p">=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">		<span class="k">if</span> <span class="nx">x</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">y</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">x</span> <span class="o">&gt;=</span> <span class="nx">m</span> <span class="o">||</span> <span class="nx">y</span> <span class="o">&gt;=</span> <span class="nx">n</span> <span class="o">||</span> <span class="nx">grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39;1&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">			<span class="k">return</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">		<span class="nx">grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="p">=</span> <span class="mi">2</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl">		<span class="nf">dfs</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">		<span class="nf">dfs</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">		<span class="nf">dfs</span><span class="p">(</span><span class="nx">x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">		<span class="nf">dfs</span><span class="p">(</span><span class="nx">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl">	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">row</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">grid</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">		<span class="k">for</span> <span class="nx">j</span><span class="p">,</span> <span class="nx">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">row</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">			<span class="k">if</span> <span class="nx">c</span> <span class="o">==</span> <span class="sc">&#39;1&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">				<span class="nf">dfs</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">j</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">				<span class="nx">ans</span><span class="o">++</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">
+</span></span><span class="line"><span class="ln">27</span><span class="cl">	<span class="k">return</span> <span class="nx">ans</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>该题考查的是图的 DFS 算法，这题也算是典型题了，有不少类似的题都是一个套路。这类题属于二维网格的连通性问题，可以套用下面的框架：</p>
 <pre><code>// 主函数
 func solve(grid):
@@ -183,38 +183,38 @@ func explore(grid, r, c):
 </ol>
 <p>当下次再遇到这道题，或者类似的题目（如“最大岛屿面积”、“被围绕的区域”等），就可以直接在脑海里构建这个框架，然后往里面填空。</p>
 <h2 id="207----leetcodehttpsleetcodecnproblemscourse-scheduledescriptionenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/course-schedule/description/?envType=study-plan-v2&amp;envId=top-interview-150">207. 课程表 - 力扣（LeetCode）</a></h2>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">canFinish</span><span class="p">(</span><span class="nx">numCourses</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">prerequisites</span> <span class="p">[][]</span><span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">dependencies</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([][]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">numCourses</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">inDegree</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">numCourses</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">d</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">prerequisites</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="o">:=</span> <span class="nx">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">dependencies</span><span class="p">[</span><span class="nx">b</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">dependencies</span><span class="p">[</span><span class="nx">b</span><span class="p">],</span> <span class="nx">a</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">inDegree</span><span class="p">[</span><span class="nx">a</span><span class="p">]</span><span class="o">++</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">learned</span> <span class="o">:=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">queue</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">degree</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">inDegree</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">degree</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="nx">queue</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">queue</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">queue</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">curCourse</span> <span class="o">:=</span> <span class="nx">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">queue</span> <span class="p">=</span> <span class="nx">queue</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">learned</span><span class="o">++</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">		<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">afterCourse</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">dependencies</span><span class="p">[</span><span class="nx">curCourse</span><span class="p">]</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="nx">inDegree</span><span class="p">[</span><span class="nx">afterCourse</span><span class="p">]</span><span class="o">--</span>
-</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="nx">inDegree</span><span class="p">[</span><span class="nx">afterCourse</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">				<span class="nx">queue</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">queue</span><span class="p">,</span> <span class="nx">afterCourse</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">			<span class="p">}</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">learned</span> <span class="o">==</span> <span class="nx">numCourses</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span> <span class="nf">canFinish</span><span class="p">(</span><span class="nx">numCourses</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">prerequisites</span> <span class="p">[][]</span><span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">	<span class="nx">dependencies</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([][]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">numCourses</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">	<span class="nx">inDegree</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">numCourses</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">d</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">prerequisites</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">		<span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="o">:=</span> <span class="nx">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">		<span class="nx">dependencies</span><span class="p">[</span><span class="nx">b</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">dependencies</span><span class="p">[</span><span class="nx">b</span><span class="p">],</span> <span class="nx">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">		<span class="nx">inDegree</span><span class="p">[</span><span class="nx">a</span><span class="p">]</span><span class="o">++</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">	<span class="nx">learned</span> <span class="o">:=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">	<span class="nx">queue</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">degree</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">inDegree</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">		<span class="k">if</span> <span class="nx">degree</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">			<span class="nx">queue</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">queue</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl">	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">queue</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">		<span class="nx">curCourse</span> <span class="o">:=</span> <span class="nx">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">		<span class="nx">queue</span> <span class="p">=</span> <span class="nx">queue</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">		<span class="nx">learned</span><span class="o">++</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">
+</span></span><span class="line"><span class="ln">24</span><span class="cl">		<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">afterCourse</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">dependencies</span><span class="p">[</span><span class="nx">curCourse</span><span class="p">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">			<span class="nx">inDegree</span><span class="p">[</span><span class="nx">afterCourse</span><span class="p">]</span><span class="o">--</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">			<span class="k">if</span> <span class="nx">inDegree</span><span class="p">[</span><span class="nx">afterCourse</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">				<span class="nx">queue</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">queue</span><span class="p">,</span> <span class="nx">afterCourse</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">	<span class="k">return</span> <span class="nx">learned</span> <span class="o">==</span> <span class="nx">numCourses</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>该题考查的是有向图的拓扑排序和环检测，上面的代码就是基于 BFS 的拓扑排序。</p>
 <p>想象一下，所有课程的依赖关系就像一个洋葱。</p>
 <ol>

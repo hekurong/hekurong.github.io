@@ -125,91 +125,91 @@
 </ul>
 <p>后面还会根据不同的题型有不同的变量引入。</p>
 <h2 id="206----leetcodehttpsleetcodecnproblemsreverse-linked-listsubmissions664347837"><a href="https://leetcode.cn/problems/reverse-linked-list/submissions/664347837/">206. 反转链表 - 力扣（LeetCode）</a></h2>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">reverseList</span><span class="p">(</span><span class="nx">head</span> <span class="o">*</span><span class="nx">ListNode</span><span class="p">)</span> <span class="o">*</span><span class="nx">ListNode</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">pre</span> <span class="o">*</span><span class="nx">ListNode</span>  <span class="c1">// 需要注意，不要写成 pre := *ListNode{}，这样就完成了初始化、值不是 nil 了
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">cur</span> <span class="o">:=</span> <span class="nx">head</span>
-</span></span><span class="line"><span class="cl">  
-</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="nx">cur</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">next</span> <span class="o">:=</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="c1">// 保存 next，防止丢失
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>   <span class="c1">// 断 cur 尾，使其指向反转链表头部
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">pre</span> <span class="p">=</span> <span class="nx">cur</span>        <span class="c1">// 更新 pre，让其移动到 cur 的位置，此时 cur 成为新头部，pre 符合其定义仍然指向反转链表的头部
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">cur</span> <span class="p">=</span> <span class="nx">next</span>       <span class="c1">// cur 移动，指向下一个待反转节点
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">pre</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span> <span class="nf">reverseList</span><span class="p">(</span><span class="nx">head</span> <span class="o">*</span><span class="nx">ListNode</span><span class="p">)</span> <span class="o">*</span><span class="nx">ListNode</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="kd">var</span> <span class="nx">pre</span> <span class="o">*</span><span class="nx">ListNode</span>  <span class="c1">// 需要注意，不要写成 pre := *ListNode{}，这样就完成了初始化、值不是 nil 了
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"></span>  <span class="nx">cur</span> <span class="o">:=</span> <span class="nx">head</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="k">for</span> <span class="nx">cur</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nx">next</span> <span class="o">:=</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="c1">// 保存 next，防止丢失
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>    <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>   <span class="c1">// 断 cur 尾，使其指向反转链表头部
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>    <span class="nx">pre</span> <span class="p">=</span> <span class="nx">cur</span>        <span class="c1">// 更新 pre，让其移动到 cur 的位置，此时 cur 成为新头部，pre 符合其定义仍然指向反转链表的头部
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span>    <span class="nx">cur</span> <span class="p">=</span> <span class="nx">next</span>       <span class="c1">// cur 移动，指向下一个待反转节点
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="k">return</span> <span class="nx">pre</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>循环中的这 4 步：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="nx">next</span> <span class="o">:=</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl"><span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>
-</span></span><span class="line"><span class="cl"><span class="nx">pre</span> <span class="p">=</span> <span class="nx">cur</span>
-</span></span><span class="line"><span class="cl"><span class="nx">cur</span> <span class="p">=</span> <span class="nx">next</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="nx">next</span> <span class="o">:=</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nx">pre</span> <span class="p">=</span> <span class="nx">cur</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nx">cur</span> <span class="p">=</span> <span class="nx">next</span>
 </span></span></code></pre><p>在之后的题型中会反复出现，意思也相同。</p>
 <h2 id="92--ii---leetcodehttpsleetcodecnproblemsreverse-linked-list-iidescription"><a href="https://leetcode.cn/problems/reverse-linked-list-ii/description/">92. 反转链表 II - 力扣（LeetCode）</a></h2>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">reverseBetween</span><span class="p">(</span><span class="nx">head</span> <span class="o">*</span><span class="nx">ListNode</span><span class="p">,</span> <span class="nx">left</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">right</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">ListNode</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// corner case
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="nx">left</span> <span class="o">==</span> <span class="nx">right</span> <span class="o">||</span> <span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">head</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  
-</span></span><span class="line"><span class="cl">  <span class="nx">dummy</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ListNode</span><span class="p">{</span><span class="nx">Next</span><span class="p">:</span> <span class="nx">head</span><span class="p">}</span> <span class="c1">// 用 dummy 处理 left 为 1 的情况
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">p0</span> <span class="o">:=</span> <span class="nx">dummy</span>
-</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="k">range</span> <span class="nx">left</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">{</span> 					 <span class="c1">// 遍历到反转链表的前一个节点，只需遍历这一次 
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">p0</span> <span class="p">=</span> <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  
-</span></span><span class="line"><span class="cl">  <span class="nx">pre</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ListNode</span><span class="p">{}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">cur</span> <span class="o">:=</span> <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="k">range</span> <span class="nx">right</span> <span class="o">-</span> <span class="nx">left</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 这 4 句同之前
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">next</span> <span class="o">:=</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">pre</span> <span class="p">=</span> <span class="nx">cur</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">cur</span> <span class="p">=</span> <span class="nx">next</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">cur</span> <span class="c1">// p0.Next 指向的是原先的第一个节点，而这第一个节点此时为反转链表的尾节点（头插法🐎）。所以此时需要让其与后半段正常链表连接，而此时的 cur 指向的就是后半段的头部，所以令其指向 cur
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>      <span class="c1">// p0.Next 为反转链表的尾部，此时也需要将前半段与反转链表连接。p0 是前半段的尾部、反转链表的前一个节点，所以令其 next 指向反转链表的头部，以完成前半段的连接
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">dummy</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span> <span class="nf">reverseBetween</span><span class="p">(</span><span class="nx">head</span> <span class="o">*</span><span class="nx">ListNode</span><span class="p">,</span> <span class="nx">left</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">right</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">ListNode</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="c1">// corner case
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="nx">left</span> <span class="o">==</span> <span class="nx">right</span> <span class="o">||</span> <span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="k">return</span> <span class="nx">head</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nx">dummy</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ListNode</span><span class="p">{</span><span class="nx">Next</span><span class="p">:</span> <span class="nx">head</span><span class="p">}</span> <span class="c1">// 用 dummy 处理 left 为 1 的情况
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>  <span class="nx">p0</span> <span class="o">:=</span> <span class="nx">dummy</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="k">for</span> <span class="k">range</span> <span class="nx">left</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">{</span> 					 <span class="c1">// 遍历到反转链表的前一个节点，只需遍历这一次 
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span>    <span class="nx">p0</span> <span class="p">=</span> <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="nx">pre</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ListNode</span><span class="p">{}</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="nx">cur</span> <span class="o">:=</span> <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="k">for</span> <span class="k">range</span> <span class="nx">right</span> <span class="o">-</span> <span class="nx">left</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="c1">// 这 4 句同之前
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span>    <span class="nx">next</span> <span class="o">:=</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="nx">pre</span> <span class="p">=</span> <span class="nx">cur</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="nx">cur</span> <span class="p">=</span> <span class="nx">next</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">  <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">cur</span> <span class="c1">// p0.Next 指向的是原先的第一个节点，而这第一个节点此时为反转链表的尾节点（头插法🐎）。所以此时需要让其与后半段正常链表连接，而此时的 cur 指向的就是后半段的头部，所以令其指向 cur
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span>  <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>      <span class="c1">// p0.Next 为反转链表的尾部，此时也需要将前半段与反转链表连接。p0 是前半段的尾部、反转链表的前一个节点，所以令其 next 指向反转链表的头部，以完成前半段的连接
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1"></span>  
+</span></span><span class="line"><span class="ln">25</span><span class="cl">  <span class="k">return</span> <span class="nx">dummy</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>该题就出现了几个新变量，定义如下：</p>
 <ul>
 <li><code>p0</code>：指向反转链表的前一个节点；</li>
 <li><code>dummy</code>：哨兵节点，方便处理边界条件。</li>
 </ul>
 <h2 id="25-k----leetcodehttpsleetcodecnproblemsreverse-nodes-in-k-groupdescriptionenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/reverse-nodes-in-k-group/description/?envType=study-plan-v2&amp;envId=top-interview-150">25. K 个一组翻转链表 - 力扣（LeetCode）</a></h2>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">reverseKGroup</span><span class="p">(</span><span class="nx">head</span> <span class="o">*</span><span class="nx">ListNode</span><span class="p">,</span> <span class="nx">k</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">ListNode</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">cntHead</span> <span class="o">:=</span> <span class="nx">head</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">n</span> <span class="o">:=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">cntHead</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span> <span class="c1">// 这里计数是方便后续 K 个、K 个的遍历需求
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">cntHead</span> <span class="p">=</span> <span class="nx">cntHead</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">n</span><span class="o">++</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	
-</span></span><span class="line"><span class="cl">  <span class="c1">// 这 4 步定义与 LC92 完全一致
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">dummy</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ListNode</span><span class="p">{</span><span class="nx">Next</span><span class="p">:</span> <span class="nx">head</span><span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">p0</span> <span class="o">:=</span> <span class="nx">dummy</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">cur</span> <span class="o">:=</span> <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">pre</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ListNode</span><span class="p">{}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="c1">// 保证每次遍历够 K 个
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">for</span> <span class="p">;</span> <span class="nx">n</span> <span class="o">&gt;=</span> <span class="nx">k</span><span class="p">;</span> <span class="nx">n</span> <span class="o">-=</span> <span class="nx">k</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 对区间内链表进行 K 次反转操作
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">for</span> <span class="k">range</span> <span class="nx">k</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="c1">// 这 4 步同前面的题，意思完全一致
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="nx">next</span> <span class="o">:=</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl">			<span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>
-</span></span><span class="line"><span class="cl">			<span class="nx">pre</span> <span class="p">=</span> <span class="nx">cur</span>
-</span></span><span class="line"><span class="cl">			<span class="nx">cur</span> <span class="p">=</span> <span class="nx">next</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">		
-</span></span><span class="line"><span class="cl">		<span class="nx">reverseTail</span> <span class="o">:=</span> <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span> <span class="c1">// 新增操作，保存本次循环的反转链表的尾节点
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">cur</span>     
-</span></span><span class="line"><span class="cl">		<span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>          
-</span></span><span class="line"><span class="cl">		<span class="nx">p0</span> <span class="p">=</span> <span class="nx">reverseTail</span>       <span class="c1">// 将 p0 更新为本次循环的反转链表的尾节点，为下一个循环作准备。对于下一个循环而言，p0 符合定义
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">dummy</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span> <span class="nf">reverseKGroup</span><span class="p">(</span><span class="nx">head</span> <span class="o">*</span><span class="nx">ListNode</span><span class="p">,</span> <span class="nx">k</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">ListNode</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">	<span class="nx">cntHead</span> <span class="o">:=</span> <span class="nx">head</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">	<span class="nx">n</span> <span class="o">:=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">	<span class="k">for</span> <span class="nx">cntHead</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span> <span class="c1">// 这里计数是方便后续 K 个、K 个的遍历需求
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span>		<span class="nx">cntHead</span> <span class="p">=</span> <span class="nx">cntHead</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">		<span class="nx">n</span><span class="o">++</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">	
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="c1">// 这 4 步定义与 LC92 完全一致
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span>	<span class="nx">dummy</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ListNode</span><span class="p">{</span><span class="nx">Next</span><span class="p">:</span> <span class="nx">head</span><span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">	<span class="nx">p0</span> <span class="o">:=</span> <span class="nx">dummy</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">	<span class="nx">cur</span> <span class="o">:=</span> <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">	<span class="nx">pre</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ListNode</span><span class="p">{}</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="c1">// 保证每次遍历够 K 个
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span>	<span class="k">for</span> <span class="p">;</span> <span class="nx">n</span> <span class="o">&gt;=</span> <span class="nx">k</span><span class="p">;</span> <span class="nx">n</span> <span class="o">-=</span> <span class="nx">k</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="c1">// 对区间内链表进行 K 次反转操作
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"></span>		<span class="k">for</span> <span class="k">range</span> <span class="nx">k</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">      <span class="c1">// 这 4 步同前面的题，意思完全一致
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"></span>			<span class="nx">next</span> <span class="o">:=</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">			<span class="nx">cur</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">			<span class="nx">pre</span> <span class="p">=</span> <span class="nx">cur</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">			<span class="nx">cur</span> <span class="p">=</span> <span class="nx">next</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">		
+</span></span><span class="line"><span class="ln">26</span><span class="cl">		<span class="nx">reverseTail</span> <span class="o">:=</span> <span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span> <span class="c1">// 新增操作，保存本次循环的反转链表的尾节点
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span>		<span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">cur</span>     
+</span></span><span class="line"><span class="ln">28</span><span class="cl">		<span class="nx">p0</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span>          
+</span></span><span class="line"><span class="ln">29</span><span class="cl">		<span class="nx">p0</span> <span class="p">=</span> <span class="nx">reverseTail</span>       <span class="c1">// 将 p0 更新为本次循环的反转链表的尾节点，为下一个循环作准备。对于下一个循环而言，p0 符合定义
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="c1"></span>	<span class="p">}</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">
+</span></span><span class="line"><span class="ln">32</span><span class="cl">	<span class="k">return</span> <span class="nx">dummy</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>新增变量定义：</p>
 <ul>
 <li><code>reverseTail</code>：反转链表的尾节点。</li>

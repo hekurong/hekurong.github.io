@@ -131,26 +131,26 @@
 <p>服务定义</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// ProductInfo.proto
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">syntax</span> <span class="o">=</span> <span class="s">&#34;proto3&#34;</span><span class="p">;</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kn">package</span> <span class="nn">ecommerce</span><span class="p">;</span>  <span class="c1">// 防止协议消息类型之间发生命名冲突
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 定义服务接口
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">service</span> <span class="n">ProductInfo</span> <span class="p">{</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">addProduct</span><span class="p">(</span><span class="n">Product</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">ProductID</span><span class="p">);</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">getProduct</span><span class="p">(</span><span class="n">ProductID</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">Product</span><span class="p">);</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 定义消息格式
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">message</span> <span class="nc">Product</span> <span class="p">{</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">name</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">description</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kd">message</span> <span class="nc">ProductID</span> <span class="p">{</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// ProductInfo.proto
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="n">syntax</span> <span class="o">=</span> <span class="s">&#34;proto3&#34;</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="err"></span><span class="kn">package</span> <span class="nn">ecommerce</span><span class="p">;</span>  <span class="c1">// 防止协议消息类型之间发生命名冲突
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span><span class="err">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="err"></span><span class="c1">// 定义服务接口
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span><span class="kd">service</span> <span class="n">ProductInfo</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">addProduct</span><span class="p">(</span><span class="n">Product</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">ProductID</span><span class="p">);</span><span class="err">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">getProduct</span><span class="p">(</span><span class="n">ProductID</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">Product</span><span class="p">);</span><span class="err">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="err"></span><span class="c1">// 定义消息格式
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span><span class="kd">message</span> <span class="nc">Product</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">name</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">description</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="err"></span><span class="kd">message</span> <span class="nc">ProductID</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
 </span></span></span></code></pre></li>
 <li>
 <p>上面定义完成之后，就使用 protocol buffers 编译器 protoc 生成服务器端和客户端代码。</p>
@@ -161,22 +161,22 @@
 <p>gRPC 服务端</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">	<span class="s">&#34;context&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;.../proto&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// ProductInfo 的 go 实现
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// 业务逻辑
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">getProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// 业务逻辑
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">	<span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;.../proto&#34;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// ProductInfo 的 go 实现
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="c1">// 业务逻辑
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">getProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="c1">// 业务逻辑
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
 </span></span></code></pre></li>
 <li>
 <p>gRPC 服务端要做两件事：</p>
@@ -204,21 +204,21 @@
 <p>gRPC 客户端</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// 使用远程服务器地址创建通道
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ManagedChannel</span> <span class="nx">channel</span> <span class="p">=</span> <span class="nx">ManagedChannelBuiler</span><span class="p">.</span><span class="nf">forAddress</span><span class="p">(</span><span class="s">&#34;localhost&#34;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="p">.</span><span class="nf">usePlaintext</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="p">.</span><span class="nf">build</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// 使用通道初始化阻塞式存根
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ProductInfoGrpc</span><span class="p">.</span><span class="nx">ProductInfoBlockingStub</span> <span class="nx">stub</span> <span class="p">=</span> <span class="nx">ProductInfoGrpc</span><span class="p">.</span><span class="nf">newBlockingStub</span><span class="p">(</span><span class="nx">channel</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// 使用阻塞式存根调用远程方法
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">StringValue</span> <span class="nx">ProductID</span> <span class="p">=</span> <span class="nx">stub</span><span class="p">.</span><span class="nf">addProduct</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">Product</span><span class="p">.</span><span class="nf">newBuiler</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">  <span class="p">.</span><span class="nf">setName</span><span class="p">(</span><span class="s">&#34;Apple&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">.</span><span class="nf">setDescription</span><span class="p">(</span><span class="s">&#34;Apple&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">.</span><span class="nf">build</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// 使用远程服务器地址创建通道
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="nx">ManagedChannel</span> <span class="nx">channel</span> <span class="p">=</span> <span class="nx">ManagedChannelBuiler</span><span class="p">.</span><span class="nf">forAddress</span><span class="p">(</span><span class="s">&#34;localhost&#34;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">	<span class="p">.</span><span class="nf">usePlaintext</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">	<span class="p">.</span><span class="nf">build</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1">// 使用通道初始化阻塞式存根
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span><span class="nx">ProductInfoGrpc</span><span class="p">.</span><span class="nx">ProductInfoBlockingStub</span> <span class="nx">stub</span> <span class="p">=</span> <span class="nx">ProductInfoGrpc</span><span class="p">.</span><span class="nf">newBlockingStub</span><span class="p">(</span><span class="nx">channel</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1">// 使用阻塞式存根调用远程方法
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span><span class="nx">StringValue</span> <span class="nx">ProductID</span> <span class="p">=</span> <span class="nx">stub</span><span class="p">.</span><span class="nf">addProduct</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="nx">Product</span><span class="p">.</span><span class="nf">newBuiler</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="p">.</span><span class="nf">setName</span><span class="p">(</span><span class="s">&#34;Apple&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="p">.</span><span class="nf">setDescription</span><span class="p">(</span><span class="s">&#34;Apple&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="p">.</span><span class="nf">build</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">)</span>
 </span></span></code></pre></li>
 <li>
 <p>可以使用服务定义生成客户端存根，它提供了与服务端类似的方法，供客户端进行调用。</p>
@@ -261,67 +261,67 @@
 <p>gRPC 服务端：</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;context&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;errors&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;log&#34;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;github.com/gofrs/uuid&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// 中间件交互的抽象
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">server</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">productMap</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">out</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nf">NewV4</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">Internal</span><span class="p">,</span> <span class="s">&#34;Error while generating Product ID&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="nx">in</span><span class="p">.</span><span class="nx">Id</span> <span class="p">=</span> <span class="nx">out</span><span class="p">.</span><span class="nf">String</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">s</span><span class="p">.</span><span class="nx">productMap</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">s</span><span class="p">.</span><span class="nx">ProductMap</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">s</span><span class="p">.</span><span class="nx">productMap</span><span class="p">[</span><span class="nx">in</span><span class="p">.</span><span class="nx">Id</span><span class="p">]</span> <span class="p">=</span> <span class="nx">in</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">{</span><span class="nx">Value</span><span class="p">:</span> <span class="nx">in</span><span class="p">.</span><span class="nx">Id</span><span class="p">},</span> <span class="nx">status</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">OK</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">).</span><span class="nf">Err</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="s">&#34;errors&#34;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="s">&#34;github.com/gofrs/uuid&#34;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">// 中间件交互的抽象
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">server</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="nx">productMap</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">  <span class="nx">out</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nf">NewV4</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">Internal</span><span class="p">,</span> <span class="s">&#34;Error while generating Product ID&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl">  <span class="nx">in</span><span class="p">.</span><span class="nx">Id</span> <span class="p">=</span> <span class="nx">out</span><span class="p">.</span><span class="nf">String</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">  <span class="k">if</span> <span class="nx">s</span><span class="p">.</span><span class="nx">productMap</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="nx">s</span><span class="p">.</span><span class="nx">ProductMap</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">  <span class="nx">s</span><span class="p">.</span><span class="nx">productMap</span><span class="p">[</span><span class="nx">in</span><span class="p">.</span><span class="nx">Id</span><span class="p">]</span> <span class="p">=</span> <span class="nx">in</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">
+</span></span><span class="line"><span class="ln">29</span><span class="cl">  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">ProductID</span><span class="p">{</span><span class="nx">Value</span><span class="p">:</span> <span class="nx">in</span><span class="p">.</span><span class="nx">Id</span><span class="p">},</span> <span class="nx">status</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">OK</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">).</span><span class="nf">Err</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;log&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;net&#34;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">port</span> <span class="p">=</span> <span class="s">&#34;:50051&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">lis</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">.</span> <span class="nx">port</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to listen: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="c1">// 创建服务器并监听
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">s</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">pb</span><span class="p">.</span><span class="nf">RegisterProductInfoServer</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="nf">server</span><span class="p">())</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Starting gRPC listener on port &#34;</span><span class="o">+</span> <span class="nx">port</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">lis</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to serve: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="s">&#34;net&#34;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">const</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="nx">port</span> <span class="p">=</span> <span class="s">&#34;:50051&#34;</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="nx">lis</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">.</span> <span class="nx">port</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to listen: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">
+</span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="c1">// 创建服务器并监听
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1"></span>  <span class="nx">s</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">  <span class="nx">pb</span><span class="p">.</span><span class="nf">RegisterProductInfoServer</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="nf">server</span><span class="p">())</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Starting gRPC listener on port &#34;</span><span class="o">+</span> <span class="nx">port</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">
+</span></span><span class="line"><span class="ln">26</span><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">lis</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to serve: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 </ul>
 </li>
@@ -329,46 +329,46 @@
 <p>gRPC 客户端：</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;context&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;time&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;log&#34;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">address</span> <span class="p">=</span> <span class="s">&#34;localhost:50051&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">conn</span><span class="p">,</span> <span class="nx">errr</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="nx">address</span><span class="p">.</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithInsecure</span><span class="p">())</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;did not connect: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="k">defer</span> <span class="nx">conn</span><span class="p">.</span><span class="nb">close</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewProductInfoClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="k">defer</span> <span class="nf">cancel</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="nx">name</span> <span class="o">:=</span> <span class="s">&#34;Apple 11&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">description</span> <span class="o">:=</span> <span class="s">&#34;Apple 11&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">price</span> <span class="o">:=</span> <span class="nb">float32</span><span class="p">(</span><span class="mf">1000.0</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">r</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">Description</span><span class="p">:</span> <span class="nx">description</span><span class="p">,</span> <span class="nx">Price</span><span class="p">:</span> <span class="nx">price</span><span class="p">})</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Could not add product: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Product ID: %s added successfully&#34;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Value</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="nx">product</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">GetProduct</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nf">ProductID</span><span class="p">(</span><span class="nx">Value</span><span class="p">:</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Value</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Could not get product: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Product: &#34;</span><span class="p">,</span> <span class="nx">Product</span><span class="p">.</span><span class="nf">String</span><span class="p">())</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="nx">pb</span> <span class="s">&#34;productinfo/service/ecommerce&#34;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kd">const</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="nx">address</span> <span class="p">=</span> <span class="s">&#34;localhost:50051&#34;</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="nx">conn</span><span class="p">,</span> <span class="nx">errr</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="nx">address</span><span class="p">.</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithInsecure</span><span class="p">())</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;did not connect: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="k">defer</span> <span class="nx">conn</span><span class="p">.</span><span class="nb">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">
+</span></span><span class="line"><span class="ln">22</span><span class="cl">  <span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewProductInfoClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">  <span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">  <span class="k">defer</span> <span class="nf">cancel</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">
+</span></span><span class="line"><span class="ln">26</span><span class="cl">  <span class="nx">name</span> <span class="o">:=</span> <span class="s">&#34;Apple 11&#34;</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">  <span class="nx">description</span> <span class="o">:=</span> <span class="s">&#34;Apple 11&#34;</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">  <span class="nx">price</span> <span class="o">:=</span> <span class="nb">float32</span><span class="p">(</span><span class="mf">1000.0</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">  <span class="nx">r</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">AddProduct</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">Product</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">Description</span><span class="p">:</span> <span class="nx">description</span><span class="p">,</span> <span class="nx">Price</span><span class="p">:</span> <span class="nx">price</span><span class="p">})</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Could not add product: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Product ID: %s added successfully&#34;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Value</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">
+</span></span><span class="line"><span class="ln">35</span><span class="cl">  <span class="nx">product</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">GetProduct</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nf">ProductID</span><span class="p">(</span><span class="nx">Value</span><span class="p">:</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Value</span><span class="p">))</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Could not get product: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Product: &#34;</span><span class="p">,</span> <span class="nx">Product</span><span class="p">.</span><span class="nf">String</span><span class="p">())</span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 </ul>
 </li>
@@ -384,9 +384,9 @@
 <p>服务定义：返回是 stream 类型</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">service</span> <span class="n">OrderManagement</span> <span class="p">{</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">searchOrders</span><span class="p">(</span><span class="n">google.protobuf.StringValue</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">stream</span> <span class="n">Order</span><span class="p">);</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">service</span> <span class="n">OrderManagement</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">searchOrders</span><span class="p">(</span><span class="n">google.protobuf.StringValue</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">stream</span> <span class="n">Order</span><span class="p">);</span><span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
 </span></span></span></code></pre></li>
 </ul>
 </li>
@@ -394,12 +394,12 @@
 <p>服务端实现：</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SearchOrders</span><span class="p">(</span><span class="nx">searchQuery</span> <span class="o">*</span><span class="nx">wrappers</span><span class="p">.</span><span class="nx">StringValue</span><span class="p">,</span> <span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">OrderManagement_SearchOrdersServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// 业务逻辑
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="o">...</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">order</span><span class="p">)</span>  <span class="c1">// 通过 send 发送到流中
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span> 	<span class="k">return</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SearchOrders</span><span class="p">(</span><span class="nx">searchQuery</span> <span class="o">*</span><span class="nx">wrappers</span><span class="p">.</span><span class="nx">StringValue</span><span class="p">,</span> <span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">OrderManagement_SearchOrdersServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="c1">// 业务逻辑
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1"></span>  <span class="o">...</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">order</span><span class="p">)</span>  <span class="c1">// 通过 send 发送到流中
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span> 	<span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 <li>
 <p>接收 stream 的响应，最后返回 nil 来标记流已经结束。</p>
@@ -410,17 +410,17 @@
 <p>客户端实现：</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="o">...</span>
-</span></span><span class="line"><span class="cl"><span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewOrderManagementClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="o">...</span>
-</span></span><span class="line"><span class="cl"><span class="nx">searchStream</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">SearchOrders</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">wrapper</span><span class="p">.</span><span class="nx">StringValue</span><span class="p">{</span><span class="nx">Value</span><span class="p">:</span> <span class="s">&#34;Google&#34;</span><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">searchOrder</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">searchStream</span><span class="p">.</span><span class="nf">Recv</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span> <span class="p">{</span>  <span class="c1">// 流已经结束
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">break</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Search Result: &#34;</span><span class="p">,</span> <span class="nx">searchOrder</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewOrderManagementClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="nx">searchStream</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">SearchOrders</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">wrapper</span><span class="p">.</span><span class="nx">StringValue</span><span class="p">{</span><span class="nx">Value</span><span class="p">:</span> <span class="s">&#34;Google&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="k">for</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nx">searchOrder</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">searchStream</span><span class="p">.</span><span class="nf">Recv</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span> <span class="p">{</span>  <span class="c1">// 流已经结束
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>    <span class="k">break</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Search Result: &#34;</span><span class="p">,</span> <span class="nx">searchOrder</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 </ul>
 </li>
@@ -433,9 +433,9 @@
 <p>服务定义：请求是 stream 类型</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">service</span> <span class="n">OrderManagement</span> <span class="p">{</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">updateOrders</span><span class="p">(</span><span class="n">stream</span> <span class="n">Order</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">google.protobuf.StringValue</span><span class="p">);</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">service</span> <span class="n">OrderManagement</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">updateOrders</span><span class="p">(</span><span class="n">stream</span> <span class="n">Order</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">google.protobuf.StringValue</span><span class="p">);</span><span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
 </span></span></span></code></pre></li>
 </ul>
 </li>
@@ -443,13 +443,13 @@
 <p>服务端实现：</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">UpdateOrders</span><span class="p">(</span><span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">OrderManagement_UpdateOrdersServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="o">...</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">order</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Recv</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">  <span class="o">...</span>
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">SendAndClose</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>  <span class="c1">// 服务端通过该方法发送响应
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="o">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">UpdateOrders</span><span class="p">(</span><span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">OrderManagement_UpdateOrdersServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="o">...</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nx">order</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Recv</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="o">...</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">  <span class="k">return</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">SendAndClose</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>  <span class="c1">// 服务端通过该方法发送响应
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="c1"></span>  <span class="o">...</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></li>
 </ul>
 </li>
@@ -457,15 +457,15 @@
 <p>客户端实现：</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="o">...</span>
-</span></span><span class="line"><span class="cl"><span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewOrderManagementClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="o">...</span>
-</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">updateStream</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">upOrder1</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>  <span class="c1">// 客户端通过 Send 连续发送多条请求
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="o">...</span>
-</span></span><span class="line"><span class="cl"><span class="nx">updateRes</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">updateStream</span><span class="p">.</span><span class="nf">CloseAndRecv</span><span class="p">()</span>  <span class="c1">// 接收响应
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="o">...</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nx">c</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewOrderManagementClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">updateStream</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">upOrder1</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>  <span class="c1">// 客户端通过 Send 连续发送多条请求
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="c1"></span>  <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="nx">updateRes</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">updateStream</span><span class="p">.</span><span class="nf">CloseAndRecv</span><span class="p">()</span>  <span class="c1">// 接收响应
+</span></span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="c1"></span><span class="o">...</span>
 </span></span></code></pre></li>
 </ul>
 </li>
@@ -489,9 +489,9 @@
 <p>对于 protocol buffers 中的消息定义：</p>
 <ul>
 <li>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">ProductID</span> <span class="p">{</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">message</span> <span class="nc">ProductID</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
 </span></span></span></code></pre></li>
 <li>
 <p>消息在经过编码后的字节流：消息字段1、消息字段2、….、结束标志。</p>

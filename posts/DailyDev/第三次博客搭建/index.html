@@ -205,18 +205,18 @@ document.addEventListener("DOMContentLoaded", function() {
     E --&gt; F[v0.5.1 工作流简化]
 </pre>
 <h3 id="v010--">v0.1.0 — 核心骨架</h3>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// chenhai 最初的入口
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Chenhai - 镇海&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// chenhai 最初的入口
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Chenhai - 镇海&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>一个下午搭好 6 个 internal 包：config / content / theme / build / index / server。第二天就能跑通 <code>chenhai build</code>。</p>
 <h3 id="v020--">v0.2.0 — 功能完善</h3>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c"># Admonition Goldmark 扩展 — v0.2 的亮点</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">&gt; [!note]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">&gt; 这是一个提示框</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">&gt; [!warning]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">&gt; 这是一个警告</span><span class="w">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c"># Admonition Goldmark 扩展 — v0.2 的亮点</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="l">&gt; [!note]</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="l">&gt; 这是一个提示框</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="l">&gt; [!warning]</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="l">&gt; 这是一个警告</span><span class="w">
 </span></span></span></code></pre><p>三种类型分别渲染为不同的 CSS 样式。还加入了分页、Favicon、标签云五级字号。</p>
 <h3 id="v030--markdown-">v0.3.0 — Markdown 渲染完整性</h3>
 <p>这是最重要的一次更新。之前 KaTeX 和 Mermaid 只保留了分隔符但没有真正渲染。</p>
@@ -233,49 +233,49 @@ $$</span></p>
 </ul>
 <div class="admonition admonition-tip"><div class="admonition-title">提示</div><div class="admonition-content"><p>KaTeX 和 Mermaid 的 CDN 注入逻辑是通过检测页面内容实现的。渲染完 HTML 后，如果发现数学公式或图表标记，就在 <code>&lt;head&gt;</code> 中注入对应的 JS/CSS 引用。这意味着没有公式的页面不会加载 KaTeX，零开销。</p>
 </div></div><h3 id="v040--">v0.4.0 — 主题生态</h3>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1"># 一键创建外部主题骨架</span>
-</span></span><span class="line"><span class="cl">chenhai new theme my-theme
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 在 config.yaml 中切换主题</span>
-</span></span><span class="line"><span class="cl">theme: <span class="s2">&#34;my-theme&#34;</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 一键创建外部主题骨架</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">chenhai new theme my-theme
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># 在 config.yaml 中切换主题</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">theme: <span class="s2">&#34;my-theme&#34;</span>
 </span></span></code></pre><p>外部主题只需写想定制的文件——缺失的模板自动回退到镇海。</p>
 <div class="admonition admonition-warning"><div class="admonition-title">注意</div><div class="admonition-content"><p>主题回退机制有个坑：<code>.Site.BuildTagCloud()</code> 在 <code>TemplateData.Site</code> 还是 <code>interface{}</code> 的时候没法在模板中调用。后来把类型改成了 <code>*index.Site</code> 才解决。</p>
 </div></div><h3 id="v050--">v0.5.0 — 体验打磨</h3>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1"># 一句话部署</span>
-</span></span><span class="line"><span class="cl">chenhai deploy -m <span class="s2">&#34;add: 新文章&#34;</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># 一句话部署</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">chenhai deploy -m <span class="s2">&#34;add: 新文章&#34;</span>
 </span></span></code></pre><p>核心改动：增量构建（SHA256 缓存）、<code>chenhai init</code> / <code>deploy</code>、构建进度日志、Chroma CSS class 亮暗双模、JetBrains Mono 代码字体。</p>
 <h2 id="hugo-">Hugo 迁移</h2>
 <p>从 Hugo + PaperMod 迁移到 Chenhai + 镇海，涉及 91 篇文章的 Front Matter 转换。</p>
 <h3 id="front-matter-">Front Matter 对比</h3>
 <p>Hugo + PaperMod：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="nn">---</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;pprof 指南&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="ld">2025-08-27</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">aliases</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;/Daily Dev&#34;</span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;pprof&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;golang&#34;</span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">categories</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;Daily Dev&#34;</span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;Kurong&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">showToc</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">TocOpen</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">draft</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">hidemeta</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">comments</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">disableHLJS</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">disableShare</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">hideSummary</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">searchHidden</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">ShowBreadCrumbs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">ShowPostNavLinks</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nn">---</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w"></span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;pprof 指南&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="ld">2025-08-27</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w"></span><span class="nt">aliases</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;/Daily Dev&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;pprof&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;golang&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="nt">categories</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;Daily Dev&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w"></span><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;Kurong&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w"></span><span class="nt">showToc</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w"></span><span class="nt">TocOpen</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="nt">draft</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w"></span><span class="nt">hidemeta</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w"></span><span class="nt">comments</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w"></span><span class="nt">disableHLJS</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w"></span><span class="nt">disableShare</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w"></span><span class="nt">hideSummary</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w"></span><span class="nt">searchHidden</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="nt">ShowBreadCrumbs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w"></span><span class="nt">ShowPostNavLinks</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
 </span></span></span></code></pre><p>Chenhai 精简后：</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="nn">---</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;pprof 指南&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="ld">2025-08-27</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">categories</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;Daily Dev&#34;</span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;pprof&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;golang&#34;</span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">draft</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">toc</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="nn">---</span><span class="w">
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="w"></span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;pprof 指南&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="w"></span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="ld">2025-08-27</span><span class="w">
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="w"></span><span class="nt">categories</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;Daily Dev&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="w"></span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;pprof&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;golang&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="w"></span><span class="nt">draft</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="w"></span><span class="nt">toc</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
 </span></span></span></code></pre><div class="admonition admonition-tip"><div class="admonition-title">提示</div><div class="admonition-content"><p>从 18 个字段精简到 6 个。PaperMod 的 <code>TocOpen</code>、<code>hidemeta</code>、<code>ShowBreadCrumbs</code> 这些配置在 Chenhai 中要么不需要，要么由站点级 config.yaml 统一控制。</p>
 </div></div><h3 id="heading-3">迁移结果</h3>
 <table>

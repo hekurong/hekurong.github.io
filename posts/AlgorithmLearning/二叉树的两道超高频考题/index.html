@@ -117,55 +117,55 @@
   </header>
 
   <h2 id="236----leetcodehttpsleetcodecnproblemslowest-common-ancestor-of-a-binary-treedescriptionenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/description/?envType=study-plan-v2&amp;envId=top-interview-150">236. 二叉树的最近公共祖先 - 力扣（LeetCode）</a></h2>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">lowestCommonAncestor</span><span class="p">(</span><span class="nx">root</span><span class="p">,</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">q</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="o">*</span><span class="nx">TreeNode</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 跳出递归
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="nx">root</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// 祖先可能是 p,q
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">root</span> <span class="o">==</span> <span class="nx">p</span> <span class="o">||</span> <span class="nx">root</span> <span class="o">==</span> <span class="nx">q</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">root</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// 祖先不是 p,q ，在左右子树上再次寻找
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">left</span> <span class="o">:=</span> <span class="nf">lowestCommonAncestor</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">Left</span><span class="p">,</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">right</span> <span class="o">:=</span> <span class="nf">lowestCommonAncestor</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">Right</span><span class="p">,</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// 左边没找到，返回右边
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">left</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">right</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    <span class="c1">// 右边没找到，返回左边
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">right</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">left</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// 左右都不为空，说明祖先在以 root 为根的子树中，返回 root
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="nx">root</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span> <span class="nf">lowestCommonAncestor</span><span class="p">(</span><span class="nx">root</span><span class="p">,</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">q</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="o">*</span><span class="nx">TreeNode</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="c1">// 跳出递归
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="nx">root</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="c1">// 祖先可能是 p,q
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">root</span> <span class="o">==</span> <span class="nx">p</span> <span class="o">||</span> <span class="nx">root</span> <span class="o">==</span> <span class="nx">q</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="k">return</span> <span class="nx">root</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="c1">// 祖先不是 p,q ，在左右子树上再次寻找
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span>    <span class="nx">left</span> <span class="o">:=</span> <span class="nf">lowestCommonAncestor</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">Left</span><span class="p">,</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="nx">right</span> <span class="o">:=</span> <span class="nf">lowestCommonAncestor</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">Right</span><span class="p">,</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="c1">// 左边没找到，返回右边
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">left</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="k">return</span> <span class="nx">right</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    
+</span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="c1">// 右边没找到，返回左边
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">right</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="k">return</span> <span class="nx">left</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">
+</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="c1">// 左右都不为空，说明祖先在以 root 为根的子树中，返回 root
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="nx">root</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>这道题直接背吧，就参考注释背。</p>
 <h2 id="124----leetcodehttpsleetcodecnproblemsbinary-tree-maximum-path-sumenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/?envType=study-plan-v2&amp;envId=top-interview-150">124. 二叉树中的最大路径和 - 力扣（LeetCode）</a></h2>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">maxPathSum</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">dfs</span> <span class="kd">func</span><span class="p">(</span><span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="kt">int</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">ans</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nx">MinInt</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nx">dfs</span> <span class="p">=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">node</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="nx">leftMax</span> <span class="o">:=</span> <span class="nf">dfs</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">rightMax</span> <span class="o">:=</span> <span class="nf">dfs</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">curSum</span> <span class="o">:=</span> <span class="nx">leftMax</span> <span class="o">+</span> <span class="nx">rightMax</span> <span class="o">+</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">ans</span> <span class="p">=</span> <span class="nf">max</span><span class="p">(</span><span class="nx">ans</span><span class="p">,</span> <span class="nx">curSum</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nf">max</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="nx">leftMax</span><span class="p">,</span> <span class="nx">rightMax</span><span class="p">)</span><span class="o">+</span><span class="nx">node</span><span class="p">.</span><span class="nx">Val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 0 代表不选
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nf">dfs</span><span class="p">(</span><span class="nx">root</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">ans</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span> <span class="nf">maxPathSum</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="kd">var</span> <span class="nx">dfs</span> <span class="kd">func</span><span class="p">(</span><span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="kt">int</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">ans</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nx">MinInt</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nx">dfs</span> <span class="p">=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="k">if</span> <span class="nx">node</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">            <span class="k">return</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="nx">leftMax</span> <span class="o">:=</span> <span class="nf">dfs</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="nx">rightMax</span> <span class="o">:=</span> <span class="nf">dfs</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="nx">curSum</span> <span class="o">:=</span> <span class="nx">leftMax</span> <span class="o">+</span> <span class="nx">rightMax</span> <span class="o">+</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="nx">ans</span> <span class="p">=</span> <span class="nf">max</span><span class="p">(</span><span class="nx">ans</span><span class="p">,</span> <span class="nx">curSum</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="k">return</span> <span class="nf">max</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="nx">leftMax</span><span class="p">,</span> <span class="nx">rightMax</span><span class="p">)</span><span class="o">+</span><span class="nx">node</span><span class="p">.</span><span class="nx">Val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 0 代表不选
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="nf">dfs</span><span class="p">(</span><span class="nx">root</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="k">return</span> <span class="nx">ans</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>同 LC236，背吧。</p>
 
 </article>

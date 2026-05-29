@@ -169,31 +169,31 @@
 </ul>
 <h2 id="heading">代码实现</h2>
 <h4 id="1-">1. 定义数据结构</h4>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// LRUCache holds the core logic for the cache.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">LRUCache</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">cache</span>      <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span> <span class="c1">// Hash map for O(1) lookups: key -&gt; Node pointer
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">*</span><span class="nx">Node</span>          <span class="c1">// Dummy head and tail nodes to handle edge cases
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">cap</span>        <span class="kt">int</span>           <span class="c1">// The capacity of the cache
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Node represents a node in the doubly linked list.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Node</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">Val</span><span class="p">,</span> <span class="nx">Key</span>  <span class="kt">int</span>           <span class="c1">// Store both key and value
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Pre</span><span class="p">,</span> <span class="nx">Next</span> <span class="o">*</span><span class="nx">Node</span>         <span class="c1">// Pointers to the previous and next nodes
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// LRUCache holds the core logic for the cache.
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">LRUCache</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">cache</span>      <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span> <span class="c1">// Hash map for O(1) lookups: key -&gt; Node pointer
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span>    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">*</span><span class="nx">Node</span>          <span class="c1">// Dummy head and tail nodes to handle edge cases
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span>    <span class="nx">cap</span>        <span class="kt">int</span>           <span class="c1">// The capacity of the cache
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">// Node represents a node in the doubly linked list.
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Node</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nx">Val</span><span class="p">,</span> <span class="nx">Key</span>  <span class="kt">int</span>           <span class="c1">// Store both key and value
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"></span>    <span class="nx">Pre</span><span class="p">,</span> <span class="nx">Next</span> <span class="o">*</span><span class="nx">Node</span>         <span class="c1">// Pointers to the previous and next nodes
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre><h4 id="2--constructor">2. 初始化 <code>Constructor</code></h4>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// Constructor initializes a new LRUCache with a given capacity.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">(</span><span class="nx">capacity</span> <span class="kt">int</span><span class="p">)</span> <span class="nx">LRUCache</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{}</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">tail</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">head</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">LRUCache</span><span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">cache</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">head</span><span class="p">:</span>  <span class="nx">head</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">tail</span><span class="p">:</span>  <span class="nx">tail</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">cap</span><span class="p">:</span>   <span class="nx">capacity</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// Constructor initializes a new LRUCache with a given capacity.
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">(</span><span class="nx">capacity</span> <span class="kt">int</span><span class="p">)</span> <span class="nx">LRUCache</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{}</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">tail</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">head</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="k">return</span> <span class="nx">LRUCache</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">       <span class="nx">cache</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">       <span class="nx">head</span><span class="p">:</span>  <span class="nx">head</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">       <span class="nx">tail</span><span class="p">:</span>  <span class="nx">tail</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">       <span class="nx">cap</span><span class="p">:</span>   <span class="nx">capacity</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><h4 id="3-">3. 编写核心辅助函数</h4>
 <p>为了让 <code>Get</code> 和 <code>Put</code> 的逻辑更清晰，我们把链表操作封装成独立的辅助函数。</p>
 <ul>
@@ -201,25 +201,25 @@
 <li><code>addToHead(node *Node)</code>: 将一个节点添加到链表头部（<code>head</code> 之后）。</li>
 <li><code>moveToHead(node *Node)</code>: 组合技，先移除再添加到头部，用于更新节点为“最新”。</li>
 </ul>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// removeNode detaches a node from the doubly linked list.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// addToHead adds a node right after the dummy head.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">addToHead</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">head</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">node</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">node</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// moveToHead moves an existing node to the head of the list.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// removeNode detaches a node from the doubly linked list.
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">// addToHead adds a node right after the dummy head.
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">addToHead</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">head</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="nx">node</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">node</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">node</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1">// moveToHead moves an existing node to the head of the list.
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><h4 id="4--get--put">4. 实现 <code>Get</code> 和 <code>Put</code></h4>
 <p>有了辅助函数，<code>Get</code> 和 <code>Put</code> 的逻辑就变得非常直观了。</p>
 <p><strong><code>Get(key int)</code> 逻辑:</strong></p>
@@ -229,15 +229,15 @@
 <li>如果存在，我们拿到了节点 <code>node</code>。这个节点刚刚被访问，所以要把它更新为“最新”。直接调用 <code>moveToHead(node)</code>。</li>
 <li>返回 <code>node.Val</code>。</li>
 </ol>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="c1">// The node was accessed, move it to the head to mark it as recently used.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">       <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// Key not found.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln">1</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">       <span class="c1">// The node was accessed, move it to the head to mark it as recently used.
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">       <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="c1">// Key not found.
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p><strong><code>Put(key int, value int)</code> 逻辑:</strong></p>
 <ol>
 <li>先用哈希表查找 <code>key</code>，看是“更新”还是“插入”。</li>
@@ -262,28 +262,28 @@
 </ul>
 </li>
 </ol>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// Case 1: The key already exists.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span> <span class="p">=</span> <span class="nx">value</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="c1">// Mark it as recently used.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="k">return</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// Case 2: The key does not exist.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Check if the cache is full.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">)</span> <span class="o">==</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cap</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="c1">// Evict the least recently used element, which is the one before the tail.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="nx">tail</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">tail</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">       <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">tail</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// Add the new node.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">newNode</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{</span><span class="nx">Key</span><span class="p">:</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">Val</span><span class="p">:</span> <span class="nx">value</span><span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">newNode</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">newNode</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCache</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="c1">// Case 1: The key already exists.
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span> <span class="p">=</span> <span class="nx">value</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="c1">// Mark it as recently used.
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"></span>       <span class="k">return</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="c1">// Case 2: The key does not exist.
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span>    <span class="c1">// Check if the cache is full.
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">)</span> <span class="o">==</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cap</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">       <span class="c1">// Evict the least recently used element, which is the one before the tail.
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span>       <span class="nx">tail</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">tail</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">       <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">tail</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="c1">// Add the new node.
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"></span>    <span class="nx">newNode</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{</span><span class="nx">Key</span><span class="p">:</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">Val</span><span class="p">:</span> <span class="nx">value</span><span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">newNode</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">newNode</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><h2 id="lru---ttl">LRU + 过期时间 (TTL)</h2>
 <h3 id="heading-1">需求变更分析</h3>
 <ol>
@@ -327,88 +327,88 @@
 <h3 id="heading-3">代码实现</h3>
 <h4 id="1--1">1. 升级数据结构</h4>
 <p><code>Node</code> 结构体需要增加一个字段来存储它的“死亡时间”。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;time&#34;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Node now includes an expiration timestamp.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Node</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">Val</span><span class="p">,</span> <span class="nx">Key</span>  <span class="kt">int</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">Pre</span><span class="p">,</span> <span class="nx">Next</span> <span class="o">*</span><span class="nx">Node</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">ExpiresAt</span> <span class="kt">int64</span> <span class="c1">// Unix timestamp (seconds) when this entry expires.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// The main struct now includes the TTL duration.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">LRUCacheWithTTL</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">cache</span>      <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">*</span><span class="nx">Node</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">cap</span>        <span class="kt">int</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">ttl</span>        <span class="kt">int64</span> <span class="c1">// Time-to-live in seconds for each entry.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">import</span> <span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1">// Node now includes an expiration timestamp.
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Node</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nx">Val</span><span class="p">,</span> <span class="nx">Key</span>  <span class="kt">int</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nx">Pre</span><span class="p">,</span> <span class="nx">Next</span> <span class="o">*</span><span class="nx">Node</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nx">ExpiresAt</span> <span class="kt">int64</span> <span class="c1">// Unix timestamp (seconds) when this entry expires.
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">// The main struct now includes the TTL duration.
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">LRUCacheWithTTL</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="nx">cache</span>      <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">*</span><span class="nx">Node</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="nx">cap</span>        <span class="kt">int</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="nx">ttl</span>        <span class="kt">int64</span> <span class="c1">// Time-to-live in seconds for each entry.
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre><h4 id="2--constructor-1">2. 修改 <code>Constructor</code></h4>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// Constructor now accepts a TTL value.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">(</span><span class="nx">capacity</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">ttl</span> <span class="kt">int</span><span class="p">)</span> <span class="nx">LRUCacheWithTTL</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{}</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">tail</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">head</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">LRUCacheWithTTL</span><span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">cache</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">head</span><span class="p">:</span>  <span class="nx">head</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">tail</span><span class="p">:</span>  <span class="nx">tail</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">cap</span><span class="p">:</span>   <span class="nx">capacity</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">ttl</span><span class="p">:</span>   <span class="nb">int64</span><span class="p">(</span><span class="nx">ttl</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// Constructor now accepts a TTL value.
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">(</span><span class="nx">capacity</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">ttl</span> <span class="kt">int</span><span class="p">)</span> <span class="nx">LRUCacheWithTTL</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nx">head</span><span class="p">,</span> <span class="nx">tail</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{}</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="nx">head</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">tail</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span> <span class="p">=</span> <span class="nx">head</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="k">return</span> <span class="nx">LRUCacheWithTTL</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">       <span class="nx">cache</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">Node</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">       <span class="nx">head</span><span class="p">:</span>  <span class="nx">head</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">       <span class="nx">tail</span><span class="p">:</span>  <span class="nx">tail</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">       <span class="nx">cap</span><span class="p">:</span>   <span class="nx">capacity</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">       <span class="nx">ttl</span><span class="p">:</span>   <span class="nb">int64</span><span class="p">(</span><span class="nx">ttl</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><h4 id="3--get-">3. 修改 <code>Get</code> 方法</h4>
 <p>这是变化最大的地方。在找到节点后，我们必须先检查它的存活状态。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// Get must now check for expiration before returning a value.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCacheWithTTL</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="c1">// Check if the node has expired.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="k">if</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">()</span> <span class="p">&gt;</span> <span class="nx">node</span><span class="p">.</span><span class="nx">ExpiresAt</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">           <span class="c1">// It&#39;s expired. Remove it from the cache.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>           <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">           <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">           <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">// Act as if it doesn&#39;t exist.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">       <span class="c1">// Not expired, proceed with standard LRU logic.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">       <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// Get must now check for expiration before returning a value.
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCacheWithTTL</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">       <span class="c1">// Check if the node has expired.
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1"></span>       <span class="k">if</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">()</span> <span class="p">&gt;</span> <span class="nx">node</span><span class="p">.</span><span class="nx">ExpiresAt</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">           <span class="c1">// It&#39;s expired. Remove it from the cache.
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>           <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">           <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">           <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">// Act as if it doesn&#39;t exist.
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span>       <span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl">       <span class="c1">// Not expired, proceed with standard LRU logic.
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">       <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre><h4 id="4--put-">4. 修改 <code>Put</code> 方法</h4>
 <p><code>Put</code> 的逻辑也需要更新，无论是插入还是更新，都要设置新的过期时间。</p>
-<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl"><span class="c1">// Put must now set or reset the expiration time.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCacheWithTTL</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// Calculate the new expiration time.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">newExpiresAt</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">()</span> <span class="o">+</span> <span class="nx">this</span><span class="p">.</span><span class="nx">ttl</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// Case 1: The key already exists.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span> <span class="p">=</span> <span class="nx">value</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">ExpiresAt</span> <span class="p">=</span> <span class="nx">newExpiresAt</span> <span class="c1">// Reset its expiration time.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">       <span class="k">return</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// Case 2: The key does not exist.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Check for capacity and evict the LRU element if full.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">)</span> <span class="o">==</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cap</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">tail</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">tail</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">       <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">tail</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// Create and add the new node.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">newNode</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">Key</span><span class="p">:</span>       <span class="nx">key</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">Val</span><span class="p">:</span>       <span class="nx">value</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">ExpiresAt</span><span class="p">:</span> <span class="nx">newExpiresAt</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">newNode</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">newNode</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// Put must now set or reset the expiration time.
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">this</span> <span class="o">*</span><span class="nx">LRUCacheWithTTL</span><span class="p">)</span> <span class="nf">Put</span><span class="p">(</span><span class="nx">key</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">value</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="c1">// Calculate the new expiration time.
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"></span>    <span class="nx">newExpiresAt</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">()</span> <span class="o">+</span> <span class="nx">this</span><span class="p">.</span><span class="nx">ttl</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="c1">// Case 1: The key already exists.
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">node</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span> <span class="p">=</span> <span class="nx">value</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">       <span class="nx">node</span><span class="p">.</span><span class="nx">ExpiresAt</span> <span class="p">=</span> <span class="nx">newExpiresAt</span> <span class="c1">// Reset its expiration time.
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"></span>       <span class="nx">this</span><span class="p">.</span><span class="nf">moveToHead</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">       <span class="k">return</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="c1">// Case 2: The key does not exist.
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"></span>    <span class="c1">// Check for capacity and evict the LRU element if full.
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">)</span> <span class="o">==</span> <span class="nx">this</span><span class="p">.</span><span class="nx">cap</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">       <span class="nx">tail</span> <span class="o">:=</span> <span class="nx">this</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nx">Pre</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">       <span class="nx">this</span><span class="p">.</span><span class="nf">removeNode</span><span class="p">(</span><span class="nx">tail</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">       <span class="nb">delete</span><span class="p">(</span><span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">,</span> <span class="nx">tail</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="c1">// Create and add the new node.
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span>    <span class="nx">newNode</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="nx">Key</span><span class="p">:</span>       <span class="nx">key</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="nx">Val</span><span class="p">:</span>       <span class="nx">value</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="nx">ExpiresAt</span><span class="p">:</span> <span class="nx">newExpiresAt</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nf">addToHead</span><span class="p">(</span><span class="nx">newNode</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="nx">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">newNode</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre>
 </article>
 
