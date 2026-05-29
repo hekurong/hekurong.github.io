@@ -194,6 +194,36 @@
   }
 
   /* ================================================================ */
+  /*  3.5. Highlight Lines                                             */
+  /* ================================================================ */
+
+  function initHighlightLines() {
+    document.querySelectorAll('pre.chroma[data-hl-lines]').forEach(function (pre) {
+      var ranges = pre.getAttribute('data-hl-lines');
+      if (!ranges) return;
+      var hlSet = new Set();
+      ranges.split(',').forEach(function (part) {
+        part = part.trim();
+        if (part.includes('-')) {
+          var segs = part.split('-');
+          var start = parseInt(segs[0], 10);
+          var end = parseInt(segs[1], 10);
+          for (var i = start; i <= end; i++) hlSet.add(i);
+        } else {
+          hlSet.add(parseInt(part, 10));
+        }
+      });
+
+      var lines = pre.querySelectorAll('.line');
+      lines.forEach(function (line, i) {
+        if (hlSet.has(i + 1)) {
+          line.classList.add('hl');
+        }
+      });
+    });
+  }
+
+  /* ================================================================ */
   /*  4. Archive Expand / Collapse                                    */
   /* ================================================================ */
 
@@ -349,6 +379,7 @@
 
     initTOC();
     initCopyButtons();
+    initHighlightLines();
     initArchiveToggle();
     initMobileMenu();
     initReadingProgress();

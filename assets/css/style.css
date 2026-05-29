@@ -54,6 +54,9 @@
   --color-danger-border: #c0392b;
   --color-danger-bg: #fdecea;
 
+  /* Code block line highlight */
+  --color-hl-line-bg: rgba(184, 150, 46, 0.1);
+
   /* Search */
   --color-search-overlay: rgba(44, 44, 44, 0.5);
   --color-search-modal-bg: #ffffff;
@@ -788,6 +791,21 @@ pre:hover .copy-btn {
   color: var(--color-text-secondary);
   opacity: 0.5;
   margin-right: 1em;
+}
+
+/* Line highlight — driven by data-hl-lines attribute + JS */
+.article-content pre.chroma[data-hl-lines] .hl {
+  display: inline-block;
+  width: 100%;
+  background: var(--color-hl-line-bg);
+  border-left: 3px solid var(--color-link);
+  margin-left: -0.6rem;
+  padding-left: calc(0.6rem - 3px);
+}
+
+body.dark .article-content pre.chroma[data-hl-lines] .hl {
+  background: rgba(212, 175, 55, 0.12);
+  border-left-color: var(--color-link);
 }
 
 /* Chroma syntax highlighting — light mode (github) */
@@ -1694,6 +1712,7 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  background: #e8e4da;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 2rem;
 }
@@ -1707,6 +1726,7 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   object-position: top center;
   opacity: 0.18;
   pointer-events: none;
+  animation: hero-fade-in 0.6s ease-out;
 }
 
 .site-hero-content {
@@ -1728,6 +1748,11 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0;
+}
+
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+  to { opacity: 0.18; }
 }
 
 /* ----------------------------------------------------------------- */
