@@ -2339,30 +2339,51 @@ body,
   color: var(--color-text-secondary);
 }
 
-/* Series navigation */
-.series-nav {
-  margin-top: 1.5rem;
-  padding: 1rem 1.2rem;
+/* Series playlist */
+.series-playlist {
+  margin-top: 2rem;
+  padding: 1.2rem;
   background: var(--color-bg-alt);
-  border-radius: 6px;
-  border-left: 3px solid var(--color-link);
+  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
 }
-.series-label {
-  font-size: 0.82rem;
-  color: var(--color-text-secondary);
-  margin-bottom: 0.6rem;
+.series-playlist-title {
+  font-size: 1rem;
+  color: var(--color-heading);
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.series-playlist-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.series-playlist-item {
+  border-radius: 4px;
+  transition: background var(--transition-fast);
+}
+.series-playlist-item.current {
+  background: var(--color-code-filename-bg);
+}
+.series-playlist-item.current .series-playlist-text {
   display: block;
-  font-family: var(--font-ui);
-}
-.series-links {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-.series-link {
+  padding: 0.5rem 0.8rem;
   font-weight: 600;
-  font-size: 0.92rem;
+  color: var(--color-link);
+}
+.series-playlist-link {
+  display: block;
+  padding: 0.5rem 0.8rem;
+  color: var(--color-text);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+.series-playlist-link:hover {
+  background: var(--color-code-filename-bg);
+  color: var(--color-link);
+  text-decoration: none;
 }
 
 /* ----------------------------------------------------------------- */
