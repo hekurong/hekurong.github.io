@@ -137,10 +137,11 @@
   /* ================================================================ */
 
   function initCopyButtons() {
-    document.querySelectorAll(".code-wrapper, .article-content pre:not(.code-ln pre)").forEach(function (wrapper) {
+    document.querySelectorAll(".code-wrapper, .article-content pre.chroma").forEach(function (wrapper) {
+      // Skip pre.chroma that is inside a code-wrapper (already handled by wrapper)
+      if (!wrapper.classList.contains("code-wrapper") && wrapper.closest(".code-wrapper")) return;
       if (wrapper.querySelector(".copy-btn")) return;
 
-      // For code-wrapper, only copy code column (exclude line numbers)
       var codeBlock;
       if (wrapper.classList.contains("code-wrapper")) {
         codeBlock = wrapper.querySelector(".code-body code");

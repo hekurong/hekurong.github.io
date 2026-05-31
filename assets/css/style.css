@@ -871,17 +871,23 @@ pre:hover .copy-btn {
 .code-wrapper[data-lang]::before {
   content: attr(data-lang);
   position: absolute;
-  top: 0;
-  right: 3.5rem;
-  padding: 0.15em 0.7em;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.1em 0.5em;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--color-text-secondary);
-  background: var(--color-code-filename-bg);
-  border-radius: 0 0 4px 4px;
-  opacity: 0.7;
+  background: transparent;
+  border: 1px solid var(--color-code-border);
+  border-radius: 3px;
+  opacity: 0.35;
   z-index: 2;
   text-transform: lowercase;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+.code-wrapper[data-lang]:hover::before {
+  opacity: 0.6;
 }
 
 /* Line highlight — driven by data-hl-lines attribute + JS */
