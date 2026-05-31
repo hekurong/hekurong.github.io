@@ -5,6 +5,7 @@ categories: ["AI"]
 tags: ["LLM", "Transformer", "GPT"]
 series: "AI应用开发面试宝典"
 toc: true
+weight: 9
 ---
 
 # 02 — 大语言模型(LLM)原理

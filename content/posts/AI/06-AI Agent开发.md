@@ -5,6 +5,7 @@ categories: ["AI"]
 tags: ["Agent", "Tool Calling", "记忆系统"]
 series: "AI应用开发面试宝典"
 toc: true
+weight: 5
 ---
 
 # Agent开发深度解析（上半部分）：架构模式、Tool Calling与记忆系统
