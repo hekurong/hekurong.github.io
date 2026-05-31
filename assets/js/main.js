@@ -101,6 +101,7 @@
             for (var i = 0; i < tocEntries.length; i++) {
               if (tocEntries[i].el === entry.target) {
                 tocEntries[i].link.classList.add("active");
+                tocEntries[i].link.scrollIntoView({ block: "nearest", behavior: "smooth" });
                 break;
               }
             }
