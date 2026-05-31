@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -127,14 +127,14 @@
 <p>再次感叹 homebrew 的伟大，一行命令就安装、后续也没有问题。</p>
 <h2 id="heading-1">仪表盘</h2>
 <p>使用 <code>minikube dashboard</code> 启动仪表盘。如果在服务器上启动、本地访问，就运行类似于的下面命令：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kubectl proxy --address<span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span> --disable-filter<span class="o">=</span><span class="nb">true</span>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kubectl proxy --address<span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span> --disable-filter<span class="o">=</span><span class="nb">true</span>
 </span></span></code></pre></div></div><p>然后把 http://127.0.0.1:46749/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/ 这样的 URL 改为 http://ServerIP:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/ ，就可以外网直接访问了（注意服务器开端口）。</p>
 <h2 id="helm-">Helm 安装</h2>
 <p>直接使用 snap 安装，方便快捷：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">sudo snap install helm --classic
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">sudo snap install helm --classic
 </span></span></code></pre></div></div><h2 id="kubectl-">kubectl 安装</h2>
 <p>snap 上大分：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">sudo snap install kubectl --classic
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">sudo snap install kubectl --classic
 </span></span></code></pre></div></div><h2 id="heading-2">安装可能遇到的问题的解决方案</h2>
 <h3 id="the-docker-driver-should-not-be-used-with-root-privileges">The &ldquo;docker&rdquo; driver should not be used with root privileges</h3>
 <p>使用命令 <code>minikube start</code> 启动，参数 <code>driver</code> 默认为 <code>docker</code> 。如果以 root 用户运行该命令会出现如标题所示的错误，下面是解决方法：</p>
@@ -142,15 +142,15 @@
 <p>然而直接在命令最后加上 <code>–-force</code> 也不是不行。</p>
 <h3 id="unable-to-find-image--locally">Unable to find image ……. locally</h3>
 <p>minikube考虑到了墙的问题，并提供了解决方案。那就是启动的时候添加两个限定国内镜像仓库的参数，这样可以避免后面minikube拉不到镜像的问题.</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"> minikube start --image-mirror-country<span class="o">=</span><span class="s1">&#39;cn&#39;</span>  --image-repository<span class="o">=</span><span class="s1">&#39;registry.cn-hangzhou.aliyuncs.com/google_containers&#39;</span>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"> minikube start --image-mirror-country<span class="o">=</span><span class="s1">&#39;cn&#39;</span>  --image-repository<span class="o">=</span><span class="s1">&#39;registry.cn-hangzhou.aliyuncs.com/google_containers&#39;</span>
 </span></span></code></pre></div></div><p>如果还是解决不了，就指定镜像，先用 docker 拉取镜像：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker pull docker-0.unsee.tech/kicbase/stable:v0.0.46
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker pull docker-0.unsee.tech/kicbase/stable:v0.0.46
 </span></span></code></pre></div></div><p>然后再指定镜像：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">minikube start --driver<span class="o">=</span>docker --base-image<span class="o">=</span><span class="s2">&#34;docker-0.unsee.tech/kicbase/stable:v0.0.46&#34;</span> --force
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">minikube start --driver<span class="o">=</span>docker --base-image<span class="o">=</span><span class="s2">&#34;docker-0.unsee.tech/kicbase/stable:v0.0.46&#34;</span> --force
 </span></span></code></pre></div></div><h2 id="heading-3">启动仪表盘可能遇到的问题的解决方案</h2>
 <h3 id="--proxy--">卡在 “正在验证 proxy 运行状况 &hellip;”</h3>
 <p>先用 <code>minikube dashboard --alsologtostderr -v=1</code> 查看是否存在 <code>503</code> 报错，如果有继续执行下面命令：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kubectl get pods --all-namespaces
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kubectl get pods --all-namespaces
 </span></span></code></pre></div></div><p>会看到所有命名空间下的 Pod 的状态，着重看 <code>dashboard-metrics-scraper</code> 和 <code>kubernetes-dashboard</code> 开头的两个 Pod，分别运行 <code>kubectl logs --namespace=kubernetes-dashboard [PodName]</code> 查看 Pod 的日志，并通过 <code>kubectl describe pod [PodName] -n [NameSpace]</code> ，查看事件详情。</p>
 <p>如果遇到的是 <code>ImagePullBackOff</code> 镜像拉取错误，步骤如下：</p>
 <ul>
@@ -163,7 +163,7 @@
 <ul>
 <li>
 <p>刷新 iptabels：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -181,6 +181,8 @@
 </ul>
 
 </article>
+
+
 
 
 
@@ -782,6 +784,30 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8aKubernetes%e7%bc%96%e7%a8%8b%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《Kubernetes编程》记录</span>
+      <span class="related-card-date">2025-04-09</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8aKubernetes%e5%be%ae%e6%9c%8d%e5%8a%a1%e5%ae%9e%e6%88%98%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《Kubernetes微服务实战》记录</span>
+      <span class="related-card-date">2025-01-25</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8a%e4%ba%91%e5%8e%9f%e7%94%9f%e5%bc%80%e5%8f%91%e5%ae%9e%e8%b7%b5%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《云原生开发实践》记录</span>
+      <span class="related-card-date">2025-01-22</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1175,6 +1201,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

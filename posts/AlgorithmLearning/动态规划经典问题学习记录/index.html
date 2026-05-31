@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -141,7 +141,7 @@
 </ol>
 <p>最终得到的递归公式：<span class="math inline">$dfs(i,c) = max(dfs(i-1, c),dfs(i-1, c-w[i])+v[i])$</span></p>
 <p>对应的代码就是：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -171,7 +171,7 @@
 </span></span><span class="line"><span class="cl">  
 </span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">dfs</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">capacity</span><span class="p">)</span>
 </span></span></code></pre></div></div><p>以上就是 0-1 背包的“至多装 capacity”的递归+记忆化搜索形式，其实也可以写成递推式：<span class="math inline">$dp[i][c] = max(dp[i-1][c],dp[i-1] [c-w[i]]+v[i])$</span></p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -232,7 +232,7 @@
 <li>因此，问题转化为：从 <code>nums</code> 中选出一些数字，使得它们的和等于 <code>(sum(nums) + target) / 2</code>。这是一个典型的 0-1 背包问题。</li>
 </ul>
 <p>得递归公式：<span class="math inline">$dfs(i, c) = dfs(i - 1, c) + dfs(i - 1, c - nums[i])$</span> ，这里的加法表示互斥条件，表示方案数两者之和。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -280,7 +280,7 @@
 </span></span><span class="line"><span class="cl">    <span class="c1"># 返回结果</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">dfs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">capacity</span><span class="p">)</span>
 </span></span></code></pre></div></div><p>写成递推式就是：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -349,7 +349,7 @@
 </li>
 </ol>
 <p>最终得到的递归公式：<span class="math inline">$dfs(i,c) = max(dfs(i-1, c),dfs(i, c-w[i])+v[i])$</span> ，对应代码：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -390,7 +390,7 @@
 </ul>
 <p>转换成背包问题的话，这里的 <code>amount</code> 就是背包容量，而最少的硬币个数就是最小的价值和，这里的价值可以用 1 表示，所以得到递归公式：<span class="math inline">$dfs(i, c) = min(dfs(i-1, c), dfs(i, c-w[i])+1)$</span> 。</p>
 <p>以下是递归式代码：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -420,7 +420,7 @@
 </span></span><span class="line"><span class="cl">  
 </span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">ans</span> <span class="k">if</span> <span class="n">ans</span> <span class="o">&lt;</span> <span class="n">inf</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
 </span></span></code></pre></div></div><p>改成递推式则为：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -451,6 +451,8 @@
 </span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">ans</span> <span class="k">if</span> <span class="n">ans</span> <span class="o">&lt;</span> <span class="n">inf</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
 </span></span></code></pre></div></div>
 </article>
+
+
 
 
 
@@ -1060,6 +1062,20 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/AlgorithmLearning/%e5%87%a0%e9%81%93%e5%8f%8d%e5%a4%8d%e5%81%9a%e4%ba%86%e5%a5%bd%e5%87%a0%e9%81%8d%e7%9a%84%e4%b8%80%e7%bb%b4DP/">
+      <span class="related-card-title">几道反复做了好几遍的一维DP</span>
+      <span class="related-card-date">2025-09-28</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1453,6 +1469,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

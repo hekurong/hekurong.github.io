@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -134,7 +134,7 @@
 <p>服务定义</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="protobuf"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -183,7 +183,7 @@
 <p>gRPC 服务端</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -241,7 +241,7 @@
 <p>gRPC 客户端</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -312,7 +312,7 @@
 <p>gRPC 服务端：</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -373,7 +373,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div></li>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -437,7 +437,7 @@
 <p>gRPC 客户端：</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -531,7 +531,7 @@
 <p>服务定义：返回是 stream 类型</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="protobuf"><div class="code-ln"><pre><code>1
 2
 3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kd">service</span> <span class="n">OrderManagement</span> <span class="p">{</span><span class="err">
 </span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">searchOrders</span><span class="p">(</span><span class="n">google.protobuf.StringValue</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">stream</span> <span class="n">Order</span><span class="p">);</span><span class="err">
@@ -543,7 +543,7 @@
 <p>服务端实现：</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -564,7 +564,7 @@
 <p>客户端实现：</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -597,7 +597,7 @@
 <p>服务定义：请求是 stream 类型</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="protobuf"><div class="code-ln"><pre><code>1
 2
 3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kd">service</span> <span class="n">OrderManagement</span> <span class="p">{</span><span class="err">
 </span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="k">rpc</span> <span class="n">updateOrders</span><span class="p">(</span><span class="n">stream</span> <span class="n">Order</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">google.protobuf.StringValue</span><span class="p">);</span><span class="err">
@@ -609,7 +609,7 @@
 <p>服务端实现：</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -629,7 +629,7 @@
 <p>客户端实现：</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -669,7 +669,7 @@
 <p>对于 protocol buffers 中的消息定义：</p>
 <ul>
 <li>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="protobuf"><div class="code-ln"><pre><code>1
 2
 3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">ProductID</span> <span class="p">{</span><span class="err">
 </span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="kt">string</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
@@ -712,6 +712,8 @@
 </ul>
 
 </article>
+
+
 
 
 
@@ -1301,6 +1303,30 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/sync%e5%8c%85%e8%af%a6%e8%a7%a3/">
+      <span class="related-card-title">sync包详解</span>
+      <span class="related-card-date">2025-08-30</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/apollo%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+      <span class="related-card-title">apollo简单入门</span>
+      <span class="related-card-date">2025-09-14</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/kafka%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+      <span class="related-card-title">Kafka简单入门</span>
+      <span class="related-card-date">2025-09-13</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1694,6 +1720,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

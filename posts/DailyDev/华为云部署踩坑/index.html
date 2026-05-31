@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -275,10 +275,10 @@
 </table>
 <h4 id="1">配置方式1：临时使用</h4>
 <p>直接使用，直接拿镜像<a href="https://cloud.tencent.com/act/pro/domain-sales?from_column=20065&amp;from=20065">域名</a>拼接上官方镜像名，例如要拉去镜像<code>istio/distroless</code>，可以用下面写法（不要带 <code>https://</code>）</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker pull docker.unsee.tech/istio/distroless
+<div class="code-wrapper" data-lang="shell"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker pull docker.unsee.tech/istio/distroless
 </span></span></code></pre></div></div><h4 id="2">配置方式2：长久有效</h4>
 <p>修改文件 <code>/etc/docker/daemon.json</code>（如果不存在则需要创建创建，注意不要写入中文，要带<code>https://</code>），并重启服务。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="shell"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -341,22 +341,22 @@ sudo systemctl enable docker
 <h3 id="docker-">Docker 容器打包</h3>
 <p>先写好Dockerfile，怎么写可以根据需要问chatgpt，它的本质作用是只在镜像化的时候才会调用。</p>
 <p>下面是使用 commit 命令直接把容器打包成镜像：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker commit <span class="o">[</span>容器ID或名称<span class="o">]</span> new_image_name
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker commit <span class="o">[</span>容器ID或名称<span class="o">]</span> new_image_name
 </span></span></code></pre></div></div><p>这里的打包尤其要注意不同系统的指令集架构不同，会导致打包的镜像不可用。比如 MacOS 为 arm64，而Ubuntu 用的 amd64，不过这个可以在创建镜像或容器实例化时指定。</p>
 <p>然后用 save 命令输出到指定路径，方便上传：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker save -o image_name.tar your_image_name
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker save -o image_name.tar your_image_name
 </span></span></code></pre></div></div><p>可以使用 load 指令还原镜像：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker load -i image_name.tar
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker load -i image_name.tar
 </span></span></code></pre></div></div><p>如果用Dockerfile创建镜像的话，可以参考下面的指令：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker build --progress<span class="o">=</span>plain -t kg-vs-backend-latest -f ./.devcontainer/Dockerfile /usr/Project/PCCKGVisualization
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker build --progress<span class="o">=</span>plain -t kg-vs-backend-latest -f ./.devcontainer/Dockerfile /usr/Project/PCCKGVisualization
 </span></span></code></pre></div></div><p>-t 后面是镜像名，-f 后面是 Dockerfile 位置，最后面的路径为指定 Dockerfile 的上下文。</p>
 <p>实例化一个容器并配置转发接口、挂载位置：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker run -d -p 8000:8000 -v ./PCCKGVisualization:/IdeaProjects/PCCKGVisualization kg-vs-backend
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker run -d -p 8000:8000 -v ./PCCKGVisualization:/IdeaProjects/PCCKGVisualization kg-vs-backend
 </span></span></code></pre></div></div><h3 id="macos-">MacOS 服务器连接</h3>
 <ol>
 <li>
 <p>ssh 连接：先设置好服务器密码，默认用户名是 root 。然后用</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">ssh root@公网IP
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">ssh root@公网IP
 </span></span></code></pre></div></div><p>连接，然后输入密码即可。</p>
 </li>
 <li>
@@ -367,15 +367,17 @@ sudo systemctl enable docker
 <ul>
 <li>
 <p>下载：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">scp root@139.x.x.x:/home/test.txt /home/
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">scp root@139.x.x.x:/home/test.txt /home/
 </span></span></code></pre></div></div></li>
 <li>
 <p>上传：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">scp /home/test.txt root@139.x.x.x:/home
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">scp /home/test.txt root@139.x.x.x:/home
 </span></span></code></pre></div></div></li>
 </ul>
 
 </article>
+
+
 
 
 
@@ -961,6 +963,30 @@ sudo systemctl enable docker
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8a%e8%ae%a1%e7%bb%84KG%e3%80%8b%e8%af%be%e9%a2%98%e5%bc%80%e5%8f%91%e8%bf%87%e7%a8%8b%ef%bc%88%e4%b8%89%ef%bc%89/">
+      <span class="related-card-title">《计组KG》课题开发过程（三）</span>
+      <span class="related-card-date">2024-11-04</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8a%e8%ae%a1%e7%bb%84KG%e3%80%8b%e8%af%be%e9%a2%98%e5%bc%80%e5%8f%91%e8%bf%87%e7%a8%8b%ef%bc%88%e4%ba%8c%ef%bc%89/">
+      <span class="related-card-title">《计组KG》课题开发过程（二）</span>
+      <span class="related-card-date">2024-09-14</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8a%e8%ae%a1%e7%bb%84KG%e3%80%8b%e8%af%be%e9%a2%98%e5%bc%80%e5%8f%91%e7%95%aa%e5%a4%96%ef%bc%9a%e5%85%b3%e7%b3%bb%e6%8a%bd%e5%8f%96%e7%9a%84%e6%80%9d%e8%80%83%e8%bf%87%e7%a8%8b/">
+      <span class="related-card-title">《计组KG》课题开发番外：关系抽取的思考过程</span>
+      <span class="related-card-date">2024-08-24</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1354,6 +1380,7 @@ sudo systemctl enable docker
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

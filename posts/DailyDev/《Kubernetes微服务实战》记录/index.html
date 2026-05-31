@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -169,7 +169,7 @@
 </ul>
 <h3 id="heading-1">微服务的完美搭档</h3>
 <p>ReplicaSet 是具有一定数量副本的 Pod 集合，创建它时 K8s 会确保始终有指定数量的 Pod 在集群中运行。以下是一个 K8s 部署清单：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -211,7 +211,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
 </span></span></span></code></pre></div></div><p>K8s 提供了 Service 服务资源，用于微服务的公开和发现：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -255,7 +255,7 @@
 <h2 id="-kubernetes--1">使用 Kubernetes 配置微服务</h2>
 <h3 id="-kubernetes-configmap">使用 Kubernetes ConfigMap</h3>
 <p>ConfigMap 是用于存储非机密配置信息的资源对象，它通常用来管理应用程序所需的配置数据。大概形式如下：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -272,7 +272,7 @@
 <ul>
 <li>
 <p>作为环境变量：将 ConfigMap 中的值注入到容器的环境变量中：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -286,7 +286,7 @@
 </span></span></span></code></pre></div></div></li>
 <li>
 <p>挂载为文件：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -394,7 +394,7 @@
 </ul>
 <p>StatefulSet 通常与 Headless Service 使用。Headless Service 不会分配 ClusterIP，而是直接返回 Pod 的 IP 和 DNS 记录。</p>
 <p>下面是一个 StatefulSet 配置：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -457,7 +457,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l">1Gi  </span><span class="w"> </span><span class="c"># 存储大小</span><span class="w">
 </span></span></span></code></pre></div></div><h3 id="-kubernetes--3">在 Kubernetes 中使用关系型和非关系型数据库</h3>
 <p>使用 StatefulSet 部署 MySQL：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -525,7 +525,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">requests</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l">10Gi</span><span class="w">
 </span></span></span></code></pre></div></div><p>使用 StatefulSet 部署 Redis：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -587,7 +587,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">requests</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l">1Gi        </span><span class="w"> </span><span class="c"># 存储大小</span><span class="w">
 </span></span></span></code></pre></div></div><p>这是 Redis 的 Headless Service 配置：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -873,6 +873,8 @@
 </ul>
 
 </article>
+
+
 
 
 
@@ -1472,6 +1474,30 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8a%e4%ba%91%e5%8e%9f%e7%94%9f%e5%bc%80%e5%8f%91%e5%ae%9e%e8%b7%b5%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《云原生开发实践》记录</span>
+      <span class="related-card-date">2025-01-22</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8aKubernetes%e7%bc%96%e7%a8%8b%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《Kubernetes编程》记录</span>
+      <span class="related-card-date">2025-04-09</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/minikube%ef%bc%9aUbuntu%e9%83%a8%e7%bd%b2%e6%9c%ac%e5%9c%b0%e9%9b%86%e7%be%a4%e8%b8%a9%e5%9d%91/">
+      <span class="related-card-title">minikube：Ubuntu部署本地集群踩坑</span>
+      <span class="related-card-date">2025-01-25</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1865,6 +1891,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

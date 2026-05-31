@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -276,7 +276,7 @@
 <p>其设计采用了典型的组合与继承模式，通过混入（Mixin）多个功能类（如<code>DataSourceSelector</code>, <code>ResultSender</code>, <code>ResultRecordSaver</code>等）来赋予自身丰富的能力，包括数据源选择、结果发送、结果持久化等。这种设计使得<code>RiskFlow</code>成为了一个功能强大的“上帝对象”，控制着风控流程的每一个环节。</p>
 <h4 id="pipeline"><code>Pipeline</code>机制：责任链模式的实现</h4>
 <p><code>RiskFlow</code>的核心驱动力来自于其内部的<code>Pipeline</code>（管道）机制。如下面的代码所示，系统通过一个工厂函数<code>make_flow</code>，根据不同的业务类型（<code>FlowType</code>），创建出包含不同<code>Pipeline</code>的<code>RiskFlow</code>实例：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -303,7 +303,7 @@
 <li><code>VarLogic</code>: 也继承自<code>BaseDataSource</code>，专门用于执行<strong>计算逻辑</strong>，它将一个或多个<code>DataSource</code>或其他<code>VarLogic</code>的输出作为输入，生成新的衍生变量。</li>
 </ul>
 <p>一个变量的计算逻辑通过在其<code>VarLogic</code>子类中定义<code>dependons</code>属性来声明其依赖项。例如，<code>MobileWallaBlackListVarLogic</code>依赖于<code>MobileWallaBlacklist</code>这个<code>DataSource</code>：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -536,6 +536,8 @@
 <p>综合来看，这四大战略方向并非孤立的技术项目，它们共同勾勒出风险中台从一个高效的“决策自动化引擎”向一个成熟的“智能化风险治理平台”演进的清晰路径。血缘系统解决“可追溯性”，Drools管理系统解决“变更安全性”，流式计算解决“实时性”，而LLM集成则解决“知识可及性”。这些举措表明，团队的关注点正在从实现核心功能，转向解决更高阶的、围绕着平台全生命周期的管理、治理和效率问题。这一系列布局的成功实施，将构建起强大的技术壁垒，使公司能够在全球化竞争中，以更快、更准、更安全的方式管理风险，从而获得持续的竞争优势。</p>
 
 </article>
+
+
 
 
 
@@ -1195,6 +1197,20 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/lubancat5%e6%8a%98%e8%85%be%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">lubancat5折腾记录</span>
+      <span class="related-card-date">2026-01-06</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1588,6 +1604,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

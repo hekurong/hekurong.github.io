@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -127,7 +127,7 @@
 <h3 id="pprof-"><strong>第一部分：PProf 基础与开启</strong></h3>
 <p>要在 Web 服务中开启 <code>pprof</code>，我们只需引入 <code>net/http/pprof</code> 包。对于使用 Gin 等框架的服务，可以将其 Handler 包装后注册到路由中。</p>
 <p>一个关键的准备步骤是，为了能分析到 <strong>阻塞</strong> 和 <strong>锁竞争</strong>，我们需要在程序启动时设置采样率。如果不设置，相关的 profile 文件将是空的。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -206,7 +206,7 @@
 <ul>
 <li>
 <p><strong>问题代码</strong>：模拟一个非常耗时的计算任务。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -226,7 +226,7 @@
 </li>
 <li>
 <p>在终端执行命令，采集 30 秒的 CPU 数据：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/profile?seconds=30&#39;</span>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/profile?seconds=30&#39;</span>
 </span></span></code></pre></div></div></li>
 <li>
 <p>进入 pprof 交互界面后，使用 <code>top</code> 命令查看最耗 CPU 的函数。</p>
@@ -251,7 +251,7 @@ Showing nodes accounting for 4.50s, 98.90% of 4.55s total
 <ul>
 <li>
 <p><strong>问题代码</strong>：模拟创建一个全局的大对象。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -271,7 +271,7 @@ Showing nodes accounting for 4.50s, 98.90% of 4.55s total
 </li>
 <li>
 <p>采集 heap profile。我们可以分析当前正在使用的内存 (<code>inuse_space</code>) 或分析自程序启动以来总共分配过的内存 (<code>alloc_space</code>)。排查内存泄漏通常用前者。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/heap&#39;</span>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/heap&#39;</span>
 </span></span></code></pre></div></div></li>
 <li>
 <p>使用 <code>top</code> 查看内存分配大户。</p>
@@ -292,7 +292,7 @@ Showing nodes accounting for 50MB, 100% of 50MB total
 <ul>
 <li>
 <p><strong>问题代码</strong>：模拟一个耗时的数据库查询。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">blockingTask</span><span class="p">()</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span> <span class="c1">// 模拟 IO 等待
@@ -331,7 +331,7 @@ Showing nodes accounting for 4s, 100% of 4s total
 </li>
 <li>
 <p><strong>问题代码</strong>：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -358,7 +358,7 @@ Showing nodes accounting for 4s, 100% of 4s total
 <li>
 <p><strong>采集快照</strong>：使用 <code>go tool pprof</code> 进行分析。</p>
 <p>Bash</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/goroutine&#39;</span>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/goroutine&#39;</span>
 </span></span></code></pre></div></div></li>
 <li>
 <p><strong>分析数据</strong>：</p>
@@ -402,7 +402,7 @@ ROUTINE ======================== main.leakGoroutineTask.func1 in .../main.go
 </li>
 <li>
 <p><strong>问题代码</strong>：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -439,7 +439,7 @@ ROUTINE ======================== main.leakGoroutineTask.func1 in .../main.go
 <li>
 <p><strong>采集快照</strong>：</p>
 <p>Bash</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/mutex&#39;</span>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go tool pprof <span class="s1">&#39;http://localhost:6060/debug/pprof/mutex&#39;</span>
 </span></span></code></pre></div></div></li>
 <li>
 <p><strong>分析数据</strong>：</p>
@@ -485,6 +485,8 @@ ROUTINE ======================== main.mutexContentionTask in .../main.go
 <p>PProf 是 Go 开发者的必备技能。通过掌握 <code>profile</code> (CPU), <code>heap</code> (内存), <code>block</code> (阻塞), <code>goroutine</code> (泄漏), 和 <code>mutex</code> (锁竞争) 这五种核心 Profile 的分析方法，我们能像侦探一样，根据“蛛丝马迹”定位并解决绝大多数性能问题，构建出更健壮、更高性能的 Go 服务。始终记住，性能优化不是靠猜测，而是靠数据驱动。PProf 正是为我们提供数据的利器。</p>
 
 </article>
+
+
 
 
 
@@ -1114,6 +1116,8 @@ ROUTINE ======================== main.mutexContentionTask in .../main.go
 </nav>
 
 
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1507,6 +1511,7 @@ ROUTINE ======================== main.mutexContentionTask in .../main.go
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

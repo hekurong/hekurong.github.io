@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -158,7 +158,7 @@
 <p>在本地安装并启动 Kafka 后，你可以使用自带的命令行工具快速体验其工作流程。</p>
 <h4 id="1--topic">1. 创建一个 Topic</h4>
 <p>创建一个名为 <code>golang-test</code> 的 Topic，它有 3 个分区和 1 个副本。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -169,7 +169,7 @@
 </span></span><span class="line"><span class="cl"><span class="c1"># kafka-topics.sh --create --topic golang-test --partitions 3 --replication-factor 1 --zookeeper localhost:2181</span>
 </span></span></code></pre></div></div><h4 id="2-">2. 启动一个生产者发送消息</h4>
 <p>在终端启动一个生产者，然后你可以输入一些消息，每行一条。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
 2
 3
 4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kafka-console-producer.sh --topic golang-test --bootstrap-server localhost:9092
@@ -178,7 +178,7 @@
 </span></span><span class="line"><span class="cl">&gt;Learning Golang with Kafka
 </span></span></code></pre></div></div><h4 id="3-">3. 启动一个消费者接收消息</h4>
 <p>打开另一个终端，启动一个消费者来接收 <code>golang-test</code> Topic 的消息。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kafka-console-consumer.sh --topic golang-test --from-beginning --bootstrap-server localhost:9092
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kafka-console-consumer.sh --topic golang-test --from-beginning --bootstrap-server localhost:9092
 </span></span></code></pre></div></div><p><code>--from-beginning</code> 参数会让消费者从头开始消费该 Topic 的所有消息。你会看到生产者发送的三条消息被打印出来。</p>
 <h2 id="kafka--2">三、Kafka 面试高频考点</h2>
 <p>以下是面试中经常被问到的关于 Kafka 的问题，理解它们能帮你更好地掌握 Kafka 的核心设计。</p>
@@ -226,10 +226,10 @@
 <p>我们将使用 <code>confluent-kafka-go</code> 这个库，它是 <code>librdkafka</code>（一个高性能的 C 语言 Kafka 客户端）的 Go 语言封装，性能和稳定性都非常出色。</p>
 <h4 id="heading">准备工作</h4>
 <p>首先，安装 Go 语言环境和 Kafka。然后，获取 <code>confluent-kafka-go</code> 库：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go get github.com/confluentinc/confluent-kafka-go/v2/kafka
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go get github.com/confluentinc/confluent-kafka-go/v2/kafka
 </span></span></code></pre></div></div><h4 id="1-producer">1. 生产者（Producer）代码</h4>
 <p>创建一个名为 <code>producer.go</code> 的文件。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -370,7 +370,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><h4 id="2-consumer">2. 消费者（Consumer）代码</h4>
 <p>创建一个名为 <code>consumer.go</code> 的文件。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -555,6 +555,8 @@
 <p>希望这篇博客能成为你学习 Kafka 之路上的一个坚实起点。祝你学习愉快！</p>
 
 </article>
+
+
 
 
 
@@ -1196,6 +1198,30 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/sync%e5%8c%85%e8%af%a6%e8%a7%a3/">
+      <span class="related-card-title">sync包详解</span>
+      <span class="related-card-date">2025-08-30</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8aKafka%e6%9d%83%e5%a8%81%e6%8c%87%e5%8d%97%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《Kafka权威指南》记录</span>
+      <span class="related-card-date">2025-03-26</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/apollo%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+      <span class="related-card-title">apollo简单入门</span>
+      <span class="related-card-date">2025-09-14</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1589,6 +1615,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

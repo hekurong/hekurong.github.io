@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -121,7 +121,7 @@
 
   <h2 id="neo4j">neo4j启动与访问</h2>
 <p>启动neo4j</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
 2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">docker start test_neo4j
 </span></span><span class="line"><span class="cl">docker <span class="nb">exec</span> -it test_neo4j /bin/bash
 </span></span></code></pre></div></div><p>访问browser</p>
@@ -418,6 +418,8 @@ RETURN ID(movie),TYPE(movie)
 <p>在Neo4j中，“Id”是节点和关系的默认内部属性。 这意味着，当我们创建一个新的节点或关系时，Neo4j数据库服务器将为内部使用分配一个数字。 它会自动递增。</p>
 
 </article>
+
+
 
 
 
@@ -909,6 +911,8 @@ RETURN ID(movie),TYPE(movie)
 </nav>
 
 
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1302,6 +1306,7 @@ RETURN ID(movie),TYPE(movie)
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

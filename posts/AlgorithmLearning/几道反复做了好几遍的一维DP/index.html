@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -120,7 +120,7 @@
   </header>
 
   <h2 id="70httpsleetcodecnproblemsclimbing-stairsdescriptionenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/climbing-stairs/description/?envType=study-plan-v2&amp;envId=top-interview-150">70.爬楼梯</a></h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -141,7 +141,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>最简单的一维 DP 题，遇见属于白给，最标准的没有套路的 DP，完全不需要解释。</p>
 <h2 id="198httpsleetcodecnproblemshouse-robberenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/house-robber/?envType=study-plan-v2&amp;envId=top-interview-150">198.打家劫舍</a></h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -162,7 +162,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>经典打家劫舍，难度同样属于白给。</p>
 <h2 id="139-httpsleetcodecnproblemsword-break"><a href="https://leetcode.cn/problems/word-break/">139. 单词拆分</a></h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -206,7 +206,7 @@
 </span></span></code></pre></div></div><p>零钱兑换变体，完全背包问题。有一定难度，属于做了多少遍都会忘的题。</p>
 <p>别忘记一定会有一个双循环，内层循环用来遍历要求的东西。该题内层循环是遍历 <code>s[j:i]</code> 子串，同时与 <code>words</code> 词表进行比对。当 <code>cache[j]</code> 存在且 <code>words[s[j:i]]</code> 存在，也就意味着这两样东西可以拼接在一起，那此时 <code>cache[i]</code> 就可以存在了。</p>
 <h2 id="322-httpsleetcodecnproblemscoin-change"><a href="https://leetcode.cn/problems/coin-change/">322. 零钱兑换</a></h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -245,7 +245,7 @@
 <p>这里的内层循环是遍历 <code>coins</code>，同时做一个条件判断：当前外层的金额 <code>i</code> 是否不小于硬币面值 &amp;&amp; 金额 <code>i - coin</code> 可以被 <code>coins</code> 表示。如果通过判断，则通过状态转移方程 <code>cache[i] = min(cache[i], cache[i-coin]+1)</code> 来进行计算。</p>
 <h2 id="300-httpsleetcodecnproblemslongest-increasing-subsequence"><a href="https://leetcode.cn/problems/longest-increasing-subsequence/">300. 最长递增子序列</a></h2>
 <p>DP 解法：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -281,7 +281,7 @@
 </span></span></code></pre></div></div><p>DP 解法类似上面的 LC139 。</p>
 <p>要计算 <code>cache[i]</code> ，需要看 <code>i</code> 之前的位置 <code>j</code> ，如果 <code>nums[i] &gt; nums[j]</code> ，意味着 <code>nums[i]</code> 可以接在以 <code>nums[j]</code> 结尾的那个递增子序列的后面，再根据状态转移方程求解 <code>cache[i] = max(cache[i], cache[j]+1)</code> 。</p>
 <p>更优的二分查找解法：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -344,6 +344,8 @@
 </ul>
 
 </article>
+
+
 
 
 
@@ -1001,6 +1003,20 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/AlgorithmLearning/%e5%8a%a8%e6%80%81%e8%a7%84%e5%88%92%e7%bb%8f%e5%85%b8%e9%97%ae%e9%a2%98%e5%ad%a6%e4%b9%a0%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">动态规划经典问题学习记录</span>
+      <span class="related-card-date">2025-03-08</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1394,6 +1410,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

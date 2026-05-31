@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -215,7 +215,7 @@
 </ul>
 <p>这里选择的是 XLM-RoBERTa，预训练模型选择的是 <a href="https://huggingface.co/FacebookAI/xlm-roberta-large-finetuned-conll03-english">FacebookAI/xlm-roberta-large-finetuned-conll03-english · Hugging Face</a></p>
 <p>模型代码如下：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -311,7 +311,7 @@
 <li>初始化 Model，启动训练 Loop 。</li>
 </ol>
 <p>以下是本次训练所选取的各项参数：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -333,7 +333,7 @@
 </span></span><span class="line"><span class="cl">    <span class="s1">&#39;num_train_epochs&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>Loss 函数的计算方式在代码中：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">crf</span><span class="p">(</span><span class="n">emissions</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="o">.</span><span class="n">byte</span><span class="p">(),</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">crf</span><span class="p">(</span><span class="n">emissions</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="o">.</span><span class="n">byte</span><span class="p">(),</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 </span></span></code></pre></div></div><p>Optimizer 选择的是 AdamW，同时运用了 Learning Rate Scheduler 来完成暖机。</p>
 <h3 id="heading-3">验证结果</h3>
 <p><strong>关于这部分，数据不保证准确、全面，因此只作为参考，切勿用于其他用途。</strong></p>
@@ -454,6 +454,8 @@
 <p>（暂定）</p>
 
 </article>
+
+
 
 
 
@@ -1015,6 +1017,30 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/%e5%8d%8e%e4%b8%ba%e4%ba%91%e9%83%a8%e7%bd%b2%e8%b8%a9%e5%9d%91/">
+      <span class="related-card-title">华为云部署踩坑</span>
+      <span class="related-card-date">2024-11-05</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8a%e8%ae%a1%e7%bb%84KG%e3%80%8b%e8%af%be%e9%a2%98%e5%bc%80%e5%8f%91%e8%bf%87%e7%a8%8b%ef%bc%88%e4%b8%89%ef%bc%89/">
+      <span class="related-card-title">《计组KG》课题开发过程（三）</span>
+      <span class="related-card-date">2024-11-04</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8a%e8%ae%a1%e7%bb%84KG%e3%80%8b%e8%af%be%e9%a2%98%e5%bc%80%e5%8f%91%e7%95%aa%e5%a4%96%ef%bc%9a%e5%85%b3%e7%b3%bb%e6%8a%bd%e5%8f%96%e7%9a%84%e6%80%9d%e8%80%83%e8%bf%87%e7%a8%8b/">
+      <span class="related-card-title">《计组KG》课题开发番外：关系抽取的思考过程</span>
+      <span class="related-card-date">2024-08-24</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1408,6 +1434,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

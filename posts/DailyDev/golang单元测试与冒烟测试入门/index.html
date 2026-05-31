@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -184,7 +184,7 @@
 <h4 id="-testing">示例：使用标准库 <code>testing</code></h4>
 <p>假设我们有一个简单的加法函数：</p>
 <p><strong><code>math.go</code></strong></p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -197,7 +197,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>现在，我们为它编写一个单元测试：</p>
 <p><strong><code>math_test.go</code></strong></p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -242,10 +242,10 @@
 <h3 id="part-3----stretchrtestify">Part 3: 让测试更优雅 - <code>stretchr/testify</code></h3>
 <p>虽然标准库够用，但 <code>if result != expected</code> 这样的断言写多了会有些繁琐。<code>stretchr/testify</code> 库提供了更丰富的语义化断言，让代码意图一目了然。</p>
 <p>安装 <code>testify</code>：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go get github.com/stretchr/testify
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go get github.com/stretchr/testify
 </span></span></code></pre></div></div><p>用 <code>testify/assert</code> 重写上面的测试：</p>
 <p><strong><code>math_test.go</code> (testify version)</strong></p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -284,7 +284,7 @@
 <h4 id="heading-3">示例：测试一个健康检查接口</h4>
 <p>假设我们有这样一个 HTTP Handler：</p>
 <p><strong><code>server.go</code></strong></p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -325,7 +325,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>我们的冒烟测试就是要确保 <code>/health</code> 接口能返回 <code>200 OK</code>。</p>
 <p><strong><code>server_test.go</code></strong></p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -381,6 +381,8 @@
 </span></span></code></pre></div></div><p>这个测试启动了我们的路由，模拟了一次对 <code>/health</code> 的真实HTTP请求，并检查了响应码和响应体。它验证了“HTTP服务启动并能正确响应核心接口”这一关键链路，是一个典型的冒烟测试。</p>
 
 </article>
+
+
 
 
 
@@ -1026,6 +1028,30 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/sync%e5%8c%85%e8%af%a6%e8%a7%a3/">
+      <span class="related-card-title">sync包详解</span>
+      <span class="related-card-date">2025-08-30</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/apollo%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+      <span class="related-card-title">apollo简单入门</span>
+      <span class="related-card-date">2025-09-14</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/kafka%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+      <span class="related-card-title">Kafka简单入门</span>
+      <span class="related-card-date">2025-09-13</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1419,6 +1445,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

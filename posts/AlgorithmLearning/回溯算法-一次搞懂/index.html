@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -126,7 +126,7 @@
 <li><strong>撤销选择 (Unchoose):</strong> 当下一层的探索全部结束后（无论是找到了解还是走到了死路），<strong>退回到当前状态</strong>，撤销刚才的选择，然后尝试下一个可用的选择。</li>
 </ol>
 <p>几乎所有的回溯问题，都可以用下面这个伪代码模板来解决：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -182,7 +182,7 @@
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><h2 id="46----leetcodehttpsleetcodecnproblemspermutationsdescriptionenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/permutations/description/?envType=study-plan-v2&amp;envId=top-interview-150">46. 全排列 - 力扣（LeetCode）</a></h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -235,7 +235,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>该题是非常标准的回溯题，只在套路代码上加了一个 visited 数组用来记录选择结果。</p>
 <h2 id="39----leetcodehttpsleetcodecnproblemscombination-sumdescriptionenvtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/combination-sum/description/?envType=study-plan-v2&amp;envId=top-interview-150">39. 组合总和 - 力扣（LeetCode）</a></h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -288,7 +288,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>为了避免产生重复的组合需要在递归时传入一个<strong>起始索引</strong>，规定下一次搜索只能从这个索引及之后的元素中选择。该题在 dfs 函数中额外加上一个入参 leftSum 表示剩余和，代表选择的结果。</p>
 <h2 id="22----leetcodehttpsleetcodecnproblemsgenerate-parenthesessubmissions666059029envtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/generate-parentheses/submissions/666059029/?envType=study-plan-v2&amp;envId=top-interview-150">22. 括号生成 - 力扣（LeetCode）</a></h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -346,7 +346,7 @@
 </span></span></code></pre></div></div><p>该题就是回溯套路的变种，因为此类题的选择面临两个，之前的两道题都是单一的选择某个数然后放进 path ，但是此题不一样，必须对每一个选择进行一次选择-dfs-回溯流程。</p>
 <p>先是选择左括号，然后 dfs，最后进行了隐式回溯（在后面第二次选择中前前次选择的结果进行了覆盖）。当左括号数量达到预定数量后，开始选择右括号，执行选择-dfs-回溯流程。</p>
 <h2 id="79----leetcodehttpsleetcodecnproblemsword-searchsubmissions666060820envtypestudy-plan-v2envidtop-interview-150"><a href="https://leetcode.cn/problems/word-search/submissions/666060820/?envType=study-plan-v2&amp;envId=top-interview-150">79. 单词搜索 - 力扣（LeetCode）</a></h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -446,6 +446,8 @@
 </ol>
 
 </article>
+
+
 
 
 
@@ -1101,6 +1103,8 @@
 </nav>
 
 
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1494,6 +1498,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

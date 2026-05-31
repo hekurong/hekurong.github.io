@@ -867,6 +867,23 @@ pre:hover .copy-btn {
   opacity: 1;
 }
 
+/* Language label */
+.code-wrapper[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0;
+  right: 3.5rem;
+  padding: 0.15em 0.7em;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  background: var(--color-code-filename-bg);
+  border-radius: 0 0 4px 4px;
+  opacity: 0.7;
+  z-index: 2;
+  text-transform: lowercase;
+}
+
 /* Line highlight — driven by data-hl-lines attribute + JS */
 .code-body pre.chroma[data-hl-lines] .hl {
   display: inline-block;
@@ -2274,4 +2291,94 @@ body,
   object-fit: contain;
   border-radius: 4px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Related posts */
+.related-posts {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border-light);
+}
+.related-title {
+  font-size: 1.2rem;
+  color: var(--color-heading);
+  margin-bottom: 1rem;
+}
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+.related-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: border-color var(--transition-fast);
+}
+.related-card:hover {
+  border-color: var(--color-link);
+  text-decoration: none;
+}
+.related-card-title {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.3rem;
+}
+.related-card-date {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+}
+
+/* Series navigation */
+.series-nav {
+  margin-top: 1.5rem;
+  padding: 1rem 1.2rem;
+  background: var(--color-bg-alt);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-link);
+}
+.series-label {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.6rem;
+  display: block;
+  font-family: var(--font-ui);
+}
+.series-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.series-link {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* ----------------------------------------------------------------- */
+/*  29. Breadcrumb                                                    */
+/* ----------------------------------------------------------------- */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+.breadcrumb a {
+  color: var(--color-text-secondary);
+}
+.breadcrumb a:hover {
+  color: var(--color-link);
+}
+.breadcrumb-sep {
+  color: var(--color-border);
+}
+.breadcrumb-current {
+  color: var(--color-heading);
+  font-weight: 600;
 }

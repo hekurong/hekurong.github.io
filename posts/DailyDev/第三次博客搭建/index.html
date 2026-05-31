@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function() {
     E --&gt; F[v0.5.1 工作流简化]
 </pre>
 <h3 id="v010--">v0.1.0 — 核心骨架</h3>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="mermaid"><div class="code-ln"><pre><code>1
 2
 3
 4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1">// chenhai 最初的入口
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>一个下午搭好 6 个 internal 包：config / content / theme / build / index / server。第二天就能跑通 <code>chenhai build</code>。</p>
 <h3 id="v020--">v0.2.0 — 功能完善</h3>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -244,7 +244,7 @@ $$</span></p>
 </ul>
 <div class="admonition admonition-tip"><div class="admonition-title">提示</div><div class="admonition-content"><p>KaTeX 和 Mermaid 的 CDN 注入逻辑是通过检测页面内容实现的。渲染完 HTML 后，如果发现数学公式或图表标记，就在 <code>&lt;head&gt;</code> 中注入对应的 JS/CSS 引用。这意味着没有公式的页面不会加载 KaTeX，零开销。</p>
 </div></div><h3 id="v040--">v0.4.0 — 主题生态</h3>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -256,7 +256,7 @@ $$</span></p>
 </span></span></code></pre></div></div><p>外部主题只需写想定制的文件——缺失的模板自动回退到镇海。</p>
 <div class="admonition admonition-warning"><div class="admonition-title">注意</div><div class="admonition-content"><p>主题回退机制有个坑：<code>.Site.BuildTagCloud()</code> 在 <code>TemplateData.Site</code> 还是 <code>interface{}</code> 的时候没法在模板中调用。后来把类型改成了 <code>*index.Site</code> 才解决。</p>
 </div></div><h3 id="v050--">v0.5.0 — 体验打磨</h3>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
 2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 一句话部署</span>
 </span></span><span class="line"><span class="cl">chenhai deploy -m <span class="s2">&#34;add: 新文章&#34;</span>
 </span></span></code></pre></div></div><p>核心改动：增量构建（SHA256 缓存）、<code>chenhai init</code> / <code>deploy</code>、构建进度日志、Chroma CSS class 亮暗双模、JetBrains Mono 代码字体。</p>
@@ -264,7 +264,7 @@ $$</span></p>
 <p>从 Hugo + PaperMod 迁移到 Chenhai + 镇海，涉及 91 篇文章的 Front Matter 转换。</p>
 <h3 id="front-matter-">Front Matter 对比</h3>
 <p>Hugo + PaperMod：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -302,7 +302,7 @@ $$</span></p>
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">ShowPostNavLinks</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
 </span></span></span></code></pre></div></div><p>Chenhai 精简后：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -423,6 +423,8 @@ $$</span></p>
 </blockquote>
 
 </article>
+
+
 
 
 
@@ -1087,6 +1089,8 @@ $$</span></p>
 </nav>
 
 
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1480,6 +1484,7 @@ $$</span></p>
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

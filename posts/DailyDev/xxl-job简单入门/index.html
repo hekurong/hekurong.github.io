@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -217,12 +217,12 @@
 </li>
 <li>
 <p>安装 Go client 库：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go get github.com/xxl-job/xxl-job-executor-go
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go get github.com/xxl-job/xxl-job-executor-go
 </span></span></code></pre></div></div></li>
 </ol>
 <h4 id="heading-1">示例代码</h4>
 <p>创建一个 <code>main.go</code> 文件。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -348,7 +348,7 @@
 </li>
 <li>
 <p>运行 Go 程序：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go run main.go
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">go run main.go
 </span></span></code></pre></div></div></li>
 <li>
 <p>观察 Admin 界面，你会看到 <code>xxl-job-executor-golang</code> 执行器下有一个实例注册上来。</p>
@@ -361,6 +361,8 @@
 <p>XXL-JOB 以其“简单、可靠”的特质，完美地解决了分布式环境下的任务调度痛点。它的架构清晰，不引入过多复杂组件，使得开发者可以快速上手并将其集成到现有系统中。无论是简单的定时提醒，还是复杂的大数据分片处理，XXL-JOB 都能提供稳定、高效的调度服务。通过本文的学习，你不仅掌握了其核心原理，更具备了在 Go 生态中使用它的实战能力，为你的系统构建强大的后台调度能力。</p>
 
 </article>
+
+
 
 
 
@@ -1000,6 +1002,30 @@
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/sync%e5%8c%85%e8%af%a6%e8%a7%a3/">
+      <span class="related-card-title">sync包详解</span>
+      <span class="related-card-date">2025-08-30</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/apollo%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+      <span class="related-card-title">apollo简单入门</span>
+      <span class="related-card-date">2025-09-14</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/kafka%e7%ae%80%e5%8d%95%e5%85%a5%e9%97%a8/">
+      <span class="related-card-title">Kafka简单入门</span>
+      <span class="related-card-date">2025-09-13</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1393,6 +1419,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

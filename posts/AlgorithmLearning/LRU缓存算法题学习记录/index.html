@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -172,7 +172,7 @@
 </ul>
 <h2 id="heading">代码实现</h2>
 <h4 id="1-">1. 定义数据结构</h4>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -196,7 +196,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Pre</span><span class="p">,</span> <span class="nx">Next</span> <span class="o">*</span><span class="nx">Node</span>         <span class="c1">// Pointers to the previous and next nodes
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></div></div><h4 id="2--constructor">2. 初始化 <code>Constructor</code></h4>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -226,7 +226,7 @@
 <li><code>addToHead(node *Node)</code>: 将一个节点添加到链表头部（<code>head</code> 之后）。</li>
 <li><code>moveToHead(node *Node)</code>: 组合技，先移除再添加到头部，用于更新节点为“最新”。</li>
 </ul>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -272,7 +272,7 @@
 <li>如果存在，我们拿到了节点 <code>node</code>。这个节点刚刚被访问，所以要把它更新为“最新”。直接调用 <code>moveToHead(node)</code>。</li>
 <li>返回 <code>node.Val</code>。</li>
 </ol>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -313,7 +313,7 @@
 </ul>
 </li>
 </ol>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -399,7 +399,7 @@
 <h3 id="heading-3">代码实现</h3>
 <h4 id="1--1">1. 升级数据结构</h4>
 <p><code>Node</code> 结构体需要增加一个字段来存储它的“死亡时间”。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -431,7 +431,7 @@
 </span></span><span class="line"><span class="cl">    <span class="nx">ttl</span>        <span class="kt">int64</span> <span class="c1">// Time-to-live in seconds for each entry.
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></div></div><h4 id="2--constructor-1">2. 修改 <code>Constructor</code></h4>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -458,7 +458,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><h4 id="3--get-">3. 修改 <code>Get</code> 方法</h4>
 <p>这是变化最大的地方。在找到节点后，我们必须先检查它的存活状态。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -495,7 +495,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><h4 id="4--put-">4. 修改 <code>Put</code> 方法</h4>
 <p><code>Put</code> 的逻辑也需要更新，无论是插入还是更新，都要设置新的过期时间。</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -556,6 +556,8 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div>
 </article>
+
+
 
 
 
@@ -1205,6 +1207,8 @@
 </nav>
 
 
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1598,6 +1602,7 @@
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

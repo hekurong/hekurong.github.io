@@ -16,7 +16,7 @@
 
 <link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 
 
@@ -156,7 +156,7 @@ LubanCat5的讲解：
 <ol>
 <li>
 <p>安装docker。这里以Ubuntu为例：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="shell"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -228,7 +228,7 @@ LubanCat5的讲解：
 </ol>
 <h2 id="roothmi-datadbfile">定时清理/root/hmi_data/db/file文件夹的脚本</h2>
 <p>假设脚本放在<code>/home/cat/Downloads/manage_file.sh</code>：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code> 1
+<div class="code-wrapper" data-lang="shell"><div class="code-ln"><pre><code> 1
  2
  3
  4
@@ -399,7 +399,7 @@ LubanCat5的讲解：
 <ol>
 <li>
 <p><strong>设置脚本执行权限</strong>：</p>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">chmod +x /home/cat/Downloads/manage_file.sh
+<div class="code-wrapper" data-lang="shell"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">chmod +x /home/cat/Downloads/manage_file.sh
 </span></span></code></pre></div></div></li>
 <li>
 <p><strong>配置 Crontab</strong>： 执行 <code>sudo crontab -e</code> 并添加以下行（设定每 5 分钟检查一次）：</p>
@@ -422,7 +422,7 @@ sudo fallocate -l 1100M /root/hmi_data/db/file/test_data.img
 <li>再用 <code>ls</code> 检查，那个 1.1GB 的文件应该消失了。</li>
 </ul>
 <h2 id="heading-3">快捷方式</h2>
-<div class="code-wrapper"><div class="code-ln"><pre><code>1
+<div class="code-wrapper" data-lang="shell"><div class="code-ln"><pre><code>1
 2
 3
 4
@@ -439,6 +439,8 @@ sudo fallocate -l 1100M /root/hmi_data/db/file/test_data.img
 </span></span><span class="line"><span class="cl">ln -s /root/hmi_data/db/file /home/cat/Desktop/HMI_Data
 </span></span></code></pre></div></div>
 </article>
+
+
 
 
 
@@ -1102,6 +1104,20 @@ sudo fallocate -l 1100M /root/hmi_data/db/file/test_data.img
 </nav>
 
 
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/%e4%bf%a1%e4%b9%9f%e5%ae%9e%e4%b9%a0%e5%86%85%e5%ae%b9%e6%95%b4%e7%90%86/">
+      <span class="related-card-title">信也实习内容整理</span>
+      <span class="related-card-date">2025-10-02</span>
+    </a>
+    
+  </div>
+</section>
+
+
   </div>
   
 <aside class="sidebar-area">
@@ -1495,6 +1511,7 @@ sudo fallocate -l 1100M /root/hmi_data/db/file/test_data.img
 
 
 <script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
 </body>

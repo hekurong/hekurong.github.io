@@ -91,86 +91,38 @@
   }
 
   /* ================================================================ */
-  /*  3. Fuzzy Search + Scoring                                       */
+  /*  3. Fuse.js Fuzzy Search                                         */
   /* ================================================================ */
 
-  function scoreMatch(entry, query) {
-    var q = query.toLowerCase();
-    var title = (entry.title || "").toLowerCase();
-    var summary = (entry.summary || "").toLowerCase();
-    var content = (entry.content || "").toLowerCase();
-    var tags = (entry.tags || []).join(" ").toLowerCase();
-    var category = (entry.category || "").toLowerCase();
+  var fuseOptions = {
+    keys: [
+      { name: "title", weight: 0.4 },
+      { name: "summary", weight: 0.2 },
+      { name: "content", weight: 0.1 },
+      { name: "tags", weight: 0.2 },
+      { name: "category", weight: 0.1 }
+    ],
+    threshold: 0.4,
+    includeScore: true,
+    ignoreLocation: true
+  };
 
-    if (
-      title.indexOf(q) === -1 &&
-      summary.indexOf(q) === -1 &&
-      content.indexOf(q) === -1 &&
-      tags.indexOf(q) === -1 &&
-      category.indexOf(q) === -1
-    ) {
-      return 0;
+  var _fuse = null;
+
+  function getFuse() {
+    if (!_fuse && searchIndex.length > 0) {
+      _fuse = new Fuse(searchIndex, fuseOptions);
     }
-
-    var score = 0;
-    if (title.indexOf(q) !== -1) score += 100;
-    if (title.indexOf(q) === 0) score += 50;
-    if (tags.indexOf(q) !== -1) score += 30;
-    if (category.indexOf(q) !== -1) score += 20;
-    if (summary.indexOf(q) !== -1) score += 15;
-    if (content.indexOf(q) !== -1) score += 5;
-    if (title === q) score += 80;
-
-    var tagArr = entry.tags || [];
-    for (var t = 0; t < tagArr.length; t++) {
-      if (tagArr[t].toLowerCase() === q) {
-        score += 40;
-        break;
-      }
-    }
-
-    return score;
+    return _fuse;
   }
 
   function search(query) {
     if (!query || query.trim() === "") return [];
+    var fuse = getFuse();
+    if (!fuse) return [];
 
-    var q = query.trim().toLowerCase();
-    var terms = q.split(/\s+/).filter(function (t) { return t.length > 0; });
-    var results = [];
-
-    for (var i = 0; i < searchIndex.length; i++) {
-      var entry = searchIndex[i];
-      var totalScore = 0;
-      var allTermsMatch = true;
-
-      for (var ti = 0; ti < terms.length; ti++) {
-        var termScore = scoreMatch(entry, terms[ti]);
-        if (termScore === 0) {
-          allTermsMatch = false;
-          break;
-        }
-        totalScore += termScore;
-      }
-
-      if (!allTermsMatch) continue;
-      totalScore += scoreMatch(entry, q);
-
-      if (entry.date) {
-        var dateParts = entry.date.split("-");
-        if (dateParts.length === 3) {
-          var year = parseInt(dateParts[0], 10);
-          var month = parseInt(dateParts[1], 10);
-          var recencyScore = (year - 2020) * 2 + month / 12;
-          if (recencyScore > 0) totalScore += recencyScore;
-        }
-      }
-
-      results.push({ entry: entry, score: totalScore });
-    }
-
-    results.sort(function (a, b) { return b.score - a.score; });
-    return results.map(function (r) { return r.entry; });
+    var results = fuse.search(query.trim());
+    return results.map(function (r) { return r.item; });
   }
 
   /* ================================================================ */
