@@ -2358,6 +2358,8 @@ body,
   list-style: none;
   padding: 0;
   margin: 0;
+  max-height: 14rem;
+  overflow-y: auto;
 }
 .series-playlist-item {
   border-radius: 4px;
@@ -2379,6 +2381,9 @@ body,
   text-decoration: none;
   border-radius: 4px;
   transition: all var(--transition-fast);
+}
+.series-playlist-link:visited {
+  color: var(--color-text);
 }
 .series-playlist-link:hover {
   background: var(--color-code-filename-bg);
