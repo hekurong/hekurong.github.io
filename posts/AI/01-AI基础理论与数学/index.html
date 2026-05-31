@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>AI基础理论与数学 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="stylesheet" href="/assets/css/style.css?v=14">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">AI基础理论与数学</h1>
+    <div class="article-meta">
+      <time datetime="2026-06-01">2026-06-01</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="01--ai">01 — AI基础理论与数学</h1>
+<blockquote>
+<p>适用于AI应用开发面试的机器学习/深度学习基础理论 + 面试常考数学
+更新至 2025-2026 年最新知识</p>
+</blockquote>
+<hr>
+<h2 id="heading">一、概述</h2>
+<p>本篇是AI应用开发面试的知识地基。无论面试的是大模型应用开发、算法工程还是AI平台架构，本篇内容都是必考项。近年来面试趋势显示：</p>
+<ul>
+<li><strong>Transformer/注意力机制</strong> 成为面试绝对核心（已经取代传统的CNN/RNN考点）</li>
+<li><strong>损失函数与优化器</strong> 侧重理解性考察（为什么用这个、什么时候换那个）</li>
+<li><strong>数学基础</strong> 的考察更加场景化（从纯推导转为&quot;讲清楚概念和应用&quot;）</li>
+<li><strong>2025-2026年新增热点</strong>：SwiGLU激活函数、LAMB优化器、扩散模型的KL散度解释</li>
+</ul>
+<hr>
+<h2 id="heading-1">二、知识点详解</h2>
+<h3 id="21-">2.1 机器学习三要素（模型、策略、算法）</h3>
+<p>李航《统计学习方法》中的经典框架：</p>
+<table>
+<thead>
+<tr>
+<th>要素</th>
+<th>定义</th>
+<th>面试要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>模型</strong></td>
+<td>假设空间，即输入到输出的映射集合</td>
+<td>区分参数模型（线性回归）与非参数模型（KNN）；说说模型容量与过拟合的关系</td>
+</tr>
+<tr>
+<td><strong>策略</strong></td>
+<td>选择最优模型的准则，即损失函数 + 正则化项</td>
+<td>经验风险最小化 vs 结构风险最小化；怎么加正则化项</td>
+</tr>
+<tr>
+<td><strong>算法</strong></td>
+<td>求解最优模型的具体计算方法</td>
+<td>凸优化 vs 非凸优化；SGD / Adam 的收敛性保证</td>
+</tr>
+</tbody>
+</table>
+<p><strong>2025年新认知</strong>：在大模型时代，&ldquo;模型&quot;的层次更加丰富——预训练基底 + 适配器(LoRA) + 提示模板，三者共同构成实际部署的模型。</p>
+<p><strong>面试常问</strong>：&ldquo;举例说明模型、策略、算法三者如何体现在GPT的训练中？&rdquo;</p>
+<hr>
+<h3 id="22-">2.2 三大学习范式</h3>
+<h4 id="supervised-learning">监督学习（Supervised Learning）</h4>
+<ul>
+<li>输入-输出对 (x, y)，目标是学习映射 f: X -&gt; Y</li>
+<li>典型任务：分类、回归、序列标注</li>
+<li>大模型应用：SFT（监督微调）</li>
+</ul>
+<h4 id="unsupervised-learning">无监督学习（Unsupervised Learning）</h4>
+<ul>
+<li>只有输入 x，没有标签 y，目标是发现数据内在结构</li>
+<li>典型任务：聚类（K-Means, DBSCAN）、降维（PCA, t-SNE）、密度估计</li>
+<li>大模型应用：预训练（Causal LM本质上是无监督/自监督学习）、对比学习</li>
+</ul>
+<h4 id="reinforcement-learning">强化学习（Reinforcement Learning）</h4>
+<ul>
+<li>Agent 在环境中行动，获得奖励信号，目标是最大化累计奖励</li>
+<li>核心：状态 S、动作 A、奖励 R、策略 π、价值函数 V/Q</li>
+<li>大模型应用：RLHF（PPO算法）、DPO、GRPO（DeepSeek-R1使用的）</li>
+</ul>
+<p><strong>2025年趋势</strong>：RLHF -&gt; DPO -&gt; GRPO 的演进路径是高频考点。需要理解为什么DeepSeek-R1放弃了RLHF中的奖励模型。</p>
+<hr>
+<h3 id="23-">2.3 损失函数</h3>
+<p>损失函数是<strong>策略</strong>的核心组成部分，面试必问。</p>
+<h4 id="cross-entropy-loss">交叉熵损失（Cross-Entropy Loss）</h4>
+<p>分类任务中最常用的损失函数：</p>
+<pre><code>L = -Σ y_i * log(p_i)
+</code></pre>
+<p>其中 y_i 是真实标签（one-hot或概率分布），p_i 是模型预测的概率分布。</p>
+<ul>
+<li>
+<p><strong>二分类特例</strong>（Binary Cross-Entropy / Log Loss）：</p>
+<pre><code>L = -[y * log(p) + (1-y) * log(1-p)]
+</code></pre>
+</li>
+<li>
+<p><strong>2025年常见用法</strong>：LLM训练中交叉熵只对&quot;输出token&quot;计算，不对输入token计算损失（这是很多人忽略的细节）</p>
+</li>
+</ul>
+<h4 id="mse--l2-loss">均方误差（MSE / L2 Loss）</h4>
+<p>回归任务标准损失：</p>
+<pre><code>L = (y - ŷ)²
+</code></pre>
+<p><strong>面试注意</strong>：MSE配合Sigmoid在分类任务中的梯度消失问题（交叉熵的梯度更陡，收敛更快）。</p>
+<h4 id="klkullback-leibler-divergence">KL散度（Kullback-Leibler Divergence）</h4>
+<p>衡量两个概率分布之间差异的非对称度量：</p>
+<pre><code>KL(P || Q) = Σ P(i) * log(P(i) / Q(i))
+</code></pre>
+<ul>
+<li>KL(Q || P) ≠ KL(P || Q) — 不对称性</li>
+<li>在蒸馏中，教师模型输出分布 Q，学生模型 P，使用 KL(P || Q) 或反向KL取决于实际需求</li>
+<li><strong>2025热点</strong>：DPO中隐式地最小化了偏好数据的KL散度</li>
+</ul>
+<h4 id="hinge-loss">Hinge Loss</h4>
+<p>SVM中使用，也用于某些对比学习场景：</p>
+<pre><code>L = max(0, 1 - y * ŷ)
+</code></pre>
+<p>其中 y ∈ {-1, 1}。</p>
+<h4 id="contrastive-loss--infonce">对比损失（Contrastive Loss / InfoNCE）</h4>
+<p>SimCLR、CLIP等对比学习模型的核心损失：</p>
+<pre><code>L = -log( exp(sim(q, k⁺)/τ) / Σ exp(sim(q, k)/τ) )
+</code></pre>
+<p><strong>2025年</strong>：CLIP的对比损失在多模态大模型中仍被广泛使用。InfoNCE损失成为连接文本-图像的核心技术。</p>
+<hr>
+<h3 id="24-">2.4 优化器</h3>
+<h4 id="sgd">SGD（随机梯度下降）</h4>
+<p>最基本优化器：</p>
+<pre><code>θ = θ - η * ∇L(θ)
+</code></pre>
+<ul>
+<li>问题：震荡严重、收敛慢、对学习率敏感</li>
+<li>改进：Momentum（动量法）</li>
+</ul>
+<h4 id="adamadaptive-moment-estimation">Adam（Adaptive Moment Estimation）</h4>
+<p>2015年提出，至今仍是主力优化器之一：</p>
+<pre><code>m = β₁ * m + (1-β₁) * g    # 一阶动量（均值）
+v = β₂ * v + (1-β₂) * g²   # 二阶动量（方差）
+θ = θ - η * m / (√v + ε)
+</code></pre>
+<ul>
+<li>优点：自适应学习率、对超参数不敏感、适合非平稳目标</li>
+<li>缺点：在Transformer训练中可能不收敛（已有论文证明）</li>
+</ul>
+<h4 id="adamwadam-with-decoupled-weight-decay">AdamW（Adam with Decoupled Weight Decay）</h4>
+<p>2019年提出，当前LLM训练的标准优化器：</p>
+<p><strong>关键改进</strong>：将权重衰减（Weight Decay）从L2正则化中分离出来，不再直接在梯度中加 λ*θ，而是单独在参数更新时做衰减：</p>
+<pre><code># AdamW 更新逻辑（简化伪代码）
+m = β₁ * m + (1-β₁) * g
+v = β₂ * v + (1-β₂) * g²
+θ = θ - η * m / (√v + ε) - η * λ * θ   # 注意：最后一项是独立的权重衰减
+</code></pre>
+<p>面试中<strong>高频问题</strong>：为什么LLM训练用AdamW而不是Adam？
+答：Adam的L2正则化会与自适应学习率产生耦合，导致正则化效果与学习率相关。AdamW解耦后效果显著更好，特别是在GPT-2/BERT/Llama等Transformer模型中。</p>
+<h4 id="lamblayer-wise-adaptive-moments">LAMB（Layer-wise Adaptive Moments）</h4>
+<p>Google 2019年提出，用于大规模Batch训练（如BERT在64K batch size下训练）：</p>
+<pre><code># 核心思想：逐层调整学习率
+r = ||θ|| / ||m / (√v + ε)||     # 信任比率（trust ratio）
+θ = θ - η * r * m / (√v + ε)     # 用r调整每层的学习率
+</code></pre>
+<ul>
+<li>在超大Batch（64K+）训练中稳定收敛</li>
+<li>在LLaMA等模型的大规模预训练中仍有使用</li>
+</ul>
+<h4 id="2025">2025年优化器新进展</h4>
+<ul>
+<li><strong>Sophia</strong>：使用随机Hessian对角估计的优化器，比AdamW快2倍</li>
+<li><strong>LOMO (Low-Memory Optimizer)</strong>：减少优化器状态的显存占用，适合全参数微调</li>
+<li><strong>GaLA</strong> (2025)：梯度对齐优化，在MoE训练中表现突出</li>
+</ul>
+<hr>
+<h3 id="25-">2.5 过拟合与正则化</h3>
+<h4 id="l1--l2-">L1 / L2 正则化</h4>
+<ul>
+<li><strong>L2 (Ridge)</strong>：损失函数加 λ * ||θ||²。权重趋向于小但不为零。</li>
+<li><strong>L1 (Lasso)</strong>：损失函数加 λ * |θ|。权重趋向于稀疏（部分变为零）。</li>
+</ul>
+<p><strong>面试重点</strong>：L1为什么会产生稀疏解？答：L1正则项在0点不可导，梯度下降中某次更新后权重可以精确归零。从贝叶斯角度看，L1对应Laplace先验，L2对应Gaussian先验。</p>
+<h4 id="dropout">Dropout</h4>
+<p>训练时随机丢弃部分神经元（比例为 p）：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># PyTorch 实现方式</span>
+</span></span><span class="line"><span class="cl"><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># 保留 90% 的神经元</span>
+</span></span><span class="line"><span class="cl"><span class="n">output</span> <span class="o">=</span> <span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>           <span class="c1"># 训练时随机丢弃，推理时缩放</span>
+</span></span></code></pre></div></div><ul>
+<li><strong>2025更新</strong>：大模型中 Dropout 使用极少。GPT-3/Llama 等模型在预训练中通常不使用Dropout（因为数据量和模型容量足够大，过拟合不严重）。但在小规模 SFT 数据中，Dropout 仍有使用。</li>
+</ul>
+<h4 id="batch-normalization-bn">Batch Normalization (BN)</h4>
+<p>对每个batch在 channel 维度做归一化：</p>
+<pre><code>ŷ = (x - μ_batch) / √(σ²_batch + ε)
+y = γ * ŷ + β
+</code></pre>
+<ul>
+<li>优点：加速收敛、缓解梯度消失、有一定正则化效果</li>
+<li>缺点：对batch size敏感（小batch效果差）；训练/推理行为不一致（推理时用全局统计量）</li>
+</ul>
+<h4 id="layer-normalization-ln">Layer Normalization (LN)</h4>
+<p>对每个样本在 feature 维度做归一化：</p>
+<pre><code>ŷ = (x - μ_sample) / √(σ²_sample + ε)
+y = γ * ŷ + β
+</code></pre>
+<ul>
+<li><strong>为什么Transformer用LN而不是BN</strong>：NLP任务中不同样本的序列长度不同，BN的batch统计不稳定。LN对每个样本独立归一化，对batch size不敏感。</li>
+<li><strong>Pre-LN vs Post-LN</strong>：现代LLM几乎全部使用Pre-LN（残差之前做LN），训练更稳定。</li>
+</ul>
+<h4 id="rmsnorm-root-mean-square-layer-normalization">RMSNorm (Root Mean Square Layer Normalization)</h4>
+<p>LLaMA系列使用的简化版LN：</p>
+<pre><code>ŷ = x / √(mean(x²) + ε) * γ
+</code></pre>
+<ul>
+<li>去掉了LN的均值中心化步骤，计算更高效</li>
+<li>LLaMA 1/2/3、Mistral、Qwen 等都使用 RMSNorm</li>
+</ul>
+<hr>
+<h3 id="26-">2.6 激活函数</h3>
+<h4 id="relu-">ReLU 系列</h4>
+<p><strong>ReLU（Rectified Linear Unit）</strong>：</p>
+<pre><code>f(x) = max(0, x)
+</code></pre>
+<ul>
+<li>优点：计算简单、缓解梯度消失（正区间梯度为1）、稀疏激活</li>
+<li>缺点：Dead ReLU问题（负区间梯度为0，神经元可能永久死亡）</li>
+</ul>
+<p><strong>Leaky ReLU</strong>：</p>
+<pre><code>f(x) = max(αx, x), α 通常为 0.01
+</code></pre>
+<ul>
+<li>解决Dead ReLU问题，负区间有小的梯度</li>
+</ul>
+<p><strong>PReLU (Parametric ReLU)</strong>：</p>
+<ul>
+<li>与Leaky ReLU类似，但 α 是可学习的参数</li>
+</ul>
+<h4 id="gelugaussian-error-linear-unit">GELU（Gaussian Error Linear Unit）</h4>
+<p>2016年提出，2018年BERT使用后成为NLP主流激活函数：</p>
+<pre><code>GELU(x) = x * Φ(x)
+</code></pre>
+<p>其中 Φ(x) 是标准正态分布的CDF。</p>
+<p>近似计算（常用）：</p>
+<pre><code>GELU(x) ≈ 0.5 * x * (1 + tanh(√(2/π) * (x + 0.044715 * x³)))
+</code></pre>
+<p><strong>为什么GELU比ReLU好</strong>：GELU是ReLU的平滑版本，且带有概率解释（输入的门控机制），在Transformer中表现更优。</p>
+<h4 id="swish--silu">Swish / SiLU</h4>
+<p>Google 2017年提出，定义：</p>
+<pre><code>Swish(x) = x * σ(βx)
+</code></pre>
+<p>其中 σ 是 sigmoid 函数。当 β=1 时称为 SiLU（Sigmoid Linear Unit）。</p>
+<h4 id="swigluswish-gated-linear-unit">SwiGLU（Swish-Gated Linear Unit）</h4>
+<p><strong>2025年最热门的激活函数</strong>，PaLM、LLaMA、Mistral、Qwen、DeepSeek全线使用。</p>
+<pre><code>SwiGLU(x, W, V, W_out) = (Swish(xW) ⊙ xV) * W_out
+</code></pre>
+<p>其中 ⊙ 是element-wise乘法。本质是GLU（门控线性单元）的一个变体，门控使用Swish激活。</p>
+<p><strong>为什么LLM都用SwiGLU</strong>：</p>
+<ol>
+<li>门控机制让网络有更强的表达能力</li>
+<li>Swish平滑非零梯度帮助训练稳定</li>
+<li>相比ReLU，在语言建模任务上稳定提升约0.5-1.0 perplexity</li>
+</ol>
+<p><strong>注意</strong>：SwiGLU的FFN层需要三个权重矩阵（W, V, W_out），参数量比标准FFN多33%。因此一些模型（如LLaMA）使用&quot;down_proj, gate_proj, up_proj&quot;的命名。</p>
+<hr>
+<h3 id="27-">2.7 注意力机制</h3>
+<p>注意力机制的核心思想：<strong>让模型关注输入中最重要的部分</strong>。</p>
+<h4 id="scaled-dot-product-attention">Scaled Dot-Product Attention</h4>
+<p>公式（Attention Is All You Need, 2017）：</p>
+<pre><code>Attention(Q, K, V) = softmax(QKᵀ / √d_k) * V
+</code></pre>
+<p>其中 Q（Query）、K（Key）、V（Value）都是从输入通过线性投影得到的矩阵。除以 √d_k 防止 softmax 输出陷入极端值（梯度消失）。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># PyTorch 实现</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">scaled_dot_product_attention</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">d_k</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d_k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">attn_weights</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">attn_weights</span><span class="p">,</span> <span class="n">V</span><span class="p">),</span> <span class="n">attn_weights</span>
+</span></span></code></pre></div></div><p><strong>面试常问</strong>：为什么除以 √d_k？
+答：当 d_k 很大时，QKᵀ 的点积值方差约为 d_k，导致 softmax 的输入落在梯度极小区域。除以 √d_k 可以让方差回到1，使得 softmax 的梯度更健康。</p>
+<p><strong>Flash Attention（2022-2025演化）</strong>：不计算完整的注意力矩阵，而是通过分块（tiling）在SRAM中逐块计算，大幅减少HBM访问。2025年FlashAttention-3已支持FP8计算。</p>
+<h4 id="multi-head-attention-mha">Multi-Head Attention (MHA)</h4>
+<p>将Q, K, V分成h个头，每个头独立计算注意力，最后拼接：</p>
+<pre><code>MultiHead(Q, K, V) = Concat(head₁, ..., head_h) * W_O
+head_i = Attention(QW_i^Q, KW_i^K, VW_i^V)
+</code></pre>
+<ul>
+<li>h 通常在 8-96 之间（GPT-4有96头？）</li>
+<li>不同头可以关注输入的不同子空间</li>
+</ul>
+<p><strong>2025年新变体</strong>：</p>
+<ul>
+<li><strong>GQA (Grouped Query Attention)</strong>：多个query头共享一组key/value头。LLaMA 2/3、Mistral使用。查效率高、推理速度快。</li>
+<li><strong>MQA (Multi-Query Attention)</strong>：所有query头共享一组key/value。推理最快但质量略降。</li>
+</ul>
+<h4 id="self-attention">Self-Attention</h4>
+<p>Q, K, V 来自同一个序列，计算序列内部各位置之间的相关性。</p>
+<p>应用：Transformer Encoder中的每个token间。</p>
+<p><strong>因果（Causal）Self-Attention</strong>：GPT等自回归模型使用，只允许关注当前位置及之前的位置（通过上三角mask）。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 因果掩码</span>
+</span></span><span class="line"><span class="cl"><span class="n">causal_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">),</span> <span class="n">diagonal</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 注意力分数在mask=True的位置被设为 -inf</span>
+</span></span></code></pre></div></div><h4 id="cross-attention">Cross-Attention</h4>
+<p>Q 来自一个序列（如解码器），K和V来自另一个序列（如编码器输出）。</p>
+<p>应用：Transformer Decoder中，解码器查询编码器的输出；T5/BART中的Cross-Attention层；多模态模型中文本查询图像特征。</p>
+<hr>
+<h3 id="28-transformer">2.8 Transformer架构详解</h3>
+<h4 id="heading-2">整体架构</h4>
+<pre><code>Transformer = Encoder + Decoder  (原始论文)
+            = Encoder only       (BERT, RoBERTa)
+            = Decoder only       (GPT系列, LLaMA, Qwen)
+            = Encoder-Decoder    (T5, BART)
+</code></pre>
+<p><strong>2025年现状</strong>：几乎所有主流LLM都是 <strong>Decoder-only</strong> 架构（GPT风格）。</p>
+<h4 id="encoder">Encoder（编码器）</h4>
+<p>结构：Embedding + N × Transformer Block</p>
+<p>每个Block：</p>
+<ol>
+<li>Multi-Head Self-Attention（双向注意力）</li>
+<li>Add &amp; LayerNorm (或 Pre-LN: LayerNorm -&gt; Attention -&gt; Residual)</li>
+<li>Feed-Forward Network（FFN）</li>
+<li>Add &amp; LayerNorm</li>
+</ol>
+<h4 id="decoder">Decoder（解码器）</h4>
+<p>结构：Embedding + N × Transformer Block</p>
+<p>每个Block：</p>
+<ol>
+<li>Masked Multi-Head Self-Attention（因果注意力）</li>
+<li>Add &amp; LayerNorm</li>
+<li>Cross-Attention（Q来自decoder, K/V来自encoder）</li>
+<li>Add &amp; LayerNorm</li>
+<li>Feed-Forward Network</li>
+<li>Add &amp; LayerNorm</li>
+</ol>
+<h4 id="positional-encoding">Positional Encoding（位置编码）</h4>
+<p>Transformer没有递归结构，需要显式注入位置信息。</p>
+<p><strong>原始方法（Sinusoidal PE）</strong>：</p>
+<pre><code>PE(pos, 2i) = sin(pos / 10000^(2i/d_model))
+PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+</code></pre>
+<ul>
+<li>优点：可以外推到训练时未见过的位置</li>
+<li>缺点：表达能力有限</li>
+</ul>
+<p><strong>可学习位置编码</strong>（BERT、GPT-2）：</p>
+<ul>
+<li>将位置编码作为可学习的Embedding</li>
+<li>缺点：不能外推，需要设定最大长度</li>
+</ul>
+<p><strong>RoPE（Rotary Position Embedding）</strong>（2021-2025年标准）：</p>
+<ul>
+<li>将位置编码通过旋转矩阵注入到Q和K中</li>
+<li>相对位置编码，天然支持外推</li>
+<li>LLaMA、Mistral、Qwen、DeepSeek全部使用</li>
+<li>详见02-文档的&quot;长上下文技术&quot;部分</li>
+</ul>
+<h4 id="feed-forward-network">Feed-Forward Network（前馈网络）</h4>
+<p>标准FFN：</p>
+<pre><code>FFN(x) = W₂ * ReLU(W₁ * x + b₁) + b₂
+</code></pre>
+<p><strong>2025年标准FFN</strong>（SwiGLU）：</p>
+<pre><code>FFN_Gated(x) = W_out * (SiLU(x * W_gate) ⊙ x * W_up)
+</code></pre>
+<p>参数量约为标准FFN的1.33倍，但效果更好。</p>
+<h4 id="residual-connection">Residual Connection（残差连接）</h4>
+<p>每个子层输出加回输入：</p>
+<pre><code>output = LayerNorm(x + Sublayer(x))
+</code></pre>
+<p><strong>Pre-LN</strong>（当前标准）：</p>
+<pre><code>output = x + Sublayer(LayerNorm(x))
+</code></pre>
+<p>Pre-LN比Post-LN训练更稳定，允许更大的学习率，不必使用学习率预热到很高（但仍然需要warmup）。</p>
+<h4 id="2025transformer">2025年Transformer改进</h4>
+<ul>
+<li><strong>LLaMA架构</strong>（Meta）：RMSNorm + RoPE + SwiGLU + GQA + Pre-LN</li>
+<li><strong>DeepSeek-V2</strong>：Multi-head Latent Attention（MLA，压缩KV Cache） + DeepSeekMoE</li>
+<li><strong>Gemma架构</strong>（Google）：GeGLU激活 + Post-Norm（Google风格）</li>
+<li><strong>混合Transformer+SSM</strong>：如Jamba（AI21 Labs）在部分层使用Mamba代替Attention</li>
+</ul>
+<hr>
+<h3 id="29-word-embedding">2.9 词嵌入（Word Embedding）</h3>
+<h4 id="word2vec2013">Word2Vec（2013）</h4>
+<ul>
+<li><strong>CBOW</strong>：根据上下文词预测中心词</li>
+<li><strong>Skip-gram</strong>：根据中心词预测上下文词</li>
+<li>训练技巧：Negative Sampling, Hierarchical Softmax</li>
+<li>局限：静态嵌入，无法处理一词多义</li>
+</ul>
+<h4 id="gloveglobal-vectors-2014">GloVe（Global Vectors, 2014）</h4>
+<p>基于词共现矩阵的分解：</p>
+<pre><code>J = Σ f(X_ij) * (w_iᵀ * w̃_j + b_i + b̃_j - log X_ij)²
+</code></pre>
+<ul>
+<li>利用全局统计信息，训练效率高</li>
+<li>语义类比：king - man + woman ≈ queen</li>
+</ul>
+<h4 id="bert-embedding2018">BERT Embedding（2018）</h4>
+<p>Token Embedding + Segment Embedding + Position Embedding</p>
+<ul>
+<li>BERT的嵌入层包含：WordPiece子词单元（约30K词汇表）、位置编码（可学习）、段落编码</li>
+<li>BERT的每层输出都可以作为&quot;特征嵌入&rdquo;，一般来说-1层（最后一层）或-2层效果最好</li>
+</ul>
+<h4 id="token-embedding">Token Embedding（现代大模型）</h4>
+<p><strong>Byte-Pair Encoding (BPE)</strong>：</p>
+<ul>
+<li>从字符开始，迭代合并最频繁的相邻token对</li>
+<li>GPT-2/3/4、LLaMA、Qwen 使用</li>
+</ul>
+<p><strong>SentencePiece / Unigram</strong>：</p>
+<ul>
+<li>基于概率语言模型的子词切分</li>
+<li>T5、LLaMA（部分版本）、Gemma 使用</li>
+</ul>
+<p><strong>tiktoken（OpenAI 2023-2025）</strong>：</p>
+<ul>
+<li>OpenAI官方的快速BPE Tokenizer</li>
+<li>cl100k_base（GPT-4, GPT-4-turbo使用，100K词汇表）</li>
+<li>o200k_base（GPT-4o使用，200K词汇表，更多多语言支持）</li>
+</ul>
+<p><strong>2025年新进展</strong>：</p>
+<ul>
+<li><strong>字节级Tokenization</strong>（如Mamba）：直接处理字节，没有固定的词汇表</li>
+<li><strong>多模态Tokenizer</strong>：将图像patch映射到LLM的嵌入空间（如Qwen-VL的视觉编码器）</li>
+<li><strong>超长Tokenizer</strong>：GPT-4o的200K词汇表支持更高效的编码</li>
+</ul>
+<hr>
+<h3 id="210-">2.10 评估指标</h3>
+<h4 id="heading-3">分类指标</h4>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>公式</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accuracy</td>
+<td>(TP+TN)/(TP+TN+FP+FN)</td>
+<td>平衡数据集</td>
+</tr>
+<tr>
+<td>Precision</td>
+<td>TP/(TP+FP)</td>
+<td>关注&quot;假阳性&quot;风险（如垃圾邮件）</td>
+</tr>
+<tr>
+<td>Recall</td>
+<td>TP/(TP+FN)</td>
+<td>关注&quot;假阴性&quot;风险（如疾病检测）</td>
+</tr>
+<tr>
+<td>F1 Score</td>
+<td>2<em>P</em>R/(P+R)</td>
+<td>类别不平衡</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Macro vs Micro vs Weighted F1</strong>：</p>
+<ul>
+<li>Macro：每类算F1再平均（每类平等）</li>
+<li>Micro：全局混淆矩阵算F1（每个样本平等）</li>
+<li>Weighted：按每类样本数加权平均</li>
+</ul>
+<h4 id="heading-4">文本生成指标</h4>
+<p><strong>Perplexity（困惑度）</strong>：</p>
+<pre><code>PPL = exp(-1/N * Σ log P(w_i | context))
+</code></pre>
+<ul>
+<li>衡量语言模型对下一个token预测的不确定性</li>
+<li>越低越好（理论最小值是1）</li>
+<li><strong>注意</strong>：不同Tokenizer下PPL不可比较；PPL低不代表生成质量好</li>
+</ul>
+<p><strong>BLEU（Bilingual Evaluation Understudy）</strong>：</p>
+<ul>
+<li>基于n-gram精确率（通常n=1-4）</li>
+<li>加上短句惩罚（Brevity Penalty）</li>
+<li>主要用于机器翻译评估</li>
+</ul>
+<p><strong>ROUGE（Recall-Oriented Understudy for Gisting Evaluation）</strong>：</p>
+<ul>
+<li>ROUGE-N：计算n-gram召回率</li>
+<li>ROUGE-L：基于最长公共子序列</li>
+<li>主要用于文本摘要评估</li>
+</ul>
+<h4 id="2025-1">2025年评估新趋势</h4>
+<ul>
+<li><strong>LLM-as-a-Judge</strong>：用GPT-4/Claude等大模型评估生成质量。MT-Bench、AlpacaEval、Chatbot Arena</li>
+<li><strong>多维度评估</strong>：事实性、安全性、有帮助性、完整性</li>
+<li><strong>Human Evaluation</strong>：仍然是最可靠的评估方式（Chatbot Arena的Elo排名）</li>
+</ul>
+<hr>
+<h3 id="211-">2.11 面试常考数学</h3>
+<h4 id="heading-5">概率论基础</h4>
+<p><strong>条件概率与贝叶斯定理</strong>：</p>
+<pre><code>P(A|B) = P(B|A) * P(A) / P(B)
+</code></pre>
+<p>面试应用：朴素贝叶斯分类器、贝叶斯正则化、贝叶斯在RLHF中的应用。</p>
+<p><strong>最大似然估计（MLE）</strong>：</p>
+<pre><code>θ_MLE = argmax_θ P(D|θ)
+</code></pre>
+<p>等价于最小化负对数似然（NLL），与交叉熵损失的等价关系：</p>
+<pre><code class="language-math">L = -log P(y|x) = Cross-Entropy(y, ŷ)
+</code></pre>
+<p><strong>最大后验估计（MAP）</strong>：</p>
+<pre><code>θ_MAP = argmax_θ P(θ|D) = argmax_θ P(D|θ) * P(θ)
+</code></pre>
+<p>L1正则化对应Laplace先验的MAP，L2正则化对应Gaussian先验的MAP。</p>
+<h4 id="heading-6">信息论</h4>
+<p><strong>熵（Entropy）</strong>：</p>
+<pre><code>H(X) = -Σ P(x) * log P(x)
+</code></pre>
+<p>表示随机变量X的不确定性。</p>
+<p><strong>交叉熵（Cross-Entropy）</strong>：</p>
+<pre><code>H(P, Q) = -Σ P(x) * log Q(x)
+</code></pre>
+<p>衡量真实分布P与预测分布Q之间的差异。</p>
+<p><strong>KL散度</strong>：</p>
+<pre><code>D_KL(P || Q) = H(P, Q) - H(P) = Σ P(x) * log(P(x)/Q(x))
+</code></pre>
+<p><strong>互信息（Mutual Information）</strong>：</p>
+<pre><code>I(X; Y) = H(X) - H(X|Y) = H(Y) - H(Y|X)
+</code></pre>
+<p>衡量X和Y共享的信息量。</p>
+<p><strong>面试问题</strong>：为什么KL散度不对称？什么时候用正向KL（P||Q），什么时候用反向KL（Q||P）？</p>
+<ul>
+<li>正向KL（P||Q）要求Q覆盖所有P不为0的区域（zero-avoiding），导致Q趋向于&quot;平均&quot;所有模式</li>
+<li>反向KL（Q||P）鼓励Q在P最大的区域集中（zero-forcing），导致Q趋向于&quot;选择&quot;一个模式</li>
+<li>在蒸馏中，教师-&gt;学生通常使用反向KL</li>
+</ul>
+<h4 id="heading-7">线性代数重点</h4>
+<p><strong>矩阵分解</strong>：</p>
+<ul>
+<li><strong>SVD（奇异值分解）</strong>：A = UΣVᵀ。应用：推荐系统、PCA、低秩近似</li>
+<li><strong>低秩分解</strong>：A ≈ UV，U∈R^{m×r}, V∈R^{r×n}。应用：LoRA微调（两个低秩矩阵的乘积）</li>
+</ul>
+<p><strong>特征值与特征向量</strong>：</p>
+<pre><code>Av = λv
+</code></pre>
+<p>应用：PCA（协方差矩阵的特征向量）、图的谱聚类、收敛性分析</p>
+<p><strong>范数</strong>：</p>
+<ul>
+<li>L0：非零元素个数（NP难，通常用L1近似）</li>
+<li>L1：绝对值之和 |x|₁ = Σ|x_i|（稀疏诱导）</li>
+<li>L2：欧几里得范数 |x|₂ = √(Σx_i²)（权重衰减）</li>
+<li>L∞：最大绝对值 |x|_∞ = max|x_i|</li>
+</ul>
+<p><strong>向量空间</strong>：</p>
+<ul>
+<li>内积与相似度（cosine similarity）：cos(A,B) = A·B / (||A|| * ||B||)</li>
+<li>Softmax的几何解释：将向量映射到概率单纯形</li>
+</ul>
+<hr>
+<h2 id="3-5">三、面试常见问题（3-5个）</h2>
+<h3 id="q1-llmlayernormbatchnormpre-lnpost-ln">Q1: 为什么现代LLM都使用LayerNorm而不是BatchNorm？Pre-LN和Post-LN有什么区别？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>NLP任务中序列长度不固定，BN需要沿batch维度统计，不稳定</li>
+<li>LN对每个样本独立归一化，与batch size无关</li>
+<li>Post-LN在残差连接后做归一化，训练时梯度容易爆炸/消失，需要学习率warmup</li>
+<li>Pre-LN在每个子层输入前做归一化，梯度更稳定，训练更顺畅，当前所有主流模型使用</li>
+</ol>
+<h3 id="q2-adamwadamllm">Q2: 解释AdamW相比Adam的关键改进，以及为什么LLM训练要用它？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>Adam的权重衰减（L2正则化）融合在梯度更新中，与自适应学习率耦合</li>
+<li>AdamW将权重衰减单独解耦：θ = θ - lr * adam_update - lr * weight_decay * θ</li>
+<li>解耦后正则化效果与学习率无关，对Transformer训练至关重要</li>
+<li>实验证明AdamW在BERT/GPT等模型上收敛更快、泛化更好</li>
+</ol>
+<h3 id="q3-swiglu2024-2025llmrelu">Q3: 为什么SwiGLU在2024-2025年成为LLM的标准激活函数？它和ReLU比有什么优劣势？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>SwiGLU = Swish(W_gate * x) ⊙ (W_up * x)，通过门控机制增强表达能力</li>
+<li>相比ReLU：SwiGLU平滑且非单调，梯度信息更丰富</li>
+<li>在语言模型任务上稳定提升0.5-1.0 PPL</li>
+<li>代价：参数量增加33%（需要三个投影矩阵），计算量更大</li>
+<li>现在几乎所有主流模型（LLaMA, Mistral, Qwen, DeepSeek）都默认使用</li>
+</ol>
+<h3 id="q4-kldporlaif">Q4: 详细推导KL散度在DPO/RLAIF中的应用，为什么它是不对称的？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>DPO损失中隐式使用KL散度约束策略偏离：
+L_DPO(π_θ, π_ref) = -E[log σ(β * log(π_θ(y_w|x)/π_ref(y_w|x) - π_θ(y_l|x)/π_ref(y_l|x)))]</li>
+<li>正向KL(P||Q)对Q在P非零区域的覆盖很严格（mode-covering）</li>
+<li>反向KL(Q||P)让Q集中在P的某个模式上（mode-seeking）</li>
+<li>DPO使用的forward KL更适合偏好优化</li>
+</ol>
+<h3 id="q5-flash-attentiontransformer">Q5: 解释Flash Attention的原理，为什么能加速Transformer训练？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>标准Attention计算完整N×N矩阵（O(N²)显存），瓶颈在HBM带宽</li>
+<li>Flash Attention通过分块（tiling）在SRAM中逐块计算</li>
+<li>避免写回HBM完整的attention矩阵，减少显存读写</li>
+<li>使用重新计算（recomputation）在前向中不保存attention矩阵，反向时重新计算</li>
+<li>FlashAttention-3 (2025) 支持FP8，进一步加速</li>
+</ol>
+<hr>
+<h2 id="heading-8">四、推荐学习资源</h2>
+<h3 id="heading-9">论文</h3>
+<table>
+<thead>
+<tr>
+<th>论文</th>
+<th>发表于</th>
+<th>必读指数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attention Is All You Need</td>
+<td>NeurIPS 2017</td>
+<td>★★★★★</td>
+<td>Transformer原始论文</td>
+</tr>
+<tr>
+<td>Deep Residual Learning for Image Recognition</td>
+<td>CVPR 2016</td>
+<td>★★★★</td>
+<td>残差网络</td>
+</tr>
+<tr>
+<td>Adam: A Method for Stochastic Optimization</td>
+<td>ICLR 2015</td>
+<td>★★★★</td>
+<td>Adam优化器</td>
+</tr>
+<tr>
+<td>Decoupled Weight Decay Regularization (AdamW)</td>
+<td>ICLR 2019</td>
+<td>★★★★★</td>
+<td>LLM训练基石</td>
+</tr>
+<tr>
+<td>Swish: A Self-Gated Activation Function</td>
+<td>2017</td>
+<td>★★★★</td>
+<td>Swish激活函数</td>
+</tr>
+<tr>
+<td>GLU Variants Improve Transformer</td>
+<td>2020</td>
+<td>★★★★★</td>
+<td>SwiGLU</td>
+</tr>
+<tr>
+<td>GELU Activation</td>
+<td>2016</td>
+<td>★★★★</td>
+<td>GELU激活函数</td>
+</tr>
+<tr>
+<td>FlashAttention: Fast and Memory-Efficient Exact Attention</td>
+<td>NeurIPS 2022</td>
+<td>★★★★★</td>
+<td>注意力加速</td>
+</tr>
+<tr>
+<td>Layer Normalization</td>
+<td>2016</td>
+<td>★★★★</td>
+<td>LN论文</td>
+</tr>
+</tbody>
+</table>
+<h3 id="heading-10">书籍</h3>
+<ul>
+<li><strong>《深度学习》（花书）</strong> — Goodfellow, Bengio, Courville：深度学习圣经</li>
+<li><strong>《统计学习方法》</strong> — 李航：中文最佳ML入门书</li>
+<li><strong>《动手学深度学习》</strong> — 李沐等：PyTorch实践，B站配套课程</li>
+<li><strong>Speech and Language Processing</strong> — Jurafsky &amp; Martin：NLP经典教材（在线免费更新）</li>
+</ul>
+<h3 id="heading-11">在线课程</h3>
+<ul>
+<li><strong>Stanford CS224n</strong>：NLP深度学习（含Transformer详细讲解）</li>
+<li><strong>Stanford CS231n</strong>：计算机视觉CNN基础</li>
+<li><strong>3Blue1Brown</strong>：线性代数、神经网络可视化解释（Youtube）</li>
+<li><strong>李沐《动手学深度学习》</strong> B站课程：配套《动手学深度学习》书</li>
+</ul>
+<h3 id="heading-12">工具与代码库</h3>
+<ul>
+<li>PyTorch: <a href="https://pytorch.org">https://pytorch.org</a></li>
+<li>Hugging Face Transformers: <a href="https://huggingface.co/docs/transformers">https://huggingface.co/docs/transformers</a></li>
+<li>NanoGPT (Andrej Karpathy): 最小化GPT实现（看完Transformer原理必读代码）</li>
+<li>FlashAttention: <a href="https://github.com/Dao-AILab/flash-attention">https://github.com/Dao-AILab/flash-attention</a></li>
+<li>TikToken: <a href="https://github.com/openai/tiktoken">https://github.com/openai/tiktoken</a></li>
+</ul>
+<hr>
+<blockquote>
+<p>下一篇：02-大语言模型(LLM)原理.md — LLM核心知识详解</p>
+</blockquote>
+
+</article>
+
+
+<nav class="series-nav">
+  <span class="series-label">AI应用开发面试宝典 系列</span>
+  <div class="series-links">
+    
+    <a class="series-link prev" href="/posts/AI/07-%e6%a8%a1%e5%9e%8b%e5%be%ae%e8%b0%83%e4%b8%8e%e8%ae%ad%e7%bb%83/">← 模型微调与训练</a>
+    
+    
+    <a class="series-link next" href="/posts/AI/09-AI%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1%e4%b8%8e%e6%9e%b6%e6%9e%84/">AI系统设计与架构 →</a>
+    
+  </div>
+</nav>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/AI/07-%e6%a8%a1%e5%9e%8b%e5%be%ae%e8%b0%83%e4%b8%8e%e8%ae%ad%e7%bb%83/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">模型微调与训练</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/09-AI%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1%e4%b8%8e%e6%9e%b6%e6%9e%84/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">AI系统设计与架构</span>
+  </a>
+  
+</nav>
+
+
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">面试真题与实战</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/02-%e5%a4%a7%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8bLLM%e5%8e%9f%e7%90%86/">大语言模型(LLM)原理</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">模型部署与推理优化</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/03-AI%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">AI应用开发框架</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering)</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+</body>
+</html>

@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>AI应用开发框架 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="stylesheet" href="/assets/css/style.css?v=14">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">AI应用开发框架</h1>
+    <div class="article-meta">
+      <time datetime="2026-06-01">2026-06-01</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="ai">AI应用开发框架面试知识</h1>
+<h2 id="heading">一、概述</h2>
+<p>AI应用开发框架是当前大模型落地工程化的核心基础设施。2025-2026年，主流框架已从单纯的LLM调用封装演进为完整的AI应用开发平台，涵盖模型编排、状态管理、检索增强、多智能体协作等能力。面试中，候选人需要理解各框架的核心设计理念、适用场景、关键差异以及最新演进方向。</p>
+<hr>
+<h2 id="heading-1">二、知识点详解</h2>
+<h3 id="1-langchain-">1. LangChain 核心概念</h3>
+<h4 id="11-chain">1.1 Chain</h4>
+<p>Chain是LangChain最原始的设计抽象，代表一系列组件的有序组合。典型如 LLMChain（Prompt + Model + OutputParser）、SequentialChain（串联多个Chain）、RouterChain（条件路由）。但自 v0.2 起，Chain 已被标记为 Legacy，推荐使用 LCEL。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># Legacy Chain 方式</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">LLMChain</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">chain</span> <span class="o">=</span> <span class="n">LLMChain</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">llm</span><span class="o">=</span><span class="n">OpenAI</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">prompt</span><span class="o">=</span><span class="n">PromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="s2">&#34;介绍</span><span class="si">{topic}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">topic</span><span class="o">=</span><span class="s2">&#34;LangChain&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="12-runnablelangchain-v02">1.2 Runnable（LangChain v0.2+核心接口）</h4>
+<p>Runnable 是 LangChain 统一执行接口，任何可执行组件都实现 <code>Runnable</code> 协议（<code>invoke</code>、<code>batch</code>、<code>stream</code>、<code>ainvoke</code> 等）。核心子类包括 RunnableSequence、RunnableParallel、RunnableLambda、RunnablePassthrough、RunnableBranch 等。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain_core.runnables</span> <span class="kn">import</span> <span class="n">RunnableLambda</span><span class="p">,</span> <span class="n">RunnablePassthrough</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">runnable</span> <span class="o">=</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="s2">&#34;topic&#34;</span><span class="p">:</span> <span class="n">RunnablePassthrough</span><span class="p">()}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&#34;介绍</span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;topic&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">runnable</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&#34;LangChain&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="13-lcellangchain-expression-language">1.3 LCEL（LangChain Expression Language）</h4>
+<p>LCEL 是 LangChain 的声明式编排语言，使用 <code>|</code> 管道操作符组合组件。LCEL 自动支持流式、异步、批处理、并行和重试。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain_core.output_parsers</span> <span class="kn">import</span> <span class="n">StrOutputParser</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain_core.prompts</span> <span class="kn">import</span> <span class="n">ChatPromptTemplate</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">prompt</span> <span class="o">=</span> <span class="n">ChatPromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="s2">&#34;用</span><span class="si">{language}</span><span class="s2">写一段代码：</span><span class="si">{topic}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&#34;gpt-4o&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">output_parser</span> <span class="o">=</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">chain</span> <span class="o">=</span> <span class="n">prompt</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">output_parser</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&#34;language&#34;</span><span class="p">:</span> <span class="s2">&#34;Python&#34;</span><span class="p">,</span> <span class="s2">&#34;topic&#34;</span><span class="p">:</span> <span class="s2">&#34;二分查找&#34;</span><span class="p">})</span>
+</span></span></code></pre></div></div><p><strong>LCEL 优势</strong>：类型安全、自动支持流式/异步、编译期优化执行图、简洁可读。</p>
+<h4 id="14-tool">1.4 Tool</h4>
+<p>Tool 是 LLM 可以调用的外部能力接口，包含名称、描述、参数 schem a 和执行逻辑。Tool 可通过 @tool 装饰器或 BaseTool 子类定义。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain_core.tools</span> <span class="kn">import</span> <span class="n">tool</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@tool</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_weather</span><span class="p">(</span><span class="n">city</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;获取指定城市的天气信息&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;https://api.weather.com/</span><span class="si">{</span><span class="n">city</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+</span></span></code></pre></div></div><h4 id="15-agent">1.5 Agent</h4>
+<p>Agent 是使用 LLM 作为推理引擎，动态决定调用哪些 Tool 以及如何组合的执行器。LangChain 提供了多种 Agent 类型，ReAct Agent 是最常用的。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain.agents</span> <span class="kn">import</span> <span class="n">create_react_agent</span><span class="p">,</span> <span class="n">AgentExecutor</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">agent</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">llm</span><span class="o">=</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&#34;gpt-4o&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">get_weather</span><span class="p">,</span> <span class="n">search_tool</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="n">prompt</span><span class="o">=</span><span class="n">react_prompt</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">agent_executor</span> <span class="o">=</span> <span class="n">AgentExecutor</span><span class="p">(</span><span class="n">agent</span><span class="o">=</span><span class="n">agent</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">get_weather</span><span class="p">,</span> <span class="n">search_tool</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">agent_executor</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&#34;input&#34;</span><span class="p">:</span> <span class="s2">&#34;北京明天天气如何？&#34;</span><span class="p">})</span>
+</span></span></code></pre></div></div><p>2025-2026年趋势：LangChain 已全面拥抱 LangGraph 作为 Agent 的底层执行引擎，AgentExecutor 内部本质是一个 LangGraph StateGraph。</p>
+<hr>
+<h3 id="2-langgraphagent">2. LangGraph（状态驱动的Agent框架）</h3>
+<p>LangGraph 是 LangChain 团队开发的<strong>有状态图执行引擎</strong>，专为Agent和多轮对话场景设计。</p>
+<h4 id="21-stategraph">2.1 StateGraph</h4>
+<p>StateGraph 的核心概念：节点（Node）、边（Edge）、状态（State）。节点执行逻辑更新状态，边决定执行流向。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langgraph.graph</span> <span class="kn">import</span> <span class="n">StateGraph</span><span class="p">,</span> <span class="n">END</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">List</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">operator</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">AgentState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">messages</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">next_step</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">node_a</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">AgentState</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;messages&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;执行步骤A&#34;</span><span class="p">],</span> <span class="s2">&#34;next_step&#34;</span><span class="p">:</span> <span class="s2">&#34;b&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">node_b</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">AgentState</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;messages&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;执行步骤B&#34;</span><span class="p">],</span> <span class="s2">&#34;next_step&#34;</span><span class="p">:</span> <span class="n">END</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">graph</span> <span class="o">=</span> <span class="n">StateGraph</span><span class="p">(</span><span class="n">AgentState</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&#34;a&#34;</span><span class="p">,</span> <span class="n">node_a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&#34;b&#34;</span><span class="p">,</span> <span class="n">node_b</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">set_entry_point</span><span class="p">(</span><span class="s2">&#34;a&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">add_conditional_edges</span><span class="p">(</span><span class="s2">&#34;a&#34;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="s2">&#34;next_step&#34;</span><span class="p">],</span> <span class="p">{</span><span class="s2">&#34;b&#34;</span><span class="p">:</span> <span class="s2">&#34;b&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&#34;b&#34;</span><span class="p">,</span> <span class="n">END</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">app</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">compile</span><span class="p">()</span>
+</span></span></code></pre></div></div><h4 id="22-agentexecutorlanggraph">2.2 AgentExecutor（LangGraph版）</h4>
+<p>LangGraph 提供了 <code>create_react_agent</code> 函数替代传统 AgentExecutor，内部封装了 ReAct 的循环逻辑——思考(Thought) → 行动(Action) → 观察(Observation) → 循环直到结束。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langgraph.prebuilt</span> <span class="kn">import</span> <span class="n">create_react_agent</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">agent</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">model</span><span class="o">=</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&#34;gpt-4o&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">get_weather</span><span class="p">,</span> <span class="n">search_tool</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">events</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">stream</span><span class="p">({</span><span class="s2">&#34;messages&#34;</span><span class="p">:</span> <span class="p">[(</span><span class="s2">&#34;human&#34;</span><span class="p">,</span> <span class="s2">&#34;北京明天天气如何？&#34;</span><span class="p">)]})</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="23-human-in-the-loop">2.3 Human-in-the-Loop</h4>
+<p>LangGraph 原生支持人类介入的三种模式：</p>
+<ul>
+<li><strong>中断(Interrupt)</strong>：在指定节点暂停，等待人工输入</li>
+<li><strong>审批(Approval)</strong>：Agent 执行关键操作前需要人类确认</li>
+<li><strong>编辑(Editing)</strong>：支持人类修改 Agent 的下一步计划</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langgraph.checkpoint.memory</span> <span class="kn">import</span> <span class="n">MemorySaver</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 在关键节点前设置中断</span>
+</span></span><span class="line"><span class="cl"><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">checkpointer</span><span class="o">=</span><span class="n">MemorySaver</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">interrupt_before</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;execute_payment&#34;</span><span class="p">]</span>  <span class="c1"># 执行支付前暂停</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="24-langgraph-2025-2026">2.4 LangGraph 2025-2026新特性</h4>
+<ul>
+<li><strong>LangGraph Cloud</strong>：托管的Agent部署平台，支持持久化状态、长时间运行的Agent</li>
+<li><strong>LangGraph Studio</strong>：可视化Graph调试工具</li>
+<li><strong>Subgraph</strong>：子图复用机制，支持图嵌套</li>
+<li><strong>Persistence Layer</strong>：支持 PostgreSQL、Redis 等持久化后端</li>
+</ul>
+<hr>
+<h3 id="3-llamaindex">3. LlamaIndex</h3>
+<p>LlamaIndex 聚焦于**数据索引与检索增强生成(RAG)**场景，提供从数据接入到查询的完整数据管线。</p>
+<h4 id="31-index">3.1 Index结构</h4>
+<p>LlamaIndex 支持多种索引类型：</p>
+<ul>
+<li><strong>VectorStoreIndex</strong>：向量存储索引，语义搜索</li>
+<li><strong>SummaryIndex</strong>：摘要索引，存储文档摘要</li>
+<li><strong>KeywordTableIndex</strong>：关键词索引，BM25检索</li>
+<li><strong>TreeIndex</strong>：树形索引，递归总结</li>
+<li><strong>PropertyGraphIndex</strong>：属性图索引，2024年新增</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.core</span> <span class="kn">import</span> <span class="n">VectorStoreIndex</span><span class="p">,</span> <span class="n">SimpleDirectoryReader</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">documents</span> <span class="o">=</span> <span class="n">SimpleDirectoryReader</span><span class="p">(</span><span class="s2">&#34;./data&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">index</span> <span class="o">=</span> <span class="n">VectorStoreIndex</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">query_engine</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">as_query_engine</span><span class="p">()</span>
+</span></span></code></pre></div></div><h4 id="32-retriever">3.2 Retriever</h4>
+<p>Retriever 负责从 Index 中检索相关信息。LlamaIndex 提供了丰富的检索策略：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.core.retrievers</span> <span class="kn">import</span> <span class="n">VectorIndexRetriever</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.core.query_engine</span> <span class="kn">import</span> <span class="n">RetrieverQueryEngine</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">retriever</span> <span class="o">=</span> <span class="n">VectorIndexRetriever</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">similarity_top_k</span><span class="o">=</span><span class="mi">5</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 高级检索：混合检索 + 重排序</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.core.retrievers</span> <span class="kn">import</span> <span class="n">RouterRetriever</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.core.retrievers</span> <span class="kn">import</span> <span class="n">BM25Retriever</span>
+</span></span></code></pre></div></div><h4 id="33-query-engine">3.3 Query Engine</h4>
+<p>Query Engine 是统一查询接口，内部封装了检索+合成的完整逻辑。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 基础查询</span>
+</span></span><span class="line"><span class="cl"><span class="n">response</span> <span class="o">=</span> <span class="n">query_engine</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&#34;文档的主要内容是什么？&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 多步查询——逐步细化</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.core.query_engine</span> <span class="kn">import</span> <span class="n">MultiStepQueryEngine</span>
+</span></span></code></pre></div></div><h4 id="34-data-ingestion">3.4 Data Ingestion</h4>
+<p>2024-2025年，LlamaIndex 推出了 <code>IngestionPipeline</code>，支持数据清洗、分块、嵌入、存储的一站式处理。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.core.ingestion</span> <span class="kn">import</span> <span class="n">IngestionPipeline</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.core.node_parser</span> <span class="kn">import</span> <span class="n">SentenceSplitter</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">llama_index.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbedding</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pipeline</span> <span class="o">=</span> <span class="n">IngestionPipeline</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">transformations</span><span class="o">=</span><span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="n">SentenceSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">200</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">OpenAIEmbedding</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nodes</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">documents</span><span class="o">=</span><span class="n">documents</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="35-agent">3.5 Agent能力</h4>
+<p>LlamaIndex 在 2025 年强化了Agent能力，支持 Function Calling Agent、ReAct Agent 以及多Agent编排。</p>
+<hr>
+<h3 id="4-semantic-kernel">4. Semantic Kernel（微软）</h3>
+<p>Semantic Kernel（SK）是微软推出的轻量级AI编排框架，深度集成Azure生态和.NET/C#生态，同时支持Python。</p>
+<h4 id="41-plugin">4.1 Plugin</h4>
+<p>Plugin 是 SK 的核心能力单元，分为 Native Plugin（原生代码）和 Semantic Plugin（定义在prompt文件中的语义函数）。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">semantic_kernel</span> <span class="kn">import</span> <span class="n">Kernel</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">semantic_kernel.plugin_definition</span> <span class="kn">import</span> <span class="n">kernel_function</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">WeatherPlugin</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nd">@kernel_function</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&#34;获取天气&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">get_weather</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">city</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">city</span><span class="si">}</span><span class="s2">的天气晴朗&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">kernel</span> <span class="o">=</span> <span class="n">Kernel</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">kernel</span><span class="o">.</span><span class="n">add_plugin</span><span class="p">(</span><span class="n">WeatherPlugin</span><span class="p">(),</span> <span class="n">plugin_name</span><span class="o">=</span><span class="s2">&#34;weather&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="42-planner">4.2 Planner</h4>
+<p>Planner 是 SK 的任务规划引擎，基于LLM自动生成执行计划。SK v1.0+ 引入了 HandlebarsPlanner 和 FunctionCallingStepwisePlanner。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">semantic_kernel.planners</span> <span class="kn">import</span> <span class="n">FunctionCallingStepwisePlanner</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">planner</span> <span class="o">=</span> <span class="n">FunctionCallingStepwisePlanner</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">service_id</span><span class="o">=</span><span class="s2">&#34;gpt-4o&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">planner</span><span class="o">.</span><span class="n">invoke_async</span><span class="p">(</span><span class="s2">&#34;帮我查询北京的天气并发送邮件&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="43-memory">4.3 Memory</h4>
+<p>SK 的 Memory 模块支持语义记忆和向量存储，类似外部知识库。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">semantic_kernel.memory</span> <span class="kn">import</span> <span class="n">SemanticTextMemory</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">semantic_kernel.connectors.memory.azure_cognitive_search</span> <span class="kn">import</span> <span class="n">AzureCognitiveSearchMemoryStore</span>
+</span></span></code></pre></div></div><h4 id="44-2025-2026">4.4 2025-2026年进展</h4>
+<ul>
+<li><strong>SK v1.x 稳定版</strong>：API 趋于稳定，Python版与C#版功能对齐</li>
+<li><strong>Auto Function Calling</strong>：原生支持 OpenAI/Anthropic 的工具调用</li>
+<li><strong>Agent Framework</strong>：SK Agent 子框架，支持多Agent</li>
+<li><strong>Copilot Stack</strong>：与 Microsoft 365 Copilot 深度集成</li>
+</ul>
+<hr>
+<h3 id="5-haystackdeepset">5. Haystack（deepset）</h3>
+<p>Haystack 是专注于搜索和RAG的开源框架，强调模块化和生产级可用性。</p>
+<h4 id="51-pipeline">5.1 Pipeline</h4>
+<p>Haystack 的 Pipeline 是有向无环图（DAG），节点间通过连接传递数据。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">haystack</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">haystack.components.retrievers</span> <span class="kn">import</span> <span class="n">InMemoryEmbeddingRetriever</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">haystack.components.generators</span> <span class="kn">import</span> <span class="n">OpenAIGenerator</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="s2">&#34;retriever&#34;</span><span class="p">,</span> <span class="n">InMemoryEmbeddingRetriever</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="s2">&#34;generator&#34;</span><span class="p">,</span> <span class="n">OpenAIGenerator</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&#34;gpt-4o&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">pipeline</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&#34;retriever.documents&#34;</span><span class="p">,</span> <span class="s2">&#34;generator.documents&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">({</span><span class="s2">&#34;retriever&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;query&#34;</span><span class="p">:</span> <span class="s2">&#34;什么是RAG？&#34;</span><span class="p">}})</span>
+</span></span></code></pre></div></div><h4 id="52-document-store">5.2 Document Store</h4>
+<p>支持多种文档存储后端：InMemoryDocumentStore、ElasticsearchDocumentStore、WeaviateDocumentStore、PineconeDocumentStore 等。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">haystack.document_stores.in_memory</span> <span class="kn">import</span> <span class="n">InMemoryDocumentStore</span>
+</span></span><span class="line"><span class="cl"><span class="n">document_store</span> <span class="o">=</span> <span class="n">InMemoryDocumentStore</span><span class="p">(</span><span class="n">embedding_similarity_function</span><span class="o">=</span><span class="s2">&#34;cosine&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="53-reader-generator">5.3 Reader-Generator</h4>
+<p>Haystack v2.x（2024+）统一使用 Generator 概念替代原来的 Reader：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">haystack.components.generators</span> <span class="kn">import</span> <span class="n">OpenAIGenerator</span><span class="p">,</span> <span class="n">AnthropicGenerator</span><span class="p">,</span> <span class="n">HuggingFaceLocalGenerator</span>
+</span></span></code></pre></div></div><h4 id="54-2025-2026">5.4 2025-2026特色</h4>
+<ul>
+<li><strong>Haystack 2.x</strong>：完全重写的组件化架构，异步原生支持</li>
+<li><strong>Deepset Cloud</strong>：托管的 RAG 平台</li>
+<li><strong>Evaluation Pipeline</strong>：内置RAG评估管线</li>
+<li><strong>Agent 支持</strong>：引入工具调用和Agent组件</li>
+</ul>
+<hr>
+<h3 id="6-dspy">6. DSPy框架</h3>
+<p>DSPy（Declarative Self-improving Python）是斯坦福大学开发的<strong>声明式LLM编程框架</strong>，核心理念：将Prompt Engineering转化为编程问题，通过编译器自动优化prompt。</p>
+<h4 id="61-llm">6.1 声明式LLM编程</h4>
+<p>DSPy 使用 Module 抽象替代手写Prompt：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">dspy</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">dspy</span> <span class="kn">import</span> <span class="n">ChainOfThought</span><span class="p">,</span> <span class="n">Predict</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">AnswerQuestion</span><span class="p">(</span><span class="n">dspy</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">generate_answer</span> <span class="o">=</span> <span class="n">ChainOfThought</span><span class="p">(</span><span class="s2">&#34;context, question -&gt; answer&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">question</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_answer</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">question</span><span class="o">=</span><span class="n">question</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="62-signature">6.2 Signature</h4>
+<p>Signature 是 DSPy 的核心抽象，定义输入和输出字段的声明式规范：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">ExtractInfo</span><span class="p">(</span><span class="n">dspy</span><span class="o">.</span><span class="n">Signature</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;从文本中提取结构化信息&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">InputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&#34;原始文本&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&#34;提取的名称&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&#34;提取的年龄&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">occupation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&#34;职业信息&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="63-optimizer">6.3 Optimizer（编译器）</h4>
+<p>DSPy 的自动优化器（原名 Teleprompter）可以自动优化prompt：</p>
+<ul>
+<li><strong>LabeledFewShot</strong>：从标注数据中自动选择示例</li>
+<li><strong>BootstrapFewShot</strong>：通过LLM自举生成示例</li>
+<li><strong>BootstrapFewShotWithRandomSearch</strong>：带随机搜索的优化</li>
+<li><strong>MIPROv2</strong>：多指令提议优化（2024年提出，2025年成为推荐方案）</li>
+<li><strong>COPRO</strong>：坐标下降优化</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">dspy.teleprompt</span> <span class="kn">import</span> <span class="n">MIPROv2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">optimizer</span> <span class="o">=</span> <span class="n">MIPROv2</span><span class="p">(</span><span class="n">prompt_model</span><span class="o">=</span><span class="n">dspy</span><span class="o">.</span><span class="n">LM</span><span class="p">(</span><span class="s2">&#34;gpt-4o&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">compiled_program</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">AnswerQuestion</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">trainset</span><span class="o">=</span><span class="n">trainset</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">num_trials</span><span class="o">=</span><span class="mi">10</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="64-2025-2026">6.4 2025-2026亮点</h4>
+<ul>
+<li><strong>DSPy v2.5+</strong>：支持多模态输入（图像、音频）</li>
+<li><strong>DSPy Assistant</strong>：交互式优化助手</li>
+<li><strong>跨框架兼容</strong>：可生成 LCEL-compatible 的优化结果</li>
+<li><strong>评估集成</strong>：内置评估框架，支持RAGAS等评估指标</li>
+</ul>
+<hr>
+<h3 id="7-">7. 各框架对比与选型建议</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>LangChain/LangGraph</th>
+<th>LlamaIndex</th>
+<th>Semantic Kernel</th>
+<th>Haystack</th>
+<th>DSPy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>核心定位</td>
+<td>通用AI应用框架</td>
+<td>RAG与数据检索</td>
+<td>企业级AI编排</td>
+<td>搜索与RAG</td>
+<td>Prompt优化</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>✅ StateGraph内置</td>
+<td>❌ 需外部实现</td>
+<td>❌ 需外部实现</td>
+<td>❌ Pipeline模型</td>
+<td>❌ 无状态</td>
+</tr>
+<tr>
+<td>Agent能力</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>RAG能力</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>生产部署</td>
+<td>LangGraph Cloud</td>
+<td>自建</td>
+<td>Azure生态集成</td>
+<td>Deepset Cloud</td>
+<td>需自建</td>
+</tr>
+<tr>
+<td>学习曲线</td>
+<td>中等偏高</td>
+<td>中等</td>
+<td>低（C#生态）</td>
+<td>低</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>Python支持</td>
+<td>✅ 原生</td>
+<td>✅ 原生</td>
+<td>✅</td>
+<td>✅ 原生</td>
+<td>✅ 原生</td>
+</tr>
+<tr>
+<td>社区活跃度</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐</td>
+</tr>
+</tbody>
+</table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>复杂Agent/多步推理 → LangGraph</li>
+<li>RAG/文档问答/知识库 → LlamaIndex</li>
+<li>.NET/C#企业环境 → Semantic Kernel</li>
+<li>搜索型RAG产品 → Haystack</li>
+<li>Prompt质量优化/研究 → DSPy</li>
+</ul>
+<hr>
+<h2 id="5">三、面试常见问题（5个）</h2>
+<h3 id="q1-lcel--chain--langchain--lcel">Q1: LCEL 与传统 Chain 模式有什么区别？为什么 LangChain 要迁移到 LCEL？</h3>
+<p><strong>答</strong>：</p>
+<ol>
+<li><strong>执行模型</strong>：传统Chain是硬编码的执行顺序，LCEL 使用惰性求值编译为优化执行图</li>
+<li><strong>流式支持</strong>：LCEL 自动支持流式输出，传统Chain需要手动实现</li>
+<li><strong>并行执行</strong>：LCEL 中 RunnableParallel 自动并行，传统Chain需额外设计</li>
+<li><strong>类型安全</strong>：LCEL 编译时检查类型兼容性</li>
+<li><strong>可观测性</strong>：LCEL 自动生成执行追踪（LangSmith集成）</li>
+<li><strong>组件复用</strong>：LCEL 的 Runnable 接口统一，可自由组合</li>
+</ol>
+<p>迁移原因：传统Chain难以扩展，不支持流式、并行、动态路由等现代AI应用需求。</p>
+<h3 id="q2-langgraph--stategraph--dag-">Q2: LangGraph 的 StateGraph 与传统 DAG 框架的核心区别是什么？</h3>
+<p><strong>答</strong>：</p>
+<ol>
+<li><strong>状态中心</strong>：StateGraph 维护全局状态（State），节点只关心状态的读取和更新，类似于 Redux 的状态管理模式</li>
+<li><strong>条件边</strong>：支持基于当前状态动态决定执行路径，而非静态DAG</li>
+<li><strong>循环支持</strong>：天然支持循环（Agent的 Thought-Action-Observation 循环），传统DAG多为有向无环图</li>
+<li><strong>中断与恢复</strong>：原生支持在任意节点中断，保存checkpoint，后续恢复执行</li>
+<li><strong>并发节点</strong>：多个节点可以并行修改同一状态（需定义归约函数 reducer）</li>
+</ol>
+<h3 id="q3--ai-">Q3: 如何实现 AI 框架的线程安全？在多用户并发场景下需要注意什么？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li><strong>LangChain/LangGraph</strong>：Runnable 默认是无状态的，但 Callback 和 LangGraph 的 State 需要关注线程安全。使用独立的 Runnable 实例或 Deep Copy。LangGraph 的 Checkpointer（MemorySaver）不是线程安全的，需要改用 PostgreSQL/Redis 后端。</li>
+<li><strong>LlamaIndex</strong>：ServiceContext 不是线程安全的，高并发下应每个请求创建独立的 ServiceContext。</li>
+<li><strong>通用方案</strong>：
+<ul>
+<li>无状态化设计：尽可能让组件无状态</li>
+<li>连接池：向量数据库/LLM客户端使用连接池</li>
+<li>异步处理：使用 <code>ainvoke</code>/<code>arun</code> 等异步接口，配合 asyncio 协程</li>
+<li>每个请求独立实例：在 FastAPI 等框架中为每个请求创建独立的 Chain/Agent 实例</li>
+</ul>
+</li>
+</ul>
+<h3 id="q4-ai-streaming-">Q4: AI框架中的 Streaming 是如何实现的？不同框架的实现差异？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li><strong>LangChain LCEL</strong>：Runnable 接口自带 <code>stream()</code> 方法，LCEL 自动在组件间逐 token 传递流式数据。核心是 RunnableGenerator 的 yield 实现。</li>
+<li><strong>LangGraph</strong>：支持 <code>stream_mode=[&quot;values&quot;, &quot;updates&quot;]</code>，可以流式输出节点状态变化，也可以逐 token 流式输出 LLM 的生成。</li>
+<li><strong>LlamaIndex</strong>：<code>StreamingQueryEngine</code> 包装了流式响应，需要传 <code>streaming=True</code> 参数。</li>
+<li><strong>Semantic Kernel</strong>：支持 <code>StreamingChatCompletion</code> 接口。</li>
+<li><strong>通用原理</strong>：底层依赖 LLM API 的 SSE（Server-Sent Events）实现，框架层通过 Generator/Python Async Generator 逐段传递给上层调用者。</li>
+</ul>
+<h3 id="q5--rag-">Q5: 如何选择合适的框架构建一个企业级 RAG 应用？</h3>
+<p><strong>答</strong>：</p>
+<ol>
+<li>
+<p><strong>需求分析</strong>：</p>
+<ul>
+<li>文档量级：&lt;10K文档 → 任何框架均可；10K-1M → LlamaIndex/Haystack；&gt;1M → 需自定义 + 高性能向量库</li>
+<li>检索复杂度：简单检索 → 任一框架均可；多步检索/多轮对话 → LangGraph</li>
+<li>部署环境：Azure/C# → Semantic Kernel；云原生 → LangGraph Cloud/Deepset Cloud</li>
+</ul>
+</li>
+<li>
+<p><strong>推荐方案</strong>：</p>
+<ul>
+<li>文档问答（简单RAG）：LlamaIndex + 向量数据库</li>
+<li>复杂Agent + RAG：LangChain/LangGraph + LlamaIndex（两者可以混用）</li>
+<li>搜索型产品：Haystack + Elasticsearch</li>
+<li>需要极致Prompt优化：DSPy优化后再部署到 LangChain/LlamaIndex</li>
+</ul>
+</li>
+<li>
+<p><strong>组件可替换性</strong>：核心原则——框架只是脚手架，关键在正确选择 Embedding 模型、Chunking 策略、检索方式和 LLM。</p>
+</li>
+</ol>
+<hr>
+<h2 id="heading-2">四、推荐学习资源</h2>
+<h3 id="heading-3">官方文档</h3>
+<ul>
+<li>LangChain: <a href="https://python.langchain.com/docs">https://python.langchain.com/docs</a></li>
+<li>LangGraph: <a href="https://langchain-ai.github.io/langgraph">https://langchain-ai.github.io/langgraph</a></li>
+<li>LlamaIndex: <a href="https://docs.llamaindex.ai">https://docs.llamaindex.ai</a></li>
+<li>Semantic Kernel: <a href="https://learn.microsoft.com/en-us/semantic-kernel">https://learn.microsoft.com/en-us/semantic-kernel</a></li>
+<li>Haystack: <a href="https://docs.haystack.deepset.ai">https://docs.haystack.deepset.ai</a></li>
+<li>DSPy: <a href="https://dspy-docs.vercel.app">https://dspy-docs.vercel.app</a></li>
+</ul>
+<h3 id="heading-4">书籍与课程</h3>
+<ul>
+<li>《LangChain实战》by 人民邮电出版社</li>
+<li>DeepLearning.AI: LangChain for LLM Application Development</li>
+<li>微软 Semantic Kernel 官方学习路径</li>
+</ul>
+<h3 id="heading-5">开源项目参考</h3>
+<ul>
+<li>LangChain + LangGraph 官方示例仓库</li>
+<li>LlamaIndex 的 llamahub 组件库</li>
+<li>Haystack 的 Cookbook</li>
+<li>DSPy 官方示例与论文仓库</li>
+</ul>
+
+</article>
+
+
+<nav class="series-nav">
+  <span class="series-label">AI应用开发面试宝典 系列</span>
+  <div class="series-links">
+    
+    <a class="series-link prev" href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">← 模型部署与推理优化</a>
+    
+    
+    <a class="series-link next" href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering) →</a>
+    
+  </div>
+</nav>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">模型部署与推理优化</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">提示工程(Prompt Engineering)</span>
+  </a>
+  
+</nav>
+
+
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">面试真题与实战</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/02-%e5%a4%a7%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8bLLM%e5%8e%9f%e7%90%86/">大语言模型(LLM)原理</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">模型部署与推理优化</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/03-AI%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">AI应用开发框架</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering)</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+</body>
+</html>

@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>模型部署与推理优化 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="stylesheet" href="/assets/css/style.css?v=14">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">模型部署与推理优化</h1>
+    <div class="article-meta">
+      <time datetime="2026-06-01">2026-06-01</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="heading">模型部署与推理优化</h1>
+<h2 id="heading-1">概述</h2>
+<p>模型部署与推理优化是AI工程化落地的核心环节。随着大语言模型（LLM）参数规模从数十亿增长至数千亿，将模型高效、低成本地部署到生产环境面临巨大挑战。本章涵盖模型导出、量化、推理引擎、分布式推理、部署架构等全链路知识，帮助面试者系统掌握从模型训练完成到线上高并发服务的完整技术栈。</p>
+<h2 id="heading-2">知识点详解</h2>
+<h3 id="model-export">一、模型导出（Model Export）</h3>
+<p>模型导出是将训练框架（PyTorch、TensorFlow、JAX）中的模型转换为推理优化格式的过程。</p>
+<h4 id="1-onnxopen-neural-network-exchange">1. ONNX（Open Neural Network Exchange）</h4>
+<p>ONNX 是微软和Meta推出的开放神经网络交换格式，作为不同框架间的中间表示。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch.onnx</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># PyTorch模型导出为ONNX</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">YourModel</span><span class="p">()</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">dummy_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">export</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">model</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dummy_input</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;model.onnx&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">opset_version</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">input_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;input&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="n">output_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;output&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dynamic_axes</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;input&#34;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&#34;batch_size&#34;</span><span class="p">},</span> <span class="s2">&#34;output&#34;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&#34;batch_size&#34;</span><span class="p">}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div></div><p>关键参数：</p>
+<ul>
+<li>opset_version：算子集版本，越高支持更多算子</li>
+<li>dynamic_axes：动态维度声明，支持可变batch size</li>
+<li>do_constant_folding：常量折叠优化</li>
+</ul>
+<h4 id="2-tensorrtnvidia">2. TensorRT（NVIDIA）</h4>
+<p>NVIDIA TensorRT 是面向GPU的高性能推理优化器，支持FP16、INT8、INT4量化。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">tensorrt</span> <span class="k">as</span> <span class="nn">trt</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ONNX -&gt; TensorRT Engine</span>
+</span></span><span class="line"><span class="cl"><span class="n">logger</span> <span class="o">=</span> <span class="n">trt</span><span class="o">.</span><span class="n">Logger</span><span class="p">(</span><span class="n">trt</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">builder</span> <span class="o">=</span> <span class="n">trt</span><span class="o">.</span><span class="n">Builder</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">network</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">create_network</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">trt</span><span class="o">.</span><span class="n">NetworkDefinitionCreationFlag</span><span class="o">.</span><span class="n">EXPLICIT_BATCH</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">parser</span> <span class="o">=</span> <span class="n">trt</span><span class="o">.</span><span class="n">OnnxParser</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;model.onnx&#34;</span><span class="p">,</span> <span class="s2">&#34;rb&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">config</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">create_builder_config</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">config</span><span class="o">.</span><span class="n">set_memory_pool_limit</span><span class="p">(</span><span class="n">trt</span><span class="o">.</span><span class="n">MemoryPoolType</span><span class="o">.</span><span class="n">WORKSPACE</span><span class="p">,</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">30</span><span class="p">)</span>  <span class="c1"># 1GB</span>
+</span></span><span class="line"><span class="cl"><span class="n">config</span><span class="o">.</span><span class="n">set_flag</span><span class="p">(</span><span class="n">trt</span><span class="o">.</span><span class="n">BuilderFlag</span><span class="o">.</span><span class="n">FP16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">serialized_engine</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build_serialized_network</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;model.engine&#34;</span><span class="p">,</span> <span class="s2">&#34;wb&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">serialized_engine</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="3-openvinointel">3. OpenVINO（Intel）</h4>
+<p>Intel OpenVINO 针对Intel CPU、GPU、NPU优化，适合边缘部署。</p>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># ONNX -&gt; OpenVINO IR</span>
+</span></span><span class="line"><span class="cl">mo --input_model model.onnx --output_dir ./ir_model --data_type FP16
+</span></span></code></pre></div></div><h4 id="4-coremlapple">4. CoreML（Apple）</h4>
+<p>Apple CoreML 用于iOS/macOS端侧推理。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">coremltools</span> <span class="k">as</span> <span class="nn">ct</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># PyTorch -&gt; CoreML</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">YourModel</span><span class="p">()</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">traced_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">example_input</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">mlmodel</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">traced_model</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">ct</span><span class="o">.</span><span class="n">ImageType</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;input&#34;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">image_shape</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl"><span class="n">mlmodel</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&#34;Model.mlpackage&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="5-tflitegoogle">5. TFLite（Google）</h4>
+<p>TFLite 用于Android/嵌入式设备。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># TF -&gt; TFLite</span>
+</span></span><span class="line"><span class="cl"><span class="n">converter</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">lite</span><span class="o">.</span><span class="n">TFLiteConverter</span><span class="o">.</span><span class="n">from_saved_model</span><span class="p">(</span><span class="s2">&#34;saved_model&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">converter</span><span class="o">.</span><span class="n">optimizations</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">lite</span><span class="o">.</span><span class="n">Optimize</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">converter</span><span class="o">.</span><span class="n">target_spec</span><span class="o">.</span><span class="n">supported_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">float16</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">tflite_model</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">convert</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;model.tflite&#34;</span><span class="p">,</span> <span class="s2">&#34;wb&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tflite_model</span><span class="p">)</span>
+</span></span></code></pre></div></div><h3 id="quantization">二、量化技术（Quantization）</h3>
+<p>量化是将模型权重和激活值从高精度（FP32）映射到低精度（INT8、INT4）的技术，显著减少内存占用和推理延迟。</p>
+<h4 id="1-ptqpost-training-quantization">1. PTQ（Post-Training Quantization）</h4>
+<p>训练后量化，无需重新训练，使用校准数据集确定量化参数。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># PyTorch静态量化示例</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch.quantization</span> <span class="k">as</span> <span class="nn">quant</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">YourModel</span><span class="p">()</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span><span class="o">.</span><span class="n">qconfig</span> <span class="o">=</span> <span class="n">quant</span><span class="o">.</span><span class="n">get_default_qconfig</span><span class="p">(</span><span class="s2">&#34;fbgemm&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">quant</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 校准：用代表性数据跑几次forward</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">calibration_dataloader</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">quant</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 模型现在以INT8运行</span>
+</span></span></code></pre></div></div><h4 id="2-qatquantization-aware-training">2. QAT（Quantization-Aware Training）</h4>
+<p>量化感知训练，在训练过程中模拟量化误差，精度优于PTQ。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># PyTorch QAT</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">YourModel</span><span class="p">()</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span><span class="o">.</span><span class="n">qconfig</span> <span class="o">=</span> <span class="n">quant</span><span class="o">.</span><span class="n">get_default_qat_qconfig</span><span class="p">(</span><span class="s2">&#34;fbgemm&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">quant</span><span class="o">.</span><span class="n">prepare_qat</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 正常训练</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 转换回INT8推理模式</span>
+</span></span><span class="line"><span class="cl"><span class="n">quant</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">(),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="3-int4--int8-">3. INT4 / INT8 量化</h4>
+<table>
+<thead>
+<tr>
+<th>精度</th>
+<th>内存节省</th>
+<th>推理加速</th>
+<th>精度损失</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FP32</td>
+<td>1x (基线)</td>
+<td>1x</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>FP16</td>
+<td>2x</td>
+<td>~1.5x</td>
+<td>极小</td>
+</tr>
+<tr>
+<td>INT8</td>
+<td>4x</td>
+<td>~2-4x</td>
+<td>较小</td>
+</tr>
+<tr>
+<td>INT4</td>
+<td>8x</td>
+<td>~3-6x</td>
+<td>较大(需特殊处理)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="4-llm">4. LLM专用量化格式</h4>
+<p><strong>GGUF（GPT-Generated Unified Format）</strong></p>
+<ul>
+<li>llama.cpp 生态使用</li>
+<li>支持 2-8 bit 混合量化</li>
+<li>适合CPU/边缘设备推理</li>
+</ul>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 使用llama.cpp进行量化</span>
+</span></span><span class="line"><span class="cl">./quantize models/llama-7b.gguf Q4_K_M
+</span></span></code></pre></div></div><p><strong>GPTQ（GPT Post-Training Quantization）</strong></p>
+<ul>
+<li>基于Optimal Brain Quantization（OBQ）算法</li>
+<li>逐层量化，考虑Hessian矩阵</li>
+<li>支持4bit量化且精度优秀</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">auto_gptq</span> <span class="kn">import</span> <span class="n">AutoGPTQForCausalLM</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">AutoGPTQForCausalLM</span><span class="o">.</span><span class="n">from_quantized</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;model_name&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">use_triton</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">quantize_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">device</span><span class="o">=</span><span class="s2">&#34;cuda:0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>AWQ（Activation-aware Weight Quantization）</strong></p>
+<ul>
+<li>基于激活值分布感知的量化</li>
+<li>保护&quot;重要&quot;权重通道（salient channels）</li>
+<li>速度优于GPTQ，精度相当</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">awq</span> <span class="kn">import</span> <span class="n">AutoAWQForCausalLM</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">AutoAWQForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&#34;model_name&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tokenizer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">quant_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;zero_point&#34;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&#34;q_group_size&#34;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span> <span class="s2">&#34;w_bit&#34;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="s2">&#34;quantized_model&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h3 id="inference-engines">三、推理引擎（Inference Engines）</h3>
+<h4 id="1-vllm">1. vLLM</h4>
+<p>高性能LLM推理引擎，核心创新是PagedAttention。</p>
+<p>特点：</p>
+<ul>
+<li>PagedAttention解决KV Cache碎片化</li>
+<li>连续批处理（Continuous Batching）</li>
+<li>支持Tensor Parallel和Pipeline Parallel</li>
+<li>OpenAI兼容API</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 使用vLLM部署</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">vllm</span> <span class="kn">import</span> <span class="n">LLM</span><span class="p">,</span> <span class="n">SamplingParams</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">llm</span> <span class="o">=</span> <span class="n">LLM</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&#34;meta-llama/Llama-3.1-8B&#34;</span><span class="p">,</span> <span class="n">tensor_parallel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">SamplingParams</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">top_p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">outputs</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">([</span><span class="s2">&#34;Hello, who are you?&#34;</span><span class="p">],</span> <span class="n">sampling_params</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</span></span></code></pre></div></div><div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 启动vLLM API服务</span>
+</span></span><span class="line"><span class="cl">python -m vllm.entrypoints.openai.api_server <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --model meta-llama/Llama-3.1-8B <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --tensor-parallel-size <span class="m">2</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --gpu-memory-utilization 0.85 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --max-num-seqs <span class="m">256</span>
+</span></span></code></pre></div></div><h4 id="2-tgitext-generation-inference">2. TGI（Text Generation Inference）</h4>
+<p>Hugging Face 推出的推理引擎，与HuggingFace生态集成最佳。</p>
+<p>特点：</p>
+<ul>
+<li>HuggingFace模型原生支持</li>
+<li>内置安全检查和内容过滤</li>
+<li>支持LoRA adapter热加载</li>
+<li>Watermarking支持</li>
+</ul>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 启动TGI</span>
+</span></span><span class="line"><span class="cl">docker run --gpus all -p 8080:80 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    ghcr.io/huggingface/text-generation-inference:latest <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --model-id meta-llama/Llama-3.1-8B <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --max-total-tokens <span class="m">8192</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --num-shard <span class="m">2</span>
+</span></span></code></pre></div></div><h4 id="3-tensorrt-llm">3. TensorRT-LLM</h4>
+<p>NVIDIA 推出的LLM推理框架，对NVIDIA GPU极致优化。</p>
+<p>特点：</p>
+<ul>
+<li>基于TensorRT底层优化</li>
+<li>支持FP8、INT4、INT8量化</li>
+<li>支持多GPU多节点分布式推理</li>
+<li>In-flight Batching</li>
+</ul>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># TensorRT-LLM构建并运行</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 1. 构建模型引擎</span>
+</span></span><span class="line"><span class="cl">python build.py --model_type llama <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --model_path meta-llama/Llama-3.1-8B <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --dtype float16 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --use_gpt_attention_plugin float16 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --use_gemm_plugin float16 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --max_batch_size <span class="m">64</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --max_input_len <span class="m">4096</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --max_output_len <span class="m">2048</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. 启动服务</span>
+</span></span><span class="line"><span class="cl">mpirun -np <span class="m">2</span> --allow-run-as-root <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    python run.py --engine_dir ./llama_engine
+</span></span></code></pre></div></div><h4 id="4-llamacpp">4. llama.cpp</h4>
+<p>C/C++实现的LLM推理框架，专注CPU和边缘设备。</p>
+<p>特点：</p>
+<ul>
+<li>无GPU依赖，纯CPU推理</li>
+<li>GGUF格式模型</li>
+<li>支持Apple Metal加速</li>
+<li>内存效率极高</li>
+</ul>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 编译和运行</span>
+</span></span><span class="line"><span class="cl">git clone https://github.com/ggerganov/llama.cpp
+</span></span><span class="line"><span class="cl">make -j
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 运行推理</span>
+</span></span><span class="line"><span class="cl">./main -m models/llama-7b.Q4_K_M.gguf <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -p <span class="s2">&#34;Hello, who are you?&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -n <span class="m">256</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -t <span class="m">8</span>
+</span></span></code></pre></div></div><h4 id="5-ollama">5. Ollama</h4>
+<p>极简LLM部署工具，面向开发者个人使用。</p>
+<p>特点：</p>
+<ul>
+<li>一键安装，极简体验</li>
+<li>内置模型管理</li>
+<li>REST API支持</li>
+<li>适合本地开发和测试</li>
+</ul>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 安装Ollama</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://ollama.com/install.sh <span class="p">|</span> sh
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 运行模型</span>
+</span></span><span class="line"><span class="cl">ollama pull llama3.1
+</span></span><span class="line"><span class="cl">ollama run llama3.1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># API调用</span>
+</span></span><span class="line"><span class="cl">curl http://localhost:11434/api/generate -d <span class="s1">&#39;{
+</span></span></span><span class="line"><span class="cl"><span class="s1">  &#34;model&#34;: &#34;llama3.1&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s1">  &#34;prompt&#34;: &#34;Hello, who are you?&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">}&#39;</span>
+</span></span></code></pre></div></div><h4 id="6-sglang">6. SGLang</h4>
+<p>新兴的LLM推理框架，面向结构化生成和复杂推理场景。</p>
+<p>特点：</p>
+<ul>
+<li>RadixAttention（前缀缓存优化）</li>
+<li>Structured Generation（JSON Schema约束）</li>
+<li>Constrained Decoding</li>
+<li>与vLLM类似的高性能</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># SGLang推理</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">sglang</span> <span class="k">as</span> <span class="nn">sgl</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@sgl</span><span class="o">.</span><span class="n">function</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">answer_question</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">question</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">s</span> <span class="o">+=</span> <span class="n">sgl</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">s</span> <span class="o">+=</span> <span class="n">sgl</span><span class="o">.</span><span class="n">assistant</span><span class="p">(</span><span class="n">sgl</span><span class="o">.</span><span class="n">gen</span><span class="p">(</span><span class="s2">&#34;answer&#34;</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">llm</span> <span class="o">=</span> <span class="n">sgl</span><span class="o">.</span><span class="n">Engine</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="s2">&#34;meta-llama/Llama-3.1-8B&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">state</span> <span class="o">=</span> <span class="n">answer_question</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">question</span><span class="o">=</span><span class="s2">&#34;What is the capital of France?&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&#34;answer&#34;</span><span class="p">])</span>
+</span></span></code></pre></div></div><h3 id="heading-3">四、推理优化技术</h3>
+<h4 id="1-pagedattention">1. PagedAttention</h4>
+<p>vLLM的核心创新，解决KV Cache的内存管理问题。</p>
+<p>传统方案：</p>
+<ul>
+<li>KV Cache预先分配固定大小 -&gt; 内存浪费（internal fragmentation）</li>
+<li>无法共享请求间的KV Cache</li>
+</ul>
+<p>PagedAttention：</p>
+<ul>
+<li>将KV Cache分页管理（类似OS虚拟内存）</li>
+<li>按需分配页面，消除碎片</li>
+<li>支持页面级共享（Copy-on-Write）</li>
+<li>内存利用率从<del>30%提升至</del>95%</li>
+</ul>
+<h4 id="2-flash-attention">2. Flash Attention</h4>
+<p>I/O-aware的精确注意力计算算法，减少HBM访问。</p>
+<p>核心思想：</p>
+<ul>
+<li>将Q、K、V分块存入SRAM（片上高速缓存）</li>
+<li>在SRAM内完成注意力计算</li>
+<li>减少HBM读写次数</li>
+</ul>
+<p>版本演进：</p>
+<ul>
+<li>FlashAttention 1：2x加速，精确注意力</li>
+<li>FlashAttention 2：进一步优化parallelism，~2x再加速</li>
+<li>FlashAttention 3（Hopper GPU）：利用FP8，~1.5x再加速</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 在模型中启用Flash Attention</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;meta-llama/Llama-3.1-8B&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">attn_implementation</span><span class="o">=</span><span class="s2">&#34;flash_attention_2&#34;</span><span class="p">,</span>  <span class="c1"># 启用Flash Attention</span>
+</span></span><span class="line"><span class="cl">    <span class="n">device_map</span><span class="o">=</span><span class="s2">&#34;auto&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="3-continuous-batching">3. Continuous Batching（连续批处理）</h4>
+<p>传统批处理：等当前批次全部完成后才处理新请求。</p>
+<p>连续批处理：</p>
+<ul>
+<li>每个请求独立管理生成进度</li>
+<li>请求完成后立即腾出slot给新请求</li>
+<li>无需等待整个批次完成</li>
+<li>GPU利用率大幅提升，延迟降低</li>
+</ul>
+<div class="code-wrapper" data-lang="text"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">传统批处理:
+</span></span><span class="line"><span class="cl">|---请求A---请求A---请求A---| |---请求B---请求B---| |---请求C---请求C---请求C---|
+</span></span><span class="line"><span class="cl">                              (GPU空闲)           (GPU空闲)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">连续批处理:
+</span></span><span class="line"><span class="cl">|---请求A---请求A---请求C---请求B---请求A---请求C---请求B---请求C---|
+</span></span><span class="line"><span class="cl">              (请求A完成，新请求C加入)      (请求B完成，新请求...)
+</span></span></code></pre></div></div><h4 id="4-prefix-caching">4. Prefix Caching（前缀缓存）</h4>
+<p>缓存公共前缀（如系统提示词、对话历史）的KV Cache。</p>
+<p>实现方式：</p>
+<ul>
+<li>SGLang: RadixAttention（基于Radix Tree的KV缓存）</li>
+<li>vLLM: Automatic Prefix Caching</li>
+<li>TGI: Prefix Caching</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># vLLM启用Prefix Caching</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">vllm</span> <span class="kn">import</span> <span class="n">LLM</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">llm</span> <span class="o">=</span> <span class="n">LLM</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">model</span><span class="o">=</span><span class="s2">&#34;meta-llama/Llama-3.1-8B&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">enable_prefix_caching</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># 启用自动前缀缓存</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div></div><h3 id="heading-4">五、分布式推理</h3>
+<h4 id="1-tensor-parallel">1. Tensor Parallel（张量并行）</h4>
+<p>将单个层的权重矩阵切分到多个GPU上并行计算。</p>
+<p>适用于：单节点多GPU场景</p>
+<div class="code-wrapper" data-lang="text"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">输入
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">[Layer]  ---  GPU0: 权重前半部分
+</span></span><span class="line"><span class="cl">  |       ---  GPU1: 权重后半部分
+</span></span><span class="line"><span class="cl">  |
+</span></span><span class="line"><span class="cl">  输出(需all-reduce合并)
+</span></span></code></pre></div></div><ul>
+<li>通信量：每层需要all-reduce</li>
+<li>延迟：低（通信量小）</li>
+<li>限制：GPU需在同一个节点（NVLink）</li>
+</ul>
+<h4 id="2-pipeline-parallel">2. Pipeline Parallel（流水线并行）</h4>
+<p>将模型的不同层分布到不同GPU上，形成流水线。</p>
+<p>适用于：跨节点多GPU场景</p>
+<div class="code-wrapper" data-lang="text"><div class="code-ln"><pre><code>1
+2
+3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">GPU0: Layer 1-10  ---&gt;  GPU1: Layer 11-20  ---&gt;  GPU2: Layer 21-30
+</span></span><span class="line"><span class="cl">          |                      |                        |
+</span></span><span class="line"><span class="cl">       输入                   中间激活                   输出
+</span></span></code></pre></div></div><ul>
+<li>通信量：仅为中间激活（较小）</li>
+<li>利用率问题：存在&quot;气泡&quot;（pipeline bubble）</li>
+<li>缓解：Micro-batching（将batch拆分为micro-batch）</li>
+</ul>
+<h4 id="3-expert-parallel-for-moemoe">3. Expert Parallel for MoE（MoE专家并行）</h4>
+<p>针对Mixture-of-Experts模型的专用并行策略。</p>
+<ul>
+<li>每个Expert放置在不同GPU</li>
+<li>路由（Router）分配token给对应的Expert</li>
+<li>需要all-to-all通信</li>
+</ul>
+<div class="code-wrapper" data-lang="text"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">Router: 输入token被路由到不同Expert
+</span></span><span class="line"><span class="cl">         |
+</span></span><span class="line"><span class="cl">  Expert A (GPU0)  ---  token子集A
+</span></span><span class="line"><span class="cl">  Expert B (GPU1)  ---  token子集B
+</span></span><span class="line"><span class="cl">  Expert C (GPU2)  ---  token子集C
+</span></span><span class="line"><span class="cl">  Expert D (GPU3)  ---  token子集D
+</span></span><span class="line"><span class="cl">         |
+</span></span><span class="line"><span class="cl">         合并输出
+</span></span></code></pre></div></div><p>典型模型：Mixtral 8x7B、DeepSeek-V2/V3、Qwen-MoE</p>
+<h3 id="heading-5">六、部署架构</h3>
+<h4 id="1-gpu">1. GPU实例选型</h4>
+<table>
+<thead>
+<tr>
+<th>需求场景</th>
+<th>推荐GPU</th>
+<th>显存需求</th>
+<th>参考成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7B模型推理</td>
+<td>A10G / RTX 4090</td>
+<td>16-24GB</td>
+<td>低</td>
+</tr>
+<tr>
+<td>13B-34B模型推理</td>
+<td>A100 40G / L40S</td>
+<td>40-48GB</td>
+<td>中</td>
+</tr>
+<tr>
+<td>70B模型推理</td>
+<td>A100 80G / H100</td>
+<td>80GB</td>
+<td>高</td>
+</tr>
+<tr>
+<td>180B+千亿模型</td>
+<td>H100 (多卡)</td>
+<td>多卡部署</td>
+<td>极高</td>
+</tr>
+<tr>
+<td>边缘/端侧</td>
+<td>Jetson Orin / Apple M系列</td>
+<td>8-16GB</td>
+<td>低</td>
+</tr>
+</tbody>
+</table>
+<p>选型要素：</p>
+<ul>
+<li>显存大小：模型权重 + KV Cache + 中间激活</li>
+<li>计算能力：TFLOPS（FP16/BF16/FP8）</li>
+<li>显存带宽：HBM带宽影响解码速度</li>
+<li>互联带宽：NVLink vs PCIe</li>
+</ul>
+<h4 id="2-">2. 负载均衡</h4>
+<p>请求路由策略：</p>
+<ul>
+<li>Round Robin：简单均匀分配</li>
+<li>Least Connections：根据当前连接数分配</li>
+<li>Token Aware：根据每个实例剩余容量（可用token slots）分配</li>
+</ul>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c"># Nginx配置示例：模型推理服务负载均衡</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">upstream inference_servers {</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">least_conn;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">server 10.0.1.1:8000 max_fails=3 fail_timeout=30s;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">server 10.0.1.2:8000 max_fails=3 fail_timeout=30s;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">server 10.0.1.3:8000 max_fails=3 fail_timeout=30s;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">server {</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">listen 443 ssl;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">location /v1/chat/completions {</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="l">proxy_pass http://inference_servers;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="l">proxy_read_timeout 300s;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>}<span class="w">
+</span></span></span></code></pre></div></div><h4 id="3-">3. 自动扩缩容</h4>
+<p>基于指标：</p>
+<ul>
+<li>GPU利用率 &gt; 70% -&gt; 扩容</li>
+<li>请求排队数 &gt; 阈值 -&gt; 扩容</li>
+<li>推理延迟 &gt; P99 5s -&gt; 扩容</li>
+</ul>
+<p>常用工具：</p>
+<ul>
+<li>Kubernetes HPA（Horizontal Pod Autoscaler）</li>
+<li>KEDA（基于事件驱动）</li>
+<li>AWS ECS Auto Scaling</li>
+</ul>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c"># Kubernetes HPA配置</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">autoscaling/v2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">HorizontalPodAutoscaler</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">inference-hpa</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">scaleTargetRef</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">inference-server</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">minReplicas</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">maxReplicas</span><span class="p">:</span><span class="w"> </span><span class="m">20</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">metrics</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">Resource</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">memory</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">Utilization</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">averageUtilization</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span></code></pre></div></div><h4 id="4-">4. 冷启动优化</h4>
+<p>问题：模型加载到GPU需要数分钟，导致弹性扩缩容延迟高。</p>
+<p>方案：</p>
+<ol>
+<li>
+<p>预加载（Model Warm Pool）</p>
+<ul>
+<li>提前部署N个副本并保持空闲</li>
+<li>收到请求快速切换</li>
+</ul>
+</li>
+<li>
+<p>模型分片加载</p>
+<ul>
+<li>先加载模型部分层开始服务</li>
+<li>后台继续加载剩余层</li>
+</ul>
+</li>
+<li>
+<p>容器镜像优化</p>
+<ul>
+<li>使用模型缓存（model cache volume）</li>
+<li>分层加载（先加载权重、再加载代码）</li>
+</ul>
+</li>
+<li>
+<p>Serverless推理</p>
+<ul>
+<li>AWS SageMaker Serverless Inference</li>
+<li>分钟级冷启动（优化后可降至10秒内）</li>
+</ul>
+</li>
+</ol>
+<h3 id="heading-6">七、推理框架选型对比</h3>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>vLLM</th>
+<th>TGI</th>
+<th>TensorRT-LLM</th>
+<th>SGLang</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>社区活跃度</td>
+<td>极高</td>
+<td>高</td>
+<td>中</td>
+<td>快速增长</td>
+</tr>
+<tr>
+<td>PagedAttention</td>
+<td>原生</td>
+<td>无</td>
+<td>类似(In-flight Batching)</td>
+<td>RadixAttention</td>
+</tr>
+<tr>
+<td>Flash Attention</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>连续批处理</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>量化支持</td>
+<td>AWQ/GPTQ</td>
+<td>GPTQ</td>
+<td>INT4/INT8/FP8</td>
+<td>AWQ/GPTQ</td>
+</tr>
+<tr>
+<td>Tensor Parallel</td>
+<td>支持</td>
+<td>支持</td>
+<td>原生优化</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>Prefix Caching</td>
+<td>支持</td>
+<td>支持</td>
+<td>V2开始支持</td>
+<td>RadixAttention(最优)</td>
+</tr>
+<tr>
+<td>LoRA支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>有限</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>OpenAI API兼容</td>
+<td>完整</td>
+<td>部分</td>
+<td>有限</td>
+<td>完整</td>
+</tr>
+<tr>
+<td>HHEcosystem集成</td>
+<td>一般</td>
+<td>最佳</td>
+<td>一般</td>
+<td>一般</td>
+</tr>
+<tr>
+<td>结构化输出</td>
+<td>有限</td>
+<td>有限</td>
+<td>有限</td>
+<td>最佳(Grammar约束)</td>
+</tr>
+<tr>
+<td>GPU利用率</td>
+<td>高</td>
+<td>中高</td>
+<td>最高</td>
+<td>高</td>
+</tr>
+</tbody>
+</table>
+<p>选型建议：</p>
+<ul>
+<li>通用场景：vLLM（生态好、性能强、功能全）</li>
+<li>HuggingFace深度用户：TGI（生态集成最佳）</li>
+<li>NVIDIA GPU极致优化：TensorRT-LLM（显存利用最佳）</li>
+<li>复杂生成/结构化输出：SGLang（RadixAttention + Grammar约束）</li>
+</ul>
+<h3 id="serving">八、Serving方案</h3>
+<h4 id="1-kserve">1. KServe</h4>
+<p>Kubernetes上的模型服务框架（原KFServing）。</p>
+<p>特点：</p>
+<ul>
+<li>基于Kubernetes CRD</li>
+<li>支持多种推理框架（vLLM、TGI、Triton）</li>
+<li>内置自动扩缩容（Knative + Istio）</li>
+<li>Canary发布、A/B测试</li>
+</ul>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">serving.kserve.io/v1beta1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">InferenceService</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">llama-service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">predictor</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">model</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">modelFormat</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">pytorch</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">storageUri</span><span class="p">:</span><span class="w"> </span><span class="l">s3://my-bucket/llama-model</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">limits</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">nvidia.com/gpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
+</span></span></span></code></pre></div></div><h4 id="2-bentoml">2. BentoML</h4>
+<p>Python-first的模型服务框架。</p>
+<p>特点：</p>
+<ul>
+<li>Pythonic API，开发体验好</li>
+<li>内置模型管理（Bento Store）</li>
+<li>支持各种推理框架作为Runner</li>
+<li>自动生成Docker镜像</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">bentoml</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">vllm</span> <span class="kn">import</span> <span class="n">LLM</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@bentoml</span><span class="o">.</span><span class="n">service</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">LLMService</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">LLM</span><span class="p">(</span><span class="s2">&#34;meta-llama/Llama-3.1-8B&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@bentoml</span><span class="o">.</span><span class="n">api</span>
+</span></span><span class="line"><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+</span></span></code></pre></div></div><div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 打包并部署</span>
+</span></span><span class="line"><span class="cl">bentoml build
+</span></span><span class="line"><span class="cl">bentoml serve LLMService:latest
+</span></span></code></pre></div></div><h4 id="3-ray-serve">3. Ray Serve</h4>
+<p>基于Ray分布式计算平台的模型服务框架。</p>
+<p>特点：</p>
+<ul>
+<li>原生分布式支持</li>
+<li>Python async/await</li>
+<li>支持动态请求批处理</li>
+<li>与Ray生态深度集成</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">vllm</span> <span class="kn">import</span> <span class="n">LLM</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span><span class="p">(</span><span class="n">num_replicas</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ray_actor_options</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;num_gpus&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">LLMDeployment</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">LLM</span><span class="p">(</span><span class="s2">&#34;meta-llama/Llama-3.1-8B&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">prompt</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="p">[</span><span class="s2">&#34;prompt&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">serve</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">LLMDeployment</span><span class="o">.</span><span class="n">bind</span><span class="p">())</span>
+</span></span></code></pre></div></div><h4 id="4-triton-inference-server">4. Triton Inference Server</h4>
+<p>NVIDIA 高性能推理服务器，支持多框架多模型。</p>
+<p>特点：</p>
+<ul>
+<li>支持所有主流框架（TensorRT、PyTorch、ONNX、vLLM等）</li>
+<li>动态批处理（Dynamic Batching）</li>
+<li>模型并发（Model Concurrency）</li>
+<li>性能监控（Prometheus Metrics）</li>
+</ul>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 启动Triton Server</span>
+</span></span><span class="line"><span class="cl">docker run --gpus all -p 8000:8000 -p 8001:8001 -p 8002:8002 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -v /models:/models <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    nvcr.io/nvidia/tritonserver:24.08-py3 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    tritonserver --model-repository<span class="o">=</span>/models
+</span></span></code></pre></div></div><div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># Triton Python Client</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">tritonclient.http</span> <span class="k">as</span> <span class="nn">httpclient</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">client</span> <span class="o">=</span> <span class="n">httpclient</span><span class="o">.</span><span class="n">InferenceServerClient</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&#34;localhost:8000&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">httpclient</span><span class="o">.</span><span class="n">InferInput</span><span class="p">(</span><span class="s2">&#34;input_ids&#34;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="s2">&#34;INT64&#34;</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">httpclient</span><span class="o">.</span><span class="n">InferRequestedOutput</span><span class="p">(</span><span class="s2">&#34;outputs&#34;</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="s2">&#34;llama_model&#34;</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+</span></span></code></pre></div></div><h3 id="heading-7">九、面试常见问题</h3>
+<h4 id="q1-llm">Q1: 如何优化LLM推理延迟？</h4>
+<p>回答框架：</p>
+<ol>
+<li><strong>模型层面</strong>：量化（INT4/AWQ）、模型蒸馏、MoE激活稀疏</li>
+<li><strong>推理引擎</strong>：使用vLLM/TensorRT-LLM、启用Flash Attention</li>
+<li><strong>KV Cache优化</strong>：PagedAttention、Prefix Caching、KV Cache量化</li>
+<li><strong>并行策略</strong>：Tensor Parallel、增大batch size</li>
+<li><strong>部署优化</strong>：Speculative Decoding（投机解码）、Prompt压缩</li>
+</ol>
+<h4 id="q2-100llm">Q2: 设计一个支持100并发的LLM推理服务？</h4>
+<p>回答框架：</p>
+<ol>
+<li><strong>选型</strong>：vLLM + Ray Serve / KServe</li>
+<li><strong>GPU配置</strong>：
+<ul>
+<li>每个模型副本使用A100 80G</li>
+<li>Tensor Parallel=2（如果模型较大）</li>
+</ul>
+</li>
+<li><strong>并发处理</strong>：
+<ul>
+<li>Continuous Batching自动处理并发</li>
+<li>配置max-num-seqs=256</li>
+</ul>
+</li>
+<li><strong>弹性扩展</strong>：
+<ul>
+<li>部署5-10个副本（根据需求）</li>
+<li>自动扩缩容</li>
+</ul>
+</li>
+<li><strong>负载均衡</strong>：
+<ul>
+<li>Token-aware调度</li>
+<li>请求队列（Redis + Celery）</li>
+</ul>
+</li>
+<li><strong>优化</strong>：
+<ul>
+<li>启用Prefix Caching</li>
+<li>响应流式输出（SSE/Streaming）</li>
+</ul>
+</li>
+</ol>
+<h4 id="q3-">Q3: 如何选择量化方案？</h4>
+<p>决策树：</p>
+<pre><code>模型 &gt; 7B 且需要最高精度？
+  └─ 是 -&gt; AWQ 4bit（精度最高）
+  └─ 否 -&gt; 继续
+需要CPU推理？
+  └─ 是 -&gt; GGUF Q4_K_M/Q5_K_M
+  └─ 否 -&gt; 继续
+需要最大速度？
+  └─ 是 -&gt; GPTQ/TensorRT-LLM INT8
+  └─ 否 -&gt; AWQ 4bit（最佳平衡）
+边缘设备？
+  └─ 是 -&gt; TFLite INT8 / CoreML FP16
+</code></pre>
+<h4 id="q4-serverless">Q4: 如何优化Serverless推理冷启动？</h4>
+<p>方案：</p>
+<ol>
+<li>
+<p><strong>模型预加载池（Warm Pool）</strong></p>
+<ul>
+<li>维护N个预热实例</li>
+<li>请求涌入时快速切换</li>
+</ul>
+</li>
+<li>
+<p><strong>模型存储优化</strong></p>
+<ul>
+<li>使用NVMe本地SSD缓存</li>
+<li>分布式模型缓存（如S3FS-FUSE + Caching）</li>
+</ul>
+</li>
+<li>
+<p><strong>模型分片加载</strong></p>
+<ul>
+<li>先加载前几层开始服务</li>
+<li>异步加载剩余层</li>
+</ul>
+</li>
+<li>
+<p><strong>容器优化</strong></p>
+<ul>
+<li>使用Safetensors加速权重加载</li>
+<li>优化Docker镜像层（基础镜像预装CUDA库）</li>
+</ul>
+</li>
+<li>
+<p><strong>框架优化</strong></p>
+<ul>
+<li>vLLM的模型加载比HuggingFace Transformers快</li>
+<li>使用编译后的Engine（TensorRT-LLM）</li>
+</ul>
+</li>
+</ol>
+<h3 id="heading-8">推荐学习资源</h3>
+<ul>
+<li><strong>vLLM官方文档</strong>：https://docs.vllm.ai</li>
+<li><strong>TensorRT-LLM文档</strong>：https://nvidia.github.io/TensorRT-LLM</li>
+<li><strong>HuggingFace TGI文档</strong>：https://huggingface.co/docs/text-generation-inference</li>
+<li><strong>Awesome LLM Inference</strong>（GitHub仓库）</li>
+<li><strong>Flash Attention论文</strong>：https://arxiv.org/abs/2205.14135</li>
+<li><strong>PagedAttention论文</strong>：https://arxiv.org/abs/2309.06180</li>
+<li><strong>EfficientML.ai</strong>（MIT课程，Song Han主讲）</li>
+<li><strong>NVIDIA TensorRT Developer Guide</strong></li>
+</ul>
+
+</article>
+
+
+<nav class="series-nav">
+  <span class="series-label">AI应用开发面试宝典 系列</span>
+  <div class="series-links">
+    
+    <a class="series-link prev" href="/posts/AI/02-%e5%a4%a7%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8bLLM%e5%8e%9f%e7%90%86/">← 大语言模型(LLM)原理</a>
+    
+    
+    <a class="series-link next" href="/posts/AI/03-AI%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">AI应用开发框架 →</a>
+    
+  </div>
+</nav>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/AI/02-%e5%a4%a7%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8bLLM%e5%8e%9f%e7%90%86/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">大语言模型(LLM)原理</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/03-AI%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">AI应用开发框架</span>
+  </a>
+  
+</nav>
+
+
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">面试真题与实战</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/02-%e5%a4%a7%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8bLLM%e5%8e%9f%e7%90%86/">大语言模型(LLM)原理</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">模型部署与推理优化</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/03-AI%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">AI应用开发框架</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering)</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+</body>
+</html>

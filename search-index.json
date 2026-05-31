@@ -1,5 +1,135 @@
 [
   {
+    "title": "面试真题与实战",
+    "url": "/posts/AI/10-面试真题与实战/",
+    "content": "# 面试真题与实战\n\n## 概述\n\n本章汇集AI应用开发面试中常见的笔试、编程题、系统设计题和行为面试题。内容覆盖从基础算法实现到完整RAG/Agent系统搭建的编码实战，以及各公司面经和考前冲刺清单，是面试前冲刺复习的核心资料。\n\n## 知识点详解\n\n### 一、基础算法题\n\n#### 1. Attention机制实现\n\n```python\nimport numpy as np\n\ndef scaled_dot_product_attention(Q, K, V, mask=None):\n    \"\"\"\n    Scaled Dot-Product Attention 实现\n    \n    Args:\n        Q: Query矩阵, shape (batch_size, seq_len, d_k)\n        K: Key矩阵, shape (batch_size, seq_len, d_k)\n        V: Value矩阵, shape (batch_size, seq_len, d_v)\n        mask: 可选mask, shape (batch_si...",
+    "summary": "",
+    "tags": [
+      "面试",
+      "真题",
+      "实战"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "大语言模型(LLM)原理",
+    "url": "/posts/AI/02-大语言模型LLM原理/",
+    "content": "# 02 — 大语言模型(LLM)原理\n\n\u003e 涵盖GPT全系列演进、预训练范式、推理机制、Scaling Laws、RLHF/DPO、MoE、长上下文、多模态及2025-2026年前沿进展\n\u003e 更新至 2025-2026 年最新知识（含DeepSeek-R1、GPT-4o、o1/o3、Mamba等）\n\n---\n\n## 一、概述\n\n大语言模型（Large Language Model, LLM）是当前AI应用开发面试的绝对核心。2025-2026年的面试关注点发生了显著变化：\n\n- **从\"了解GPT\"到\"理解GPT**：不再是简单罗列模型名字，而是深入理解每个设计决策的原因\n- **推理能力成为新焦点**：o1/o3模型开启\"推理Scaling Law\"新时代，DeepSeek-R1展示开源推理模型的可行性\n- **MoE架构占据主导**：GPT-4、Mixtral、DeepSeek-V2/V3全线MoE，理解路由和负载均衡成为必备知识\n- **长上下文成标配**：1M+ token上下文窗口的模型越来越多，位置编码技术成为面试高频考点\n- **前沿模型百花齐放**：Mamba（SSM...",
+    "summary": "",
+    "tags": [
+      "LLM",
+      "Transformer",
+      "GPT"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "模型部署与推理优化",
+    "url": "/posts/AI/08-模型部署与推理优化/",
+    "content": "# 模型部署与推理优化\n\n## 概述\n\n模型部署与推理优化是AI工程化落地的核心环节。随着大语言模型（LLM）参数规模从数十亿增长至数千亿，将模型高效、低成本地部署到生产环境面临巨大挑战。本章涵盖模型导出、量化、推理引擎、分布式推理、部署架构等全链路知识，帮助面试者系统掌握从模型训练完成到线上高并发服务的完整技术栈。\n\n## 知识点详解\n\n### 一、模型导出（Model Export）\n\n模型导出是将训练框架（PyTorch、TensorFlow、JAX）中的模型转换为推理优化格式的过程。\n\n#### 1. ONNX（Open Neural Network Exchange）\n\nONNX 是微软和Meta推出的开放神经网络交换格式，作为不同框架间的中间表示。\n\n```python\nimport torch\nimport torch.onnx\n\n# PyTorch模型导出为ONNX\nmodel = YourModel().eval()\ndummy_input = torch.randn(1, 3, 224, 224)\n\ntorch.onnx.export(\n    model,\n   ...",
+    "summary": "",
+    "tags": [
+      "部署",
+      "推理优化",
+      "量化"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "AI应用开发框架",
+    "url": "/posts/AI/03-AI应用开发框架/",
+    "content": "# AI应用开发框架面试知识\n\n## 一、概述\n\nAI应用开发框架是当前大模型落地工程化的核心基础设施。2025-2026年，主流框架已从单纯的LLM调用封装演进为完整的AI应用开发平台，涵盖模型编排、状态管理、检索增强、多智能体协作等能力。面试中，候选人需要理解各框架的核心设计理念、适用场景、关键差异以及最新演进方向。\n\n---\n\n## 二、知识点详解\n\n### 1. LangChain 核心概念\n\n#### 1.1 Chain\nChain是LangChain最原始的设计抽象，代表一系列组件的有序组合。典型如 LLMChain（Prompt + Model + OutputParser）、SequentialChain（串联多个Chain）、RouterChain（条件路由）。但自 v0.2 起，Chain 已被标记为 Legacy，推荐使用 LCEL。\n```python\n# Legacy Chain 方式\nfrom langchain.chains import LLMChain\nfrom langchain.prompts import PromptTemplate\nfrom ...",
+    "summary": "",
+    "tags": [
+      "LangChain",
+      "LlamaIndex",
+      "开发框架"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "提示工程(Prompt Engineering)",
+    "url": "/posts/AI/04-提示工程Prompt Engineering/",
+    "content": "# 提示工程(Prompt Engineering)面试知识\n\n## 一、概述\n\n提示工程（Prompt Engineering）是设计与优化输入提示词以引导大语言模型（LLM）产生期望输出的技术与艺术。2025-2026年，随着模型能力的持续提升和Agent/工具调用范式的普及，Prompt Engineering 已从简单的\"写提示词\"演变为系统化的工程实践，涉及消息结构设计、推理策略、结构化输出、安全防护和自动优化等多个维度。\n\n---\n\n## 二、知识点详解\n\n### 1. Prompt基本结构\n\n#### 1.1 消息角色体系\n\n现代LLM（OpenAI、Anthropic、Gemini等）使用多轮消息体系，核心角色包括：\n\n**System Message（系统消息）**\n- 设置全局行为规范和上下文\n- 定义模型角色、能力边界、输出格式\n- 优先级最高，后续User消息受其约束\n\n**User Message（用户消息）**\n- 用户的真实输入\n- 可以是问题、指令、数据\n\n**Assistant Message（助手消息）**\n- 模型的回复\n- 在多轮对话中用于提供示...",
+    "summary": "",
+    "tags": [
+      "Prompt",
+      "提示工程",
+      "Few-Shot"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "RAG与检索增强生成",
+    "url": "/posts/AI/05-RAG与检索增强生成/",
+    "content": "# RAG与检索增强生成面试知识\n\n## 一、概述\n\n检索增强生成（Retrieval-Augmented Generation，RAG）是2024-2026年间大模型落地的核心范式。RAG通过在生成前检索外部知识库中的相关信息，有效解决LLM的知识截止、幻觉和领域知识不足等关键问题。随着模型上下文窗口的扩展（128K-1M tokens）和Agent范式的兴起，RAG技术也在快速演进——从简单的Retrieve-Read到Self-RAG、GraphRAG、Agentic RAG等高级形态。面试中需要系统掌握RAG的全链路知识，包括架构设计、向量数据库、Embedding、检索策略、重排序、评估等。\n\n---\n\n## 二、知识点详解\n\n### 1. RAG架构\n\n#### 1.1 基础架构：Retrieve-Read\n\n最简单的RAG架构：用户查询 → 检索相关文档 → 将文档作为上下文注入Prompt → LLM生成回答。\n\n```python\n# 基础Retrieve-Read流程\ndef simple_rag(query, vector_store, llm):\n    # S...",
+    "summary": "",
+    "tags": [
+      "RAG",
+      "检索增强",
+      "向量数据库"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "AI Agent开发",
+    "url": "/posts/AI/06-AI Agent开发/",
+    "content": "# Agent开发深度解析（上半部分）：架构模式、Tool Calling与记忆系统\n\n---\n\n## 一、概述\n\n### Agent的定义与发展历程\n\n智能体（Agent）是指能够感知环境、自主决策并执行行动以实现目标的AI系统。与传统的大语言模型（LLM）问答不同，Agent具备三个核心能力：工具使用（Tool Use）、记忆（Memory）和规划（Planning）。这三点构成了Agent区别于普通Chatbot的本质特征——Agent不只是\"说话\"，而是\"做事\"。\n\nAgent的发展可以分为几个关键阶段：\n\n- **2023年：Agent的元年。** AutoGPT和BabyAGI引发第一波热潮，ReAct论文（Yao et al. 2023）奠定了Thinking-\u003eActing-\u003eObserving的基础范式。LangChain在这期间快速迭代，成为最早一批Agent框架。此时Agent的主要问题是可靠性极低，Token消耗巨大，基本停留在Demo阶段。\n\n- **2024年：框架成熟与工具生态。** LangGraph替代LangChain成为主流Agent编排框架，Cr...",
+    "summary": "",
+    "tags": [
+      "Agent",
+      "Tool Calling",
+      "记忆系统"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "模型微调与训练",
+    "url": "/posts/AI/07-模型微调与训练/",
+    "content": "# 07 - 模型微调与训练\n\n## 一、概述\n\n大模型微调（Fine-tuning）是将预训练基座模型适配到特定任务或领域的关键技术。2025-2026年，LoRA 及其变体已成为行业标准，RLHF/DPO 等对齐技术持续演进，GRPO 等新方法在推理模型中广泛应用。分布式训练工具链日趋成熟，Axolotl、Unsloth、LLaMA-Factory 等工具大幅降低了微调门槛。\n\n---\n\n## 二、知识点详解\n\n### 1. 全量微调 vs PEFT\n\n#### 全量微调（Full Fine-tuning）\n\n更新模型所有参数。效果上限高，但计算和存储成本巨大。\n\n- 显存需求：以 LLaMA-70B 为例，全量微调需 8x80G A100+\n- 存储需求：每个微调版本需存储完整模型权重（~140GB for 70B）\n- 适用场景：有充足算力、需要极致效果\n\n#### PEFT（Parameter-Efficient Fine-Tuning）\n\n只更新少量参数，大部分参数冻结。\n\n##### Adapter\n\n在 Transformer 层中插入小的瓶颈层（bottleneck）...",
+    "summary": "",
+    "tags": [
+      "微调",
+      "LoRA",
+      "训练"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "AI基础理论与数学",
+    "url": "/posts/AI/01-AI基础理论与数学/",
+    "content": "# 01 — AI基础理论与数学\n\n\u003e 适用于AI应用开发面试的机器学习/深度学习基础理论 + 面试常考数学\n\u003e 更新至 2025-2026 年最新知识\n\n---\n\n## 一、概述\n\n本篇是AI应用开发面试的知识地基。无论面试的是大模型应用开发、算法工程还是AI平台架构，本篇内容都是必考项。近年来面试趋势显示：\n\n- **Transformer/注意力机制** 成为面试绝对核心（已经取代传统的CNN/RNN考点）\n- **损失函数与优化器** 侧重理解性考察（为什么用这个、什么时候换那个）\n- **数学基础** 的考察更加场景化（从纯推导转为\"讲清楚概念和应用\"）\n- **2025-2026年新增热点**：SwiGLU激活函数、LAMB优化器、扩散模型的KL散度解释\n\n---\n\n## 二、知识点详解\n\n### 2.1 机器学习三要素（模型、策略、算法）\n\n李航《统计学习方法》中的经典框架：\n\n| 要素 | 定义 | 面试要点 |\n|------|------|----------|\n| **模型** | 假设空间，即输入到输出的映射集合 | 区分参数模型（线性回归）与非参数模型（KNN...",
+    "summary": "",
+    "tags": [
+      "机器学习",
+      "深度学习",
+      "数学基础"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "AI系统设计与架构",
+    "url": "/posts/AI/09-AI系统设计与架构/",
+    "content": "# AI系统设计与架构\n\n## 概述\n\nAI系统设计是AI应用开发面试中的核心环节，考察候选人对从用户请求到模型推理的完整链路理解。本章涵盖AI应用整体架构、RAG系统、AI Agent、高并发设计、监控可观测性等主题，帮助候选人系统掌握AI系统设计的架构方法论和实践经验。\n\n## 知识点详解\n\n### 一、AI应用整体架构\n\n一个成熟的AI应用通常包含以下层次：\n\n```\n[用户层]  Web/App/API客户端\n    |\n[网关层]  API Gateway、LB、Rate Limiter、Auth\n    |\n[编排层]  业务逻辑、Prompt管理、会话管理、Tool调度\n    |\n[推理层]  Model Router、推理引擎、模型Cache\n    |\n[存储层]  Vector DB、对象存储、Redis、PostgreSQL\n    |\n[监控层]  Metrics、Tracing、Logging、Cost分析\n```\n\n#### 1. 网关层（Gateway Layer）\n\n职责：\n- 身份认证与授权（API Key、JWT、OAuth）\n- 速率限制（Rat...",
+    "summary": "",
+    "tags": [
+      "系统设计",
+      "架构",
+      "AI应用"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
     "title": "第三次博客搭建：从零打造 Chenhai-hugo",
     "url": "/posts/DailyDev/第三次博客搭建/",
     "content": "## 缘起\n\n这是我第三次搭建个人博客。\n\n- 第一次：Hugo + 不知名主题，工作流混乱、完全不好用。\n- 第二次：Hugo + PaperMod 主题，从 2024 年用到 2026 年，期间写了 91 篇文章\n- 第三次：**自己写一个**\n\n为什么不用 Hugo 了？\n\n\u003e Hugo 很好，但它太庞杂了。Go template 语法别扭、中文社区支持差、PaperMod 主题里到处都是我永远也用不上的配置项。我想要一个更轻、更符合自己需求的工具。\n\n于是我花了一个下午，从零写了一个 Go 语言的静态博客生成器。名字叫 **Chenhai**，取自碧蓝航线角色「镇海」——我的秘书舰。\n\n\u003e [!note]\n\u003e 镇海是我在碧蓝航线中最喜欢的角色。文静内敛、常年伏案处理文书——很适合做一个博客主题的意象。这次的主题设计就是围绕她展开的：**水墨为底、金线点睛、大巧不工**。\n\n## 技术选型\n\n| 层 | 选型 | 理由 |\n|------|------|------|\n| Markdown 解析 | Goldmark | Go 生态最成熟的 Markdown 引擎 |\n| 代码高...",
@@ -150,18 +280,6 @@
     "date": "2025-09-14"
   },
   {
-    "title": "Kafka简单入门",
-    "url": "/posts/DailyDev/kafka简单入门/",
-    "content": "Apache Kafka 是一个开源的分布式事件流平台，被数千家公司用于高性能数据管道、流分析、数据集成和关键任务应用。无论你是后端开发者、数据工程师，还是希望构建实时数据系统的架构师，掌握 Kafka 都是一项至关重要的技能。\n\n本文将带你系统地学习 Kafka，从核心概念到命令行实战，再到面试高频考点，最后用 Go 语言构建一个简单的生产者和消费者应用。\n\n## 一、Kafka 核心概念解析\n\n要理解 Kafka，首先必须掌握其核心术语。我们可以把 Kafka 想象成一个高度有序、可分区、可复制的数字“邮局系统”。\n\n#### 1. Broker\n\nKafka 集群中的一台服务器就是一个 Broker。你可以把它想象成邮局系统中的一个“邮局分拣中心”。多个 Broker 共同组成一个 Kafka 集群，协同工作，提供高可用和负载均衡。\n\n#### 2. Topic（主题）\n\nTopic 是消息的类别。所有发布到 Kafka 集群的消息都有一个指定的 Topic。这就像邮局里的不同“信件类型”，比如“平信”、“挂号信”或“国际邮件”。生产者将消息发送到特定的 Topic，消费者订阅特...",
-    "summary": "",
-    "tags": [
-      "Kafka",
-      "Golang"
-    ],
-    "category": "Daily Dev",
-    "date": "2025-09-13"
-  },
-  {
     "title": "xxl-job简单入门",
     "url": "/posts/DailyDev/xxl-job简单入门/",
     "content": "在任何复杂的业务系统中，定时任务、延时任务、周期性报表生成等调度需求都不可或令。虽然 Linux 的 `cron` 和编程语言内置的定时器可以解决简单问题，但在微服务架构下，它们面临着单点故障、无法统一管理、不支持集群和分片等诸多挑战。\n\n[XXL-JOB](https://www.xuxueli.com/xxl-job/) 是一个由大众点评开源的轻量级分布式任务调度平台，其核心设计目标是开发迅速、学习简单、轻量级、易扩展。凭借其清晰的架构、丰富的功能和极低的接入成本，XXL-JOB 已成为国内最流行的任务调度解决方案之一。\n\n本文将带你全面解析 XXL-JOB，从核心概念、架构原理，到面试中的高频问题，并最终使用 Go 语言构建一个可以实际运行的执行器。\n\n## 一、XXL-JOB 核心概念\n\n理解 XXL-JOB 的工作模式，需要先掌握它的几个基本组件和术语。\n\n#### 1. `调度中心` (Admin)\n\n调度中心是 XXL-JOB 的“大脑”，是一个独立部署的 Web 应用。它负责：\n\n- **任务管理**：提供可视化的 UI，用于创建、编辑、启动/停止任务。\n- **调度触...",
@@ -174,12 +292,24 @@
     "date": "2025-09-13"
   },
   {
-    "title": "WebSocket面试详解",
-    "url": "/posts/DailyDev/WebSocket面试详解/",
-    "content": "## 第一部分：核心概念\n\n### 1.1 什么是 WebSocket？\n\nWebSocket 是一种在单个 TCP 连接上进行**全双工通信**的协议。它诞生于 HTML5，旨在解决浏览器与服务器之间低延迟、实时、双向通信的需求。\n\n- **全双工 (Full-duplex)**：与 HTTP 的“请求-响应”模式不同，WebSocket 连接一旦建立，客户端和服务器双方可以随时主动向对方发送数据，无需等待对方的请求。\n- **单个 TCP 连接**：所有通信都在一个 TCP 连接上完成，减少了重复建立和关闭连接的开销。\n- **协议标识符**：WebSocket 的 URL 方案是 `ws://`（非加密）和 `wss://`（加密，运行在 TLS 之上）。\n\n### 1.2 为什么需要 WebSocket？(解决了什么问题？)\n\n在 WebSocket 出现之前，为了模拟实时通信，开发者通常采用以下技术，但它们都有明显的缺陷：\n\n1. **轮询 (Polling)**：客户端定时向服务器发送 HTTP 请求，询问是否有新数据。\n   - **缺点**：大量无效请求，浪费带宽和服务...",
+    "title": "Kafka简单入门",
+    "url": "/posts/DailyDev/kafka简单入门/",
+    "content": "Apache Kafka 是一个开源的分布式事件流平台，被数千家公司用于高性能数据管道、流分析、数据集成和关键任务应用。无论你是后端开发者、数据工程师，还是希望构建实时数据系统的架构师，掌握 Kafka 都是一项至关重要的技能。\n\n本文将带你系统地学习 Kafka，从核心概念到命令行实战，再到面试高频考点，最后用 Go 语言构建一个简单的生产者和消费者应用。\n\n## 一、Kafka 核心概念解析\n\n要理解 Kafka，首先必须掌握其核心术语。我们可以把 Kafka 想象成一个高度有序、可分区、可复制的数字“邮局系统”。\n\n#### 1. Broker\n\nKafka 集群中的一台服务器就是一个 Broker。你可以把它想象成邮局系统中的一个“邮局分拣中心”。多个 Broker 共同组成一个 Kafka 集群，协同工作，提供高可用和负载均衡。\n\n#### 2. Topic（主题）\n\nTopic 是消息的类别。所有发布到 Kafka 集群的消息都有一个指定的 Topic。这就像邮局里的不同“信件类型”，比如“平信”、“挂号信”或“国际邮件”。生产者将消息发送到特定的 Topic，消费者订阅特...",
     "summary": "",
     "tags": [
-      "WebSocket"
+      "Kafka",
+      "Golang"
+    ],
+    "category": "Daily Dev",
+    "date": "2025-09-13"
+  },
+  {
+    "title": "TCP的三次握手与四次挥手",
+    "url": "/posts/DailyDev/TCP的三次握手与四次挥手/",
+    "content": "# 深入理解TCP：三次握手与四次挥手（含面试高频考点）\n\nTCP (Transmission Control Protocol) 作为互联网核心协议簇中的基石，保证了数据传输的可靠性和顺序性。而要理解 TCP 的可靠性，就必须掌握其经典的连接管理机制——**三次握手**与**四次挥手**。\n\n本文将用通俗易懂的比喻和清晰的技术图解，带你彻底搞懂这两个过程，并深入剖析面试中关于它们的高频考点。\n\n## 一、三次握手：建立可靠的连接\n\n在进行数据传输之前，通信双方（客户端和服务器）必须建立一个可靠的连接。这个建立连接的过程，就是“三次握手”。\n\n### 一个生动的比喻：打电话\n\n想象一下你给朋友打电话确认双方都能正常通信的过程：\n\n\u003e 1. **你**：“喂，能听到我说话吗？” (发送 `SYN`)\n\u003e 2. **朋友**：“我能听到你，你能听到我吗？” (回复 `SYN+ACK`)\n\u003e 3. **你**：“我也能听到你，那我们可以开始聊天了。” (发送 `ACK`)\n\n经过这三步，双方都确认了彼此的发送和接收能力都正常，通话（连接）才正式建立。\n\n### 技术流程详解\n\n- **第一次...",
+    "summary": "",
+    "tags": [
+      "TCP"
     ],
     "category": "Daily Dev",
     "date": "2025-08-30"
@@ -208,12 +338,12 @@
     "date": "2025-08-30"
   },
   {
-    "title": "TCP的三次握手与四次挥手",
-    "url": "/posts/DailyDev/TCP的三次握手与四次挥手/",
-    "content": "# 深入理解TCP：三次握手与四次挥手（含面试高频考点）\n\nTCP (Transmission Control Protocol) 作为互联网核心协议簇中的基石，保证了数据传输的可靠性和顺序性。而要理解 TCP 的可靠性，就必须掌握其经典的连接管理机制——**三次握手**与**四次挥手**。\n\n本文将用通俗易懂的比喻和清晰的技术图解，带你彻底搞懂这两个过程，并深入剖析面试中关于它们的高频考点。\n\n## 一、三次握手：建立可靠的连接\n\n在进行数据传输之前，通信双方（客户端和服务器）必须建立一个可靠的连接。这个建立连接的过程，就是“三次握手”。\n\n### 一个生动的比喻：打电话\n\n想象一下你给朋友打电话确认双方都能正常通信的过程：\n\n\u003e 1. **你**：“喂，能听到我说话吗？” (发送 `SYN`)\n\u003e 2. **朋友**：“我能听到你，你能听到我吗？” (回复 `SYN+ACK`)\n\u003e 3. **你**：“我也能听到你，那我们可以开始聊天了。” (发送 `ACK`)\n\n经过这三步，双方都确认了彼此的发送和接收能力都正常，通话（连接）才正式建立。\n\n### 技术流程详解\n\n- **第一次...",
+    "title": "WebSocket面试详解",
+    "url": "/posts/DailyDev/WebSocket面试详解/",
+    "content": "## 第一部分：核心概念\n\n### 1.1 什么是 WebSocket？\n\nWebSocket 是一种在单个 TCP 连接上进行**全双工通信**的协议。它诞生于 HTML5，旨在解决浏览器与服务器之间低延迟、实时、双向通信的需求。\n\n- **全双工 (Full-duplex)**：与 HTTP 的“请求-响应”模式不同，WebSocket 连接一旦建立，客户端和服务器双方可以随时主动向对方发送数据，无需等待对方的请求。\n- **单个 TCP 连接**：所有通信都在一个 TCP 连接上完成，减少了重复建立和关闭连接的开销。\n- **协议标识符**：WebSocket 的 URL 方案是 `ws://`（非加密）和 `wss://`（加密，运行在 TLS 之上）。\n\n### 1.2 为什么需要 WebSocket？(解决了什么问题？)\n\n在 WebSocket 出现之前，为了模拟实时通信，开发者通常采用以下技术，但它们都有明显的缺陷：\n\n1. **轮询 (Polling)**：客户端定时向服务器发送 HTTP 请求，询问是否有新数据。\n   - **缺点**：大量无效请求，浪费带宽和服务...",
     "summary": "",
     "tags": [
-      "TCP"
+      "WebSocket"
     ],
     "category": "Daily Dev",
     "date": "2025-08-30"
@@ -681,17 +811,6 @@
     "date": "2024-08-16"
   },
   {
-    "title": "😺 Is All You Need——Transformer补充",
-    "url": "/posts/NLP/Attention-Is-All-You-Need/",
-    "content": "## 关于本文动机\n\nTransformer主要内容请见 [Lecture 9: Transformer | KurongBlog (kurongtohsaka.github.io)](https://kurongtohsaka.github.io/posts/cs224n/lesson_9/)，对 Transformer 已经进行比较详细的介绍和讲解了，但还是有一些细节问题不好在该篇文章提及，所以单开一篇讨论。\n\n\n\n## Q，K，V 的理解\n\n假设我们想让所有的词都与第一个词 $v_1$ 相似，我们可以让 $v_1$ 作为查询。 然后，将该查询与句子中所有词进行点积，这里的词就是键。 所以查询和键的组合给了我们权重，接着再将这些权重与作为值的所有单词相乘。\n\n通过下面的公式可以理解这个过程，并理解查询、键、值分别代表什么意思：\n$$\nsoftmax(QK)=W \\\\\nWV=Y\n$$\n一种比较感性的理解：想要得到某个 $V$ 对应的某个可能的相似信息需要先 $Q$ 这个 $V$ 的 $K$ ，$QK$ 得到注意力分数，之后经过 softmax 平滑后得到概率 $W $，然后 $WV$...",
-    "summary": "",
-    "tags": [
-      "NLP"
-    ],
-    "category": "NLP",
-    "date": "2024-08-14"
-  },
-  {
     "title": "《实体关系抽取方法研究综述》笔记",
     "url": "/posts/PaperNotes/实体关系抽取方法研究综述_李冬梅/",
     "content": "## 关系抽取 Relation Extraction\n\n定义：\n\n- 通常将实体间的关系形式化地描述为关系三元组 $\\{E_1,R,E_2\\}$ ，其中 $E$ 为实体类型，$R$ 为关系描述类型。\n\n关系抽取与命名实体识别、关系触发词识别构成一个端到端任务的框架：\n\n- 命名实体识别 Name Entity Recognition：是指识别文本中具有特定意义的实体，主要包括人名、地名、机构名、专有名词等；\n- 关系触发词识别 Relation trigger word identification：是指对触发实体关系的词进行分类，识别出是触发词还是非触发词，判定抽取出的关系是正类还是负类。\n\n关系抽取是一个文本分类问题，相比于情感分类等任物，其具有以下特点：\n\n- 领域众多，关系模型构建复杂。由于限定了关系类别，可采用基于规则、词典以及本体的方法，也可采用传统机器学习的有监督、半监督以及无监督方法，深度学习的有监督、远程监督方法。这类方法的模型构建难度相对于开放领域难度较低，但是移植性和扩展性较差。而针对开放领域的关系抽取，由于关系类型多样且不确定，可以采用无监督和远程监督等方法\n...",
@@ -700,6 +819,17 @@
       "PaperNotes"
     ],
     "category": "PaperNotes",
+    "date": "2024-08-14"
+  },
+  {
+    "title": "😺 Is All You Need——Transformer补充",
+    "url": "/posts/NLP/Attention-Is-All-You-Need/",
+    "content": "## 关于本文动机\n\nTransformer主要内容请见 [Lecture 9: Transformer | KurongBlog (kurongtohsaka.github.io)](https://kurongtohsaka.github.io/posts/cs224n/lesson_9/)，对 Transformer 已经进行比较详细的介绍和讲解了，但还是有一些细节问题不好在该篇文章提及，所以单开一篇讨论。\n\n\n\n## Q，K，V 的理解\n\n假设我们想让所有的词都与第一个词 $v_1$ 相似，我们可以让 $v_1$ 作为查询。 然后，将该查询与句子中所有词进行点积，这里的词就是键。 所以查询和键的组合给了我们权重，接着再将这些权重与作为值的所有单词相乘。\n\n通过下面的公式可以理解这个过程，并理解查询、键、值分别代表什么意思：\n$$\nsoftmax(QK)=W \\\\\nWV=Y\n$$\n一种比较感性的理解：想要得到某个 $V$ 对应的某个可能的相似信息需要先 $Q$ 这个 $V$ 的 $K$ ，$QK$ 得到注意力分数，之后经过 softmax 平滑后得到概率 $W $，然后 $WV$...",
+    "summary": "",
+    "tags": [
+      "NLP"
+    ],
+    "category": "NLP",
     "date": "2024-08-14"
   },
   {
@@ -726,17 +856,6 @@
     "date": "2024-08-11"
   },
   {
-    "title": "残差连接",
-    "url": "/posts/NLP/残差连接/",
-    "content": "## 原理\n\n残差连接（Residual Connection）最早由何凯明等人在2015年提出的 ResNet 中引入。ResNet 通过引入残差块，使得网络可以扩展到更深的层数，并在 ImageNet 比赛中取得了显著的成功。\n\n残差连接的核心思想是引入跳跃连接，将输入信号直接传递到网络的后续层，从而构建了一条捷径路径。这种结构允许网络学习输入和输出之间的残差，而不是直接学习输出。\n\n残差连接可以表示为：\n$$\ny=F(x)+x\n$$\n其中，$x$ 表示输入，$F(x)$ 表示经过非线性变换后的输出。\n\n\n\n## 作用\n\n- 解决梯度消失和梯度爆炸问题\n- 提高训练效率\n- 增强模型的泛化性能\n\n\n\n## 例子\n\n下图是 Transformer 论文中的模型结构图。\n\n![](/img/NLP/img14.png)\n\n可以看到在每一个 Attention Layer 中都有一个 `Add` ，原输入和 Multi-head 变换后的输出做了一个简单的相加操作，而这就是所谓的残差连接。",
-    "summary": "",
-    "tags": [
-      "NLP"
-    ],
-    "category": "NLP",
-    "date": "2024-08-11"
-  },
-  {
     "title": "8.06-8.11：一周总结",
     "url": "/posts/WeeklyWorking/2024_08_06-2024_08_11/",
     "content": "## 本周工作\n\n本周工作是从8月10号vpn重置之后才开始进行的，所以内容有点少\n\n- 完成了第一版训练、验证代码\n- 调试第一个模型，修复各种bug\n- 学习 Transformer 相关内容\n\n\n\n## 课题下周改进\n\n- 先快速训练出几个模型出来，选出一个最好的模型\n- 进行第二次及多次迭代训练，更新词典\n- 关系抽取看相关文献\n\n\n\n## 本周反思\n\n本周算是玩爽了，课题下周尽快开展关系抽取的调研工作。",
@@ -745,6 +864,17 @@
       "WeeklyWorking"
     ],
     "category": "WeeklyWorking",
+    "date": "2024-08-11"
+  },
+  {
+    "title": "残差连接",
+    "url": "/posts/NLP/残差连接/",
+    "content": "## 原理\n\n残差连接（Residual Connection）最早由何凯明等人在2015年提出的 ResNet 中引入。ResNet 通过引入残差块，使得网络可以扩展到更深的层数，并在 ImageNet 比赛中取得了显著的成功。\n\n残差连接的核心思想是引入跳跃连接，将输入信号直接传递到网络的后续层，从而构建了一条捷径路径。这种结构允许网络学习输入和输出之间的残差，而不是直接学习输出。\n\n残差连接可以表示为：\n$$\ny=F(x)+x\n$$\n其中，$x$ 表示输入，$F(x)$ 表示经过非线性变换后的输出。\n\n\n\n## 作用\n\n- 解决梯度消失和梯度爆炸问题\n- 提高训练效率\n- 增强模型的泛化性能\n\n\n\n## 例子\n\n下图是 Transformer 论文中的模型结构图。\n\n![](/img/NLP/img14.png)\n\n可以看到在每一个 Attention Layer 中都有一个 `Add` ，原输入和 Multi-head 变换后的输出做了一个简单的相加操作，而这就是所谓的残差连接。",
+    "summary": "",
+    "tags": [
+      "NLP"
+    ],
+    "category": "NLP",
     "date": "2024-08-11"
   },
   {
@@ -782,6 +912,17 @@
     "date": "2024-08-01"
   },
   {
+    "title": "7.22-7.28：一周总结",
+    "url": "/posts/WeeklyWorking/2024_07_22-2024_07_28/",
+    "content": "## 本周任务\n\n本周主要还是做计组知识图谱课题。以下为本周具体进度：\n\n- 把数据集分割为了训练集、验证集、测试集，对训练集以随机抽样进行进一步分割，以减小工作量\n- 第一次标注采用预标注，之后用词典不断迭代标注\n- 完成了第一份训练集1000条和验证集、测试集的标注，总共2000余条语料，用新标签PCC 标注\n- 用 Adaseq 训练模型，但是遇到了诸多问题，尚未解决\n\n\n\n## 课题下周改进\n\n- PCC 标签过于笼统，下周对标签进一步细化，并去除少部分无用标签\n- 弃用 Adaseq ，国产的玩意是真不如 Transformers 好用\n- 找一个新的预训练模型进行训练（其实已经找到了）\n- 多模型对比训练\n\n以上修改标签预计最少3天，用 Transformers 训练最少2天，多模型能做多少算多少\n\n\n\n## 本周反思\n\n- 每一步的数据尽可能的量化并记录，方便日后发论文\n- 对课题各个工作部分理解浅显，应当在阅读部分文献后再进行",
+    "summary": "",
+    "tags": [
+      "WeeklyWorking"
+    ],
+    "category": "WeeklyWorking",
+    "date": "2024-07-28"
+  },
+  {
     "title": "《基于预训练模型的医药说明书实体抽取方法研究》笔记",
     "url": "/posts/PaperNotes/基于预训练模型的医药说明书实体抽取方法研究_陈仲永/",
     "content": "## 基于预训练模型的部分标签命名实体识别模型\n\n![](/img/PaperNotes/基于预训练模型的医药说明书实体抽取方法研究_陈仲永/img1.png)\n\n对于输入的药品说明书文本先利用少量样本微调的预训练模型进行实体抽取，如上图所示，“云南白药成分：三七、麝香、草乌等”通过预训练模型识别出 “麝香”和“草乌”两个“成分”类型的实体。由于受标注样本数量限制，预训练模型经少量样本微调后，其召回率不高，如例子中“云南白药”“三七”两个实体未能识别，但把预训练模型识别出的部分实体及该实体的类型标签作为一种提示信息输入到后面的部分标签模型，这将有助于部分标签模型进行实体抽取任务。\n\n部分标签模型采用平面格结构对输入文本及预训练语言模型识别的部分实体进行整合，整合信息包括字符或实体词 token、标签 tag、头部位置标记 head 和尾部位置标记 tail。部分标签模型使用 Transformer 建模平面格结构的编码输入，通过 Transformer 的自注意力机制使字符可以与潜在实体词直接交互。最后将 Transformer 提取特征表示，输入到 CRF层预测实体标签。\n\n## 训...",
@@ -794,15 +935,16 @@
     "date": "2024-07-28"
   },
   {
-    "title": "7.22-7.28：一周总结",
-    "url": "/posts/WeeklyWorking/2024_07_22-2024_07_28/",
-    "content": "## 本周任务\n\n本周主要还是做计组知识图谱课题。以下为本周具体进度：\n\n- 把数据集分割为了训练集、验证集、测试集，对训练集以随机抽样进行进一步分割，以减小工作量\n- 第一次标注采用预标注，之后用词典不断迭代标注\n- 完成了第一份训练集1000条和验证集、测试集的标注，总共2000余条语料，用新标签PCC 标注\n- 用 Adaseq 训练模型，但是遇到了诸多问题，尚未解决\n\n\n\n## 课题下周改进\n\n- PCC 标签过于笼统，下周对标签进一步细化，并去除少部分无用标签\n- 弃用 Adaseq ，国产的玩意是真不如 Transformers 好用\n- 找一个新的预训练模型进行训练（其实已经找到了）\n- 多模型对比训练\n\n以上修改标签预计最少3天，用 Transformers 训练最少2天，多模型能做多少算多少\n\n\n\n## 本周反思\n\n- 每一步的数据尽可能的量化并记录，方便日后发论文\n- 对课题各个工作部分理解浅显，应当在阅读部分文献后再进行",
+    "title": "《中文命名实体识别研究综述》笔记",
+    "url": "/posts/PaperNotes/中文命名实体识别研究综述_赵继贵/",
+    "content": "## 中文NER的难点\n\n1. 词边界模糊。中文没有像英文等语言一样使用空格或其他分隔符来表示词边界，这种特点导致中文命名实体识别面临着边界歧义和识别困难的问题。例如，“计算机科学与技术系”中“计算机科学与技术”是一个 复合词，边界不明确。\n2. 语义多样化。中文存在大量多义词，一个词汇可能会被用于不同的上下文中表示不同的含义。\n3. 形态特征模糊。在英语中，一些指定类型的实体的第一个字母通常是大写的，例如指定人员或地点的名称。这种信息是识别一些命名实体的位置和边界的明确特征。在中文命名实体识别中缺乏汉语形态的显式特征，增加了识别的难度。\n4. 中文语料库内容较少。命名实体识别需要大量 的标注数据来训练模型，但中文标注数据数量及质量有限，导致命名实体识别模型的训练更为困难。\n\n\n\n## CNER数据集\n\n![](/img/PaperNotes/中文命名实体识别研究综述_赵继贵/img1.png)\n\n\n\n## CNER标注方式、性能指标\n\nBIO标注、 BMES标注以及BIOSE标注方案。\n\n![](/img/PaperNotes/中文命名实体识别研究综述_赵继贵/img2.png)\n\n...",
     "summary": "",
     "tags": [
-      "WeeklyWorking"
+      "PaperNotes",
+      "NER"
     ],
-    "category": "WeeklyWorking",
-    "date": "2024-07-28"
+    "category": "PaperNotes",
+    "date": "2024-07-27"
   },
   {
     "title": "Lecture 8: Attention",
@@ -814,18 +956,6 @@
       "NLP"
     ],
     "category": "CS224N",
-    "date": "2024-07-27"
-  },
-  {
-    "title": "《中文命名实体识别研究综述》笔记",
-    "url": "/posts/PaperNotes/中文命名实体识别研究综述_赵继贵/",
-    "content": "## 中文NER的难点\n\n1. 词边界模糊。中文没有像英文等语言一样使用空格或其他分隔符来表示词边界，这种特点导致中文命名实体识别面临着边界歧义和识别困难的问题。例如，“计算机科学与技术系”中“计算机科学与技术”是一个 复合词，边界不明确。\n2. 语义多样化。中文存在大量多义词，一个词汇可能会被用于不同的上下文中表示不同的含义。\n3. 形态特征模糊。在英语中，一些指定类型的实体的第一个字母通常是大写的，例如指定人员或地点的名称。这种信息是识别一些命名实体的位置和边界的明确特征。在中文命名实体识别中缺乏汉语形态的显式特征，增加了识别的难度。\n4. 中文语料库内容较少。命名实体识别需要大量 的标注数据来训练模型，但中文标注数据数量及质量有限，导致命名实体识别模型的训练更为困难。\n\n\n\n## CNER数据集\n\n![](/img/PaperNotes/中文命名实体识别研究综述_赵继贵/img1.png)\n\n\n\n## CNER标注方式、性能指标\n\nBIO标注、 BMES标注以及BIOSE标注方案。\n\n![](/img/PaperNotes/中文命名实体识别研究综述_赵继贵/img2.png)\n\n...",
-    "summary": "",
-    "tags": [
-      "PaperNotes",
-      "NER"
-    ],
-    "category": "PaperNotes",
     "date": "2024-07-27"
   },
   {
@@ -982,20 +1112,9 @@
     "date": "2024-06-26"
   },
   {
-    "title": "Inception V3",
-    "url": "/posts/ClassicPaperTranslation/InceptionV3/",
-    "content": "# Inception V3\n\n## Abstract\n\n对许多任务而言，卷积网络是目前最新的计算机视觉解决方案的核心。从2014年开始，深度卷积网络开始变成主流，在各种基准数据集上都取得了实质性成果。对于大多数任务而言，虽然增加的模型大小和计算成本都趋向于转化为直接的质量收益（只要提供足够的标注数据去训练），但计算效率和低参数计数仍是各种应用场景的限制因素，例如移动视觉和大数据场景。目前，我们正在探索增大网络的方法，目标是通过适当的分解卷积和积极的正则化来尽可能地有效利用增加的计算。我们在ILSVRC 2012分类挑战赛的验证集上评估了我们的方法，结果证明我们的方法超过了目前最先进的方法并取得了实质性收益：对于单一框架评估错误率为：`21.2% top-1`和`5.6% top-5`，使用的网络计算代价为每次推断需要进行50亿次乘加运算并使用不到2500万的参数。通过四个模型组合和多次评估，我们报告了`3.5% top-5`和`17.3% top-1`的错误率。\n\n\n\n## 1. Introduction\n\n从2012年Krizhevsky等人[9]赢得了ImageNet竞赛[16]...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "NIN",
-    "url": "/posts/ClassicPaperTranslation/NIN/",
-    "content": "# NIN\n\n## Abstract\n\n本文提出了一种新的网络结构，称为 \"网络中的网络\"(NIN)，以提高模型对感受野内局部图块的可辨别性。传统的卷积层使用线性滤波器和非线性激活函数来扫描输入。相反，本文建立了结构更复杂的微神经网络，以抽象出感受野内的数据。本文用MLP来实例化微神经网络，MLP是一个有效的函数近似器。通过类似CNN的方式在输入上滑动微网络来提取特征图，然后将它们送入下一层。深度NIN可以通过堆叠多个上述结构来实现。通过微网络加强局部建模，能够在分类层中利用全局平均池化的特征图，这比传统的全连接层更容易解释，也更不容易过拟合。本文在CIFAR-10和CIFAR-100上用NIN取得了最先进的分类性能，其在SVHN和MNIST数据集上也有合理的表现。\n\n\n\n## 1 Introduction\n\n卷积神经网络[1]由交替的卷积层和池化层组成。卷积层采取线性滤波器和底层感受野的内积，然后在输入的每个局部使用非线性激活函数，由此产生的输出称为特征图。\n\nCNN中的卷积滤波器是基础数据块的广义线性模型（GLM），本文认为GLM的抽象程度很低。这里所说的抽象性是指特征对同一概念的...",
+    "title": "VGG",
+    "url": "/posts/ClassicPaperTranslation/VGG/",
+    "content": "# VGG\n\n## ABSTRACT\n\n本文研究了卷积网络深度在大规模的图像识别环境下对准确性的影响。主要贡献是使用非常小的（3×3）卷积滤波器架构对网络深度的增加进行了全面评估，这表明通过将深度推到16-19加权层可以实现对现有技术配置的显著改进。这些发现是ImageNet Challenge 2014提交的基础，本文作者团队在定位和分类过程中分别获得了第一名和第二名。\n\n\n\n## 1 INTRODUCTION\n\n随着ConvNets在计算机视觉领域越来越商品化，为了达到更好的准确性，已经进行了许多尝试来改进Krizhevsky等人（2012）最初的架构。例如，ILSVRC-2013（Zeiler＆Fergus，2013；Sermanet等，2014）表现最佳的提交使用了更小的感受窗口尺寸和更小的第一卷积层步长。另一条改进措施在整个图像和多个尺度上对网络进行密集地训练和测试（Sermanet等，2014；Howard，2014）。在本文中，解决了ConvNet架构设计的另一个重要方面——其深度。为此修正了架构的其它参数，并通过添加更多的卷积层来稳定地增加网络的深度，这是可行的，因为在...",
     "summary": "",
     "tags": [
       "NN"
@@ -1015,14 +1134,14 @@
     "date": "2024-06-26"
   },
   {
-    "title": "VGG",
-    "url": "/posts/ClassicPaperTranslation/VGG/",
-    "content": "# VGG\n\n## ABSTRACT\n\n本文研究了卷积网络深度在大规模的图像识别环境下对准确性的影响。主要贡献是使用非常小的（3×3）卷积滤波器架构对网络深度的增加进行了全面评估，这表明通过将深度推到16-19加权层可以实现对现有技术配置的显著改进。这些发现是ImageNet Challenge 2014提交的基础，本文作者团队在定位和分类过程中分别获得了第一名和第二名。\n\n\n\n## 1 INTRODUCTION\n\n随着ConvNets在计算机视觉领域越来越商品化，为了达到更好的准确性，已经进行了许多尝试来改进Krizhevsky等人（2012）最初的架构。例如，ILSVRC-2013（Zeiler＆Fergus，2013；Sermanet等，2014）表现最佳的提交使用了更小的感受窗口尺寸和更小的第一卷积层步长。另一条改进措施在整个图像和多个尺度上对网络进行密集地训练和测试（Sermanet等，2014；Howard，2014）。在本文中，解决了ConvNet架构设计的另一个重要方面——其深度。为此修正了架构的其它参数，并通过添加更多的卷积层来稳定地增加网络的深度，这是可行的，因为在...",
+    "title": "neo4j常用命令",
+    "url": "/posts/DailyDev/neo4j/",
+    "content": "## neo4j启动与访问\n\n启动neo4j\n\n```bash\ndocker start test_neo4j\ndocker exec -it test_neo4j /bin/bash\n```\n\n访问browser\n\n```\nhttp://localhost:7474/browser/\n```\n\n访问database\n\n```\nneo4j://localhost:7687\nauth: neo4j\npw: 5225400599\n```\n\n\n\n## CQL语法\n\n### create 创建节点\n\n```cypher\nCREATE (\n   \u003cnode-name\u003e:\u003clabel-name\u003e\n   { \t\n      \u003cProperty1-name\u003e:\u003cProperty1-Value\u003e\n      ........\n      \u003cPropertyn-name\u003e:\u003cPropertyn-Value\u003e\n   }\n)\n```\n\n\n\n### match 查询节点或属性\n\n```cypher\n# 查询Dept下的内容\nMATCH (dept:Dept) return dept\n\n# 查询Employee标...",
     "summary": "",
     "tags": [
-      "NN"
+      "Neo4j"
     ],
-    "category": "ClassicPaperTranslation",
+    "category": "Daily Dev",
     "date": "2024-06-26"
   },
   {
@@ -1037,14 +1156,25 @@
     "date": "2024-06-26"
   },
   {
-    "title": "neo4j常用命令",
-    "url": "/posts/DailyDev/neo4j/",
-    "content": "## neo4j启动与访问\n\n启动neo4j\n\n```bash\ndocker start test_neo4j\ndocker exec -it test_neo4j /bin/bash\n```\n\n访问browser\n\n```\nhttp://localhost:7474/browser/\n```\n\n访问database\n\n```\nneo4j://localhost:7687\nauth: neo4j\npw: 5225400599\n```\n\n\n\n## CQL语法\n\n### create 创建节点\n\n```cypher\nCREATE (\n   \u003cnode-name\u003e:\u003clabel-name\u003e\n   { \t\n      \u003cProperty1-name\u003e:\u003cProperty1-Value\u003e\n      ........\n      \u003cPropertyn-name\u003e:\u003cPropertyn-Value\u003e\n   }\n)\n```\n\n\n\n### match 查询节点或属性\n\n```cypher\n# 查询Dept下的内容\nMATCH (dept:Dept) return dept\n\n# 查询Employee标...",
+    "title": "NIN",
+    "url": "/posts/ClassicPaperTranslation/NIN/",
+    "content": "# NIN\n\n## Abstract\n\n本文提出了一种新的网络结构，称为 \"网络中的网络\"(NIN)，以提高模型对感受野内局部图块的可辨别性。传统的卷积层使用线性滤波器和非线性激活函数来扫描输入。相反，本文建立了结构更复杂的微神经网络，以抽象出感受野内的数据。本文用MLP来实例化微神经网络，MLP是一个有效的函数近似器。通过类似CNN的方式在输入上滑动微网络来提取特征图，然后将它们送入下一层。深度NIN可以通过堆叠多个上述结构来实现。通过微网络加强局部建模，能够在分类层中利用全局平均池化的特征图，这比传统的全连接层更容易解释，也更不容易过拟合。本文在CIFAR-10和CIFAR-100上用NIN取得了最先进的分类性能，其在SVHN和MNIST数据集上也有合理的表现。\n\n\n\n## 1 Introduction\n\n卷积神经网络[1]由交替的卷积层和池化层组成。卷积层采取线性滤波器和底层感受野的内积，然后在输入的每个局部使用非线性激活函数，由此产生的输出称为特征图。\n\nCNN中的卷积滤波器是基础数据块的广义线性模型（GLM），本文认为GLM的抽象程度很低。这里所说的抽象性是指特征对同一概念的...",
     "summary": "",
     "tags": [
-      "Neo4j"
+      "NN"
     ],
-    "category": "Daily Dev",
+    "category": "ClassicPaperTranslation",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "Inception V3",
+    "url": "/posts/ClassicPaperTranslation/InceptionV3/",
+    "content": "# Inception V3\n\n## Abstract\n\n对许多任务而言，卷积网络是目前最新的计算机视觉解决方案的核心。从2014年开始，深度卷积网络开始变成主流，在各种基准数据集上都取得了实质性成果。对于大多数任务而言，虽然增加的模型大小和计算成本都趋向于转化为直接的质量收益（只要提供足够的标注数据去训练），但计算效率和低参数计数仍是各种应用场景的限制因素，例如移动视觉和大数据场景。目前，我们正在探索增大网络的方法，目标是通过适当的分解卷积和积极的正则化来尽可能地有效利用增加的计算。我们在ILSVRC 2012分类挑战赛的验证集上评估了我们的方法，结果证明我们的方法超过了目前最先进的方法并取得了实质性收益：对于单一框架评估错误率为：`21.2% top-1`和`5.6% top-5`，使用的网络计算代价为每次推断需要进行50亿次乘加运算并使用不到2500万的参数。通过四个模型组合和多次评估，我们报告了`3.5% top-5`和`17.3% top-1`的错误率。\n\n\n\n## 1. Introduction\n\n从2012年Krizhevsky等人[9]赢得了ImageNet竞赛[16]...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
     "date": "2024-06-26"
   },
   {

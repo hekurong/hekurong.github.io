@@ -1,0 +1,2752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>RAG与检索增强生成 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="stylesheet" href="/assets/css/style.css?v=14">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">RAG与检索增强生成</h1>
+    <div class="article-meta">
+      <time datetime="2026-06-01">2026-06-01</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="rag">RAG与检索增强生成面试知识</h1>
+<h2 id="heading">一、概述</h2>
+<p>检索增强生成（Retrieval-Augmented Generation，RAG）是2024-2026年间大模型落地的核心范式。RAG通过在生成前检索外部知识库中的相关信息，有效解决LLM的知识截止、幻觉和领域知识不足等关键问题。随着模型上下文窗口的扩展（128K-1M tokens）和Agent范式的兴起，RAG技术也在快速演进——从简单的Retrieve-Read到Self-RAG、GraphRAG、Agentic RAG等高级形态。面试中需要系统掌握RAG的全链路知识，包括架构设计、向量数据库、Embedding、检索策略、重排序、评估等。</p>
+<hr>
+<h2 id="heading-1">二、知识点详解</h2>
+<h3 id="1-rag">1. RAG架构</h3>
+<h4 id="11-retrieve-read">1.1 基础架构：Retrieve-Read</h4>
+<p>最简单的RAG架构：用户查询 → 检索相关文档 → 将文档作为上下文注入Prompt → LLM生成回答。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 基础Retrieve-Read流程</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">simple_rag</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">vector_store</span><span class="p">,</span> <span class="n">llm</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Step 1: 检索</span>
+</span></span><span class="line"><span class="cl">    <span class="n">retrieved_docs</span> <span class="o">=</span> <span class="n">vector_store</span><span class="o">.</span><span class="n">similarity_search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Step 2: 组合上下文</span>
+</span></span><span class="line"><span class="cl">    <span class="n">context</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">doc</span><span class="o">.</span><span class="n">page_content</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">retrieved_docs</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Step 3: 生成</span>
+</span></span><span class="line"><span class="cl">    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;&#34;&#34;基于以下参考内容回答问题：
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">参考内容：
+</span></span></span><span class="line"><span class="cl"><span class="s2"></span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">问题：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">回答：&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">response</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">response</span>
+</span></span></code></pre></div></div><p><strong>优缺点</strong>：实现简单，但对噪声文档敏感，无法处理复杂的多步推理。</p>
+<h4 id="12-retrieve-read-rerank--">1.2 Retrieve-Read-Rerank（检索-读取-重排序）</h4>
+<p>在检索和生成之间增加Reranker重排序环节，提升检索质量。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">rag_with_rerank</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">vector_store</span><span class="p">,</span> <span class="n">reranker</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">rerank_top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Step 1: 初步检索（召回更多文档）</span>
+</span></span><span class="line"><span class="cl">    <span class="n">retrieved_docs</span> <span class="o">=</span> <span class="n">vector_store</span><span class="o">.</span><span class="n">similarity_search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">top_k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Step 2: 重排序</span>
+</span></span><span class="line"><span class="cl">    <span class="n">reranked</span> <span class="o">=</span> <span class="n">reranker</span><span class="o">.</span><span class="n">rerank</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">retrieved_docs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">best_docs</span> <span class="o">=</span> <span class="n">reranked</span><span class="p">[:</span><span class="n">rerank_top_k</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Step 3: 生成</span>
+</span></span><span class="line"><span class="cl">    <span class="n">context</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">doc</span><span class="o">.</span><span class="n">page_content</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">best_docs</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;...</span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="s2">...</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">...&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="13-iterative-retrieval">1.3 Iterative Retrieval（迭代检索）</h4>
+<p>多次检索，每次根据已生成的部分结果调整检索策略。</p>
+<p><strong>多轮检索</strong>（Multi-Hop RAG）：第一个查询的检索结果引导第二个查询。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">multi_hop_rag</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">vector_store</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">max_hops</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">context</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current_query</span> <span class="o">=</span> <span class="n">query</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">hop</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_hops</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 检索</span>
+</span></span><span class="line"><span class="cl">        <span class="n">docs</span> <span class="o">=</span> <span class="n">vector_store</span><span class="o">.</span><span class="n">similarity_search</span><span class="p">(</span><span class="n">current_query</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">context</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">doc</span><span class="o">.</span><span class="n">page_content</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># 判断是否需要继续检索</span>
+</span></span><span class="line"><span class="cl">        <span class="n">next_query</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;基于当前信息：</span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="se">\n</span><span class="s2">原始问题：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;是否还需要更多信息才能完整回答问题？如果需要，请生成下一个查询。&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s2">&#34;不需要&#34;</span> <span class="ow">in</span> <span class="n">next_query</span> <span class="ow">or</span> <span class="s2">&#34;no&#34;</span> <span class="ow">in</span> <span class="n">next_query</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span>
+</span></span><span class="line"><span class="cl">        <span class="n">current_query</span> <span class="o">=</span> <span class="n">next_query</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 最终回答</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;基于以下信息回答问题：</span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="se">\n</span><span class="s2">问题：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>其他迭代变体</strong>：</p>
+<ul>
+<li><strong>Corrective RAG</strong>：评估检索结果质量，必要时重新检索</li>
+<li><strong>Self-RAG</strong>：在生成过程中自我评估是否需要检索以及检索结果是否相关</li>
+</ul>
+<h4 id="14-2025-2026rag">1.4 2025-2026年RAG架构趋势</h4>
+<ul>
+<li><strong>Agentic RAG</strong>：Agent自主决定何时检索、使用何种检索策略、以及是否需要多步检索</li>
+<li><strong>GraphRAG</strong>：基于知识图谱的RAG，支持跨实体推理</li>
+<li><strong>Adaptive RAG</strong>：根据查询复杂度自适应选择检索策略（简单查询直接生成，复杂查询多步检索）</li>
+<li><strong>Streaming RAG</strong>：检索结果边到达边生成，降低端到端延迟</li>
+</ul>
+<hr>
+<h3 id="2-">2. 向量数据库对比</h3>
+<h4 id="21-">2.1 核心指标对比</h4>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>FAISS</th>
+<th>Pinecone</th>
+<th>Weaviate</th>
+<th>Milvus</th>
+<th>Chroma</th>
+<th>Qdrant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>部署方式</td>
+<td>本地/内存</td>
+<td>SaaS</td>
+<td>自托管/SaaS</td>
+<td>自托管</td>
+<td>本地/内存</td>
+<td>自托管/SaaS</td>
+</tr>
+<tr>
+<td>索引算法</td>
+<td>IVF/HNSW</td>
+<td>HNSW</td>
+<td>HNSW</td>
+<td>IVF/HNSW</td>
+<td>HNSW</td>
+<td>HNSW</td>
+</tr>
+<tr>
+<td>持久化</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅(磁盘)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>分布式</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>过滤标量</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>混合搜索</td>
+<td>❌</td>
+<td>✅(2024)</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>安装复杂度</td>
+<td>简单</td>
+<td>简单</td>
+<td>中等</td>
+<td>复杂</td>
+<td>极简</td>
+<td>简单</td>
+</tr>
+<tr>
+<td>社区版限制</td>
+<td>无</td>
+<td>1GB免费</td>
+<td>有限制</td>
+<td>无</td>
+<td>无</td>
+<td>1GB免费</td>
+</tr>
+<tr>
+<td>主流用途</td>
+<td>原型/研究</td>
+<td>生产</td>
+<td>通用</td>
+<td>大规模</td>
+<td>原型/本地</td>
+<td>生产</td>
+</tr>
+</tbody>
+</table>
+<h4 id="22-">2.2 各库详解</h4>
+<p><strong>FAISS（Facebook AI Similarity Search）</strong></p>
+<ul>
+<li>最成熟的向量搜索库，不是数据库（无持久化）</li>
+<li>支持多种索引（IndexFlatIP、IndexIVFFlat、IndexHNSWFlat等）</li>
+<li>2025年：FAISS GPU加速版本成熟，支持10亿级向量搜索</li>
+<li>适用：研究、原型、对持久化无要求的小规模场景</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">faiss</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">dim</span> <span class="o">=</span> <span class="mi">768</span>  <span class="c1"># 向量维度</span>
+</span></span><span class="line"><span class="cl"><span class="n">index</span> <span class="o">=</span> <span class="n">faiss</span><span class="o">.</span><span class="n">IndexFlatIP</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>  <span class="c1"># 内积索引（余弦相似度）</span>
+</span></span><span class="line"><span class="cl"><span class="n">vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10000</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">index</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">vectors</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">D</span><span class="p">,</span> <span class="n">I</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>Pinecone</strong></p>
+<ul>
+<li>全托管的SaaS向量数据库，零运维</li>
+<li>2024年新增混合搜索（稀疏+密集向量）</li>
+<li>支持metadata过滤、命名空间隔离</li>
+<li>适用：不想自建基础设施的生产场景</li>
+</ul>
+<p><strong>Weaviate</strong></p>
+<ul>
+<li>开源向量数据库，支持原生GraphQL接口</li>
+<li>内置模块化向量化功能（集成OpenAI/Cohere/HuggingFace）</li>
+<li>2025年新增：多租户支持、Improved Hybrid Search</li>
+<li>适用：需要灵活Schema和GraphQL查询的场景</li>
+</ul>
+<p><strong>Milvus</strong></p>
+<ul>
+<li>专为大规模向量检索设计的分布式数据库</li>
+<li>GPU加速版本（Milvus GPU）支持亿级向量毫秒级检索</li>
+<li>2025年：Milvus 3.0引入存算分离架构，支持Serverless</li>
+<li>适用：大规模生产环境（&gt;1000万向量）</li>
+</ul>
+<p><strong>Chroma</strong></p>
+<ul>
+<li>极简嵌入式向量数据库，追求开发体验</li>
+<li>2025年更新：磁盘持久化稳定版、改进的集合管理</li>
+<li>适用：原型开发、小型项目、本地开发</li>
+</ul>
+<p><strong>Qdrant</strong></p>
+<ul>
+<li>Rust编写的向量数据库，性能优异</li>
+<li>2025年：Qdrant 1.12+引入稀疏向量原生支持</li>
+<li>过滤和分页功能完备</li>
+<li>适用：对性能要求高的生产场景</li>
+</ul>
+<hr>
+<h3 id="3-embedding">3. Embedding模型选型</h3>
+<h4 id="31-embedding">3.1 主流Embedding模型对比</h4>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>维度</th>
+<th>最大长度</th>
+<th>支持语言</th>
+<th>价格</th>
+<th>性能(MTEB)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI text-embedding-3-large</td>
+<td>3072</td>
+<td>8191</td>
+<td>多语言</td>
+<td>$0.13/1M tokens</td>
+<td>64.6</td>
+</tr>
+<tr>
+<td>OpenAI text-embedding-3-small</td>
+<td>1536</td>
+<td>8191</td>
+<td>多语言</td>
+<td>$0.02/1M tokens</td>
+<td>62.3</td>
+</tr>
+<tr>
+<td>BGE-M3 (BAAI)</td>
+<td>1024</td>
+<td>8192</td>
+<td>多语言</td>
+<td>免费/开源</td>
+<td>64.0</td>
+</tr>
+<tr>
+<td>BGE-large-EN-v1.5</td>
+<td>1024</td>
+<td>512</td>
+<td>英文</td>
+<td>免费/开源</td>
+<td>64.2</td>
+</tr>
+<tr>
+<td>BGE-large-ZH-v1.5</td>
+<td>1024</td>
+<td>512</td>
+<td>中文</td>
+<td>免费/开源</td>
+<td>中文本最佳</td>
+</tr>
+<tr>
+<td>E5-mistral-7b-instruct</td>
+<td>4096</td>
+<td>4096</td>
+<td>英文</td>
+<td>免费/开源</td>
+<td>66.6</td>
+</tr>
+<tr>
+<td>Cohere Embed v3</td>
+<td>1024</td>
+<td>512</td>
+<td>多语言</td>
+<td>$0.10/1K units</td>
+<td>64.8</td>
+</tr>
+<tr>
+<td>Jina Embedding v3</td>
+<td>1024</td>
+<td>8192</td>
+<td>多语言</td>
+<td>免费/开源</td>
+<td>64.2</td>
+</tr>
+<tr>
+<td>jina-embeddings-v3 (2025)</td>
+<td>1024</td>
+<td>8192</td>
+<td>多语言(89种)</td>
+<td>免费/开源</td>
+<td>66.0</td>
+</tr>
+<tr>
+<td>voyage-lite-02-instruct</td>
+<td>1024</td>
+<td>16000</td>
+<td>多语言</td>
+<td>$0.10/1M tokens</td>
+<td>65.5</td>
+</tr>
+</tbody>
+</table>
+<h4 id="32-">3.2 选型策略</h4>
+<p><strong>1. 按语言选择</strong></p>
+<ul>
+<li>中文为主：BGE-large-ZH-v1.5、BGE-M3、Jina v3、OpenAI text-embedding-3</li>
+<li>英文为主：E5-mistral、BGE-large-EN-v1.5、Cohere Embed v3</li>
+<li>多语言混合：BGE-M3、Jina v3、OpenAI text-embedding-3</li>
+</ul>
+<p><strong>2. 按维度选择</strong></p>
+<ul>
+<li>高维度（3072/4096）：精度更高，但存储和检索成本高</li>
+<li>低维度（768/1024）：速度更快，存储成本低</li>
+<li>维度缩减：OpenAI支持通过<code>dimensions</code>参数缩减维度</li>
+</ul>
+<p><strong>3. 2025年新趋势</strong></p>
+<ul>
+<li><strong>Matryoshka Embedding</strong>（OpenAI、Nomic）：单一向量支持多维度输出，根据精度需求动态选择</li>
+<li><strong>Instruct Embedding</strong>：通过指令调整嵌入偏向，如voyage-lite-02-instruct</li>
+<li><strong>Late Interaction</strong>（ColBERT系列）：保留Token级交互信息，提升检索精度</li>
+<li><strong>领域专用Embedding</strong>：针对代码、医疗、法律等垂直领域微调的Embedding模型</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 使用BGE-M3（2025年推荐的多语言模型）</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s2">&#34;BAAI/bge-m3&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">([</span><span class="s2">&#34;今天天气真好&#34;</span><span class="p">,</span> <span class="s2">&#34;深度学习框架对比&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Matryoshka维度缩减</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s2">&#34;nomic-ai/nomic-embed-text-v1.5&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">([</span><span class="s2">&#34;text&#34;</span><span class="p">],</span> <span class="n">normalize_embeddings</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 通过截断向量维度来缩减</span>
+</span></span><span class="line"><span class="cl"><span class="n">short_embeddings</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">256</span><span class="p">]</span>  <span class="c1"># 取前256维</span>
+</span></span></code></pre></div></div><hr>
+<h3 id="4-chunking">4. Chunking策略</h3>
+<p>Chunking（文本分块）是RAG管线的第一步，直接影响检索质量。</p>
+<h4 id="41-fixed-size-chunking">4.1 Fixed-size Chunking（固定大小分块）</h4>
+<p>最简单的方法，按固定的字符数或token数切分，通常带重叠。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">RecursiveCharacterTextSplitter</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">text_splitter</span> <span class="o">=</span> <span class="n">RecursiveCharacterTextSplitter</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chunk_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>      <span class="c1"># 每个块的大小（字符数）</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>    <span class="c1"># 相邻块重叠字符数</span>
+</span></span><span class="line"><span class="cl">    <span class="n">separators</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;</span><span class="se">\n\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="s2">&#34;。&#34;</span><span class="p">,</span> <span class="s2">&#34;.&#34;</span><span class="p">,</span> <span class="s2">&#34; &#34;</span><span class="p">,</span> <span class="s2">&#34;&#34;</span><span class="p">]</span>  <span class="c1"># 优先在自然边界切分</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">chunks</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_text</span><span class="p">(</span><span class="n">long_text</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>参数调优</strong>：</p>
+<ul>
+<li>chunk_size：256-1024字符常见，根据文档类型和检索任务调整</li>
+<li>chunk_overlap：通常为chunk_size的10-20%</li>
+<li>分隔符优先级：段落 &gt; 句子 &gt; 词组 &gt; 字符</li>
+</ul>
+<h4 id="42-semantic-chunking">4.2 Semantic Chunking（语义分块）</h4>
+<p>根据语义边界（主题变化、段落结束）进行切分，不固定长度。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain_experimental.text_splitter</span> <span class="kn">import</span> <span class="n">SemanticChunker</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">langchain_openai.embeddings</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">semantic_splitter</span> <span class="o">=</span> <span class="n">SemanticChunker</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">embeddings</span><span class="o">=</span><span class="n">OpenAIEmbeddings</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">breakpoint_threshold_type</span><span class="o">=</span><span class="s2">&#34;percentile&#34;</span><span class="p">,</span>  <span class="c1"># percentile/standard_deviation/interquartile</span>
+</span></span><span class="line"><span class="cl">    <span class="n">breakpoint_threshold_amount</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span>  <span class="c1"># 百分位阈值</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">chunks</span> <span class="o">=</span> <span class="n">semantic_splitter</span><span class="o">.</span><span class="n">split_text</span><span class="p">(</span><span class="n">long_text</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>2025年语义分块方法</strong>：</p>
+<ul>
+<li><strong>Embedding-based</strong>：计算句子间embedding相似度，在相似度突降处切分</li>
+<li><strong>LLM-based</strong>：用LLM判断语义边界（准确但成本高）</li>
+<li><strong>Model-based</strong>：使用专用分块模型（如Jina AI的Segmentation模型）</li>
+</ul>
+<h4 id="43-agentic-chunking">4.3 Agentic Chunking（智能分块）</h4>
+<p>2024-2025年出现的新范式：让AI Agent根据需要动态决定如何分块和聚合。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># Agentic Chunking 思路（伪代码）</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">agentic_chunking</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">llm</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 1. 分析文档结构</span>
+</span></span><span class="line"><span class="cl">    <span class="n">structure</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;分析这个文档的结构：</span><span class="si">{</span><span class="n">document</span><span class="p">[:</span><span class="mi">1000</span><span class="p">]</span><span class="si">}</span><span class="s2">...&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 2. 根据结构制定分块策略</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">structure</span> <span class="o">==</span> <span class="s2">&#34;技术文档&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">chunks</span> <span class="o">=</span> <span class="n">split_by_section</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">structure</span> <span class="o">==</span> <span class="s2">&#34;小说&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">chunks</span> <span class="o">=</span> <span class="n">split_by_chapter</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">structure</span> <span class="o">==</span> <span class="s2">&#34;表格数据&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">chunks</span> <span class="o">=</span> <span class="n">split_by_row_group</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 3. 为每个块生成摘要和标签</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">chunk</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">chunk</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">extract_tags</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">chunks</span>
+</span></span></code></pre></div></div><h4 id="44-chunking">4.4 Chunking选型建议</h4>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐策略</th>
+<th>chunk_size</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>问答系统</td>
+<td>Semantic Chunking</td>
+<td>512-1024</td>
+<td>语义完整性好</td>
+</tr>
+<tr>
+<td>代码库</td>
+<td>Fixed-size (按函数/类)</td>
+<td>256-512</td>
+<td>保持代码结构</td>
+</tr>
+<tr>
+<td>长文档总结</td>
+<td>Agentic Chunking</td>
+<td>灵活</td>
+<td>根据文档结构定制</td>
+</tr>
+<tr>
+<td>搜索引擎</td>
+<td>Fixed-size + 重叠</td>
+<td>256-512</td>
+<td>高召回率</td>
+</tr>
+<tr>
+<td>法律/医疗文档</td>
+<td>Semantic Chunking</td>
+<td>1024-2048</td>
+<td>保留完整条款</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="5-">5. 检索策略</h3>
+<h4 id="51-dense-retrieval">5.1 Dense Retrieval（密集检索）</h4>
+<p>使用Embedding模型将文本映射到向量空间，通过向量相似度检索。</p>
+<ul>
+<li>优点：语义理解能力强，能匹配同义词和近义表达</li>
+<li>缺点：需要训练Embedding模型，对领域术语可能不敏感</li>
+<li>相似度度量：余弦相似度(Cosine)、内积(IP)、欧氏距离(L2)</li>
+</ul>
+<h4 id="52-sparse-retrieval--bm25">5.2 Sparse Retrieval（稀疏检索）- BM25</h4>
+<p>基于关键词匹配的经典检索算法，TF-IDF的改进版。</p>
+<ul>
+<li>优点：精确匹配、对罕见词敏感、无需训练、可解释性强</li>
+<li>缺点：语义鸿沟（无法处理同义词）、无法处理拼写变体</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># BM25检索</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">rank_bm25</span> <span class="kn">import</span> <span class="n">BM25Okapi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">tokenized_corpus</span> <span class="o">=</span> <span class="p">[</span><span class="n">doc</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">bm25</span> <span class="o">=</span> <span class="n">BM25Okapi</span><span class="p">(</span><span class="n">tokenized_corpus</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">scores</span> <span class="o">=</span> <span class="n">bm25</span><span class="o">.</span><span class="n">get_scores</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+</span></span></code></pre></div></div><h4 id="53-hybrid-search">5.3 Hybrid Search（混合搜索）</h4>
+<p>结合Dense和Sparse检索的优势，使用加权融合策略。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hybrid_search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">dense_encoder</span><span class="p">,</span> <span class="n">bm25</span><span class="p">,</span> <span class="n">vector_index</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">                  <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Dense检索</span>
+</span></span><span class="line"><span class="cl">    <span class="n">query_vec</span> <span class="o">=</span> <span class="n">dense_encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dense_scores</span><span class="p">,</span> <span class="n">dense_indices</span> <span class="o">=</span> <span class="n">vector_index</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query_vec</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">top_k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Sparse检索</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bm25_scores</span> <span class="o">=</span> <span class="n">bm25</span><span class="o">.</span><span class="n">get_scores</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sparse_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">bm25_scores</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="n">top_k</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 分数归一化 + 加权融合（RRF或加权和）</span>
+</span></span><span class="line"><span class="cl">    <span class="n">combined_scores</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dense_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">combined_scores</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="o">/</span><span class="n">top_k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sparse_indices</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">combined_scores</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="o">/</span><span class="n">top_k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 按综合得分排序</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ranked</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">combined_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">[</span><span class="n">documents</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ranked</span><span class="p">[:</span><span class="n">top_k</span><span class="p">]]</span>
+</span></span></code></pre></div></div><p><strong>RRF（Reciprocal Rank Fusion）</strong>：混合搜索中最推荐的融合算法</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># RRF融合：不依赖分数绝对值，更鲁棒</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">rrf_fusion</span><span class="p">(</span><span class="n">dense_results</span><span class="p">,</span> <span class="n">sparse_results</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">scores</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">doc_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dense_results</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">scores</span><span class="p">[</span><span class="n">doc_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">doc_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sparse_results</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">scores</span><span class="p">[</span><span class="n">doc_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="54-2025">5.4 2025年检索趋势</h4>
+<ul>
+<li><strong>Late Interaction</strong>（ColBERTv2）：保留Token级交互，兼顾速度和精度</li>
+<li><strong>Sparse-Dense Hybrid</strong>（如Splade）：学习生成稀疏向量，结合BM-like和Dense优势</li>
+<li><strong>多向量检索</strong>（MRL、Matryoshka Embedding）：不同精度需求的维度适配</li>
+<li><strong>多模态检索</strong>：图文统一向量空间</li>
+</ul>
+<hr>
+<h3 id="6-reranker">6. Reranker（重排序）</h3>
+<p>Reranker 对初步检索结果进行精细化排序，通常使用Cross-Encoder架构。</p>
+<h4 id="61-cross-encoder-reranker">6.1 Cross-Encoder Reranker</h4>
+<p>与Bi-Encoder不同，Cross-Encoder同时处理Query和Document，精度更高但速度慢。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">CrossEncoder</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># BGE Reranker（推荐中文场景）</span>
+</span></span><span class="line"><span class="cl"><span class="n">reranker</span> <span class="o">=</span> <span class="n">CrossEncoder</span><span class="p">(</span><span class="s2">&#34;BAAI/bge-reranker-v2-m3&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">query</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">scores</span> <span class="o">=</span> <span class="n">reranker</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sorted_docs</span> <span class="o">=</span> <span class="p">[</span><span class="n">doc</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">docs</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+</span></span></code></pre></div></div><h4 id="62-reranker">6.2 主流Reranker模型</h4>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>优点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cohere Rerank v3</td>
+<td>多语言、稳定、SaaS</td>
+<td>生产环境（付费）</td>
+</tr>
+<tr>
+<td>BGE Reranker v2</td>
+<td>免费、中文优秀</td>
+<td>自托管</td>
+</tr>
+<tr>
+<td>BGE Reranker v2-M3</td>
+<td>支持多语言、长文本</td>
+<td>多语言场景</td>
+</tr>
+<tr>
+<td>Cross-Encoder (ms-marco)</td>
+<td>快速、英文好</td>
+<td>英文搜索</td>
+</tr>
+<tr>
+<td>Jina Reranker</td>
+<td>长上下文支持(8K)</td>
+<td>长文档重排</td>
+</tr>
+<tr>
+<td>Voyage Rerank</td>
+<td>质量高</td>
+<td>追求极致精度</td>
+</tr>
+</tbody>
+</table>
+<h4 id="63-reranker">6.3 Reranker使用策略</h4>
+<ul>
+<li><strong>两阶段检索</strong>：第一段用Bi-Encoder召回Top-50<del>100，第二段用Cross-Encoder重排Top-3</del>5</li>
+<li><strong>延迟预算</strong>：Cross-Encoder比Bi-Encoder慢10-100倍，仅对Top-N重排</li>
+<li><strong>嵌入Reranker</strong>：如Cohere Rerank，返回相关性分数而非排序，可用于过滤</li>
+</ul>
+<hr>
+<h3 id="7-advanced-rag">7. Advanced RAG技术</h3>
+<h4 id="71-self-rag">7.1 Self-RAG</h4>
+<p>2023年由Asai等人提出，让LLM通过特殊token自主决定是否需要检索以及是否使用检索结果。</p>
+<p>核心机制：</p>
+<ol>
+<li><strong>是否需要检索</strong>：LLM输出 <code>[Retrieve]</code> 或 <code>[No Retrieve]</code> token</li>
+<li><strong>检索结果是否相关</strong>：LLM输出 <code>[Relevant]</code> 或 <code>[Irrelevant]</code> token</li>
+<li><strong>是否支持回答</strong>：LLM输出 <code>[Fully Supported]</code> / <code>[Partially Supported]</code> / <code>[Not Supported]</code></li>
+</ol>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># Self-RAG逻辑（简化版）</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">self_rag</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">retriever</span><span class="p">,</span> <span class="n">llm</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 第1步：判断是否需要检索</span>
+</span></span><span class="line"><span class="cl">    <span class="n">decision</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;问题：</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="se">\n</span><span class="s2">是否需要查询外部知识？[Retrieve]/[No Retrieve]&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s2">&#34;[Retrieve]&#34;</span> <span class="ow">in</span> <span class="n">decision</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">docs</span> <span class="o">=</span> <span class="n">retriever</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 第2步：判断文档相关性</span>
+</span></span><span class="line"><span class="cl">            <span class="n">relevance</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;文档：</span><span class="si">{</span><span class="n">doc</span><span class="si">}</span><span class="se">\n</span><span class="s2">问题：</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="se">\n</span><span class="s2">相关？[Relevant]/[Irrelevant]&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="s2">&#34;[Relevant]&#34;</span> <span class="ow">in</span> <span class="n">relevance</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="c1"># 第3步：基于文档生成回答并检查事实验证</span>
+</span></span><span class="line"><span class="cl">                <span class="n">answer</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;基于文档[</span><span class="si">{</span><span class="n">doc</span><span class="si">}</span><span class="s2">]回答：</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">yield</span> <span class="n">answer</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">yield</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;回答：</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="72-corrective-ragcrag">7.2 Corrective RAG（CRAG）</h4>
+<p>2023年Yan等人提出，核心思想：评估检索质量，对低质量检索进行纠正。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">corrective_rag</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">retriever</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">web_search</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">docs</span> <span class="o">=</span> <span class="n">retriever</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 评估检索质量</span>
+</span></span><span class="line"><span class="cl">    <span class="n">eval_score</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">evaluate_relevance</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">docs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">eval_score</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 高质量检索 - 直接使用</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">generate_answer</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">docs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">eval_score</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 中等质量 - 提取有用部分 + 补充检索</span>
+</span></span><span class="line"><span class="cl">        <span class="n">useful_parts</span> <span class="o">=</span> <span class="n">extract_relevant</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">question</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">extra_docs</span> <span class="o">=</span> <span class="n">web_search</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">generate_answer</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">useful_parts</span> <span class="o">+</span> <span class="n">extra_docs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 低质量 - 完全放弃，使用其他来源</span>
+</span></span><span class="line"><span class="cl">        <span class="n">web_results</span> <span class="o">=</span> <span class="n">web_search</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">generate_answer</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">web_results</span><span class="p">)</span>
+</span></span></code></pre></div></div><h4 id="73-graphrag">7.3 GraphRAG（微软）</h4>
+<p>2024年微软提出，使用知识图谱增强RAG，特别适合全局性问题和跨实体推理。</p>
+<p><strong>核心流程</strong>：</p>
+<ol>
+<li>文档 → 实体抽取（LLM）→ 知识图谱构建</li>
+<li>查询 → 实体识别 → 图谱遍历 → 社区摘要</li>
+<li>社区摘要 → LLM生成</li>
+</ol>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># GraphRAG概念性流程</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">graphrag</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">llm</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 1. 从查询中识别实体</span>
+</span></span><span class="line"><span class="cl">    <span class="n">entities</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">extract_entities</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 2. 在图谱中定位实体并获取邻居</span>
+</span></span><span class="line"><span class="cl">    <span class="n">local_context</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_subgraph</span><span class="p">(</span><span class="n">entities</span><span class="p">,</span> <span class="n">hops</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 3. 生成社区摘要</span>
+</span></span><span class="line"><span class="cl">    <span class="n">community_summaries</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">summarize_communities</span><span class="p">(</span><span class="n">local_context</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 4. 生成回答</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;社区知识：</span><span class="si">{</span><span class="n">community_summaries</span><span class="si">}</span><span class="se">\n</span><span class="s2">问题：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>GraphRAG vs 传统RAG</strong>：</p>
+<ul>
+<li>传统RAG：适合&quot;单点&quot;事实查询（&ldquo;XX公司的创始人是谁&rdquo;）</li>
+<li>GraphRAG：适合&quot;关系型&quot;和&quot;全局型&quot;查询（&ldquo;XX公司生态布局的分析&rdquo;）</li>
+<li>代价：GraphRAG构建成本高（LLM抽取实体+关系），适合对知识深度要求高的场景</li>
+</ul>
+<h4 id="74-hydehypothetical-document-embedding">7.4 HyDE（Hypothetical Document Embedding）</h4>
+<p>2022年由Gao等人提出，核心思路：先用LLM生成一个假设性文档（理想答案），然后用该假设文档的Embedding去检索相似的真实文档。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hyde</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">embedder</span><span class="p">,</span> <span class="n">vector_store</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 1. 生成假设文档</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hypothetical_doc</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="sa">f</span><span class="s2">&#34;请为以下问题生成一段详细的回答文档：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 2. 用假设文档的向量进行检索</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hypo_embedding</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">hypothetical_doc</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">real_docs</span> <span class="o">=</span> <span class="n">vector_store</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">hypo_embedding</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">real_docs</span>
+</span></span></code></pre></div></div><p><strong>适用场景</strong>：查询与文档的语义差距大时效果好（如&quot;如何做咖啡&quot;检索技术文档）</p>
+<h4 id="75-2025advanced-rag">7.5 2025年Advanced RAG新趋势</h4>
+<table>
+<thead>
+<tr>
+<th>技术</th>
+<th>核心思想</th>
+<th>开源性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>REAPER (2025)</td>
+<td>使用LLM规划多步检索路径</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>RAPTOR (2024)</td>
+<td>递归式文本摘要聚合，构建层级索引</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Self-Reflection RAG</td>
+<td>Agent在生成后自我反思并补充检索</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Multi-Modal RAG</td>
+<td>图文/视频/音频统一检索</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>FLARE (Active RAG)</td>
+<td>生成过程中主动触发检索</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>CRUD-RAG</td>
+<td>支持增删改查的动态知识库</td>
+<td>❌ 商业</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="8-rag">8. 多模态RAG</h3>
+<h4 id="81-image-text-rag">8.1 图文检索（Image-Text RAG）</h4>
+<p>将图像和文本统一到同一向量空间，实现跨模态检索。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 使用多模态Embedding实现图文RAG</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 使用CLIP或类似多模态模型</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s2">&#34;clip-ViT-B-32&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 索引图文数据</span>
+</span></span><span class="line"><span class="cl"><span class="n">documents</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="s2">&#34;text&#34;</span><span class="p">:</span> <span class="s2">&#34;一只猫在晒太阳&#34;</span><span class="p">,</span> <span class="s2">&#34;image&#34;</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&#34;cat.jpg&#34;</span><span class="p">)},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="s2">&#34;text&#34;</span><span class="p">:</span> <span class="s2">&#34;城市夜景&#34;</span><span class="p">,</span> <span class="s2">&#34;image&#34;</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&#34;city.jpg&#34;</span><span class="p">)},</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 生成图文混合向量</span>
+</span></span><span class="line"><span class="cl">    <span class="n">text_emb</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&#34;text&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">image_emb</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&#34;image&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 可以根据需要融合或索引两种向量</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 文字检索图片</span>
+</span></span><span class="line"><span class="cl"><span class="n">query</span> <span class="o">=</span> <span class="s2">&#34;可爱的动物&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">query_emb</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>2025年多模态RAG方案</strong>：</p>
+<ul>
+<li><strong>图文统一索引</strong>：CLIP/BLIP/Fuyu 生成图文统一向量</li>
+<li><strong>图生文再检索</strong>：先用VLM描述图片生成文字，再用文字检索</li>
+<li><strong>交错检索</strong>：同时在文本和图像向量空间中检索</li>
+</ul>
+<h4 id="82-">8.2 视频检索</h4>
+<ul>
+<li><strong>基于帧</strong>：关键帧提取 -&gt; 图文RAG</li>
+<li><strong>基于描述</strong>：视频摘要 -&gt; 文本RAG</li>
+<li><strong>基于语音</strong>：ASR字幕 -&gt; 文本RAG</li>
+<li><strong>端到端</strong>：Video-LLM直接处理视频输入（Gemini 1.5 Pro/Claude 3.5支持原生视频理解）</li>
+</ul>
+<hr>
+<h3 id="9-rag-evaluation">9. 评估（RAG Evaluation）</h3>
+<h4 id="91-">9.1 评估框架</h4>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>核心指标</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RAGAS</strong></td>
+<td>Faithfulness, Answer Relevance, Context Precision, Context Recall</td>
+<td>无需标注数据，LLM as Judge</td>
+</tr>
+<tr>
+<td><strong>TruLens</strong></td>
+<td>Answer Relevance, Context Relevance, Groundedness</td>
+<td>基于反馈函数，支持自定义</td>
+</tr>
+<tr>
+<td><strong>DeepEval</strong></td>
+<td>10+指标，包括Hallucination、Bias、Toxicity</td>
+<td>CI/CD集成良好</td>
+</tr>
+<tr>
+<td><strong>ARES</strong></td>
+<td>使用LLM微调评估器</td>
+<td>需要少量标注数据</td>
+</tr>
+<tr>
+<td><strong>RGB (RAG Benchmark)</strong></td>
+<td>标准化评测集</td>
+<td>学术基准</td>
+</tr>
+</tbody>
+</table>
+<h4 id="92-ragas">9.2 RAGAS核心指标详解</h4>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ragas</span> <span class="kn">import</span> <span class="n">evaluate</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ragas.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">faithfulness</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">answer_relevancy</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">context_precision</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">context_recall</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">answer_correctness</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 评估结果</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span class="p">,</span>  <span class="c1"># question, answer, contexts, ground_truth</span>
+</span></span><span class="line"><span class="cl">    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="n">faithfulness</span><span class="p">,</span>          <span class="c1"># 回答是否基于上下文（无幻觉）</span>
+</span></span><span class="line"><span class="cl">        <span class="n">answer_relevancy</span><span class="p">,</span>      <span class="c1"># 回答是否与问题相关</span>
+</span></span><span class="line"><span class="cl">        <span class="n">context_precision</span><span class="p">,</span>     <span class="c1"># 检索到的上下文是否包含有用信息</span>
+</span></span><span class="line"><span class="cl">        <span class="n">context_recall</span><span class="p">,</span>        <span class="c1"># 需要的所有信息是否都被检索到</span>
+</span></span><span class="line"><span class="cl">        <span class="n">answer_correctness</span><span class="p">,</span>    <span class="c1"># 回答的准确性（需参考答案）</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>Faithfulness（忠实度）</strong>：最重要的指标，衡量回答是否有幻觉。</p>
+<ul>
+<li>将回答拆分为独立声明（claims）</li>
+<li>检查每个声明是否能从上下文中找到依据</li>
+<li>公式：faithfulness = 可支持的声明数 / 总声明数</li>
+</ul>
+<p><strong>Answer Relevance（答案相关性）</strong>：</p>
+<ul>
+<li>反向生成问题：根据回答生成N个问题</li>
+<li>计算生成的问题与原始问题的余弦相似度</li>
+<li>评估回答是否切题</li>
+</ul>
+<p><strong>Context Precision（上下文精度）</strong>：</p>
+<ul>
+<li>评估检索结果中相关文档的排序质量</li>
+<li>相关信息排名越高，分数越高</li>
+</ul>
+<p><strong>Context Recall（上下文召回率）</strong>：</p>
+<ul>
+<li>参考答案所需的全部信息是否都在检索结果中</li>
+<li>需要GT（Ground Truth）答案</li>
+</ul>
+<h4 id="93-">9.3 评估数据集构建</h4>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 评估数据集格式（RAGAS）</span>
+</span></span><span class="line"><span class="cl"><span class="n">eval_dataset</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;question&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;地球到月球的距离是多少？&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;answer&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;地球到月球的距离约为38.4万公里。&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;contexts&#34;</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&#34;月球是地球的卫星，平均距离地球约384,400公里...&#34;</span><span class="p">]],</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;ground_truth&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;地球到月球的距离约为384,400公里。&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><h4 id="94-2025">9.4 2025年评估趋势</h4>
+<ul>
+<li><strong>LLM as Judge</strong> 成为主流评估方式</li>
+<li><strong>自一致性评估</strong>：多次采样取均值</li>
+<li><strong>端到端评估管线</strong>：集成到CI/CD流程</li>
+<li><strong>成本考量</strong>：评估成本可能超过推理成本，采样评估逐渐被采用</li>
+</ul>
+<hr>
+<h2 id="5">三、面试常见问题（5个）</h2>
+<h3 id="q1-rag-vs-fine-tuning">Q1: RAG vs 模型微调（Fine-tuning）如何选型？各自优缺点？</h3>
+<p><strong>答</strong>：</p>
+<p><strong>RAG优势</strong>：</p>
+<ol>
+<li><strong>知识更新</strong>：只需更新向量库，无需重新训练模型</li>
+<li><strong>可解释性</strong>：回答可追溯到具体文档</li>
+<li><strong>幻觉控制</strong>：通过检索限制回答范围</li>
+<li><strong>成本低</strong>：无需GPU训练资源</li>
+<li><strong>长尾知识</strong>：对低频知识效果好</li>
+</ol>
+<p><strong>微调优势</strong>：</p>
+<ol>
+<li><strong>风格/行为对齐</strong>：学习输出格式、语气、专业术语</li>
+<li><strong>推理能力</strong>：在特定任务上微调可提升推理表现</li>
+<li><strong>减少推理成本</strong>：微调后可以用更小的模型达到相同效果</li>
+<li><strong>离线场景</strong>：不需要外部检索服务</li>
+</ol>
+<p><strong>选型决策树</strong>：</p>
+<pre><code>知识更新频率高？→ RAG
+需要模型掌握特定输出格式/风格？→ 微调
+数据隐私敏感？→ 开源模型微调 + RAG
+推理成本敏感？→ 小模型微调
+需要精确引用来源？→ RAG
+两者不互斥→ RAG + 微调（最佳实践）
+</code></pre>
+<p><strong>2025年趋势</strong>：RAG + 微调混合架构成为主流。用微调让模型学会正确使用检索结果（&ldquo;如何根据检索内容作答&rdquo;），用RAG提供实时外部知识。</p>
+<h3 id="q2-">Q2: 如何优化检索质量？检索结果不准确或者不相关怎么办？</h3>
+<p><strong>答</strong>：</p>
+<p><strong>问题诊断路径</strong>：</p>
+<ol>
+<li>
+<p><strong>Chunking优化</strong>：</p>
+<ul>
+<li>chunk太大 → 噪声过多，设置300-500 tokens</li>
+<li>chunk太小 → 上下文不完整，增大chunk并增加overlap</li>
+<li>切分边界错误 → 使用Semantic Chunking</li>
+</ul>
+</li>
+<li>
+<p><strong>Embedding模型优化</strong>：</p>
+<ul>
+<li>领域不匹配 → 更换领域专用模型或微调Embedding</li>
+<li>多语言问题 → 使用BGE-M3/Jina v3</li>
+<li>维度不匹配 → 检查维度和相似度度量</li>
+</ul>
+</li>
+<li>
+<p><strong>检索策略优化</strong>：</p>
+<ul>
+<li>召回不足 → 增加top_k，引入Hybrid Search</li>
+<li>精度不足 → 增加Reranker</li>
+<li>Query模糊 → Query重写（Query Rewrite/Expansion）</li>
+</ul>
+</li>
+<li>
+<p><strong>Query处理优化</strong>：</p>
+</li>
+</ol>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># Query Rewrite - 改写用户查询</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">rewrite_query</span><span class="p">(</span><span class="n">raw_query</span><span class="p">,</span> <span class="n">llm</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">rewritten</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="sa">f</span><span class="s2">&#34;将以下用户问题改写为更适合检索的形式，保持原意：</span><span class="si">{</span><span class="n">raw_query</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">rewritten</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Query Expansion - 扩展查询（多角度检索）</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">expand_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">llm</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">expansions</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="sa">f</span><span class="s2">&#34;为以下问题生成3个不同角度的检索查询：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">[</span><span class="n">query</span><span class="p">]</span> <span class="o">+</span> <span class="n">expansions</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>系统化优化路线</strong>：</p>
+<ol>
+<li>先用BM25 baseline建立下限</li>
+<li>嵌入BM25 + Dense Hybrid Search</li>
+<li>增加Reranker（Top-100→Top-5）</li>
+<li>查漏补缺：分析bad case，针对性优化（query rewrite、HyDE等）</li>
+</ol>
+<h3 id="q3-100rag">Q3: 长文档（100页以上）的RAG方案如何设计？</h3>
+<p><strong>答</strong>：</p>
+<p>长文档RAG面临两个核心挑战：检索精度下降（信息分散在大量文本中）和上下文遗漏（关键信息未检索到）。</p>
+<p><strong>推荐方案</strong>：</p>
+<ol>
+<li><strong>分层索引（Hierarchical Indexing）</strong></li>
+</ol>
+<pre><code>文档
+├── 章节摘要 (embedding)
+│   ├── 段落 (embedding)
+│   │   └── 句子
+│   ├── 段落
+│   └── ...
+├── 章节摘要
+│   └── ...
+└── 全局摘要
+</code></pre>
+<ol start="2">
+<li>
+<p><strong>递归检索（Recursive Retrieval）</strong></p>
+<ul>
+<li>第一轮：检索章节摘要，找到相关章节</li>
+<li>第二轮：在相关章节中检索具体段落</li>
+<li>第三轮：在段落中定位具体内容</li>
+</ul>
+</li>
+<li>
+<p><strong>RAPTOR（递归摘要聚合，2024）</strong></p>
+<ul>
+<li>底层：原始chunks</li>
+<li>中层：chunks聚类+摘要</li>
+<li>顶层：摘要的摘要</li>
+<li>检索时从多层同时检索</li>
+</ul>
+</li>
+<li>
+<p><strong>MapReduce策略</strong></p>
+<ul>
+<li>分段总结：将长文档分块，每块独立检索+回答</li>
+<li>汇总整合：将各段回答汇总为完整答案</li>
+</ul>
+</li>
+</ol>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">long_document_rag</span><span class="p">(</span><span class="n">large_doc</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">embedder</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 方法1：分层检索</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sections</span> <span class="o">=</span> <span class="n">split_by_sections</span><span class="p">(</span><span class="n">large_doc</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">section_embeddings</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">encode</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">summary</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 先找相关章节</span>
+</span></span><span class="line"><span class="cl">    <span class="n">top_sections</span> <span class="o">=</span> <span class="n">search</span><span class="p">(</span><span class="n">section_embeddings</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 再在章节内精确检索</span>
+</span></span><span class="line"><span class="cl">    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">top_sections</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">chunks</span> <span class="o">=</span> <span class="n">split_into_chunks</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">search</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">generate_from_chunks</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">llm</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>2025年长文档方案进阶</strong>：</p>
+<ul>
+<li>利用长上下文模型（128K-1M tokens）：将整本书直接输入context，配合预处理的文档摘要作为索引</li>
+<li>Agentic RAG：让Agent逐步阅读文档，动态决定下一步检索位置</li>
+<li>KeyBERT + LLM：先用关键词提取定位，再用LLM精读</li>
+</ul>
+<h3 id="q4-rag">Q4: RAG系统中的幻觉问题如何检测和缓解？</h3>
+<p><strong>答</strong>：</p>
+<p><strong>检测方法</strong>：</p>
+<ol>
+<li><strong>Faithfulness评估（RAGAS）</strong>：自动检测回答是否基于检索内容</li>
+<li><strong>Self-Eval（自评估）</strong>：让LLM对自己回答的每个声明进行事实验证</li>
+<li><strong>NLI模型</strong>：使用自然语言推理模型判断&quot;上下文是否蕴含回答&quot;</li>
+<li><strong>引用标注</strong>：强制LLM在回答中标注来源，无标注部分为潜在幻觉</li>
+</ol>
+<p><strong>缓解策略</strong>：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 多层幻觉防御</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">HallucinationGuard</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">retriever</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="n">llm</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">retriever</span> <span class="o">=</span> <span class="n">retriever</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">generate_with_guard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 1. 检索 + 生成</span>
+</span></span><span class="line"><span class="cl">        <span class="n">docs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retriever</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;基于检索内容回答：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\n</span><span class="s2">内容：</span><span class="si">{</span><span class="n">docs</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># 2. 自检测</span>
+</span></span><span class="line"><span class="cl">        <span class="n">verification</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;回答：</span><span class="si">{</span><span class="n">answer</span><span class="si">}</span><span class="se">\n</span><span class="s2">检索内容：</span><span class="si">{</span><span class="n">docs</span><span class="si">}</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;请检查回答中的每个声明是否都能从检索内容中找到依据。&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;列出无法支持的声明：&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># 3. 如果发现幻觉，重新生成或标记</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s2">&#34;无法支持&#34;</span> <span class="ow">in</span> <span class="n">verification</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regenerate_safe</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">docs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># 4. 输出时标注可信度</span>
+</span></span><span class="line"><span class="cl">        <span class="n">confidence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_confidence</span><span class="p">(</span><span class="n">answer</span><span class="p">,</span> <span class="n">docs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;answer&#34;</span><span class="p">:</span> <span class="n">answer</span><span class="p">,</span> <span class="s2">&#34;confidence&#34;</span><span class="p">:</span> <span class="n">confidence</span><span class="p">,</span> <span class="s2">&#34;sources&#34;</span><span class="p">:</span> <span class="n">docs</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">regenerate_safe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">docs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;基于以下检索内容回答问题，只回答检索内容明确支持的信息。</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;如果不确定，请回答&#39;根据检索内容无法确定&#39;。</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;内容：</span><span class="si">{</span><span class="n">docs</span><span class="si">}</span><span class="se">\n</span><span class="s2">问题：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>系统级方案</strong>：</p>
+<ul>
+<li><strong>检索质量的提升直接降低幻觉率</strong></li>
+<li><strong>设置&quot;不知道&quot;回答策略</strong>：当置信度低时明确拒绝回答</li>
+<li><strong>引用机制</strong>：强制LLM输出引用（citation），便于人工核实</li>
+<li><strong>温度调参</strong>：低温度(0-0.3)减少创造性输出</li>
+</ul>
+<h3 id="q5--vs-">Q5: 向量数据库选型时，自建方案 vs 托管服务怎么选？</h3>
+<p><strong>答</strong>：</p>
+<p><strong>自建方案（FAISS/Milvus/Qdrant自托管）的条件</strong>：</p>
+<ul>
+<li>有运维团队（Kubernetes、Docker、集群管理）</li>
+<li>数据隐私/合规要求无法使用SaaS</li>
+<li>大规模数据（&gt;1亿向量），SaaS成本过高</li>
+<li>需要深度定制（自定义索引、特殊filter逻辑）</li>
+</ul>
+<p><strong>托管服务（Pinecone/Weaviate Cloud/Qdrant Cloud）的条件</strong>：</p>
+<ul>
+<li>团队小/无运维能力</li>
+<li>快速验证产品</li>
+<li>对SLA有要求（Pinecone 99.99%可用性）</li>
+<li>中小规模数据（&lt;1亿向量）</li>
+</ul>
+<p><strong>混合策略</strong>：</p>
+<ul>
+<li>原型阶段：Chroma（本地开发）</li>
+<li>小规模内测：Pinecone/Qdrant Cloud（快速上线）</li>
+<li>大规模生产：Milvus/Qdrant自托管（成本优化）</li>
+</ul>
+<p><strong>成本对比</strong>（以1000万向量、768维为例）：</p>
+<ul>
+<li>Pinecone：约$500-1000/月（p2 pod）</li>
+<li>自建Milvus(3节点)：约$300-500/月（云主机费）</li>
+<li>FAISS纯内存：约$50-100/月（单机RAM）</li>
+</ul>
+<hr>
+<h2 id="heading-2">四、推荐学习资源</h2>
+<h3 id="heading-3">论文</h3>
+<ul>
+<li>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (Lewis et al., 2020) - RAG开山之作</li>
+<li>Self-RAG: Learning to Retrieve, Generate, and Critique (Asai et al., 2023)</li>
+<li>Corrective Retrieval Augmented Generation (Yan et al., 2023)</li>
+<li>GraphRAG: Unlocking LLM Discovery on Narrative Private Data (Microsoft, 2024)</li>
+<li>Precise Zero-Shot Dense Retrieval without Relevance Labels (HyDE, Gao et al., 2022)</li>
+<li>RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval (2024)</li>
+<li>RAGAS: Automated Evaluation of Retrieval Augmented Generation (2023)</li>
+</ul>
+<h3 id="heading-4">课程与教程</h3>
+<ul>
+<li>DeepLearning.AI: Building and Evaluating Advanced RAG</li>
+<li>LangChain: RAG from Scratch (YouTube系列)</li>
+<li>LlamaIndex: RAG Guide (官方文档)</li>
+<li>Pinecone: RAG学习路径</li>
+</ul>
+<h3 id="heading-5">工具与框架</h3>
+<ul>
+<li>LangChain / LlamaIndex / Haystack - RAG框架</li>
+<li>RAGAS - 评估框架</li>
+<li>TruLens - 评估框架</li>
+<li>Unstructured.io - 文档解析</li>
+<li>Jina AI - Embedding和Reranker</li>
+</ul>
+<h3 id="heading-6">开源项目</h3>
+<ul>
+<li>llamaindex/examples - LlamaIndex RAG示例</li>
+<li>langchain-ai/rag-from-scratch - LangChain RAG教程</li>
+<li>microsoft/graphrag - 微软GraphRAG</li>
+<li>h2oai/h2ogpt - 开源RAG系统</li>
+<li>oobabooga/text-generation-webui - 本地RAG部署</li>
+</ul>
+
+</article>
+
+
+<nav class="series-nav">
+  <span class="series-label">AI应用开发面试宝典 系列</span>
+  <div class="series-links">
+    
+    <a class="series-link prev" href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">← 提示工程(Prompt Engineering)</a>
+    
+    
+    <a class="series-link next" href="/posts/AI/06-AI%20Agent%e5%bc%80%e5%8f%91/">AI Agent开发 →</a>
+    
+  </div>
+</nav>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">提示工程(Prompt Engineering)</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/06-AI%20Agent%e5%bc%80%e5%8f%91/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">AI Agent开发</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/PaperNotes/%e5%9f%ba%e4%ba%8e%e5%a4%a7%e5%9e%8b%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8b%e7%9a%84%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba%e7%94%9f%e6%88%90%e7%bb%bc%e8%bf%b0_%e5%88%98%e9%9b%aa%e9%a2%96/">
+      <span class="related-card-title">《基于大型语言模型的检索增强生成综述》笔记</span>
+      <span class="related-card-date">2025-08-01</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">面试真题与实战</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/02-%e5%a4%a7%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8bLLM%e5%8e%9f%e7%90%86/">大语言模型(LLM)原理</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">模型部署与推理优化</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/03-AI%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">AI应用开发框架</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering)</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+</body>
+</html>

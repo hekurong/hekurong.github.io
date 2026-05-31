@@ -1,0 +1,2446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>大语言模型(LLM)原理 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="stylesheet" href="/assets/css/style.css?v=14">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">大语言模型(LLM)原理</h1>
+    <div class="article-meta">
+      <time datetime="2026-06-01">2026-06-01</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="tag" href="/tags/GPT/">GPT</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="02--llm">02 — 大语言模型(LLM)原理</h1>
+<blockquote>
+<p>涵盖GPT全系列演进、预训练范式、推理机制、Scaling Laws、RLHF/DPO、MoE、长上下文、多模态及2025-2026年前沿进展
+更新至 2025-2026 年最新知识（含DeepSeek-R1、GPT-4o、o1/o3、Mamba等）</p>
+</blockquote>
+<hr>
+<h2 id="heading">一、概述</h2>
+<p>大语言模型（Large Language Model, LLM）是当前AI应用开发面试的绝对核心。2025-2026年的面试关注点发生了显著变化：</p>
+<ul>
+<li><strong>从&quot;了解GPT&quot;到&quot;理解GPT</strong>：不再是简单罗列模型名字，而是深入理解每个设计决策的原因</li>
+<li><strong>推理能力成为新焦点</strong>：o1/o3模型开启&quot;推理Scaling Law&quot;新时代，DeepSeek-R1展示开源推理模型的可行性</li>
+<li><strong>MoE架构占据主导</strong>：GPT-4、Mixtral、DeepSeek-V2/V3全线MoE，理解路由和负载均衡成为必备知识</li>
+<li><strong>长上下文成标配</strong>：1M+ token上下文窗口的模型越来越多，位置编码技术成为面试高频考点</li>
+<li><strong>前沿模型百花齐放</strong>：Mamba（SSM）、RWKV（RNN+Transformer融合）、DeepSeek全系列技术报告</li>
+</ul>
+<hr>
+<h2 id="heading-1">二、知识点详解</h2>
+<h3 id="21-gpt">2.1 GPT系列演进</h3>
+<h4 id="gpt-120186openai">GPT-1（2018年6月，OpenAI）</h4>
+<ul>
+<li>12层Transformer Decoder，约1.1亿参数</li>
+<li>在BooksCorpus上预训练（无标注数据）</li>
+<li>关键创新：<strong>生成式预训练 + 任务特定的有监督微调</strong></li>
+<li>证明了&quot;预训练 -&gt; 微调&quot;范式的有效性</li>
+</ul>
+<h4 id="gpt-220192">GPT-2（2019年2月）</h4>
+<ul>
+<li>最大版本1.5B参数（48层）</li>
+<li>训练数据：WebText（从Reddit爬取的4500万网页）</li>
+<li><strong>Zero-shot能力初现</strong>：无需微调即可完成翻译、问答等任务</li>
+<li>提出&quot;Language Models are Unsupervised Multitask Learners&quot;</li>
+</ul>
+<h4 id="gpt-320205">GPT-3（2020年5月）</h4>
+<ul>
+<li>1750亿参数，96层，96头注意力</li>
+<li>训练数据：Common Crawl + WebText2 + Books + Wikipedia</li>
+<li><strong>关键创新</strong>：In-Context Learning（ICL），Few-shot Prompting</li>
+<li>证明了<strong>Scaling Law</strong>：模型越大，少样本能力越强</li>
+<li>局限：推理成本极高、事实错误（幻觉）、长序列表现差</li>
+</ul>
+<h4 id="gpt-35--instructgpt--chatgpt2022-2023">GPT-3.5 / InstructGPT / ChatGPT（2022-2023）</h4>
+<ul>
+<li>GPT-3 + Codex + <strong>指令微调（Instruction Tuning）</strong> + RLHF</li>
+<li>InstructGPT论文（2022）：将GPT-3对齐人类偏好</li>
+<li>ChatGPT（2022年11月）：基于GPT-3.5+RLHF的对话模型</li>
+<li><strong>关键创新</strong>：RLHF（人类反馈强化学习）使模型有用、安全、诚实</li>
+</ul>
+<h4 id="gpt-420233">GPT-4（2023年3月）</h4>
+<ul>
+<li>未公开具体参数（估计1-1.7万亿参数，MoE架构）</li>
+<li><strong>多模态</strong>：支持图像输入</li>
+<li>在各种考试中表现优异（Bar Exam前10%）</li>
+<li>从GPT-4开始，OpenAI不再公开技术细节</li>
+</ul>
+<h4 id="gpt-4o--gpt-4o-mini20245">GPT-4o / GPT-4o-mini（2024年5月）</h4>
+<ul>
+<li><strong>&ldquo;o&quot;代表omni（全模态）</strong>— 原生支持文本、图像、音频输入和输出</li>
+<li>响应速度提升5倍，成本降低50%</li>
+<li>200K词汇表的tokenizer（o200k_base）</li>
+<li><strong>GPT-4o-mini</strong>：小型模型，成本更低但能力强劲</li>
+</ul>
+<h4 id="o1--o1-mini20249">o1 / o1-mini（2024年9月）</h4>
+<p><strong>推理模型（Reasoning Model）的开端</strong>：</p>
+<ul>
+<li>在回答前&quot;思考&rdquo;——内部生成更长的推理链（Chain-of-Thought）</li>
+<li>使用<strong>强化学习训练</strong>推理过程，而不是简单的监督学习</li>
+<li>在数学（IMO竞赛）、编程（Codeforces）、科学推理上大幅超越GPT-4</li>
+<li>训练时使用<strong>推理Scaling Law</strong>：更多的推理计算（test-time compute）带来更好的结果</li>
+</ul>
+<h4 id="o3--o3-mini2025">o3 / o3-mini（2025年）</h4>
+<ul>
+<li>o1的继任者，推理能力进一步提升</li>
+<li><strong>Adaptive Thinking Time</strong>：可以根据问题难度动态调整推理时间</li>
+<li>在ARC AGI等高级推理基准上突破性表现</li>
+<li><strong>o3-mini</strong>：提供low/medium/high三种推理强度可调</li>
+</ul>
+<h4 id="2025">2025年演进总结</h4>
+<pre><code>GPT-1 (2018)  -&gt; 证明预训练-&gt;微调范式
+GPT-2 (2019)  -&gt; Zero-shot能力初现
+GPT-3 (2020)  -&gt; In-Context Learning, Scaling Law
+GPT-3.5 (2022) -&gt; RLHF对齐, ChatGPT 
+GPT-4 (2023)  -&gt; 多模态, MoE架构
+GPT-4o (2024) -&gt; 全模态, 超低延迟
+o1 (2024)     -&gt; 推理模型, 推理Scaling Law
+o3 (2025)     -&gt; 自适应推理, 更强推理能力
+</code></pre>
+<hr>
+<h3 id="22-">2.2 预训练范式</h3>
+<h4 id="causal-lm--autoregressive-lm">Causal LM（因果语言模型 / Autoregressive LM）</h4>
+<p><strong>代表模型</strong>：GPT系列、LLaMA、Mistral、Qwen、DeepSeek</p>
+<p><strong>训练目标</strong>：根据前文预测下一个token（Next Token Prediction）</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 伪代码：Causal LM 损失计算</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 用前 i 个 token 预测第 i+1 个 token</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">sequence</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">        <span class="n">loss</span> <span class="o">+=</span> <span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</span></span></code></pre></div></div><p><strong>核心特征</strong>：</p>
+<ul>
+<li>单向注意力（因果掩码），只能看到上文</li>
+<li>天然适合文本生成</li>
+<li>2025年：所有主流LLM均使用此范式</li>
+</ul>
+<p><strong>2025年变体</strong>：</p>
+<ul>
+<li><strong>Fill-in-the-Middle (FIM)</strong>：在代码模型中使用，预测中间部分（DeepSeek-Coder, CodeLlama）</li>
+<li><strong>Multi-Token Prediction</strong>（Meta 2024）：一次预测多个未来token，提升推理效率</li>
+</ul>
+<h4 id="masked-lm">Masked LM（掩码语言模型）</h4>
+<p><strong>代表模型</strong>：BERT、RoBERTa、ALBERT</p>
+<p><strong>训练目标</strong>：随机mask部分token，预测被mask的token</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 伪代码：MLM 损失计算</span>
+</span></span><span class="line"><span class="cl"><span class="n">masked_sequence</span> <span class="o">=</span> <span class="n">mask</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>  <span class="c1"># 15% 的token被替换为[MASK]</span>
+</span></span><span class="line"><span class="cl"><span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">masked_sequence</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">loss</span> <span class="o">=</span> <span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">[</span><span class="n">mask_positions</span><span class="p">],</span> <span class="n">sequence</span><span class="p">[</span><span class="n">mask_positions</span><span class="p">])</span>
+</span></span></code></pre></div></div><p><strong>核心特征</strong>：</p>
+<ul>
+<li>双向注意力（能看到上下文）</li>
+<li>适合理解类任务（分类、NER、QA）</li>
+<li><strong>2025年现状</strong>：BERT族模型在LLM时代已不再是主流，但知识点仍需掌握</li>
+</ul>
+<h4 id="seq2seq">Seq2Seq（序列到序列）</h4>
+<p><strong>代表模型</strong>：T5、BART、Flan-T5</p>
+<p><strong>训练目标</strong>：Encoder解读输入序列，Decoder生成输出序列</p>
+<p><strong>核心特征</strong>：</p>
+<ul>
+<li>Encoder使用双向注意力，Decoder使用因果注意力 + Cross-Attention</li>
+<li>适合翻译、摘要、问答等<strong>转化</strong>类任务</li>
+<li>Flan-T5在各种任务上经过指令微调</li>
+</ul>
+<h4 id="2025-1">2025年预训练新趋势</h4>
+<ul>
+<li><strong>大模型基本上只用Causal LM</strong>（Scaling Law要求且生成任务最核心）</li>
+<li><strong>预训练数据为王</strong>：DeepSeek、Qwen对数据质量的高度重视</li>
+<li><strong>FIM预训练</strong>：代码大模型标配</li>
+<li><strong>多模态预训练</strong>：CLIP式图文对比学习 -&gt; Qwen-VL联合预训练</li>
+</ul>
+<hr>
+<h3 id="23-">2.3 推理机制</h3>
+<h4 id="autoregressive-decoding">Autoregressive Decoding（自回归解码）</h4>
+<p><strong>核心思想</strong>：一次生成一个token，每个新token基于已生成的整个序列。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_new_tokens</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">next_token</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="n">logits</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># 最后一个位置的logits</span>
+</span></span><span class="line"><span class="cl">        <span class="n">input_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">next_token</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">next_token</span> <span class="o">==</span> <span class="n">eos_token_id</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>采样策略</strong>：</p>
+<ul>
+<li><strong>Greedy Decoding</strong>：每次选概率最高的token，确定性但可能重复</li>
+<li><strong>Top-K Sampling</strong>：只在概率最高K个token中采样</li>
+<li><strong>Top-P (Nucleus) Sampling</strong>：选择累计概率达到P的最小token集</li>
+<li><strong>Temperature Sampling</strong>：通过温度参数平滑/锐化概率分布</li>
+<li><strong>Beam Search</strong>：维护K个最优候选路径（离线总结任务常用）</li>
+</ul>
+<h4 id="kv-cache">KV Cache（键值缓存）</h4>
+<p><strong>为什么需要</strong>：自回归解码时，每次生成新token都要重新计算之前所有token的K和V。KV Cache缓存这些值，避免重复计算。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 自回归解码（无KV Cache）</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">generate_without_kv_cache</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 第1步：计算 prompt 的 logits -&gt; 生成 token1</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#    需要计算整个 prompt 的 K, V</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 第2步：计算 [prompt, token1] 的 logits -&gt; 生成 token2</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#    需要重新计算整个序列的 K, V（包括之前已经算过的）</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 第t步：需要 O(t * d) 注意力计算</span>
+</span></span><span class="line"><span class="cl">    <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 自回归解码（有KV Cache）</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">generate_with_kv_cache</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">kv_cache</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 初始prompt，计算所有K,V并缓存</span>
+</span></span><span class="line"><span class="cl">            <span class="n">logits</span><span class="p">,</span> <span class="n">kv_cache</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">kv_cache</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 只传入最后1个token，复用缓存的K,V</span>
+</span></span><span class="line"><span class="cl">            <span class="n">logits</span><span class="p">,</span> <span class="n">kv_cache</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">last_token_only</span><span class="p">,</span> <span class="n">kv_cache</span><span class="o">=</span><span class="n">kv_cache</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">next_token</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="n">logits</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span></span></code></pre></div></div><p><strong>KV Cache优化</strong>：</p>
+<ul>
+<li><strong>PagedAttention</strong>（vLLM, 2023）：类似操作系统的虚拟内存管理KV Cache块，减少显存碎片</li>
+<li><strong>MQA/GQA</strong>：共享KV头减少缓存大小（LLaMA 2/3, Mistral使用）</li>
+<li><strong>MLA（Multi-head Latent Attention）</strong>：DeepSeek-V2提出的低秩压缩KV Cache</li>
+</ul>
+<p><strong>Quantized KV Cache</strong>：FP8 / INT8量化KV Cache，2025年标配</p>
+<h4 id="speculative-decoding">Speculative Decoding（投机解码）</h4>
+<p><strong>问题</strong>：自回归解码无法并行——一个token一个token地生成，GPU利用率低。</p>
+<p><strong>思路</strong>：用小模型（draft model）快速生成一批候选token，大模型一次性验证。</p>
+<pre><code>1. 小模型快速生成 K 个候选 token（猜的）
+2. 大模型在1次前向中并行验证这些token
+3. 接受匹配的token，拒绝不匹配的并从那里继续
+</code></pre>
+<p><strong>加速效果</strong>：理想情况下2-3倍加速，对带宽瓶颈模型效果最好。</p>
+<p><strong>2025年变体</strong>：</p>
+<ul>
+<li><strong>Self-Speculative Decoding</strong>：使用同一模型的浅层做小模型（Medusa, 2024）</li>
+<li><strong>Lookahead Decoding</strong>：使用Johnn-Scheduler并行探索多个分支</li>
+<li><strong>EAGLE</strong>（2025）：用轻量级预测头做投机解码，额外训练draft head</li>
+</ul>
+<h4 id="continuous-batching">Continuous Batching（连续批处理）</h4>
+<p>传统批处理：等同一批次所有序列都生成完成后才进入下一批。</p>
+<p>连续批处理：新到达的请求可以<strong>立即</strong>插入到当前批次中，替换已完成的序列的空位。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 连续批处理核心思想</span>
+</span></span><span class="line"><span class="cl"><span class="n">batch</span> <span class="o">=</span> <span class="p">[</span><span class="n">req1</span><span class="p">,</span> <span class="n">req2</span><span class="p">,</span> <span class="n">req3</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="n">batch</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 所有序列同时前向计算</span>
+</span></span><span class="line"><span class="cl">    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>  <span class="c1"># 每个序列只计算新的那个token</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">output</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">outputs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">output</span><span class="o">.</span><span class="n">is_finished</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">batch</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_request</span>  <span class="c1"># 立即插入新请求</span>
+</span></span></code></pre></div></div><ul>
+<li>vLLM、TensorRT-LLM、SGLang 都支持</li>
+</ul>
+<hr>
+<h3 id="24-scaling-laws--chinchilla-">2.4 Scaling Laws 与 Chinchilla 法则</h3>
+<h4 id="-scaling-lawkaplan-et-al-2020">原始 Scaling Law（Kaplan et al., 2020）</h4>
+<p><strong>核心结论</strong>：模型性能（交叉熵损失）与模型参数量 N、数据量 D、计算量 C 呈幂律关系：</p>
+<pre><code>L(N, D) = (N_c/N)^α_N + (D_c/D)^α_D
+</code></pre>
+<p><strong>关键发现</strong>：</p>
+<ul>
+<li>模型越大，数据越多，效果越好（在当时的数据量范围内）</li>
+<li>计算量应该主要分配给扩大模型规模（而不是增加数据）</li>
+<li>模型参数每增加8倍，数据量只需增加约5倍</li>
+</ul>
+<p>→ GPT-3 就是按照这个法则设计的（175B参数，但数据量相对不足）</p>
+<h4 id="chinchilla-hoffmann-et-al-2022-deepmind">Chinchilla 法则（Hoffmann et al., 2022, DeepMind）</h4>
+<p><strong>核心发现</strong>：原始Scaling Law低估了数据的重要性。</p>
+<p><strong>Fine-grained分析</strong>：在固定计算预算下，模型参数和数据量应该<strong>等比例增加</strong>。</p>
+<p><strong>关键公式</strong>：</p>
+<pre><code>对于计算预算 C：
+  最优模型大小 N_opt ≈ C^0.5
+  最优token数 D_opt ≈ C^0.5
+  即：每增加1个参数，需要约20个token
+</code></pre>
+<p><strong>实际案例</strong>：</p>
+<ul>
+<li>Chinchilla（70B参数，1.4T tokens）在同等计算量下击败了GPT-3（175B），因为数据量更足</li>
+<li>LLaMA系列完全遵循Chinchilla法则（LLaMA-1 65B/1.4T，LLaMA-2 70B/2T）</li>
+</ul>
+<h4 id="2025-scaling-law-">2025年 Scaling Law 新进展</h4>
+<ul>
+<li><strong>推理Scaling Law</strong>（o1, 2024）：在推理时增加计算量（更长的推理链）可以提升推理任务表现</li>
+<li><strong>Post-Training Scaling</strong>：RLHF/DPO阶段的scaling law</li>
+<li><strong>Data Quality Scaling</strong>：高质量数据比纯数据量更重要（DeepSeek、Qwen的观点）</li>
+<li><strong>MoE Scaling Law</strong>：MoE架构下，总参数量和活跃参数量的平衡</li>
+</ul>
+<hr>
+<h3 id="25-rlhf--dpo-">2.5 RLHF 与 DPO 原理及对比</h3>
+<h4 id="rlhfreinforcement-learning-from-human-feedback">RLHF（Reinforcement Learning from Human Feedback）</h4>
+<p><strong>完整流程（三步走）</strong>：</p>
+<p><strong>Step 1: SFT（监督微调）</strong></p>
+<ul>
+<li>收集高质量的人写对话数据</li>
+<li>用标准交叉熵损失微调预训练模型</li>
+</ul>
+<p><strong>Step 2: 训练奖励模型（Reward Model, RM）</strong></p>
+<ul>
+<li>收集人类对模型输出的偏好排名数据</li>
+<li>训练一个独立的奖励模型 R(s, a)——对模型的回答打分</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 奖励模型训练损失（Bradley-Terry模型）</span>
+</span></span><span class="line"><span class="cl"><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">log</span><span class="p">(</span><span class="n">σ</span><span class="p">(</span><span class="n">R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y_w</span><span class="p">)</span> <span class="o">-</span> <span class="n">R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y_l</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># y_w: 人类偏好的回答, y_l: 不被偏好的回答</span>
+</span></span></code></pre></div></div><p><strong>Step 3: PPO（Proximal Policy Optimization）</strong> 优化策略</p>
+<ul>
+<li>使用奖励模型给出的分数作为奖励信号</li>
+<li>用PPO目标更新LLM参数</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># PPO-ptx目标（InstructGPT论文）</span>
+</span></span><span class="line"><span class="cl"><span class="n">objective</span> <span class="o">=</span> <span class="n">E</span><span class="p">[</span><span class="n">R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="n">β</span> <span class="o">*</span> <span class="n">KL</span><span class="p">(</span><span class="n">π_θ</span><span class="p">(</span><span class="n">y</span><span class="o">|</span><span class="n">x</span><span class="p">)</span> <span class="o">||</span> <span class="n">π_ref</span><span class="p">(</span><span class="n">y</span><span class="o">|</span><span class="n">x</span><span class="p">))]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 加上预训练损失防止遗忘</span>
+</span></span><span class="line"><span class="cl"><span class="n">total_loss</span> <span class="o">=</span> <span class="n">objective</span> <span class="o">+</span> <span class="n">γ</span> <span class="o">*</span> <span class="n">E</span><span class="p">[</span><span class="n">log</span> <span class="n">π_ref</span><span class="p">(</span><span class="n">y</span><span class="o">|</span><span class="n">x</span><span class="p">)]</span>
+</span></span></code></pre></div></div><p><strong>RLHF的缺点</strong>：</p>
+<ol>
+<li>训练流程复杂（需要维护4个模型：Policy, Reference, Reward, Critic）</li>
+<li>奖励模型可能被hack（reward hacking）</li>
+<li>PPO训练不稳定，超参数敏感</li>
+</ol>
+<h4 id="dpodirect-preference-optimization-2023">DPO（Direct Preference Optimization, 2023年）</h4>
+<p><strong>核心思想</strong>：不需要显式的奖励模型，将偏好优化直接融入损失函数。</p>
+<p><strong>数学推导</strong>：DPO证明了RLHF的奖励函数可以<strong>隐式地</strong>由策略π_θ和参考策略π_ref表达。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># DPO 损失函数</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">dpo_loss</span><span class="p">(</span><span class="n">policy_logps</span><span class="p">,</span> <span class="n">ref_logps</span><span class="p">,</span> <span class="n">yw_idxs</span><span class="p">,</span> <span class="n">yl_idxs</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">    policy_logps: 当前策略对所有token的log概率
+</span></span></span><span class="line"><span class="cl"><span class="s2">    ref_logps: 参考策略对所有token的log概率
+</span></span></span><span class="line"><span class="cl"><span class="s2">    &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 计算被偏好和被拒绝的回答的对数概率</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pi_yw</span> <span class="o">=</span> <span class="n">policy_logps</span><span class="p">[</span><span class="n">yw_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pi_yl</span> <span class="o">=</span> <span class="n">policy_logps</span><span class="p">[</span><span class="n">yl_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ref_yw</span> <span class="o">=</span> <span class="n">ref_logps</span><span class="p">[</span><span class="n">yw_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ref_yl</span> <span class="o">=</span> <span class="n">ref_logps</span><span class="p">[</span><span class="n">yl_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># DPO核心损失</span>
+</span></span><span class="line"><span class="cl">    <span class="n">log_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">pi_yw</span> <span class="o">-</span> <span class="n">ref_yw</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">pi_yl</span> <span class="o">-</span> <span class="n">ref_yl</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">log</span><span class="p">(</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">beta</span> <span class="o">*</span> <span class="n">log_ratio</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">loss</span>
+</span></span></code></pre></div></div><p><strong>DPO的优点</strong>：</p>
+<ol>
+<li>不需要奖励模型，训练更简单、更稳定</li>
+<li>不需要复杂的PPO训练，直接优化偏好</li>
+<li>计算效率更高</li>
+</ol>
+<p><strong>DPO的缺点</strong>：</p>
+<ol>
+<li>对偏好数据质量更敏感</li>
+<li>隐式奖励可能不够准确</li>
+<li>对超出偏好的行为（如安全性）控制不如RLHF直接</li>
+</ol>
+<h4 id="rlhf-vs-dpo-">RLHF vs DPO 详细对比</h4>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>RLHF</th>
+<th>DPO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>训练流程</td>
+<td>3步（SFT -&gt; RM -&gt; PPO）</td>
+<td>2步（SFT -&gt; DPO）</td>
+</tr>
+<tr>
+<td>奖励模型</td>
+<td>需要独立训练</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>训练稳定性</td>
+<td>低（PPO敏感）</td>
+<td>高</td>
+</tr>
+<tr>
+<td>计算成本</td>
+<td>高（4个模型）</td>
+<td>低（2个模型）</td>
+</tr>
+<tr>
+<td>偏好表达</td>
+<td>间接（通过奖励）</td>
+<td>直接</td>
+</tr>
+<tr>
+<td>官方用例</td>
+<td>GPT-4、Claude</td>
+<td>无（学术方法）</td>
+</tr>
+<tr>
+<td>2025年趋势</td>
+<td>DeepSeek-R1使用改进版（GRPO）</td>
+<td>更广泛的社区采用</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2025rlhfdpo">2025年RLHF/DPO新变体</h4>
+<ul>
+<li><strong>KTO（Kahneman-Tversky Optimization, 2024）</strong>：只需要&quot;好/坏&quot;标签，不需要成对偏好</li>
+<li><strong>IPO（Identity Preference Optimization, 2024）</strong>：在DPO基础上增加了正则化项，避免过拟合</li>
+<li><strong>SimPO（Simple Preference Optimization, 2024）</strong>：使用平均对数概率作为隐式奖励</li>
+<li><strong>GRPO（Group Relative Policy Optimization, 2025）</strong>：DeepSeek-R1使用，抛弃Critic模型，使用组内分数作为baseline</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># GRPO 损失简化（DeepSeek-R1）</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 对于同一个问题，生成G个回答</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 对G个回答评分，用组内均值作为baseline</span>
+</span></span><span class="line"><span class="cl"><span class="n">advantages</span> <span class="o">=</span> <span class="p">(</span><span class="n">scores</span> <span class="o">-</span> <span class="n">scores</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">scores</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">mean</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">advantages</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">log</span> <span class="n">π_θ</span><span class="p">(</span><span class="n">y_i</span><span class="o">|</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">G</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># + KL正则化项防止偏离参考策略</span>
+</span></span></code></pre></div></div><hr>
+<h3 id="26-moe-mixture-of-experts">2.6 MoE 架构（Mixture of Experts）</h3>
+<h4 id="heading-2">基本概念</h4>
+<p>MoE 将一个Transformer层替换为多个&quot;专家&quot;（FFN子网络）和一个门控（Router）机制。</p>
+<pre><code>输入 x
+    |
+    v
+Router(x) -&gt; 选择 Top-K 专家
+    |
+    v
+输出 = Σ g_i(x) * Expert_i(x)
+其中 g_i(x) 是 Router 分配给第 i 个专家的权重
+</code></pre>
+<h4 id="sparse-gating">稀疏门控（Sparse Gating）</h4>
+<p>每次前向只激活 Top-K 个专家（通常 K=2），其余专家不参与计算。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 稀疏门控伪代码</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">sparse_moe_forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">experts</span><span class="p">,</span> <span class="n">router</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># x: (batch, seq_len, d_model)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">logits</span> <span class="o">=</span> <span class="n">router</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># (batch, seq_len, num_experts)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">weights</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># 选Top-K</span>
+</span></span><span class="line"><span class="cl">    <span class="n">weights</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># 归一化</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">expert_idx</span><span class="p">,</span> <span class="n">expert</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">experts</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">indices</span> <span class="o">==</span> <span class="n">expert_idx</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># 此专家被哪些token选中</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">            <span class="n">expert_out</span> <span class="o">=</span> <span class="n">expert</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 加权合并</span>
+</span></span><span class="line"><span class="cl">            <span class="n">expert_weight</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">mask</span><span class="p">][</span><span class="n">indices</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">==</span> <span class="n">expert_idx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">output</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">expert_weight</span> <span class="o">*</span> <span class="n">expert_out</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">output</span>
+</span></span></code></pre></div></div><p><strong>为什么MoE有效</strong>：</p>
+<ul>
+<li>大幅增加总参数量（更多知识容量），但计算量几乎不变（每次只激活2个专家）</li>
+<li>每个专家可以 specialize 到不同的知识领域或能力</li>
+<li>2025年：几乎所有超大模型都使用MoE（GPT-4, Mixtral, DeepSeek-V2/V3）</li>
+</ul>
+<h4 id="load-balancing">负载均衡（Load Balancing）</h4>
+<p><strong>问题</strong>：门控网络可能倾向于总是选择某些&quot;强&quot;专家，导致专家间负载不均。</p>
+<p><strong>解决方法</strong>：</p>
+<ol>
+<li><strong>Auxiliary Loss（辅助损失）</strong>：在门控输出上添加负载均衡损失</li>
+</ol>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 负载均衡损失（Switch Transformer, 2021）</span>
+</span></span><span class="line"><span class="cl"><span class="n">f_i</span> <span class="o">=</span> <span class="n">对一个batch中选专家的token数</span> <span class="o">/</span> <span class="n">total_tokens</span>
+</span></span><span class="line"><span class="cl"><span class="n">P_i</span> <span class="o">=</span> <span class="n">门控输出的平均softmax概率</span>
+</span></span><span class="line"><span class="cl"><span class="n">load_balance_loss</span> <span class="o">=</span> <span class="n">num_experts</span> <span class="o">*</span> <span class="n">Σ</span> <span class="n">f_i</span> <span class="o">*</span> <span class="n">P_i</span>
+</span></span></code></pre></div></div><ol start="2">
+<li>
+<p><strong>Expert Choice Routing（EC路由）</strong>：专家主动选择token，而非token选择专家。DeepSeek-V2使用此方法。</p>
+</li>
+<li>
+<p><strong>DeepSeek-V3的负载均衡策略</strong>：动态调整专家选择的阈值，同时使用设备级平衡</p>
+</li>
+</ol>
+<h4 id="moe">重要MoE模型</h4>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>时间</th>
+<th>总参数</th>
+<th>激活参数</th>
+<th>专家数</th>
+<th>Top-K</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Switch Transformer</td>
+<td>2021</td>
+<td>1.6T</td>
+<td>~</td>
+<td>2048</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Mixtral 8x7B</td>
+<td>2023</td>
+<td>47B</td>
+<td>12.9B</td>
+<td>8</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Mixtral 8x22B</td>
+<td>2024</td>
+<td>141B</td>
+<td>39B</td>
+<td>8</td>
+<td>2</td>
+</tr>
+<tr>
+<td>DeepSeek-V2</td>
+<td>2024</td>
+<td>236B</td>
+<td>21B</td>
+<td>160 (细粒度)</td>
+<td>6</td>
+</tr>
+<tr>
+<td>DeepSeek-V3</td>
+<td>2024</td>
+<td>671B</td>
+<td>37B</td>
+<td>256</td>
+<td>~8</td>
+</tr>
+<tr>
+<td>GPT-4 (猜)</td>
+<td>2023</td>
+<td>~1.7T</td>
+<td>~</td>
+<td>16</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h4 id="deepseek-v2v3-moe">DeepSeek-V2/V3 的MoE创新</h4>
+<p><strong>DeepSeekMoE</strong>（2024）：</p>
+<ul>
+<li><strong>细粒度专家（Fine-grained Experts）</strong>：将传统FFN拆分为更多更小的专家（160个），每个专家只处理FFN的一部分</li>
+<li><strong>共享专家（Shared Experts）</strong>：保留一些被所有token共享的专家，处理通用知识</li>
+<li><strong>设备级平衡</strong>：负载均衡损失在设备层面计算</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># DeepSeekMoE 输出</span>
+</span></span><span class="line"><span class="cl"><span class="n">output</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">[</span><span class="n">细粒度专家</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span> <span class="o">+</span> <span class="n">SharedExpert</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 共享专家始终激活 + 路由选择的k个细粒度专家</span>
+</span></span></code></pre></div></div><hr>
+<h3 id="27-">2.7 长上下文技术</h3>
+<p>2024-2025年，长上下文能力成为LLM的核心竞争点。GPT-4支持128K，Claude支持200K，Gemini支持1M，DeepSeek支持1M。</p>
+<h4 id="roperotary-position-embedding-2021">RoPE（Rotary Position Embedding, 2021）</h4>
+<p><strong>目前最主流的位置编码方案</strong>。通过旋转矩阵将位置信息注入Q和K。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># RoPE 核心思想（简化）</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">apply_rope</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">positions</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 将q和k按dim分成两半</span>
+</span></span><span class="line"><span class="cl">    <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 旋转角度 = position * theta</span>
+</span></span><span class="line"><span class="cl">    <span class="n">thetas</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">theta</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">d</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cos</span><span class="p">,</span> <span class="n">sin</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">thetas</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 应用旋转</span>
+</span></span><span class="line"><span class="cl">    <span class="n">q_rotated</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">q1</span> <span class="o">*</span> <span class="n">cos</span> <span class="o">-</span> <span class="n">q2</span> <span class="o">*</span> <span class="n">sin</span><span class="p">,</span> <span class="n">q1</span> <span class="o">*</span> <span class="n">sin</span> <span class="o">+</span> <span class="n">q2</span> <span class="o">*</span> <span class="n">cos</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">k_rotated</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">k1</span> <span class="o">*</span> <span class="n">cos</span> <span class="o">-</span> <span class="n">k2</span> <span class="o">*</span> <span class="n">sin</span><span class="p">,</span> <span class="n">k1</span> <span class="o">*</span> <span class="n">sin</span> <span class="o">+</span> <span class="n">k2</span> <span class="o">*</span> <span class="n">cos</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">q_rotated</span><span class="p">,</span> <span class="n">k_rotated</span>
+</span></span></code></pre></div></div><p><strong>RoPE的关键性质</strong>：</p>
+<ul>
+<li><strong>相对位置编码</strong>：注意力分数只与相对位置有关（旋转矩阵的差）</li>
+<li><strong>天然支持长距离外推</strong>：但外推超过训练长度时性能会下降</li>
+<li><strong>LLaMA, Mistral, Qwen, DeepSeek全线使用</strong></li>
+</ul>
+<h4 id="rope">RoPE长上下文外推技术</h4>
+<p><strong>Position Interpolation（位置插值, 2023）</strong>：</p>
+<ul>
+<li>将长序列的位置索引&quot;压缩&quot;到训练长度内</li>
+<li>例如训练长度4096，推理长度8192：新位置 = 旧位置 / 2</li>
+</ul>
+<p><strong>NTK-aware Scaling（2023）</strong>：</p>
+<ul>
+<li>基于神经正切核理论，对不同的维度使用不同的缩放系数</li>
+<li>高频维度不缩放（保留局部位置精度），低频维度缩放</li>
+</ul>
+<p><strong>YaRN（Yet another RoPE extensioN, 2024）</strong>：</p>
+<ul>
+<li>结合PI和NTK-aware，再通过波长分析优化</li>
+<li>LLaMA 3/3.1 使用 YaRN 扩展到 128K</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># YaRN 核心：对基础频率 theta 应用波长缩放</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">yarn_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># ratio: 扩展倍数（如从4K到128K，ratio=32）</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># alpha: 用于高频保护的参数</span>
+</span></span><span class="line"><span class="cl">    <span class="n">scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">wavelengths</span> <span class="o">&gt;</span> <span class="n">max_wavelength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># 高频不缩放</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ratio</span> <span class="o">**</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">/</span> <span class="n">d</span><span class="p">)</span>  <span class="c1"># 低频缩放</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">theta</span> <span class="o">/</span> <span class="n">scale</span>
+</span></span></code></pre></div></div><h4 id="alibiattention-with-linear-biases-2022">ALiBi（Attention with Linear Biases, 2022）</h4>
+<pre><code>Attention(Q, K, V) = softmax(QKᵀ / √d + bias_matrix) * V
+bias(i, j) = -m * |i - j|  # 线性距离惩罚
+</code></pre>
+<ul>
+<li>不需要位置编码，直接向注意力分数输入距离惩罚</li>
+<li>训练时使用短序列，推理时可以直接外推到长序列</li>
+<li>被BLOOM等模型使用，但现在基本被RoPE取代</li>
+</ul>
+<h4 id="ring-attention-2024">环形注意力（Ring Attention, 2024）</h4>
+<p><strong>问题</strong>：长上下文场景下，单设备显存放不下完整的KV Cache。</p>
+<p><strong>思路</strong>：将序列在多个设备上分片，每个设备只存一段，计算时通过通信获取其他段的K,V。</p>
+<ul>
+<li><strong>Block-wise计算</strong>：将注意力矩阵分成块，每块在一个设备上计算</li>
+<li><strong>分布式Softmax</strong>：使用在线softmax（两步法）处理跨设备的softmax计算</li>
+<li><strong>计算-通信重叠</strong>：用异步通信隐藏数据传输延迟</li>
+</ul>
+<p><strong>2025年进展</strong>：</p>
+<ul>
+<li><strong>FlashAttention + Ring Attention</strong> 结合</li>
+<li><strong>DeepSeek-V3</strong>使用多token预测 + 并行注意力来实现超长序列训练</li>
+</ul>
+<h4 id="2025-2">2025年长上下文前沿</h4>
+<ul>
+<li><strong>LLaMA 3.1 405B</strong>：预训练长度扩展到128K</li>
+<li><strong>Gemini 1.5 Pro</strong>：1M token上下文（前2024）</li>
+<li><strong>DeepSeek-V2/V3</strong>：128K上下文</li>
+<li><strong>Qwen2.5</strong>：128K上下文，支持到1M的实验性扩展</li>
+<li><strong>Gradient AI</strong>：展示100M+ token的&quot;无限制上下文&quot;研究</li>
+</ul>
+<hr>
+<h3 id="28-">2.8 多模态模型原理</h3>
+<h4 id="clipcontrastive-language-image-pre-training-openai-2021">CLIP（Contrastive Language-Image Pre-training, OpenAI 2021）</h4>
+<p><strong>核心思想</strong>：图文对比学习，将图像和文本嵌入到同一语义空间。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># CLIP 训练损失（InfoNCE / 对比损失）</span>
+</span></span><span class="line"><span class="cl"><span class="n">image_features</span> <span class="o">=</span> <span class="n">image_encoder</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>     <span class="c1"># (batch, d)</span>
+</span></span><span class="line"><span class="cl"><span class="n">text_features</span> <span class="o">=</span> <span class="n">text_encoder</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span>         <span class="c1"># (batch, d)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 计算相似度矩阵</span>
+</span></span><span class="line"><span class="cl"><span class="n">logits</span> <span class="o">=</span> <span class="n">image_features</span> <span class="o">@</span> <span class="n">text_features</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># (batch, batch) </span>
+</span></span><span class="line"><span class="cl">                                            <span class="c1"># 对角线是匹配的图文对</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 图像视角的损失（每个图像应该匹配对应的文本）</span>
+</span></span><span class="line"><span class="cl"><span class="n">loss_i</span> <span class="o">=</span> <span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>  <span class="c1"># targets是单位矩阵</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 文本视角的损失</span>
+</span></span><span class="line"><span class="cl"><span class="n">loss_t</span> <span class="o">=</span> <span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">loss_i</span> <span class="o">+</span> <span class="n">loss_t</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+</span></span></code></pre></div></div><ul>
+<li>训练数据：4亿图文对</li>
+<li>Zero-shot图像分类能力：对未见过的类别也能分类</li>
+<li>2025年：CLIP仍然是多模态领域的基石模型</li>
+</ul>
+<h4 id="qwen-vl2023-2025">Qwen-VL（2023-2025）</h4>
+<p>阿里巴巴的通义千问多模态版本。</p>
+<p><strong>架构</strong>：</p>
+<pre><code>图像 -&gt; Vision Encoder -&gt; MLP Adapter -&gt; LLM
+文本 -&gt; Tokenizer -&gt; LLM
+</code></pre>
+<ul>
+<li><strong>Vision Encoder</strong>：通常使用预训练的视觉模型（如SigLIP, ViT）</li>
+<li><strong>MLP Adapter</strong>：将视觉特征投影到LLM的embedding空间（连接层）</li>
+<li><strong>LLM</strong>：接收拼接的文本和图像token</li>
+</ul>
+<p><strong>训练流程</strong>：</p>
+<ol>
+<li>预训练：图文对齐（CLIP-like对比学习）</li>
+<li>多模态SFT：图像描述、视觉问答</li>
+<li>对话对齐：RLHF</li>
+</ol>
+<h4 id="gpt-4v--gpt-4o2023-2024">GPT-4V / GPT-4o（2023-2024）</h4>
+<p>GPT-4V（Vision）：GPT-4的多模态版本。</p>
+<p><strong>已公开特点</strong>：</p>
+<ul>
+<li>可以输入图像并理解图像内容</li>
+<li>支持文本标注、图表分析、场景理解</li>
+<li>GPT-4o将音频也纳入原生输入</li>
+</ul>
+<p><strong>架构猜测</strong>：</p>
+<ul>
+<li>类Qwen-VL的&quot;视觉编码器 + 连接器 + LLM&quot;架构</li>
+<li>但可能使用了更紧密的跨模态融合</li>
+</ul>
+<h4 id="ditdiffusion-transformer-2023">DiT（Diffusion Transformer, 2023）</h4>
+<p><strong>核心思想</strong>：用Transformer替换U-Net作为扩散模型的backbone。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># DiT 核心模块</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">DiTBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">LayerNorm</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">Attention</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">LayerNorm</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">GELU_MLP</span><span class="p">(</span><span class="n">dim</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 自适应层归一化（adaLN）</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">adaLN</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">condition_dim</span><span class="p">,</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># t: 时间步, c: 条件信息（如文本）</span>
+</span></span><span class="line"><span class="cl">        <span class="n">shift_msa</span><span class="p">,</span> <span class="n">scale_msa</span><span class="p">,</span> <span class="n">gate_msa</span><span class="p">,</span> <span class="n">shift_mlp</span><span class="p">,</span> <span class="n">scale_mlp</span><span class="p">,</span> <span class="n">gate_mlp</span> <span class="o">=</span> \
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">adaLN</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">gate_msa</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn</span><span class="p">(</span><span class="n">modulate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">shift_msa</span><span class="p">,</span> <span class="n">scale_msa</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">gate_mlp</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">modulate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">shift_mlp</span><span class="p">,</span> <span class="n">scale_mlp</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">x</span>
+</span></span></code></pre></div></div><ul>
+<li><strong>Sora</strong>（OpenAI视频生成模型）使用DiT架构</li>
+<li><strong>Flux</strong>（Black Forest Lab 2024，Stable Diffusion核心团队的后续模型）基于DiT</li>
+<li>2025年：DiT已是图像/视频生成的主流架构</li>
+</ul>
+<h4 id="2025-3">2025年多模态前沿</h4>
+<ul>
+<li><strong>视觉语言模型成熟化</strong>：GPT-4o, Qwen-VL-Max, Gemini Pro Vision</li>
+<li><strong>统一多模态</strong>：同一个模型处理文本、图像、音频、视频（Gemini原生多模态）</li>
+<li><strong>视频理解</strong>：长视频理解成为新赛道（GPT-4o, Gemini 1.5 Pro）</li>
+<li><strong>多模态Agent</strong>：使用视觉进行GUI操作（Mobile Agent, Screen Agent）</li>
+</ul>
+<hr>
+<h3 id="29-2024-2025">2.9 近期前沿（2024-2025）</h3>
+<h4 id="mamba-2023-2024">Mamba（选择性状态空间模型, 2023-2024）</h4>
+<p><strong>动机</strong>：Transformer的O(N²)注意力计算在长序列下不可持续。</p>
+<p><strong>核心思想</strong>：用结构化状态空间模型（SSM）替代注意力机制。</p>
+<pre><code>SSM 离散化:
+h_t = A * h_{t-1} + B * x_t
+y_t = C * h_t
+
+Mamba 创新: 让 A, B, C 变成输入相关的（选择性SSM）
+B_t = Linear_B(x_t)
+C_t = Linear_C(x_t)
+Δ_t = softplus(Linear_Δ(x_t))
+A_bar = exp(Δ_t * A)
+B_bar = Δ_t * B_t
+h_t = A_bar * h_{t-1} + B_bar * x_t
+y_t = C_t * h_t
+</code></pre>
+<p><strong>Mamba的关键创新</strong>：</p>
+<ul>
+<li><strong>选择性机制</strong>：参数随输入变化（与Transformer的Query类似的想法）</li>
+<li><strong>并行扫描</strong>：使用associative scan实现高效并行计算（O(N log N)）</li>
+<li><strong>硬件感知</strong>：用kernel融合优化内存访问</li>
+</ul>
+<p><strong>性能</strong>：</p>
+<ul>
+<li>在语言建模上与同等规模Transformer相当</li>
+<li>长序列（100K+）上优于Transformer</li>
+<li>推理时<strong>线性</strong>复杂度（不计入权重大小）</li>
+</ul>
+<h4 id="rwkvreceptance-weighted-key-value-2023-2024">RWKV（Receptance Weighted Key Value, 2023-2024）</h4>
+<p><strong>核心思想</strong>：将Transformer的注意力转化为线性RNN的形式。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># RWKV 核心: 时间混合（Time Mixing）和通道混合（Channel Mixing）</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Time Mixing: 线性注意力</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkv</span> <span class="o">=</span> <span class="n">time_mixing</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span> <span class="n">x_</span><span class="p">{</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="o">...</span><span class="p">)</span>  <span class="c1"># 使用可学习的衰减因子</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Channel Mixing: FFN变体</span>
+</span></span><span class="line"><span class="cl"><span class="n">output</span> <span class="o">=</span> <span class="n">channel_mixing</span><span class="p">(</span><span class="n">wkv</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><strong>特点</strong>：</p>
+<ul>
+<li>训练时可用并行计算（类Transformer）</li>
+<li>推理时是RNN（O(1)每token计算）</li>
+<li>在同等参数下性能略低于Transformer，但推理效率极高</li>
+</ul>
+<h4 id="deepseek-2024-2025">DeepSeek 系列技术报告（2024-2025）</h4>
+<p>DeepSeek是2024-2025年最受关注的中国大模型团队，技术透明度极高。</p>
+<p><strong>DeepSeek-R1（2025年1月）</strong>：</p>
+<ul>
+<li><strong>推理模型开源版本</strong>，对标o1</li>
+<li>使用<strong>强化学习直接训练推理能力</strong>（GRPO算法）</li>
+<li>通过&quot;冷启动&quot;SFT数据初始化，再做RL，防止RL初期探索崩溃</li>
+<li>在AIME 2024、MATH-500等数学基准上达到o1级别</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># DeepSeek-R1 训练流程（简化）</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.</span> <span class="n">收集少量</span><span class="s2">&#34;推理链&#34;</span><span class="n">SFT数据</span> <span class="o">-&gt;</span> <span class="n">初始冷启动模型</span>
+</span></span><span class="line"><span class="cl"><span class="mf">2.</span> <span class="n">大规模RL训练</span><span class="err">（</span><span class="n">使用GRPO</span><span class="err">）</span>
+</span></span><span class="line"><span class="cl">   <span class="o">-</span> <span class="n">对每个问题生成G个回答</span>
+</span></span><span class="line"><span class="cl">   <span class="o">-</span> <span class="n">用规则验证器</span><span class="err">（</span><span class="n">数学答案</span><span class="o">/</span><span class="n">代码测试</span><span class="err">）</span><span class="n">评分</span>
+</span></span><span class="line"><span class="cl">   <span class="o">-</span> <span class="n">组内归一化得advantage</span>
+</span></span><span class="line"><span class="cl">   <span class="o">-</span> <span class="n">优化策略</span><span class="err">（</span><span class="n">带KL正则化</span><span class="err">）</span>
+</span></span><span class="line"><span class="cl"><span class="mf">3.</span> <span class="n">拒绝采样生成更多SFT数据</span>
+</span></span><span class="line"><span class="cl"><span class="mf">4.</span> <span class="n">再次SFT</span> <span class="o">+</span> <span class="n">RL</span>
+</span></span></code></pre></div></div><p><strong>DeepSeek-V3（2024年底）</strong>：</p>
+<ul>
+<li>671B总参数，37B激活参数（MoE）</li>
+<li>训练成本约280万H800 GPU小时（约557万美元）</li>
+<li>使用FP8训练，Multi-Token Prediction（MTP）</li>
+<li>在多项基准上超过GPT-4</li>
+</ul>
+<p><strong>DeepSeek的技术特点总结</strong>：</p>
+<ol>
+<li><strong>极致数据质量</strong>：非常注重预训练数据的过滤和处理</li>
+<li><strong>高效MoE</strong>：DeepSeekMoE的创新设计（细粒度专家 + 共享专家）</li>
+<li><strong>MLA注意力</strong>：降低KV Cache到接近MQA的水平</li>
+<li><strong>FP8训练</strong>：首个大规模FP8预训练实证</li>
+<li><strong>开源文化</strong>：模型权重和大量技术细节完全公开</li>
+</ol>
+<hr>
+<h2 id="3-5">三、面试常见问题（3-5个）</h2>
+<h3 id="q1-transformerkv-cachepagedattention">Q1: 详细解释Transformer的推理过程为什么需要KV Cache？它和PagedAttention有什么区别？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>自回归解码每步依赖所有历史token的K,V值</li>
+<li>KV Cache将历史K,V缓存在显存中，每步只计算新token的K,V</li>
+<li>每次只需做1个token的注意力查询，而不是整个序列</li>
+<li>复杂度从O(N²·d)降到O(N·d)（忽略batch维度）</li>
+<li>PagedAttention是vLLM的KV Cache管理方案：将KV Cache分块管理（类似操作系统分页），消除显存碎片，实现&quot;几乎零浪费&quot;的显存利用</li>
+</ol>
+<h3 id="q2-rlhfppodpoppo">Q2: RLHF流程中PPO的作用是什么？为什么DPO可以替代PPO？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>PPO是一种信赖域策略优化算法，通过裁剪（clip）目标函数避免策略更新过大</li>
+<li>RLHF用PPO优化LLM策略，最大化奖励模型的分数同时限制偏离原策略</li>
+<li>DPO证明了RLHF的最优策略可以解析表达为π* ∝ π_ref * exp(R/β)</li>
+<li>代入Bradley-Terry偏好模型后，奖励函数R可以被消掉，得到直接优化损失</li>
+<li>DPO不需要奖励模型和复杂的PPO实现，但需要高质量的偏好数据</li>
+</ol>
+<h3 id="q3-moedeepseek">Q3: 解释MoE架构中的负载均衡问题以及DeepSeek的解决方案。</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>负载均衡问题：门控网络可能总选择某些&quot;强&quot;专家，导致其他专家闲置</li>
+<li>经典方案：Switch Transformer的辅助损失（auxiliary loss）</li>
+<li>Expert Choice Routing：让专家主动选择token，保证每个专家负载平衡</li>
+<li>DeepSeek-V2创新：
+<ul>
+<li>细粒度专家（160个）+ 共享专家</li>
+<li>设备级平衡损失（在设备维度计算）</li>
+<li>动态偏置调节（bias调整）</li>
+</ul>
+</li>
+</ol>
+<h3 id="q4-deepseek-r1grpoppo">Q4: DeepSeek-R1如何实现开源推理模型？GRPO相比PPO有什么改进？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>冷启动：用少量高质量推理链数据SFT初始化</li>
+<li>GRPO（Group Relative Policy Optimization）：
+<ul>
+<li>抛弃Critic模型（价值函数网络），减小显存占用</li>
+<li>对同一个问题生成G个回答，用组内分数计算advantage</li>
+<li>避免训练额外的价值网络</li>
+</ul>
+</li>
+<li>规则验证器：数学用答案匹配，编程用测试用例</li>
+<li>两阶段训练：RL产出更多高质量数据 -&gt; 拒绝采样 -&gt; SFT -&gt; 再RL</li>
+<li>GRPO比PPO少维护一个模型，训练更稳定，更适合开源社区</li>
+</ol>
+<h3 id="q5-2025llmrope128k">Q5: 为什么2025年大多数LLM使用RoPE而不是绝对位置编码？如何扩展到128K甚至更长上下文？</h3>
+<p><strong>回答要点</strong>：</p>
+<ol>
+<li>RoPE是相对位置编码，通过旋转矩阵编码相对位置信息</li>
+<li>绝对位置编码（可学习）无法外推到训练长度之外</li>
+<li>RoPE天然支持长距离建模，但直接外推效果差</li>
+<li>扩展方法：
+<ul>
+<li>PI（位置插值）：压缩位置索引</li>
+<li>YaRN：基于波长分析，高频不缩放、低频缩放</li>
+<li>NTK-aware：不同维度不同缩放系数</li>
+</ul>
+</li>
+<li>LLaMA 3用YaRN扩展到128K，DeepSeek使用NTK-aware</li>
+</ol>
+<hr>
+<h2 id="heading-3">四、推荐学习资源</h2>
+<h3 id="heading-4">必读论文</h3>
+<table>
+<thead>
+<tr>
+<th>论文</th>
+<th>发表时间</th>
+<th>重要性</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attention Is All You Need</td>
+<td>2017</td>
+<td>★★★★★</td>
+<td>Transformer原点</td>
+</tr>
+<tr>
+<td>GPT-1: Improving Language Understanding by Generative Pre-Training</td>
+<td>2018</td>
+<td>★★★★</td>
+<td>预训练范式起点</td>
+</tr>
+<tr>
+<td>GPT-2: Language Models are Unsupervised Multitask Learners</td>
+<td>2019</td>
+<td>★★★★</td>
+<td>Zero-shot能力</td>
+</tr>
+<tr>
+<td>GPT-3: Scaling Laws for Neural Language Models</td>
+<td>2020</td>
+<td>★★★★★</td>
+<td>Scaling Law奠基</td>
+</tr>
+<tr>
+<td>Scaling Laws for Neural Language Models (Kaplan)</td>
+<td>2020</td>
+<td>★★★★★</td>
+<td>原始Scaling Law</td>
+</tr>
+<tr>
+<td>Training Compute-Optimal LLMs (Chinchilla)</td>
+<td>2022</td>
+<td>★★★★★</td>
+<td>Chinchilla法则</td>
+</tr>
+<tr>
+<td>Training language models to follow instructions (InstructGPT)</td>
+<td>2022</td>
+<td>★★★★★</td>
+<td>RLHF奠基</td>
+</tr>
+<tr>
+<td>Direct Preference Optimization (DPO)</td>
+<td>2023</td>
+<td>★★★★★</td>
+<td>DPO原始论文</td>
+</tr>
+<tr>
+<td>Llama 2: Open Foundation and Fine-Tuned Chat Models</td>
+<td>2023</td>
+<td>★★★★★</td>
+<td>LLaMA家族</td>
+</tr>
+<tr>
+<td>DeepSeek-V2: Mixture-of-Experts MoE</td>
+<td>2024</td>
+<td>★★★★★</td>
+<td>高效MoE</td>
+</tr>
+<tr>
+<td>DeepSeek-R1: Incentivizing Reasoning in LLMs via RL</td>
+<td>2025</td>
+<td>★★★★★</td>
+<td>开源推理模型</td>
+</tr>
+<tr>
+<td>Mamba: Linear-Time Sequence Modeling with State Spaces</td>
+<td>2023</td>
+<td>★★★★</td>
+<td>SSM替代注意力</td>
+</tr>
+<tr>
+<td>RoFormer: Enhanced Transformer with Rotary Position Embedding</td>
+<td>2021</td>
+<td>★★★★★</td>
+<td>RoPE原论文</td>
+</tr>
+<tr>
+<td>FlashAttention: Fast and Memory-Efficient Exact Attention</td>
+<td>2022</td>
+<td>★★★★★</td>
+<td>注意力加速</td>
+</tr>
+</tbody>
+</table>
+<h3 id="heading-5">书籍</h3>
+<ul>
+<li><strong>Speech and Language Processing (Jurafsky &amp; Martin)</strong> — NLP综合教材，在线免费更新</li>
+<li><strong>《大规模语言模型：从理论到实践》</strong> — 张奇、桂韬等（复旦NLP组）</li>
+<li><strong>《深度强化学习》</strong> — 王树森等，RLHF的基础</li>
+</ul>
+<h3 id="heading-6">课程</h3>
+<ul>
+<li><strong>Stanford CS224n</strong>: 深度NLP（含Transformer和预训练详解）</li>
+<li><strong>Stanford XCS224u</strong>: 自然语言理解（含RLHF内容）</li>
+<li><strong>Andrej Karpathy &ldquo;Let&rsquo;s build GPT from scratch&rdquo;</strong>: YouTube上最佳GPT代码讲解</li>
+<li><strong>UCL RL Course (David Silver)</strong>: 强化学习经典课程，RLHF的数学基础</li>
+</ul>
+<h3 id="heading-7">代码库</h3>
+<ul>
+<li><strong>NanoGPT</strong> (Karpathy): <a href="https://github.com/karpathy/nanoGPT">https://github.com/karpathy/nanoGPT</a></li>
+<li><strong>Hugging Face Transformers</strong>: <a href="https://github.com/huggingface/transformers">https://github.com/huggingface/transformers</a></li>
+<li><strong>vLLM</strong>: <a href="https://github.com/vllm-project/vllm">https://github.com/vllm-project/vllm</a> (推理优化)</li>
+<li><strong>DeepSeek开源仓库</strong>: <a href="https://github.com/deepseek-ai">https://github.com/deepseek-ai</a></li>
+<li><strong>TRL (Transformer Reinforcement Learning)</strong>: <a href="https://github.com/huggingface/trl">https://github.com/huggingface/trl</a></li>
+<li><strong>Unsloth</strong>: <a href="https://github.com/unslothai/unsloth">https://github.com/unslothai/unsloth</a> (微调加速)</li>
+</ul>
+<h3 id="heading-8">博客与社区</h3>
+<ul>
+<li>OpenAI Blog: <a href="https://openai.com/blog">https://openai.com/blog</a></li>
+<li>DeepSeek官方技术博客: <a href="https://deepseek.com">https://deepseek.com</a></li>
+<li>The Annotated Transformer (Harvard NLP): Transformer逐行解读</li>
+<li>Lil&rsquo;Log (李纪为): 高质量ML博客</li>
+<li>机器之心 / 量子位: 中文AI新闻</li>
+</ul>
+<hr>
+<blockquote>
+<p>下一篇：03-模型训练与微调.md — 从预训练到SFT到RLHF的完整训练流程</p>
+</blockquote>
+
+</article>
+
+
+<nav class="series-nav">
+  <span class="series-label">AI应用开发面试宝典 系列</span>
+  <div class="series-links">
+    
+    <a class="series-link prev" href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">← 面试真题与实战</a>
+    
+    
+    <a class="series-link next" href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">模型部署与推理优化 →</a>
+    
+  </div>
+</nav>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">面试真题与实战</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">模型部署与推理优化</span>
+  </a>
+  
+</nav>
+
+
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">面试真题与实战</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/02-%e5%a4%a7%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8bLLM%e5%8e%9f%e7%90%86/">大语言模型(LLM)原理</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/08-%e6%a8%a1%e5%9e%8b%e9%83%a8%e7%bd%b2%e4%b8%8e%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">模型部署与推理优化</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/03-AI%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">AI应用开发框架</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering)</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+</body>
+</html>
