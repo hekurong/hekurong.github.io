@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践</h1>
+    <div class="article-meta">
+      <time datetime="2026-06-02">2026-06-02</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="tag" href="/tags/FastAPI/">FastAPI</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="heading">为什么要做这个项目</h2>
+<p>最近在学习多智能体系统的设计，正好看到 LangGraph 的 Supervisor 模式很适合用来做客服场景——一个主管智能体根据用户意图分发给专业子智能体，最后汇总回复。趁热打铁，用 LangChain + LangGraph + DeepSeek 从零搭了一个电商售前客服系统。</p>
+<p>这篇文章会完整介绍系统的架构设计、核心实现和踩坑经验。</p>
+<h2 id="heading-1">整体架构</h2>
+<p>系统采用 <strong>Supervisor + Specialists</strong> 的集中式架构：</p>
+<pre><code>用户请求 → Supervisor（意图识别）→ Product Agent（商品查询）
+                                 → Recommend Agent（推荐导购）
+                                 → Promotion Agent（促销查询）
+                                 → 汇总回复
+</code></pre>
+<p>技术栈：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>选型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLM</td>
+<td>DeepSeek（OpenAI 兼容 API）</td>
+</tr>
+<tr>
+<td>智能体</td>
+<td>LangChain <code>create_react_agent</code></td>
+</tr>
+<tr>
+<td>编排</td>
+<td>LangGraph <code>StateGraph</code> + 条件路由</td>
+</tr>
+<tr>
+<td>API</td>
+<td>FastAPI + Uvicorn</td>
+</tr>
+<tr>
+<td>记忆</td>
+<td>SQLite + FTS5 全文搜索</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>JSON 文件（模拟商品/促销库）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="langgraph-">LangGraph 工作流</h2>
+<p>工作流是一个 5 节点的 <code>StateGraph</code>，共享一个 <code>AgentState</code> TypedDict：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">AgentState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">intent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">    <span class="n">phase</span><span class="p">:</span> <span class="nb">int</span>
+</span></span><span class="line"><span class="cl">    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">    <span class="n">supervisor_reply</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">    <span class="n">product_info</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">    <span class="n">recommendation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">    <span class="n">promotion_info</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</span></span></code></pre></div></div><p>节点流转：</p>
+<pre><code>START → supervisor_node → [条件路由] → product_node → generate_reply → END
+                                       → recommend_node
+                                       → promotion_node
+                                       → (greeting 直接)
+</code></pre>
+<h3 id="supervisor-">Supervisor 节点</h3>
+<p>Supervisor 是一个<strong>纯 LLM 节点</strong>，不绑定任何工具。它的职责是分析用户意图并以 JSON 输出：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&#34;&#34;&#34;你是一个电商客服主管。请以 JSON 格式输出：
+</span></span></span><span class="line"><span class="cl"><span class="s2">{
+</span></span></span><span class="line"><span class="cl"><span class="s2">    &#34;intent&#34;: &#34;product_query&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s2">    &#34;reply&#34;: &#34;您好！请问您想了解哪款手机？&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">}
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">intent 类型：product_query | recommend | promotion | greeting
+</span></span></span><span class="line"><span class="cl"><span class="s2">&#34;&#34;&#34;</span>
+</span></span></code></pre></div></div><p>LLM 返回的 JSON 被解析后写入 state，<code>route_by_intent</code> 条件边根据 <code>intent</code> 路由到不同的专业智能体。</p>
+<h3 id="heading-2">专业智能体节点</h3>
+<p>每个专业智能体使用 <code>create_react_agent</code> 构建，绑定不同的工具集：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># Product Agent —— 商品查询工具</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">create_product_agent</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">data_service</span><span class="p">,</span> <span class="n">skill_registry</span><span class="p">,</span> <span class="n">memory_service</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tools</span> <span class="o">=</span> <span class="n">skill_registry</span><span class="o">.</span><span class="n">get_tools</span><span class="p">(</span><span class="s2">&#34;product&#34;</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tools</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">memory_tools</span><span class="o">.</span><span class="n">save_fact</span><span class="p">)</span>  <span class="c1"># 记忆工具所有智能体共享</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tools</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">memory_tools</span><span class="o">.</span><span class="n">recall</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">create_react_agent</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">state_modifier</span><span class="o">=</span><span class="n">PRODUCT_SYSTEM_PROMPT</span><span class="p">)</span>
+</span></span></code></pre></div></div><h3 id="generate-reply-">Generate Reply 节点</h3>
+<p>所有专业智能体的输出在此汇聚。优先使用专业智能体的结果，没有则回退到 Supervisor 的问候回复。同时触发<strong>消息窗口压缩</strong>——超过 8 轮对话后，早期消息被 LLM 压缩为摘要注入。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">_compress_messages</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">memory_service</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&#34;messages&#34;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">MAX_TURNS</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># LLM 生成摘要</span>
+</span></span><span class="line"><span class="cl">        <span class="n">summary</span> <span class="o">=</span> <span class="n">summarize_conversation</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&#34;messages&#34;</span><span class="p">][:</span><span class="n">MAX_TURNS</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 将摘要作为 SystemMessage 注入</span>
+</span></span><span class="line"><span class="cl">        <span class="n">compressed</span> <span class="o">=</span> <span class="p">[</span><span class="n">SystemMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">summary</span><span class="p">)]</span> <span class="o">+</span> <span class="n">state</span><span class="p">[</span><span class="s2">&#34;messages&#34;</span><span class="p">][</span><span class="n">MAX_TURNS</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:]</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 持久化到长期记忆</span>
+</span></span><span class="line"><span class="cl">        <span class="n">memory_service</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&#34;session_id&#34;</span><span class="p">],</span> <span class="s2">&#34;summary&#34;</span><span class="p">,</span> <span class="s2">&#34;...&#34;</span><span class="p">,</span> <span class="n">summary</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">compressed</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">state</span><span class="p">[</span><span class="s2">&#34;messages&#34;</span><span class="p">]</span>
+</span></span></code></pre></div></div><h2 id="skillregistry">分层工具披露：SkillRegistry</h2>
+<p>一个有意思的设计是<strong>按对话阶段逐步开放工具</strong>。比如在对话初期，商品智能体只能搜索和浏览类目；到了深入咨询阶段，才能查看详情和对比；决策阶段才能查库存。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">SkillLevel</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">INITIAL</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># 对话开始：搜索、浏览</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DETAILING</span> <span class="o">=</span> <span class="mi">2</span>    <span class="c1"># 深入咨询：详情、对比</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECISION</span> <span class="o">=</span> <span class="mi">3</span>     <span class="c1"># 决策阶段：库存、下单</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">SkillRegistry</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">get_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skill_name</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">lvl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tools</span><span class="p">[</span><span class="n">skill_name</span><span class="p">]</span> <span class="k">if</span> <span class="n">lvl</span> <span class="o">&lt;=</span> <span class="n">phase</span><span class="p">]</span>
+</span></span></code></pre></div></div><p>这样做的优势：<strong>节省 token</strong>（不让 LLM 看到当前阶段用不到的工具）、<strong>防止越级操作</strong>（比如在对话刚开始时就暴露库存查询）。</p>
+<p>阶段推进由 <code>_try_advance_phase()</code> 控制：初次对话 → 阶段 1，非问候意图进入阶段 2，消息数 ≥4 进入阶段 3。</p>
+<h2 id="heading-3">三层记忆系统</h2>
+<p>项目实现了<strong>短期→摘要→长期</strong>三层记忆架构：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>存储</th>
+<th>生命周期</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>短期</td>
+<td><code>AgentState.messages</code></td>
+<td>单次调用</td>
+<td>当前对话上下文</td>
+</tr>
+<tr>
+<td>摘要</td>
+<td>LLM 生成 JSON</td>
+<td>压缩注入的 SystemMessage</td>
+<td>超出窗口的对话摘要</td>
+</tr>
+<tr>
+<td>长期</td>
+<td>SQLite + FTS5</td>
+<td>跨 session 持久</td>
+<td>用户偏好、历史事实</td>
+</tr>
+</tbody>
+</table>
+<p>长期记忆的实现很轻量。SQLite 表结构：</p>
+<div class="code-wrapper" data-lang="sql"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">memories</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">session_id</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">       </span><span class="c1">-- preference | summary | product_interaction | fact
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="k">key</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">CREATE</span><span class="w"> </span><span class="n">VIRTUAL</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">memories_fts</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">fts5</span><span class="p">(</span><span class="k">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="o">=</span><span class="n">memories</span><span class="p">,</span><span class="w"> </span><span class="n">content_rowid</span><span class="o">=</span><span class="n">id</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div></div><p>FTS5 全文搜索让 <code>recall</code> 工具能快速检索历史记忆，无需引入向量数据库。三个触发器自动保持 FTS 索引同步。</p>
+<p>Agent 通过两个 <code>@tool</code> 函数访问记忆：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="nd">@tool</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">save_fact</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;保存一条关于用户的事实信息或偏好。&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memory_service</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&#34;global&#34;</span><span class="p">,</span> <span class="s2">&#34;fact&#34;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="sa">f</span><span class="s2">&#34;好的，已记住：</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@tool</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">recall</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;搜索关于用户的历史记忆。&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">results</span> <span class="o">=</span> <span class="n">memory_service</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">format_recall_results</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</span></span></code></pre></div></div><h2 id="heading-4">工具集一览</h2>
+<p>系统共有 10 个工具，按专业领域分布：</p>
+<table>
+<thead>
+<tr>
+<th>专业</th>
+<th>阶段</th>
+<th>工具</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Product</td>
+<td>1</td>
+<td><code>search_products(keyword)</code></td>
+<td>关键词搜索商品</td>
+</tr>
+<tr>
+<td>Product</td>
+<td>1</td>
+<td><code>get_category_list()</code></td>
+<td>获取商品类目</td>
+</tr>
+<tr>
+<td>Product</td>
+<td>2</td>
+<td><code>get_product_detail(id)</code></td>
+<td>查看商品详情</td>
+</tr>
+<tr>
+<td>Product</td>
+<td>2</td>
+<td><code>compare_products(ids)</code></td>
+<td>对比商品</td>
+</tr>
+<tr>
+<td>Product</td>
+<td>3</td>
+<td><code>check_stock(id, qty)</code></td>
+<td>查库存</td>
+</tr>
+<tr>
+<td>Recommend</td>
+<td>1</td>
+<td><code>get_all_categories()</code></td>
+<td>浏览类目</td>
+</tr>
+<tr>
+<td>Recommend</td>
+<td>1</td>
+<td><code>get_products_by_category(c)</code></td>
+<td>按类目推荐</td>
+</tr>
+<tr>
+<td>Promotion</td>
+<td>1</td>
+<td><code>get_active_promotions()</code></td>
+<td>查看促销</td>
+</tr>
+<tr>
+<td>Promotion</td>
+<td>2</td>
+<td><code>check_product_promotion(id)</code></td>
+<td>查商品促销</td>
+</tr>
+</tbody>
+</table>
+<p>外加两个记忆工具（<code>save_fact</code> / <code>recall</code>），所有智能体共享。</p>
+<h2 id="api-">API 层</h2>
+<p>FastAPI 提供两个端点，简单直接：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">ChatRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># None 时自动创建新 session</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">ChatResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">reply</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&#34;/chat&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">async</span> <span class="k">def</span> <span class="nf">chat</span><span class="p">(</span><span class="n">req</span><span class="p">:</span> <span class="n">ChatRequest</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">session_id</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">session_id</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="n">phase</span> <span class="o">=</span> <span class="n">phase_manager</span><span class="o">.</span><span class="n">get_phase</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">graph</span><span class="o">.</span><span class="n">ainvoke</span><span class="p">({</span><span class="s2">&#34;messages&#34;</span><span class="p">:</span> <span class="n">messages</span><span class="p">,</span> <span class="s2">&#34;session_id&#34;</span><span class="p">:</span> <span class="n">session_id</span><span class="p">,</span> <span class="s2">&#34;phase&#34;</span><span class="p">:</span> <span class="n">phase</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">reply</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&#34;messages&#34;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">content</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">ChatResponse</span><span class="p">(</span><span class="n">reply</span><span class="o">=</span><span class="n">reply</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">session_id</span><span class="p">)</span>
+</span></span></code></pre></div></div><p>前端是一个纯 HTML/CSS/JS 聊天界面，支持多 session 切换。前端直接 fetch <code>/api/chat</code>，没有构建工具。</p>
+<h2 id="heading-5">踩坑与反思</h2>
+<p><strong>1. Supervisor JSON 解析的鲁棒性。</strong> 即使提示词要求&quot;不要包含 markdown 代码块&quot;，LLM 有时还是会输出 <code>```json ... ```</code>。用正则 <code>re.search(r'\{.*\}', text, re.DOTALL)</code> 兜底，再加一个关键词匹配的 fallback，基本不会挂。</p>
+<p><strong>2. 消息窗口管理要在统一的节点做。</strong> 最初消息压缩分散在各个智能体节点中，导致 state 不一致。统一在 <code>generate_reply_node</code> 中处理后，逻辑清晰很多。</p>
+<p><strong>3. FTS5 触发器比应用层管理更可靠。</strong> 早期记忆索引是在 Python 代码里手动维护的，经常出现数据不一致。改用 SQLite 触发器后，FTS 索引自动跟随主表变更，零维护。</p>
+<p><strong>4. <code>create_react_agent</code> 比手写循环好太多。</strong> v1 是自己手写 Agent 循环的（while 循环 + LLM 调用 + 工具执行），代码冗长且容易出 bug。v2 切换到 LangChain 的 <code>create_react_agent</code>，Agent 节点变成一行代码：</p>
+<div class="code-wrapper" data-lang="json"><div class="code-ln"><pre><code>1
+2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">agent</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">state_modifier</span><span class="o">=</span><span class="n">PROMPT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&#34;messages&#34;</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="s2">&#34;messages&#34;</span><span class="p">]})</span>
+</span></span></code></pre></div></div><p>本质上就是把思考和工具调用交给了框架，把精力集中在业务逻辑上。</p>
+<h2 id="heading-6">总结</h2>
+<p>这个项目的核心价值不是&quot;做出了一个客服系统&quot;，而是跑通了以下几个模式：</p>
+<ol>
+<li><strong>Supervisor + Specialists</strong> 多智能体编排——用 LangGraph StateGraph 做条件路由</li>
+<li><strong>分层工具披露</strong>——根据对话阶段逐步开放工具能力</li>
+<li><strong>三层记忆</strong>——短期 state + LLM 摘要 + SQLite FTS5 长期持久化</li>
+<li><strong>模块注入</strong>——不用 DI 框架，通过模块级全局变量注入 DataService 等单例</li>
+</ol>
+<p>完整代码在 <a href="https://github.com/KurongTohsaka/CustomerService-MultiAgent">GitHub</a> 上，可以直接 clone 运行（配好 DeepSeek API Key 即可）。</p>
+<p>后续计划加入 <code>check_tool_call</code> 人工审批节点，让敏感操作（如下单）必须经过确认，算是多 Agent 系统的进阶玩法。</p>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">多Agent学习（1 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践</span>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <div></div>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">面试真题与实战</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/AI/06-AI%20Agent%e5%bc%80%e5%8f%91/">
+      <span class="related-card-title">AI Agent开发</span>
+      <span class="related-card-date">2026-06-01</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">
+      <span class="related-card-title">Agent三大经典范式学习</span>
+      <span class="related-card-date">2026-02-27</span>
+    </a>
+    
+    <a class="related-card" href="/posts/AI/03-AI%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">
+      <span class="related-card-title">AI应用开发框架</span>
+      <span class="related-card-date">2026-06-01</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/customer-service-multi-agent/">从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践</a>
+        <span class="sidebar-post-date">2026-06-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">面试真题与实战</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/05-RAG%e4%b8%8e%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba%e7%94%9f%e6%88%90/">RAG与检索增强生成</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/01-AI%e5%9f%ba%e7%a1%80%e7%90%86%e8%ae%ba%e4%b8%8e%e6%95%b0%e5%ad%a6/">AI基础理论与数学</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering)</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+</body>
+</html>
