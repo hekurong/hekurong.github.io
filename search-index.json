@@ -1,5 +1,20 @@
 [
   {
+    "title": "AI Native 探索：我的 Hermes Agent 使用手记",
+    "url": "/posts/AI/hermes-agent-experience/",
+    "content": "## 缘起\n\n去年底开始，AI Agent 的概念铺天盖地而来。我试过几款产品级的 Agent 助手，也看过不少开源的 Agent 框架，但总觉得差一口气——要么太封闭（只能在一个聊天框里用），要么太笨重（复杂得像个微服务架构），要么就是工具链绑死在某家云平台上。\n\n直到我遇到了 **Hermes Agent**。\n\n项目地址：[github.com/NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent)\n\n它不是常规意义上的\"AI 聊天助手\"，而是一个**以 Agent 为中心的个人计算框架**。它的核心设计哲学很简单：让 AI 能真正用上你的电脑——读文件、写文件、跑命令、调用 API、控制浏览器、管理定时任务——并且所有这些能力都可以通过聊天界面（终端、Telegram、微信……）来驱动。\n\n这篇文章记录了我从零开始配置 Hermes Agent 到深度使用的全过程，包括一些踩过的坑和积累下来的使用心得。\n\n## 初识 Hermes\n\n### 安装\n\nHermes Agent 的安装非常清爽...",
+    "summary": "",
+    "tags": [
+      "Hermes Agent",
+      "AI Native",
+      "Agent",
+      "WeChat",
+      "Tool Use"
+    ],
+    "category": "AI",
+    "date": "2026-06-06"
+  },
+  {
     "title": "从零搭建电商客服多Agent系统：LangGraph + Supervisor 架构实践",
     "url": "/posts/AI/customer-service-multi-agent/",
     "content": "## 为什么要做这个项目\n\n最近在学习多智能体系统的设计，正好看到 LangGraph 的 Supervisor 模式很适合用来做客服场景——一个主管智能体根据用户意图分发给专业子智能体，最后汇总回复。趁热打铁，用 LangChain + LangGraph + DeepSeek 从零搭了一个电商售前客服系统。\n\n这篇文章会完整介绍系统的架构设计、核心实现和踩坑经验。\n\n## 整体架构\n\n系统采用 **Supervisor + Specialists** 的集中式架构：\n\n```\n用户请求 → Supervisor（意图识别）→ Product Agent（商品查询）\n                                 → Recommend Agent（推荐导购）\n                                 → Promotion Agent（促销查询）\n                                 → 汇总回复\n```\n\n技术栈：\n\n| 层 | 选型 |\n|---|------|\n| LLM | DeepSeek（OpenAI...",
@@ -30,27 +45,14 @@
     "date": "2026-06-01"
   },
   {
-    "title": "RAG与检索增强生成",
-    "url": "/posts/AI/05-RAG与检索增强生成/",
-    "content": "# RAG与检索增强生成面试知识\n\n## 一、概述\n\n检索增强生成（Retrieval-Augmented Generation，RAG）是2024-2026年间大模型落地的核心范式。RAG通过在生成前检索外部知识库中的相关信息，有效解决LLM的知识截止、幻觉和领域知识不足等关键问题。随着模型上下文窗口的扩展（128K-1M tokens）和Agent范式的兴起，RAG技术也在快速演进——从简单的Retrieve-Read到Self-RAG、GraphRAG、Agentic RAG等高级形态。面试中需要系统掌握RAG的全链路知识，包括架构设计、向量数据库、Embedding、检索策略、重排序、评估等。\n\n---\n\n## 二、知识点详解\n\n### 1. RAG架构\n\n#### 1.1 基础架构：Retrieve-Read\n\n最简单的RAG架构：用户查询 → 检索相关文档 → 将文档作为上下文注入Prompt → LLM生成回答。\n\n```python\n# 基础Retrieve-Read流程\ndef simple_rag(query, vector_store, llm):\n    # S...",
+    "title": "大语言模型(LLM)原理",
+    "url": "/posts/AI/02-大语言模型LLM原理/",
+    "content": "# 02 — 大语言模型(LLM)原理\n\n\u003e 涵盖GPT全系列演进、预训练范式、推理机制、Scaling Laws、RLHF/DPO、MoE、长上下文、多模态及2025-2026年前沿进展\n\u003e 更新至 2025-2026 年最新知识（含DeepSeek-R1、GPT-4o、o1/o3、Mamba等）\n\n---\n\n## 一、概述\n\n大语言模型（Large Language Model, LLM）是当前AI应用开发面试的绝对核心。2025-2026年的面试关注点发生了显著变化：\n\n- **从\"了解GPT\"到\"理解GPT**：不再是简单罗列模型名字，而是深入理解每个设计决策的原因\n- **推理能力成为新焦点**：o1/o3模型开启\"推理Scaling Law\"新时代，DeepSeek-R1展示开源推理模型的可行性\n- **MoE架构占据主导**：GPT-4、Mixtral、DeepSeek-V2/V3全线MoE，理解路由和负载均衡成为必备知识\n- **长上下文成标配**：1M+ token上下文窗口的模型越来越多，位置编码技术成为面试高频考点\n- **前沿模型百花齐放**：Mamba（SSM...",
     "summary": "",
     "tags": [
-      "RAG",
-      "检索增强",
-      "向量数据库"
-    ],
-    "category": "AI",
-    "date": "2026-06-01"
-  },
-  {
-    "title": "AI基础理论与数学",
-    "url": "/posts/AI/01-AI基础理论与数学/",
-    "content": "# 01 — AI基础理论与数学\n\n\u003e 适用于AI应用开发面试的机器学习/深度学习基础理论 + 面试常考数学\n\u003e 更新至 2025-2026 年最新知识\n\n---\n\n## 一、概述\n\n本篇是AI应用开发面试的知识地基。无论面试的是大模型应用开发、算法工程还是AI平台架构，本篇内容都是必考项。近年来面试趋势显示：\n\n- **Transformer/注意力机制** 成为面试绝对核心（已经取代传统的CNN/RNN考点）\n- **损失函数与优化器** 侧重理解性考察（为什么用这个、什么时候换那个）\n- **数学基础** 的考察更加场景化（从纯推导转为\"讲清楚概念和应用\"）\n- **2025-2026年新增热点**：SwiGLU激活函数、LAMB优化器、扩散模型的KL散度解释\n\n---\n\n## 二、知识点详解\n\n### 2.1 机器学习三要素（模型、策略、算法）\n\n李航《统计学习方法》中的经典框架：\n\n| 要素 | 定义 | 面试要点 |\n|------|------|----------|\n| **模型** | 假设空间，即输入到输出的映射集合 | 区分参数模型（线性回归）与非参数模型（KNN...",
-    "summary": "",
-    "tags": [
-      "机器学习",
-      "深度学习",
-      "数学基础"
+      "LLM",
+      "Transformer",
+      "GPT"
     ],
     "category": "AI",
     "date": "2026-06-01"
@@ -69,14 +71,14 @@
     "date": "2026-06-01"
   },
   {
-    "title": "大语言模型(LLM)原理",
-    "url": "/posts/AI/02-大语言模型LLM原理/",
-    "content": "# 02 — 大语言模型(LLM)原理\n\n\u003e 涵盖GPT全系列演进、预训练范式、推理机制、Scaling Laws、RLHF/DPO、MoE、长上下文、多模态及2025-2026年前沿进展\n\u003e 更新至 2025-2026 年最新知识（含DeepSeek-R1、GPT-4o、o1/o3、Mamba等）\n\n---\n\n## 一、概述\n\n大语言模型（Large Language Model, LLM）是当前AI应用开发面试的绝对核心。2025-2026年的面试关注点发生了显著变化：\n\n- **从\"了解GPT\"到\"理解GPT**：不再是简单罗列模型名字，而是深入理解每个设计决策的原因\n- **推理能力成为新焦点**：o1/o3模型开启\"推理Scaling Law\"新时代，DeepSeek-R1展示开源推理模型的可行性\n- **MoE架构占据主导**：GPT-4、Mixtral、DeepSeek-V2/V3全线MoE，理解路由和负载均衡成为必备知识\n- **长上下文成标配**：1M+ token上下文窗口的模型越来越多，位置编码技术成为面试高频考点\n- **前沿模型百花齐放**：Mamba（SSM...",
+    "title": "RAG与检索增强生成",
+    "url": "/posts/AI/05-RAG与检索增强生成/",
+    "content": "# RAG与检索增强生成面试知识\n\n## 一、概述\n\n检索增强生成（Retrieval-Augmented Generation，RAG）是2024-2026年间大模型落地的核心范式。RAG通过在生成前检索外部知识库中的相关信息，有效解决LLM的知识截止、幻觉和领域知识不足等关键问题。随着模型上下文窗口的扩展（128K-1M tokens）和Agent范式的兴起，RAG技术也在快速演进——从简单的Retrieve-Read到Self-RAG、GraphRAG、Agentic RAG等高级形态。面试中需要系统掌握RAG的全链路知识，包括架构设计、向量数据库、Embedding、检索策略、重排序、评估等。\n\n---\n\n## 二、知识点详解\n\n### 1. RAG架构\n\n#### 1.1 基础架构：Retrieve-Read\n\n最简单的RAG架构：用户查询 → 检索相关文档 → 将文档作为上下文注入Prompt → LLM生成回答。\n\n```python\n# 基础Retrieve-Read流程\ndef simple_rag(query, vector_store, llm):\n    # S...",
     "summary": "",
     "tags": [
-      "LLM",
-      "Transformer",
-      "GPT"
+      "RAG",
+      "检索增强",
+      "向量数据库"
     ],
     "category": "AI",
     "date": "2026-06-01"
@@ -129,6 +131,19 @@
       "系统设计",
       "架构",
       "AI应用"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "AI基础理论与数学",
+    "url": "/posts/AI/01-AI基础理论与数学/",
+    "content": "# 01 — AI基础理论与数学\n\n\u003e 适用于AI应用开发面试的机器学习/深度学习基础理论 + 面试常考数学\n\u003e 更新至 2025-2026 年最新知识\n\n---\n\n## 一、概述\n\n本篇是AI应用开发面试的知识地基。无论面试的是大模型应用开发、算法工程还是AI平台架构，本篇内容都是必考项。近年来面试趋势显示：\n\n- **Transformer/注意力机制** 成为面试绝对核心（已经取代传统的CNN/RNN考点）\n- **损失函数与优化器** 侧重理解性考察（为什么用这个、什么时候换那个）\n- **数学基础** 的考察更加场景化（从纯推导转为\"讲清楚概念和应用\"）\n- **2025-2026年新增热点**：SwiGLU激活函数、LAMB优化器、扩散模型的KL散度解释\n\n---\n\n## 二、知识点详解\n\n### 2.1 机器学习三要素（模型、策略、算法）\n\n李航《统计学习方法》中的经典框架：\n\n| 要素 | 定义 | 面试要点 |\n|------|------|----------|\n| **模型** | 假设空间，即输入到输出的映射集合 | 区分参数模型（线性回归）与非参数模型（KNN...",
+    "summary": "",
+    "tags": [
+      "机器学习",
+      "深度学习",
+      "数学基础"
     ],
     "category": "AI",
     "date": "2026-06-01"
@@ -272,18 +287,6 @@
     "date": "2025-09-19"
   },
   {
-    "title": "apollo简单入门",
-    "url": "/posts/DailyDev/apollo简单入门/",
-    "content": "在现代微服务架构中，服务数量的激增使得传统的配置文件管理方式（如本地文件、Git 仓库）变得越来越难以维护。配置的修改、发布、回滚、权限控制以及实时生效等需求，催生了分布式配置中心这一关键中间件。\n\n[Apollo (阿波罗)](https://github.com/apolloconfig/apollo) 是由携程框架部门研发的开源配置管理中心，它功能强大、生态丰富，能够集中化管理应用在不同环境、不同集群的配置。本文将带你深入了解 Apollo 的世界，从核心概念到架构原理，再到 Go 语言的实战集成。\n\n## 一、Apollo 核心概念\n\n要用好 Apollo，首先需要理解它的几个核心概念，这些概念构成了其灵活、强大的配置管理模型。\n\n#### 1. `Application` (应用)\n\n这是配置管理的基本单元，代表一个独立的应用或服务。每个应用都有一个全局唯一的 `AppId`，这是客户端与服务端交互时的身份标识。\n\n#### 2. `Environment` (环境)\n\n用于隔离不同部署环境的配置，如 `DEV` (开发环境)、`FAT` (测试环境)、`UAT` (预发布环...",
-    "summary": "",
-    "tags": [
-      "Apollo",
-      "Golang"
-    ],
-    "category": "Daily Dev",
-    "date": "2025-09-14"
-  },
-  {
     "title": "golang单元测试与冒烟测试入门",
     "url": "/posts/DailyDev/golang单元测试与冒烟测试入门/",
     "content": "## 概念解析：单元测试 vs. 冒烟测试\n\n### 1. 单元测试 (Unit Testing)\n\n**单元测试**是针对程序中最小的可测试单元进行的测试。在 Go 语言中，这个“单元”通常指一个函数（Function）或一个方法（Method）。\n\n- **核心目标**：验证单个函数或方法的逻辑是否正确。它确保给定特定的输入，该函数能返回预期的输出。\n- **关键原则**：**隔离**。单元测试应该与其依赖项（如数据库、文件系统、外部API等）隔离开来。如果一个函数依赖了这些外部服务，我们通常会使用“模拟（Mock）”技术来创建一个假的依赖项，从而保证测试的稳定性和速度。\n- **特点**：\n  - **速度快**：因为不涉及外部I/O操作，通常毫秒级就能完成。\n  - **粒度细**：精确到每个函数，能够快速定位问题。\n  - **编写频繁**：是开发过程中最常编写的测试类型。\n\n### 2. 冒烟测试 (Smoke Testing)\n\n**冒烟测试**，又称“构建验证测试（Build Verification Test）”，是一种非常基础的测试，用于确定软件的关键功能是否能够正...",
@@ -292,6 +295,18 @@
       "Golang",
       "Unit Testing",
       "Mock Testing"
+    ],
+    "category": "Daily Dev",
+    "date": "2025-09-14"
+  },
+  {
+    "title": "apollo简单入门",
+    "url": "/posts/DailyDev/apollo简单入门/",
+    "content": "在现代微服务架构中，服务数量的激增使得传统的配置文件管理方式（如本地文件、Git 仓库）变得越来越难以维护。配置的修改、发布、回滚、权限控制以及实时生效等需求，催生了分布式配置中心这一关键中间件。\n\n[Apollo (阿波罗)](https://github.com/apolloconfig/apollo) 是由携程框架部门研发的开源配置管理中心，它功能强大、生态丰富，能够集中化管理应用在不同环境、不同集群的配置。本文将带你深入了解 Apollo 的世界，从核心概念到架构原理，再到 Go 语言的实战集成。\n\n## 一、Apollo 核心概念\n\n要用好 Apollo，首先需要理解它的几个核心概念，这些概念构成了其灵活、强大的配置管理模型。\n\n#### 1. `Application` (应用)\n\n这是配置管理的基本单元，代表一个独立的应用或服务。每个应用都有一个全局唯一的 `AppId`，这是客户端与服务端交互时的身份标识。\n\n#### 2. `Environment` (环境)\n\n用于隔离不同部署环境的配置，如 `DEV` (开发环境)、`FAT` (测试环境)、`UAT` (预发布环...",
+    "summary": "",
+    "tags": [
+      "Apollo",
+      "Golang"
     ],
     "category": "Daily Dev",
     "date": "2025-09-14"
@@ -321,6 +336,17 @@
     "date": "2025-09-13"
   },
   {
+    "title": "sync包详解",
+    "url": "/posts/DailyDev/sync包详解/",
+    "content": "## 一、`sync` 包概述\n\n`sync` 包是 Go 标准库中用于处理并发和同步的核心工具包。在 Go 语言中，我们通过 Goroutine 实现并发，而当多个 Goroutine 需要访问共享资源时，为了避免数据竞争（Data Race）等问题，就需要使用 `sync` 包提供的同步原语来保证并发安全。\n\n面试官通过 `sync` 包相关的问题，主要考察你对 Go 并发模型的理解、处理并发问题的能力以及对底层原理的掌握程度。\n\n## 二、`sync.Mutex`与`sync.RWMutex` (互斥锁与读写锁)\n\n### 1. 作用与目的\n\n这是最基础和最常用的同步原语。\n\n- **`sync.Mutex` (互斥锁)**: 保证在同一时刻，只有一个 Goroutine 可以访问被其保护的共享资源。当一个 Goroutine 获取了锁，其他试图获取该锁的 Goroutine 都会被阻塞，直到锁被释放。\n- **`sync.RWMutex` (读写锁)**: `Mutex` 的一种更细粒度的实现，它将访问分为“读”和“写”。\n  - **多个读**：可以共存，多个 Gorouti...",
+    "summary": "",
+    "tags": [
+      "Golang"
+    ],
+    "category": "Daily Dev",
+    "date": "2025-08-30"
+  },
+  {
     "title": "搞懂BIO与AIO",
     "url": "/posts/DailyDev/搞懂BIO与AIO/",
     "content": "# 彻底搞懂 AIO 与 epoll\n\n## 维度一：必须厘清的两个核心概念\n\n在深入 I/O 模型之前，我们必须先区分两组完全独立的概念，很多人在这里就已混淆：\n\n1. **阻塞 (Blocking) vs. 非阻塞 (Non-blocking)**\n   - **关注点**：**应用程序**在等待结果时的**状态**。\n   - **阻塞**：发起 I/O 操作后，如果数据未就绪，当前线程会被挂起，直到操作完成。\n   - **非阻塞**：发起 I/O 操作后，如果数据未就绪，函数会立刻返回一个错误码，线程不会被挂起，可以继续执行其他任务。\n2. **同步 (Synchronous) vs. 异步 (Asynchronous)**\n   - **关注点**：**内核与应用程序**之间如何**交付 I/O 结果**。\n   - **同步**：应用程序**自己**负责发起 I/O 操作，并且**主动**去查询或等待结果。即便是非阻塞轮询，只要是“我”去问内核“好了没”，都算同步。\n   - **异步**：应用程序发起 I/O 操作后便立即返回。**内核会独立完成整个 I/O 过程**（...",
@@ -328,17 +354,6 @@
     "tags": [
       "IO",
       "epoll"
-    ],
-    "category": "Daily Dev",
-    "date": "2025-08-30"
-  },
-  {
-    "title": "sync包详解",
-    "url": "/posts/DailyDev/sync包详解/",
-    "content": "## 一、`sync` 包概述\n\n`sync` 包是 Go 标准库中用于处理并发和同步的核心工具包。在 Go 语言中，我们通过 Goroutine 实现并发，而当多个 Goroutine 需要访问共享资源时，为了避免数据竞争（Data Race）等问题，就需要使用 `sync` 包提供的同步原语来保证并发安全。\n\n面试官通过 `sync` 包相关的问题，主要考察你对 Go 并发模型的理解、处理并发问题的能力以及对底层原理的掌握程度。\n\n## 二、`sync.Mutex`与`sync.RWMutex` (互斥锁与读写锁)\n\n### 1. 作用与目的\n\n这是最基础和最常用的同步原语。\n\n- **`sync.Mutex` (互斥锁)**: 保证在同一时刻，只有一个 Goroutine 可以访问被其保护的共享资源。当一个 Goroutine 获取了锁，其他试图获取该锁的 Goroutine 都会被阻塞，直到锁被释放。\n- **`sync.RWMutex` (读写锁)**: `Mutex` 的一种更细粒度的实现，它将访问分为“读”和“写”。\n  - **多个读**：可以共存，多个 Gorouti...",
-    "summary": "",
-    "tags": [
-      "Golang"
     ],
     "category": "Daily Dev",
     "date": "2025-08-30"
@@ -468,17 +483,6 @@
     "date": "2025-03-14"
   },
   {
-    "title": "动态规划经典问题学习记录",
-    "url": "/posts/AlgorithmLearning/动态规划经典问题学习记录/",
-    "content": "# 动态规划经典问题学习记录\n\n ## 0-1 背包\n\n### 问题描述\n\n有 $n$ 个物品，第 $i$ 个物品的体积为 $w[i]$ ，价值为 $v[i]$ ，每个物品最多选一次，求体积和不超过 $capacity$ 时的最大价值和。\n\n### 通过回溯去思考解题思路\n\n1. 先去思考当前的操作，即枚举第 $i$ 个物品选与不选：\n   - 不选，剩余容量不变。\n   - 选，剩余容量减少 $w[i]$  。\n2. 递归到子问题，在剩余容量为 $c$ 时，从前 $i$ 个物品中得到的最大价值和。\n3. 下一个递归子问题：\n   - 不选，在剩余容量为 $c$ 时，从前 $i-1$ 个物品中得到的最大价值和。\n   - 选，在剩余容量为 $c-w[i]$ 时，从前 $i-1$ 个物品中得到的最大价值和。\n\n最终得到的递归公式：$dfs(i,c) = max(dfs(i-1, c),dfs(i-1, c-w[i])+v[i])$\n\n对应的代码就是：\n\n```python\ndef zero_one_backpack(capacity: int, w: List[int], v: List...",
-    "summary": "",
-    "tags": [
-      "DP"
-    ],
-    "category": "Algorithm Learning",
-    "date": "2025-03-08"
-  },
-  {
     "title": "《深入理解设计模式》记录",
     "url": "/posts/DailyDev/《深入理解设计模式》记录/",
     "content": "# 《深入理解设计模式》记录\n\n**这里只记录了相对常用、面试常问的设计模式。**\n\n## 单例模式\n\n单例模式（Singleton Pattern）是一种创建型设计模式，其核心目标是确保一个类仅有一个实例，并提供全局访问点。它适用于需要全局唯一对象且频繁访问的场景，例如配置管理、线程池、日志记录器等。\n\n单例模式需要注意三点：\n\n- 私有化构造函数：防止外部通过 `new` 直接创建实例。\n- 自行创建实例：类内部负责生成唯一实例。\n- 全局访问方法：提供静态方法供外部获取实例。\n\n### 懒汉模式\n\n特点：延迟实例化，首次调用时创建实例，需处理线程安全问题。\n\n```go\npackage singleton\n\nimport \"sync\"\n\ntype lazySingleton struct {\n  \n}\n\nvar (\n\tinstance *lazySingleton\n  once sync.Once\n)\n\nfunc GetLazyInstance() *lazySingleton {\n  once.Do(func() {\n    instance = \u0026lazySingleton{...",
@@ -487,6 +491,17 @@
       "Design Pattern"
     ],
     "category": "Daliy Dev",
+    "date": "2025-03-08"
+  },
+  {
+    "title": "动态规划经典问题学习记录",
+    "url": "/posts/AlgorithmLearning/动态规划经典问题学习记录/",
+    "content": "# 动态规划经典问题学习记录\n\n ## 0-1 背包\n\n### 问题描述\n\n有 $n$ 个物品，第 $i$ 个物品的体积为 $w[i]$ ，价值为 $v[i]$ ，每个物品最多选一次，求体积和不超过 $capacity$ 时的最大价值和。\n\n### 通过回溯去思考解题思路\n\n1. 先去思考当前的操作，即枚举第 $i$ 个物品选与不选：\n   - 不选，剩余容量不变。\n   - 选，剩余容量减少 $w[i]$  。\n2. 递归到子问题，在剩余容量为 $c$ 时，从前 $i$ 个物品中得到的最大价值和。\n3. 下一个递归子问题：\n   - 不选，在剩余容量为 $c$ 时，从前 $i-1$ 个物品中得到的最大价值和。\n   - 选，在剩余容量为 $c-w[i]$ 时，从前 $i-1$ 个物品中得到的最大价值和。\n\n最终得到的递归公式：$dfs(i,c) = max(dfs(i-1, c),dfs(i-1, c-w[i])+v[i])$\n\n对应的代码就是：\n\n```python\ndef zero_one_backpack(capacity: int, w: List[int], v: List...",
+    "summary": "",
+    "tags": [
+      "DP"
+    ],
+    "category": "Algorithm Learning",
     "date": "2025-03-08"
   },
   {

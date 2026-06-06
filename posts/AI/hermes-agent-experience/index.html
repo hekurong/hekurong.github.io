@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>AI Native 探索：我的 Hermes Agent 使用手记 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">AI Native 探索：我的 Hermes Agent 使用手记</h1>
+    <div class="article-meta">
+      <time datetime="2026-06-06">2026-06-06</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="heading">缘起</h2>
+<p>去年底开始，AI Agent 的概念铺天盖地而来。我试过几款产品级的 Agent 助手，也看过不少开源的 Agent 框架，但总觉得差一口气——要么太封闭（只能在一个聊天框里用），要么太笨重（复杂得像个微服务架构），要么就是工具链绑死在某家云平台上。</p>
+<p>直到我遇到了 <strong>Hermes Agent</strong>。</p>
+<p>项目地址：<a href="https://github.com/NousResearch/hermes-agent">github.com/NousResearch/hermes-agent</a></p>
+<p>它不是常规意义上的&quot;AI 聊天助手&quot;，而是一个<strong>以 Agent 为中心的个人计算框架</strong>。它的核心设计哲学很简单：让 AI 能真正用上你的电脑——读文件、写文件、跑命令、调用 API、控制浏览器、管理定时任务——并且所有这些能力都可以通过聊天界面（终端、Telegram、微信……）来驱动。</p>
+<p>这篇文章记录了我从零开始配置 Hermes Agent 到深度使用的全过程，包括一些踩过的坑和积累下来的使用心得。</p>
+<h2 id="-hermes">初识 Hermes</h2>
+<h3 id="heading-1">安装</h3>
+<p>Hermes Agent 的安装非常清爽：</p>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">git clone https://github.com/NousResearch/hermes-agent
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> hermes-agent
+</span></span><span class="line"><span class="cl">pip install -e .
+</span></span></code></pre></div></div><p>没有复杂的 Docker 编排，没有几十个微服务，没有强绑某个 Agent 框架或推理厂商。装完后一条命令就能运行：</p>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">hermes  <span class="c1"># 进入交互式聊天</span>
+</span></span></code></pre></div></div><p>对，就这么简单。第一次启动时会引导你配置 LLM provider——支持 OpenAI、Anthropic、OpenRouter、DeepSeek 以及任何兼容 OpenAI API 的自定义端点。</p>
+<h3 id="heading-2">第一印象</h3>
+<p>第一次用的时候，我感觉它不像一个&quot;产品&quot;，更像一个<strong>开发者工具</strong>。它没有花哨的 GUI，默认界面就是终端里的交互式聊天。但正是这种&quot;工具感&quot;吸引了——它尊重用户，不给用户设限，所有能力透明可查。</p>
+<p>打个招呼：</p>
+<pre><code>&gt; 你好，你是谁？
+</code></pre>
+<p>它不仅能回答，还能直接调工具查文件、跑命令、写代码。这种&quot;即问即做&quot;的体验，比单纯的对话模型实用太多了。</p>
+<h2 id="wechat-">WeChat 集成：最折腾也最值的一环</h2>
+<h3 id="heading-3">需求</h3>
+<p>我日常重度使用微信。如果能把自己的 AI Agent 接入微信，那就可以在任何时候、任何地方通过手机和它交互——发个消息就能让它查资料、记笔记、检查定时任务。</p>
+<p>但微信的生态是出了名的封闭。</p>
+<h3 id="heading-4">方案选择</h3>
+<p>Hermes Agent 的消息平台架构很优雅：它定义了一个 MessageBus 抽象，每个平台（Telegram、Discord、微信……）作为一个 Gateway 插件接入。服务端和客户端通过 MessageBus 通信，互不耦合。</p>
+<p>微信这边，我最终选择了 <strong>腾讯 iLink Bot API</strong>（企业微信的开放能力）作为底层通道。配置流程大致如下：</p>
+<ol>
+<li>在企业微信后台创建一个自建应用</li>
+<li>配置回调 URL 指向 Hermes Gateway 的 Webhook 端点</li>
+<li>在 <code>config.yaml</code> 中启用 weixin 平台并填入凭证</li>
+</ol>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="nt">gateways</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">weixin</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">bot_id</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;你的BotID&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">token</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;你的Token&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">encoding_aes_key</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;你的AESKey&#34;</span><span class="w">
+</span></span></span></code></pre></div></div><h3 id="heading-5">踩坑记录</h3>
+<p>最折腾的地方是<strong>消息格式适配</strong>。微信的消息类型和 Telegram 差异很大，尤其是：</p>
+<ul>
+<li><strong>消息路由</strong>：微信的 Webhook 是推模式（推送给我），而 Agent 需要回复，中间需要维护一个 session 到 chat_id 的映射</li>
+<li><strong>多媒体消息</strong>：图片、语音、文件的收发都需要额外的编解码</li>
+</ul>
+<p>改了几轮消息适配器之后终于稳定下来。现在我在微信上给 Agent 发消息，就像跟一个微信好友聊天一样自然。</p>
+<h3 id="heading-6">最终的配置参考</h3>
+<p>为了方便复盘，我把关键的配置文件结构和路径记了下来：</p>
+<pre><code>~/.hermes/
+├── config.yaml          ← 主配置：provider、gateways、skills
+├── .env                 ← 敏感信息：API keys、Tokens
+├── skills/              ← 自定义技能
+├── memories/            ← 持久记忆
+└── cron/                ← 定时任务输出
+</code></pre>
+<p><code>config.yaml</code> 中 weixin 部分的核心配置写入了对应的 skill 里，方便以后重新部署时快速恢复。</p>
+<h2 id="skills-">Skills 系统：技能就是一切</h2>
+<p>Hermes Agent 最让我惊艳的设计是 <strong>Skills</strong>。</p>
+<p>每个 Skill 本质上是一个 Markdown 文件，包含一组结构化指令：触发条件、执行步骤、注意事项。当用户的消息匹配某个 Skill 的场景时，Agent 会自动加载并遵循其中的指引。</p>
+<h3 id="-skill">我常用的几个 Skill</h3>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>功能</th>
+<th>使用频率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chenhai-blog</code></td>
+<td>写博客并部署</td>
+<td>每天</td>
+</tr>
+<tr>
+<td><code>daily-learning</code></td>
+<td>每日系统学习（理财→量化课程队列）</td>
+<td>每天</td>
+</tr>
+<tr>
+<td><code>wechat-platform</code></td>
+<td>微信消息发送规范</td>
+<td>每天</td>
+</tr>
+<tr>
+<td><code>subagent-driven-development</code></td>
+<td>拆任务并行执行</td>
+<td>几乎每天</td>
+</tr>
+<tr>
+<td><code>node-inspect-debugger</code></td>
+<td>调试 Node.js</td>
+<td>按需</td>
+</tr>
+<tr>
+<td><code>systematic-debugging</code></td>
+<td>根因调试法</td>
+<td>修 Bug 时</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-skill-">自定义 Skill 的妙用</h3>
+<p>我最满意的是自己定义的一个 skill：<code>wechat-platform</code>。</p>
+<p>它的内容包含了微信消息发送的标准流程、gateway 路径、venv 路径、夫君的微信 ID 等。这样每次要发消息时，Agent 自动加载这个 skill，不会再出错或忘记参数。</p>
+<div class="code-wrapper" data-lang="markdown"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="gh"># wechat-platform
+</span></span></span><span class="line"><span class="cl"><span class="gh"></span>
+</span></span><span class="line"><span class="cl"><span class="gu">## 发送消息
+</span></span></span><span class="line"><span class="cl"><span class="gu"></span>python -m hermes_cli.main send --to weixin &#34;消息内容&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## 常用目标
+</span></span></span><span class="line"><span class="cl"><span class="gu"></span>夫君微信: o9cq805iPEZUjZ5F4DxUt4Q62_Zo@im.wechat
+</span></span></code></pre></div></div><p>这不就是&quot;将经验代码化&quot;吗？Skill 让 AI Agent 不再是从零开始的通用模型，而是<strong>带着你的经验、你的配置、你的工作流</strong>的私人数码助理。</p>
+<h3 id="skills--cron-">Skills + cron 的组合拳</h3>
+<p>更妙的是，Skills 可以绑定到定时任务（cronjob）上：</p>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">hermes cron create <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --schedule <span class="s2">&#34;0 8 * * *&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --skill daily-learning <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --prompt <span class="s2">&#34;执行今天的学习任务&#34;</span>
+</span></span></code></pre></div></div><p>每天早八点自动加载 <code>daily-learning</code> 技能，执行当天课程。我甚至给这个设了一个课程队列：理财学完后自动切换到量化课程。这让我保持了连续两个月每天学习的节奏。</p>
+<h2 id="heading-7">记忆系统：从普通记忆到全息记忆</h2>
+<p>Hermes Agent 有两种记忆机制：</p>
+<h3 id="memory">传统记忆（memory）</h3>
+<p>简单的 key-value 持久化，适合存偏好和事实：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">memory</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&#34;add&#34;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&#34;memory&#34;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&#34;用户习惯简洁回复&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></div><p>每次对话开始时会自动注入，让我不用重复交代背景。</p>
+<h3 id="holographic-memory">全息记忆（Holographic Memory）</h3>
+<p>这是 Hermes 区别于其他 Agent 框架的核心特性之一。它不只是存文本，而是构建了一个<strong>带信任评分的语义事实网络</strong>。</p>
+<ul>
+<li>每条事实都有信任分（trust score）</li>
+<li>可以通过 <code>probe</code> 查询某个实体（人、项目、工具）的所有关联事实</li>
+<li>可以通过 <code>reason</code> 做跨实体的组合推理</li>
+<li>可以通过 <code>contradict</code> 检测矛盾、自动降权</li>
+</ul>
+<p>举个例子：</p>
+<pre><code>&gt; probe entity=&quot;Chenhai-hugo&quot;
+→ 查到：项目是自研 Go 静态博客生成器，v0.6.1，workflow 是写 md → deploy → CI
+</code></pre>
+<p>这对长时间、多会话的协作场景帮助极大。我不再需要每次重复解释项目背景，Agent 自己就知道该查哪段记忆。</p>
+<h2 id="heading-8">日常使用场景</h2>
+<h3 id="1-">1. 写博客（就是这篇）</h3>
+<p>标准流程：</p>
+<ol>
+<li>在微信上跟镇海说&quot;写一篇关于某主题的博客&quot;</li>
+<li>Agent 加载 <code>chenhai-blog</code> skill，用 <code>chenhai new</code> 创建文章骨架</li>
+<li>自动填充 front matter（title、date、categories、tags、series）</li>
+<li>写完正文后 <code>chenhai deploy -m &quot;add: 标题&quot;</code></li>
+<li>GitHub Actions CI 自动构建部署到 GitHub Pages</li>
+</ol>
+<p>整个过程无需打开编辑器、无需敲命令、甚至不用坐在电脑前——手机微信就能发起。</p>
+<h3 id="2-">2. 每日学习</h3>
+<p>每天早上定时收到学习提醒，内容是当天的课程模块。理财课程学完后自动切换到量化课程，无需我手动干预。</p>
+<h3 id="3-">3. 并行工作</h3>
+<p>Hermes 的 <code>delegate_task</code> 可以同时派发多个子任务：</p>
+<blockquote>
+<p>&ldquo;帮我查一下这几个 API 的区别，同时看看 issue 里的讨论，然后总结给我&rdquo;</p>
+</blockquote>
+<p>Agent 会并行跑多个子 Agent，各自独立工作，最后汇总结果。这比我手动一个一个查快多了。</p>
+<h2 id="heading-9">踩坑与思考</h2>
+<h3 id="-1cron-">坑 1：Cron 任务触发规则</h3>
+<p>一开始我没搞清楚 cron 的&quot;天条&quot;——<strong>定时任务未经主人允许不得主动触发</strong>。镇海一直严格遵守这条规则，即使我设置了 cron job 配置但没有&quot;跑一次&quot;的指令，她也不会越界执行。后来我理解了：这是安全边界设计，防止 Agent 在用户不知情的情况下执行操作。</p>
+<h3 id="-2wechat-">坑 2：WeChat 集成的不稳定性</h3>
+<p>微信 Gateway 依赖 Webhook 回调。家里网络偶尔波动时，回调会超时，导致消息丢失。目前的应对是加了一层重试机制，并且对重要的指令（如部署博客）先确认再执行。</p>
+<h3 id="-3memory-">坑 3：Memory 上限管理</h3>
+<p>默认 memory_char_limit 是 2200 字符，很快就满了。后来发现 config.yaml 里可以调大，但 Hermes Desktop 客户端对这个值的处理是硬编码在 asar 里的，需要解包改源码才能对齐。这个坑花了我小半天去排查。</p>
+<h3 id="ai-native-">思考：AI Native 到底是什么？</h3>
+<p>用了三个月 Hermes Agent，我对&quot;AI Native&quot;这个词有了更具体的理解：</p>
+<p><strong>AI Native 不是&quot;加一个 AI 功能&quot;，而是&quot;以 AI 为核心重新设计工具&quot;。</strong></p>
+<p>传统软件是&quot;人操作工具，工具完成任务&quot;。AI Native 软件是&quot;人表达意图，AI 编排工具完成任务&quot;。Hermes Agent 的 Skills + memory + tool use 组合，已经让我进入了这种工作模式——我告诉它&quot;我想做什么&quot;，它知道该用什么工具、走什么流程、注意什么陷阱。</p>
+<p>这比任何&quot;AI + 旧工具&quot;的缝合方案都走得更远。因为它不满足于&quot;让 AI 能回答问题&quot;，而是追求&quot;让 AI 能操作系统&quot;。</p>
+<h2 id="heading-10">未来展望</h2>
+<p>Hermes Agent 还在快速迭代中。我比较期待的几个方向：</p>
+<ol>
+<li><strong>更多的平台集成</strong>：如果能接入飞书、钉钉，办公场景就更完整了</li>
+<li><strong>技能市场</strong>：社区共享的 Skill 仓库，可以直接安装别人做好的技能</li>
+<li><strong>多 Agent 协作</strong>：多个 Hermes Agent 实例之间的通信和任务编排</li>
+</ol>
+<p>当然，我也会继续深入打磨自己的一套工作流，把更多日常事务交给 Agent 去编排。毕竟，<strong>工具的价值不在于它有多强，而在于你让它为你做了多少事</strong>。</p>
+<hr>
+<p><em>这篇文章就是用 Hermes Agent + 镇海（我的自定义 Agent）完成的——从在微信上说了句&quot;写篇博客&quot;到发布上线，全程没有手动打开一次终端或编辑器。</em></p>
+<p><em>或许，这就是 AI Native 的样子吧。</em></p>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">AI Native探索（1 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">AI Native 探索：我的 Hermes Agent 使用手记</span>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <div></div>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/customer-service-multi-agent/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/Agent%e4%b8%89%e5%a4%a7%e7%bb%8f%e5%85%b8%e8%8c%83%e5%bc%8f%e5%ad%a6%e4%b9%a0/">
+      <span class="related-card-title">Agent三大经典范式学习</span>
+      <span class="related-card-date">2026-02-27</span>
+    </a>
+    
+    <a class="related-card" href="/posts/AI/06-AI%20Agent%e5%bc%80%e5%8f%91/">
+      <span class="related-card-title">AI Agent开发</span>
+      <span class="related-card-date">2026-06-01</span>
+    </a>
+    
+    <a class="related-card" href="/posts/AI/customer-service-multi-agent/">
+      <span class="related-card-title">从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践</span>
+      <span class="related-card-date">2026-06-02</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/hermes-agent-experience/">AI Native 探索：我的 Hermes Agent 使用手记</a>
+        <span class="sidebar-post-date">2026-06-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/customer-service-multi-agent/">从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践</a>
+        <span class="sidebar-post-date">2026-06-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/10-%e9%9d%a2%e8%af%95%e7%9c%9f%e9%a2%98%e4%b8%8e%e5%ae%9e%e6%88%98/">面试真题与实战</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/02-%e5%a4%a7%e8%af%ad%e8%a8%80%e6%a8%a1%e5%9e%8bLLM%e5%8e%9f%e7%90%86/">大语言模型(LLM)原理</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering)</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+</body>
+</html>
