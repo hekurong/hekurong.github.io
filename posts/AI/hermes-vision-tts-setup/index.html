@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>让 Hermes 看见、听见：视觉模型与 TTS 的集成折腾记 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="Enter keyword to search..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="search-modal-hint">Ctrl+K</span>
+    <button id="search-modal-close" class="search-modal-close" aria-label="Close search">&times;</button>
+  </div>
+  <div id="search-results" class="search-results">
+    <div class="search-empty">Enter keyword to search...</div>
+  </div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">让 Hermes 看见、听见：视觉模型与 TTS 的集成折腾记</h1>
+    <div class="article-meta">
+      <time datetime="2026-06-06">2026-06-06</time>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="heading">缘起</h2>
+<p>在上一篇《AI Native 探索：我的 Hermes Agent 使用手记》中，我记录了 Hermes Agent 的安装配置、WeChat 集成和 Skills 系统。但当时的配置还缺两块能力：<strong>视觉</strong>和<strong>语音</strong>。</p>
+<p>我的主力模型是 DeepSeek V4 Flash，它没有原生多模态能力——给它一张图片，它看不懂。与此同时，日常使用中我经常需要它帮我读截图、分析图表、识别验证码。另一面是<strong>语音合成</strong>——我希望它能用中文念出回复，甚至用特定的音色说话。</p>
+<p>这篇文章就记录下这两块能力的集成过程，以及在阿里云百炼（DashScope）平台上踩过的坑。</p>
+<h2 id="-hermes-">一、辅助视觉模型：让 Hermes 能&quot;看见&quot;</h2>
+<h3 id="heading-1">架构设计</h3>
+<p>Hermes 的视觉能力设计很优雅：它不要求主模型有原生视觉能力，而是提供了一个 <strong>auxiliary vision</strong> 机制。当主模型不支持视觉时，Agent 会自动调用 <code>vision_analyze</code> 工具，把图片传给一个专门的辅助视觉模型，再将分析结果以文本形式送回上下文。这样，即使主模型是纯文本的，也能间接&quot;看见&quot;。</p>
+<p>这个辅助模型可以托管在任何 OpenAI 兼容的 API 上，通过 <code>auxiliary.vision</code> 配置项设置。</p>
+<h3 id="heading-2">配置过程</h3>
+<p>选型上，我选择了阿里云百炼的 <strong>qwen3-vl-flash</strong>——通义千问的轻量级视觉模型，速度快、成本低，对中文图片的理解力也不错。</p>
+<p>配置分两步走：</p>
+<p><strong>第一步</strong>，在 <code>~/.hermes/config.yaml</code> 中添加 auxiliary vision 配置：</p>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="nt">auxiliary</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">vision</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l">custom</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l">qwen3-vl-flash</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">base_url</span><span class="p">:</span><span class="w"> </span><span class="l">https://dashscope.aliyuncs.com/compatible-mode/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">api_key</span><span class="p">:</span><span class="w"> </span><span class="l">sk-d2b...a8d3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="m">120</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">download_timeout</span><span class="p">:</span><span class="w"> </span><span class="m">30</span><span class="w">
+</span></span></span></code></pre></div></div><p><strong>第二步</strong>，在 <code>~/.hermes/.env</code> 中设置 API 密钥。注意：auxiliary vision 读取的是 <code>CUSTOM_API_KEY</code> 环境变量，而不是 <code>DASHSCOPE_API_KEY</code>——这两个是独立的。</p>
+<h3 id="heading-3">踩坑：密钥被自动脱敏</h3>
+<p>Hermes 有一个安全机制：当 Agent 在 terminal 中执行包含 API Key 的命令时，系统会自动检测并<strong>脱敏</strong>密钥（将真实密钥替换为 <code>sk-d2b...a8d3</code> 这样的掩码形式）。这导致了一个特坑的场景：</p>
+<blockquote>
+<p>你让 Agent 帮你执行 <code>export CUSTOM_API_KEY=sk-xxx...</code>，它确实执行了——但终端里实际跑的是 <code>export CUSTOM_API_KEY=sk-d2b...a8d3</code>！因为脱敏发生在工具输出展示层，而非命令执行层——等等，其实反过来：<strong>脱敏发生在 Agent 看到的结果中，但 Agent 本就看不到原始密钥，它只能拿到脱敏后的文本</strong>，所以它会用脱敏后的字符串去执行。</p>
+</blockquote>
+<p>最终解决方式很简单：<strong>不在终端里设，直接在 <code>.env</code> 文件里手写</strong>。或者用 <code>hermes config set</code> 写入配置项。</p>
+<h3 id="heading-4">验证效果</h3>
+<p>配置完成后，随便丢一张图片给 Agent，它就能自动调用 <code>vision_analyze</code> 来分析。比如给一张 UI 截图，它能描述布局、识别文字、分析图标——准确度出乎意料地好。</p>
+<h2 id="tts--hermes-">二、TTS 语音合成：让 Hermes 能&quot;说话&quot;</h2>
+<h3 id="heading-5">两条技术路线</h3>
+<p>给 Hermes 加语音合成，面临两条路线：</p>
+<p><strong>路线 A：在 TTS 工具中集成</strong></p>
+<p>Hermes 内置了 TTS 工具（<code>text_to_speech</code>），支持多种后端：Edge TTS、ElevenLabs、OpenAI（兼容格式）等。只需在配置中设置 <code>tts.provider: openai</code>，并把 <code>base_url</code> 指向阿里云百炼的兼容端点即可：</p>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="nt">tts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l">openai</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">openai</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l">qwen3-tts-flash</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">voice</span><span class="p">:</span><span class="w"> </span><span class="l">Cherry</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">base_url</span><span class="p">:</span><span class="w"> </span><span class="l">https://dashscope.aliyuncs.com/compatible-mode/v1</span><span class="w">
+</span></span></span></code></pre></div></div><p>API 密钥通过 <code>VOICE_TOOLS_OPENAI_KEY</code> 环境变量设置。</p>
+<p>然而问题来了：<strong>阿里云百炼的 OpenAI 兼容端点不支持 <code>/v1/audio/speech</code> 路径</strong>。DashScope 的兼容模式只实现了 Chat Completions，TTS 走的是另一套非标准 API。</p>
+<p>所以路线 A 走不通。</p>
+<p><strong>路线 B：自定义 CLI 工具</strong></p>
+<p>既然内置 TTS 工具无法直连，就自己写一个 CLI 工具，对接 DashScope 的原生多模态 TTS API。</p>
+<h3 id="-qwen-tts-cli">编写 qwen-tts CLI</h3>
+<p>脚本放在了 <code>/usr/local/bin/qwen-tts</code>，核心逻辑很简单：</p>
+<ol>
+<li>调用阿里云百炼的 multimodal-generation API</li>
+<li>传入文本和音色参数</li>
+<li>从返回的 <code>output.audio.url</code> 下载音频</li>
+<li>保存为 WAV 文件</li>
+</ol>
+<p>使用方式：</p>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">qwen-tts <span class="s2">&#34;你好，欢迎使用语音合成服务&#34;</span> /tmp/output.wav
+</span></span></code></pre></div></div><p>支持环境变量 <code>QWEN_TTS_VOICE</code> 切换音色，默认使用我在百炼上克隆的镇海音色。</p>
+<p>完整的使用方法在 Hermes 的 <code>qwen-tts</code> skill 中已有详细记录。</p>
+<h3 id="bug--status-code">Bug 修复：不存在的 status_code</h3>
+<p>写完后测试，发现脚本一直报错退出：</p>
+<pre><code>API returned 0: Unknown error
+</code></pre>
+<p>查了一圈，问题出在第 74 行：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">status</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;status_code&#34;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="o">...</span>
+</span></span></code></pre></div></div><p>但阿里云百炼的 TTS API <strong>成功响应中根本没有 <code>status_code</code> 字段</strong>！HTTP 200 本身就是成功信号，响应体里只有 <code>output.audio.url</code>。旧代码用 <code>result.get(&quot;status_code&quot;, 0)</code> 永远得到 0，自然被判定为失败。</p>
+<p>修复很简单：去掉 status_code 检查，直接取 <code>output</code> 字段。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">output</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;output&#34;</span><span class="p">,</span> <span class="p">{})</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="s2">&#34;audio&#34;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;API response missing output.audio&#34;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span></code></pre></div></div><p>然后顺手把这个踩坑记录更新到了 <code>qwen-tts</code> skill 的&quot;已知问题与修复&quot;中。</p>
+<h3 id="heading-6">语音克隆：模型与音色不能乱配</h3>
+<p>在折腾过程中，我深入探究了阿里云百炼的语音克隆体系，发现它有两套完全独立的体系：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">体系</th>
+<th style="text-align:left">专用模型</th>
+<th style="text-align:left">API 端点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Qwen-TTS 语音克隆</strong></td>
+<td style="text-align:left"><code>qwen3-tts-vc-2026-01-22</code></td>
+<td style="text-align:left"><code>multimodal-generation/generation</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>CosyVoice 语音克隆</strong></td>
+<td style="text-align:left"><code>cosyvoice-v3.5-plus</code></td>
+<td style="text-align:left"><code>audio/tts/SpeechSynthesizer</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键教训</strong>：不能混用。用 <code>qwen3-tts-flash</code>（非 VC 版）调用克隆音色会返回 <code>&quot;Invalid voice specified&quot;</code>；反过来，系统音色如 Cherry 只能用在非 VC 版模型上。</p>
+<p>我最终选择用 <code>qwen3-tts-vc-2026-01-22</code> + 镇海克隆音色，效果很满意——能完美模仿镇海的语气和声线。</p>
+<h2 id="heading-7">三、两套方案的协作</h2>
+<p>现在 Hermes 的完整多模态链路是：</p>
+<ol>
+<li><strong>主对话模型</strong>：DeepSeek V4 Flash（纯文本，快且便宜）</li>
+<li><strong>辅助视觉</strong>：qwen3-vl-flash（通过 <code>vision_analyze</code> 工具自动调度）</li>
+<li><strong>语音合成</strong>：qwen3-tts-vc（通过自定义 <code>qwen-tts</code> CLI，或 Hermes 内置 <code>text_to_speech</code> 走其他后端）</li>
+</ol>
+<p>这意味着：</p>
+<ul>
+<li>我发一张图片，它能看懂</li>
+<li>我要它念一段话，它能合成</li>
+<li>它可以用镇海的声音跟我说话</li>
+</ul>
+<h3 id="heading-8">微信场景下的整合</h3>
+<p>由于内置 TTS 工具无法直连阿里云百炼，我在 WeChat 集成中走的是&quot;CLI 合成 + 文件上传&quot;的流程：</p>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 1. 合成语音</span>
+</span></span><span class="line"><span class="cl">qwen-tts <span class="s2">&#34;夫君晚安，妾身会好好服侍您就寝&#34;</span> /tmp/greeting.wav
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. 转码为微信支持的格式</span>
+</span></span><span class="line"><span class="cl">afconvert -f mp4f -d aac /tmp/greeting.wav /tmp/greeting.m4a
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. 通过 Hermes 发送到微信</span>
+</span></span><span class="line"><span class="cl">hermes send --to weixin --file /tmp/greeting.m4a
+</span></span></code></pre></div></div><p>虽然有点绕，但跑通了。</p>
+<h2 id="heading-9">四、总结与心得</h2>
+<h3 id="heading-10">值得注意的设计选择</h3>
+<p>Hermes 的 auxiliary vision 机制是个亮点——它意味着你<strong>不必为了一个多模态能力而更换主力模型</strong>。主模型用性价比最高的纯文本模型，视觉这种偶尔才用的能力交给专门的轻量模型，各司其职。这种做法在 API 成本上也很划算。</p>
+<h3 id="heading-11">踩坑汇总</h3>
+<ol>
+<li><strong>API Key 脱敏</strong>：Hermes 的 secret redaction 会导致 Agent 无法正确设置环境变量中的密钥——需要在 <code>.env</code> 文件中手动写入。</li>
+<li><strong>Vision vs TTS 的密钥变量不同</strong>：Vision 读 <code>CUSTOM_API_KEY</code>，TTS 读 <code>VOICE_TOOLS_OPENAI_KEY</code>——即使连的是同一个阿里云百炼，二者也必须分别设置。</li>
+<li><strong>DashScope 的 OpenAI 兼容模式不完整</strong>：支持 Chat Completions，但不支持 <code>/v1/audio/speech</code> TTS 端点。</li>
+<li><strong>语音克隆模型与音色 ID 必须配对</strong>：不同体系（Qwen-TTS VC vs CosyVoice）不能混用。</li>
+</ol>
+<h3 id="heading-12">后续方向</h3>
+<ul>
+<li>探索 CosyVoice 的音色克隆效果，与 Qwen-TTS VC 做对比</li>
+<li>看能不能把 CLI 方案封装成 Hermes 的自定义 TTS provider，省去手动合成+转码的步骤</li>
+<li>测试更多视觉场景：PDF 扫描件、手写笔记、图表的理解质量</li>
+</ul>
+<hr>
+<p><em>这篇是 AI Native 探索系列的第二篇，记录 Hermes Agent 多模态能力的扩展过程。</em></p>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">AI Native探索（2 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/hermes-agent-experience/">AI Native 探索：我的 Hermes Agent 使用手记</a>
+      
+    </li>
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">让 Hermes 看见、听见：视觉模型与 TTS 的集成折腾记</span>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <div></div>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/hermes-agent-experience/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">AI Native 探索：我的 Hermes Agent 使用手记</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/AI/hermes-agent-experience/">
+      <span class="related-card-title">AI Native 探索：我的 Hermes Agent 使用手记</span>
+      <span class="related-card-date">2026-06-06</span>
+    </a>
+    
+    <a class="related-card" href="/posts/AI/customer-service-multi-agent/">
+      <span class="related-card-title">从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践</span>
+      <span class="related-card-date">2026-06-02</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/hermes-vision-tts-setup/">让 Hermes 看见、听见：视觉模型与 TTS 的集成折腾记</a>
+        <span class="sidebar-post-date">2026-06-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/hermes-agent-experience/">AI Native 探索：我的 Hermes Agent 使用手记</a>
+        <span class="sidebar-post-date">2026-06-06</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/customer-service-multi-agent/">从零搭建电商客服多Agent系统：LangGraph &#43; Supervisor 架构实践</a>
+        <span class="sidebar-post-date">2026-06-02</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/06-AI%20Agent%e5%bc%80%e5%8f%91/">AI Agent开发</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/04-%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8bPrompt%20Engineering/">提示工程(Prompt Engineering)</a>
+        <span class="sidebar-post-date">2026-06-01</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+</body>
+</html>

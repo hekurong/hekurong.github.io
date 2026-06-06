@@ -1,5 +1,21 @@
 [
   {
+    "title": "让 Hermes 看见、听见：视觉模型与 TTS 的集成折腾记",
+    "url": "/posts/AI/hermes-vision-tts-setup/",
+    "content": "## 缘起\n\n在上一篇《AI Native 探索：我的 Hermes Agent 使用手记》中，我记录了 Hermes Agent 的安装配置、WeChat 集成和 Skills 系统。但当时的配置还缺两块能力：**视觉**和**语音**。\n\n我的主力模型是 DeepSeek V4 Flash，它没有原生多模态能力——给它一张图片，它看不懂。与此同时，日常使用中我经常需要它帮我读截图、分析图表、识别验证码。另一面是**语音合成**——我希望它能用中文念出回复，甚至用特定的音色说话。\n\n这篇文章就记录下这两块能力的集成过程，以及在阿里云百炼（DashScope）平台上踩过的坑。\n\n## 一、辅助视觉模型：让 Hermes 能\"看见\"\n\n### 架构设计\n\nHermes 的视觉能力设计很优雅：它不要求主模型有原生视觉能力，而是提供了一个 **auxiliary vision** 机制。当主模型不支持视觉时，Agent 会自动调用 `vision_analyze` 工具，把图片传给一个专门的辅助视觉模型，再将分析结果以文本形式送回上下文。这样，即使主模型是纯文本的，也能间接\"看见\"。\n\n这个...",
+    "summary": "",
+    "tags": [
+      "Hermes Agent",
+      "视觉模型",
+      "TTS",
+      "阿里云百炼",
+      "Qwen",
+      "DeepSeek"
+    ],
+    "category": "AI",
+    "date": "2026-06-06"
+  },
+  {
     "title": "AI Native 探索：我的 Hermes Agent 使用手记",
     "url": "/posts/AI/hermes-agent-experience/",
     "content": "## 缘起\n\n去年底开始，AI Agent 的概念铺天盖地而来。我试过几款产品级的 Agent 助手，也看过不少开源的 Agent 框架，但总觉得差一口气——要么太封闭（只能在一个聊天框里用），要么太笨重（复杂得像个微服务架构），要么就是工具链绑死在某家云平台上。\n\n直到我遇到了 **Hermes Agent**。\n\n项目地址：[github.com/NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent)\n\n它不是常规意义上的\"AI 聊天助手\"，而是一个**以 Agent 为中心的个人计算框架**。它的核心设计哲学很简单：让 AI 能真正用上你的电脑——读文件、写文件、跑命令、调用 API、控制浏览器、管理定时任务——并且所有这些能力都可以通过聊天界面（终端、Telegram、微信……）来驱动。\n\n这篇文章记录了我从零开始配置 Hermes Agent 到深度使用的全过程，包括一些踩过的坑和积累下来的使用心得。\n\n## 初识 Hermes\n\n### 安装\n\nHermes Agent 的安装非常清爽...",
@@ -32,27 +48,14 @@
     "date": "2026-06-02"
   },
   {
-    "title": "面试真题与实战",
-    "url": "/posts/AI/10-面试真题与实战/",
-    "content": "# 面试真题与实战\n\n## 概述\n\n本章汇集AI应用开发面试中常见的笔试、编程题、系统设计题和行为面试题。内容覆盖从基础算法实现到完整RAG/Agent系统搭建的编码实战，以及各公司面经和考前冲刺清单，是面试前冲刺复习的核心资料。\n\n## 知识点详解\n\n### 一、基础算法题\n\n#### 1. Attention机制实现\n\n```python\nimport numpy as np\n\ndef scaled_dot_product_attention(Q, K, V, mask=None):\n    \"\"\"\n    Scaled Dot-Product Attention 实现\n    \n    Args:\n        Q: Query矩阵, shape (batch_size, seq_len, d_k)\n        K: Key矩阵, shape (batch_size, seq_len, d_k)\n        V: Value矩阵, shape (batch_size, seq_len, d_v)\n        mask: 可选mask, shape (batch_si...",
+    "title": "AI Agent开发",
+    "url": "/posts/AI/06-AI Agent开发/",
+    "content": "# Agent开发深度解析（上半部分）：架构模式、Tool Calling与记忆系统\n\n---\n\n## 一、概述\n\n### Agent的定义与发展历程\n\n智能体（Agent）是指能够感知环境、自主决策并执行行动以实现目标的AI系统。与传统的大语言模型（LLM）问答不同，Agent具备三个核心能力：工具使用（Tool Use）、记忆（Memory）和规划（Planning）。这三点构成了Agent区别于普通Chatbot的本质特征——Agent不只是\"说话\"，而是\"做事\"。\n\nAgent的发展可以分为几个关键阶段：\n\n- **2023年：Agent的元年。** AutoGPT和BabyAGI引发第一波热潮，ReAct论文（Yao et al. 2023）奠定了Thinking-\u003eActing-\u003eObserving的基础范式。LangChain在这期间快速迭代，成为最早一批Agent框架。此时Agent的主要问题是可靠性极低，Token消耗巨大，基本停留在Demo阶段。\n\n- **2024年：框架成熟与工具生态。** LangGraph替代LangChain成为主流Agent编排框架，Cr...",
     "summary": "",
     "tags": [
-      "面试",
-      "真题",
-      "实战"
-    ],
-    "category": "AI",
-    "date": "2026-06-01"
-  },
-  {
-    "title": "大语言模型(LLM)原理",
-    "url": "/posts/AI/02-大语言模型LLM原理/",
-    "content": "# 02 — 大语言模型(LLM)原理\n\n\u003e 涵盖GPT全系列演进、预训练范式、推理机制、Scaling Laws、RLHF/DPO、MoE、长上下文、多模态及2025-2026年前沿进展\n\u003e 更新至 2025-2026 年最新知识（含DeepSeek-R1、GPT-4o、o1/o3、Mamba等）\n\n---\n\n## 一、概述\n\n大语言模型（Large Language Model, LLM）是当前AI应用开发面试的绝对核心。2025-2026年的面试关注点发生了显著变化：\n\n- **从\"了解GPT\"到\"理解GPT**：不再是简单罗列模型名字，而是深入理解每个设计决策的原因\n- **推理能力成为新焦点**：o1/o3模型开启\"推理Scaling Law\"新时代，DeepSeek-R1展示开源推理模型的可行性\n- **MoE架构占据主导**：GPT-4、Mixtral、DeepSeek-V2/V3全线MoE，理解路由和负载均衡成为必备知识\n- **长上下文成标配**：1M+ token上下文窗口的模型越来越多，位置编码技术成为面试高频考点\n- **前沿模型百花齐放**：Mamba（SSM...",
-    "summary": "",
-    "tags": [
-      "LLM",
-      "Transformer",
-      "GPT"
+      "Agent",
+      "Tool Calling",
+      "记忆系统"
     ],
     "category": "AI",
     "date": "2026-06-01"
@@ -79,19 +82,6 @@
       "RAG",
       "检索增强",
       "向量数据库"
-    ],
-    "category": "AI",
-    "date": "2026-06-01"
-  },
-  {
-    "title": "AI Agent开发",
-    "url": "/posts/AI/06-AI Agent开发/",
-    "content": "# Agent开发深度解析（上半部分）：架构模式、Tool Calling与记忆系统\n\n---\n\n## 一、概述\n\n### Agent的定义与发展历程\n\n智能体（Agent）是指能够感知环境、自主决策并执行行动以实现目标的AI系统。与传统的大语言模型（LLM）问答不同，Agent具备三个核心能力：工具使用（Tool Use）、记忆（Memory）和规划（Planning）。这三点构成了Agent区别于普通Chatbot的本质特征——Agent不只是\"说话\"，而是\"做事\"。\n\nAgent的发展可以分为几个关键阶段：\n\n- **2023年：Agent的元年。** AutoGPT和BabyAGI引发第一波热潮，ReAct论文（Yao et al. 2023）奠定了Thinking-\u003eActing-\u003eObserving的基础范式。LangChain在这期间快速迭代，成为最早一批Agent框架。此时Agent的主要问题是可靠性极低，Token消耗巨大，基本停留在Demo阶段。\n\n- **2024年：框架成熟与工具生态。** LangGraph替代LangChain成为主流Agent编排框架，Cr...",
-    "summary": "",
-    "tags": [
-      "Agent",
-      "Tool Calling",
-      "记忆系统"
     ],
     "category": "AI",
     "date": "2026-06-01"
@@ -136,14 +126,14 @@
     "date": "2026-06-01"
   },
   {
-    "title": "AI基础理论与数学",
-    "url": "/posts/AI/01-AI基础理论与数学/",
-    "content": "# 01 — AI基础理论与数学\n\n\u003e 适用于AI应用开发面试的机器学习/深度学习基础理论 + 面试常考数学\n\u003e 更新至 2025-2026 年最新知识\n\n---\n\n## 一、概述\n\n本篇是AI应用开发面试的知识地基。无论面试的是大模型应用开发、算法工程还是AI平台架构，本篇内容都是必考项。近年来面试趋势显示：\n\n- **Transformer/注意力机制** 成为面试绝对核心（已经取代传统的CNN/RNN考点）\n- **损失函数与优化器** 侧重理解性考察（为什么用这个、什么时候换那个）\n- **数学基础** 的考察更加场景化（从纯推导转为\"讲清楚概念和应用\"）\n- **2025-2026年新增热点**：SwiGLU激活函数、LAMB优化器、扩散模型的KL散度解释\n\n---\n\n## 二、知识点详解\n\n### 2.1 机器学习三要素（模型、策略、算法）\n\n李航《统计学习方法》中的经典框架：\n\n| 要素 | 定义 | 面试要点 |\n|------|------|----------|\n| **模型** | 假设空间，即输入到输出的映射集合 | 区分参数模型（线性回归）与非参数模型（KNN...",
+    "title": "面试真题与实战",
+    "url": "/posts/AI/10-面试真题与实战/",
+    "content": "# 面试真题与实战\n\n## 概述\n\n本章汇集AI应用开发面试中常见的笔试、编程题、系统设计题和行为面试题。内容覆盖从基础算法实现到完整RAG/Agent系统搭建的编码实战，以及各公司面经和考前冲刺清单，是面试前冲刺复习的核心资料。\n\n## 知识点详解\n\n### 一、基础算法题\n\n#### 1. Attention机制实现\n\n```python\nimport numpy as np\n\ndef scaled_dot_product_attention(Q, K, V, mask=None):\n    \"\"\"\n    Scaled Dot-Product Attention 实现\n    \n    Args:\n        Q: Query矩阵, shape (batch_size, seq_len, d_k)\n        K: Key矩阵, shape (batch_size, seq_len, d_k)\n        V: Value矩阵, shape (batch_size, seq_len, d_v)\n        mask: 可选mask, shape (batch_si...",
     "summary": "",
     "tags": [
-      "机器学习",
-      "深度学习",
-      "数学基础"
+      "面试",
+      "真题",
+      "实战"
     ],
     "category": "AI",
     "date": "2026-06-01"
@@ -157,6 +147,32 @@
       "LangChain",
       "LlamaIndex",
       "开发框架"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "大语言模型(LLM)原理",
+    "url": "/posts/AI/02-大语言模型LLM原理/",
+    "content": "# 02 — 大语言模型(LLM)原理\n\n\u003e 涵盖GPT全系列演进、预训练范式、推理机制、Scaling Laws、RLHF/DPO、MoE、长上下文、多模态及2025-2026年前沿进展\n\u003e 更新至 2025-2026 年最新知识（含DeepSeek-R1、GPT-4o、o1/o3、Mamba等）\n\n---\n\n## 一、概述\n\n大语言模型（Large Language Model, LLM）是当前AI应用开发面试的绝对核心。2025-2026年的面试关注点发生了显著变化：\n\n- **从\"了解GPT\"到\"理解GPT**：不再是简单罗列模型名字，而是深入理解每个设计决策的原因\n- **推理能力成为新焦点**：o1/o3模型开启\"推理Scaling Law\"新时代，DeepSeek-R1展示开源推理模型的可行性\n- **MoE架构占据主导**：GPT-4、Mixtral、DeepSeek-V2/V3全线MoE，理解路由和负载均衡成为必备知识\n- **长上下文成标配**：1M+ token上下文窗口的模型越来越多，位置编码技术成为面试高频考点\n- **前沿模型百花齐放**：Mamba（SSM...",
+    "summary": "",
+    "tags": [
+      "LLM",
+      "Transformer",
+      "GPT"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "AI基础理论与数学",
+    "url": "/posts/AI/01-AI基础理论与数学/",
+    "content": "# 01 — AI基础理论与数学\n\n\u003e 适用于AI应用开发面试的机器学习/深度学习基础理论 + 面试常考数学\n\u003e 更新至 2025-2026 年最新知识\n\n---\n\n## 一、概述\n\n本篇是AI应用开发面试的知识地基。无论面试的是大模型应用开发、算法工程还是AI平台架构，本篇内容都是必考项。近年来面试趋势显示：\n\n- **Transformer/注意力机制** 成为面试绝对核心（已经取代传统的CNN/RNN考点）\n- **损失函数与优化器** 侧重理解性考察（为什么用这个、什么时候换那个）\n- **数学基础** 的考察更加场景化（从纯推导转为\"讲清楚概念和应用\"）\n- **2025-2026年新增热点**：SwiGLU激活函数、LAMB优化器、扩散模型的KL散度解释\n\n---\n\n## 二、知识点详解\n\n### 2.1 机器学习三要素（模型、策略、算法）\n\n李航《统计学习方法》中的经典框架：\n\n| 要素 | 定义 | 面试要点 |\n|------|------|----------|\n| **模型** | 假设空间，即输入到输出的映射集合 | 区分参数模型（线性回归）与非参数模型（KNN...",
+    "summary": "",
+    "tags": [
+      "机器学习",
+      "深度学习",
+      "数学基础"
     ],
     "category": "AI",
     "date": "2026-06-01"
@@ -336,6 +352,17 @@
     "date": "2025-09-13"
   },
   {
+    "title": "TCP的三次握手与四次挥手",
+    "url": "/posts/DailyDev/TCP的三次握手与四次挥手/",
+    "content": "# 深入理解TCP：三次握手与四次挥手（含面试高频考点）\n\nTCP (Transmission Control Protocol) 作为互联网核心协议簇中的基石，保证了数据传输的可靠性和顺序性。而要理解 TCP 的可靠性，就必须掌握其经典的连接管理机制——**三次握手**与**四次挥手**。\n\n本文将用通俗易懂的比喻和清晰的技术图解，带你彻底搞懂这两个过程，并深入剖析面试中关于它们的高频考点。\n\n## 一、三次握手：建立可靠的连接\n\n在进行数据传输之前，通信双方（客户端和服务器）必须建立一个可靠的连接。这个建立连接的过程，就是“三次握手”。\n\n### 一个生动的比喻：打电话\n\n想象一下你给朋友打电话确认双方都能正常通信的过程：\n\n\u003e 1. **你**：“喂，能听到我说话吗？” (发送 `SYN`)\n\u003e 2. **朋友**：“我能听到你，你能听到我吗？” (回复 `SYN+ACK`)\n\u003e 3. **你**：“我也能听到你，那我们可以开始聊天了。” (发送 `ACK`)\n\n经过这三步，双方都确认了彼此的发送和接收能力都正常，通话（连接）才正式建立。\n\n### 技术流程详解\n\n- **第一次...",
+    "summary": "",
+    "tags": [
+      "TCP"
+    ],
+    "category": "Daily Dev",
+    "date": "2025-08-30"
+  },
+  {
     "title": "sync包详解",
     "url": "/posts/DailyDev/sync包详解/",
     "content": "## 一、`sync` 包概述\n\n`sync` 包是 Go 标准库中用于处理并发和同步的核心工具包。在 Go 语言中，我们通过 Goroutine 实现并发，而当多个 Goroutine 需要访问共享资源时，为了避免数据竞争（Data Race）等问题，就需要使用 `sync` 包提供的同步原语来保证并发安全。\n\n面试官通过 `sync` 包相关的问题，主要考察你对 Go 并发模型的理解、处理并发问题的能力以及对底层原理的掌握程度。\n\n## 二、`sync.Mutex`与`sync.RWMutex` (互斥锁与读写锁)\n\n### 1. 作用与目的\n\n这是最基础和最常用的同步原语。\n\n- **`sync.Mutex` (互斥锁)**: 保证在同一时刻，只有一个 Goroutine 可以访问被其保护的共享资源。当一个 Goroutine 获取了锁，其他试图获取该锁的 Goroutine 都会被阻塞，直到锁被释放。\n- **`sync.RWMutex` (读写锁)**: `Mutex` 的一种更细粒度的实现，它将访问分为“读”和“写”。\n  - **多个读**：可以共存，多个 Gorouti...",
@@ -365,17 +392,6 @@
     "summary": "",
     "tags": [
       "WebSocket"
-    ],
-    "category": "Daily Dev",
-    "date": "2025-08-30"
-  },
-  {
-    "title": "TCP的三次握手与四次挥手",
-    "url": "/posts/DailyDev/TCP的三次握手与四次挥手/",
-    "content": "# 深入理解TCP：三次握手与四次挥手（含面试高频考点）\n\nTCP (Transmission Control Protocol) 作为互联网核心协议簇中的基石，保证了数据传输的可靠性和顺序性。而要理解 TCP 的可靠性，就必须掌握其经典的连接管理机制——**三次握手**与**四次挥手**。\n\n本文将用通俗易懂的比喻和清晰的技术图解，带你彻底搞懂这两个过程，并深入剖析面试中关于它们的高频考点。\n\n## 一、三次握手：建立可靠的连接\n\n在进行数据传输之前，通信双方（客户端和服务器）必须建立一个可靠的连接。这个建立连接的过程，就是“三次握手”。\n\n### 一个生动的比喻：打电话\n\n想象一下你给朋友打电话确认双方都能正常通信的过程：\n\n\u003e 1. **你**：“喂，能听到我说话吗？” (发送 `SYN`)\n\u003e 2. **朋友**：“我能听到你，你能听到我吗？” (回复 `SYN+ACK`)\n\u003e 3. **你**：“我也能听到你，那我们可以开始聊天了。” (发送 `ACK`)\n\n经过这三步，双方都确认了彼此的发送和接收能力都正常，通话（连接）才正式建立。\n\n### 技术流程详解\n\n- **第一次...",
-    "summary": "",
-    "tags": [
-      "TCP"
     ],
     "category": "Daily Dev",
     "date": "2025-08-30"
@@ -843,17 +859,6 @@
     "date": "2024-08-16"
   },
   {
-    "title": "😺 Is All You Need——Transformer补充",
-    "url": "/posts/NLP/Attention-Is-All-You-Need/",
-    "content": "## 关于本文动机\n\nTransformer主要内容请见 [Lecture 9: Transformer | KurongBlog (kurongtohsaka.github.io)](https://kurongtohsaka.github.io/posts/cs224n/lesson_9/)，对 Transformer 已经进行比较详细的介绍和讲解了，但还是有一些细节问题不好在该篇文章提及，所以单开一篇讨论。\n\n\n\n## Q，K，V 的理解\n\n假设我们想让所有的词都与第一个词 $v_1$ 相似，我们可以让 $v_1$ 作为查询。 然后，将该查询与句子中所有词进行点积，这里的词就是键。 所以查询和键的组合给了我们权重，接着再将这些权重与作为值的所有单词相乘。\n\n通过下面的公式可以理解这个过程，并理解查询、键、值分别代表什么意思：\n$$\nsoftmax(QK)=W \\\\\nWV=Y\n$$\n一种比较感性的理解：想要得到某个 $V$ 对应的某个可能的相似信息需要先 $Q$ 这个 $V$ 的 $K$ ，$QK$ 得到注意力分数，之后经过 softmax 平滑后得到概率 $W $，然后 $WV$...",
-    "summary": "",
-    "tags": [
-      "NLP"
-    ],
-    "category": "NLP",
-    "date": "2024-08-14"
-  },
-  {
     "title": "《实体关系抽取方法研究综述》笔记",
     "url": "/posts/PaperNotes/实体关系抽取方法研究综述_李冬梅/",
     "content": "## 关系抽取 Relation Extraction\n\n定义：\n\n- 通常将实体间的关系形式化地描述为关系三元组 $\\{E_1,R,E_2\\}$ ，其中 $E$ 为实体类型，$R$ 为关系描述类型。\n\n关系抽取与命名实体识别、关系触发词识别构成一个端到端任务的框架：\n\n- 命名实体识别 Name Entity Recognition：是指识别文本中具有特定意义的实体，主要包括人名、地名、机构名、专有名词等；\n- 关系触发词识别 Relation trigger word identification：是指对触发实体关系的词进行分类，识别出是触发词还是非触发词，判定抽取出的关系是正类还是负类。\n\n关系抽取是一个文本分类问题，相比于情感分类等任物，其具有以下特点：\n\n- 领域众多，关系模型构建复杂。由于限定了关系类别，可采用基于规则、词典以及本体的方法，也可采用传统机器学习的有监督、半监督以及无监督方法，深度学习的有监督、远程监督方法。这类方法的模型构建难度相对于开放领域难度较低，但是移植性和扩展性较差。而针对开放领域的关系抽取，由于关系类型多样且不确定，可以采用无监督和远程监督等方法\n...",
@@ -862,6 +867,17 @@
       "PaperNotes"
     ],
     "category": "PaperNotes",
+    "date": "2024-08-14"
+  },
+  {
+    "title": "😺 Is All You Need——Transformer补充",
+    "url": "/posts/NLP/Attention-Is-All-You-Need/",
+    "content": "## 关于本文动机\n\nTransformer主要内容请见 [Lecture 9: Transformer | KurongBlog (kurongtohsaka.github.io)](https://kurongtohsaka.github.io/posts/cs224n/lesson_9/)，对 Transformer 已经进行比较详细的介绍和讲解了，但还是有一些细节问题不好在该篇文章提及，所以单开一篇讨论。\n\n\n\n## Q，K，V 的理解\n\n假设我们想让所有的词都与第一个词 $v_1$ 相似，我们可以让 $v_1$ 作为查询。 然后，将该查询与句子中所有词进行点积，这里的词就是键。 所以查询和键的组合给了我们权重，接着再将这些权重与作为值的所有单词相乘。\n\n通过下面的公式可以理解这个过程，并理解查询、键、值分别代表什么意思：\n$$\nsoftmax(QK)=W \\\\\nWV=Y\n$$\n一种比较感性的理解：想要得到某个 $V$ 对应的某个可能的相似信息需要先 $Q$ 这个 $V$ 的 $K$ ，$QK$ 得到注意力分数，之后经过 softmax 平滑后得到概率 $W $，然后 $WV$...",
+    "summary": "",
+    "tags": [
+      "NLP"
+    ],
+    "category": "NLP",
     "date": "2024-08-14"
   },
   {
@@ -877,9 +893,9 @@
     "date": "2024-08-13"
   },
   {
-    "title": "残差连接",
-    "url": "/posts/NLP/残差连接/",
-    "content": "## 原理\n\n残差连接（Residual Connection）最早由何凯明等人在2015年提出的 ResNet 中引入。ResNet 通过引入残差块，使得网络可以扩展到更深的层数，并在 ImageNet 比赛中取得了显著的成功。\n\n残差连接的核心思想是引入跳跃连接，将输入信号直接传递到网络的后续层，从而构建了一条捷径路径。这种结构允许网络学习输入和输出之间的残差，而不是直接学习输出。\n\n残差连接可以表示为：\n$$\ny=F(x)+x\n$$\n其中，$x$ 表示输入，$F(x)$ 表示经过非线性变换后的输出。\n\n\n\n## 作用\n\n- 解决梯度消失和梯度爆炸问题\n- 提高训练效率\n- 增强模型的泛化性能\n\n\n\n## 例子\n\n下图是 Transformer 论文中的模型结构图。\n\n![](/img/NLP/img14.png)\n\n可以看到在每一个 Attention Layer 中都有一个 `Add` ，原输入和 Multi-head 变换后的输出做了一个简单的相加操作，而这就是所谓的残差连接。",
+    "title": "Encoder-Decoder 架构",
+    "url": "/posts/NLP/Encoder-Decoder/",
+    "content": "## 原理\n\nEncoder-Decoder架构通常由两个主要部分组成：编码器（Encoder）和解码器（Decoder）。\n\n1. **编码器（Encoder）**：编码器的任务是将输入序列（如一句话）转换为一个固定长度的上下文向量（context vector）。这个过程通常通过递归神经网络（RNN）、长短期记忆网络（LSTM）或门控循环单元（GRU）来实现。编码器逐步读取输入序列的每个元素，并将其信息压缩到上下文向量中。\n2. **解码器（Decoder）**：解码器接收编码器生成的上下文向量，并将其转换为输出序列。解码器同样可以使用RNN、LSTM或GRU。解码器在生成每个输出元素时，会考虑上下文向量以及之前生成的输出元素。\n\n\n\n## 作用\n\nEncoder-Decoder架构主要用于处理需要将一个序列转换为另一个序列的任务，例如：\n\n- **机器翻译**：将一种语言的句子翻译成另一种语言。\n- **文本摘要**：将长文本压缩成简短摘要。\n- **对话系统**：生成对用户输入的响应。\n\n近年来，基于Transformer的Encoder-Decoder架构（如BERT、GPT...",
     "summary": "",
     "tags": [
       "NLP"
@@ -899,9 +915,9 @@
     "date": "2024-08-11"
   },
   {
-    "title": "Encoder-Decoder 架构",
-    "url": "/posts/NLP/Encoder-Decoder/",
-    "content": "## 原理\n\nEncoder-Decoder架构通常由两个主要部分组成：编码器（Encoder）和解码器（Decoder）。\n\n1. **编码器（Encoder）**：编码器的任务是将输入序列（如一句话）转换为一个固定长度的上下文向量（context vector）。这个过程通常通过递归神经网络（RNN）、长短期记忆网络（LSTM）或门控循环单元（GRU）来实现。编码器逐步读取输入序列的每个元素，并将其信息压缩到上下文向量中。\n2. **解码器（Decoder）**：解码器接收编码器生成的上下文向量，并将其转换为输出序列。解码器同样可以使用RNN、LSTM或GRU。解码器在生成每个输出元素时，会考虑上下文向量以及之前生成的输出元素。\n\n\n\n## 作用\n\nEncoder-Decoder架构主要用于处理需要将一个序列转换为另一个序列的任务，例如：\n\n- **机器翻译**：将一种语言的句子翻译成另一种语言。\n- **文本摘要**：将长文本压缩成简短摘要。\n- **对话系统**：生成对用户输入的响应。\n\n近年来，基于Transformer的Encoder-Decoder架构（如BERT、GPT...",
+    "title": "残差连接",
+    "url": "/posts/NLP/残差连接/",
+    "content": "## 原理\n\n残差连接（Residual Connection）最早由何凯明等人在2015年提出的 ResNet 中引入。ResNet 通过引入残差块，使得网络可以扩展到更深的层数，并在 ImageNet 比赛中取得了显著的成功。\n\n残差连接的核心思想是引入跳跃连接，将输入信号直接传递到网络的后续层，从而构建了一条捷径路径。这种结构允许网络学习输入和输出之间的残差，而不是直接学习输出。\n\n残差连接可以表示为：\n$$\ny=F(x)+x\n$$\n其中，$x$ 表示输入，$F(x)$ 表示经过非线性变换后的输出。\n\n\n\n## 作用\n\n- 解决梯度消失和梯度爆炸问题\n- 提高训练效率\n- 增强模型的泛化性能\n\n\n\n## 例子\n\n下图是 Transformer 论文中的模型结构图。\n\n![](/img/NLP/img14.png)\n\n可以看到在每一个 Attention Layer 中都有一个 `Add` ，原输入和 Multi-head 变换后的输出做了一个简单的相加操作，而这就是所谓的残差连接。",
     "summary": "",
     "tags": [
       "NLP"
@@ -944,6 +960,17 @@
     "date": "2024-08-01"
   },
   {
+    "title": "7.22-7.28：一周总结",
+    "url": "/posts/WeeklyWorking/2024_07_22-2024_07_28/",
+    "content": "## 本周任务\n\n本周主要还是做计组知识图谱课题。以下为本周具体进度：\n\n- 把数据集分割为了训练集、验证集、测试集，对训练集以随机抽样进行进一步分割，以减小工作量\n- 第一次标注采用预标注，之后用词典不断迭代标注\n- 完成了第一份训练集1000条和验证集、测试集的标注，总共2000余条语料，用新标签PCC 标注\n- 用 Adaseq 训练模型，但是遇到了诸多问题，尚未解决\n\n\n\n## 课题下周改进\n\n- PCC 标签过于笼统，下周对标签进一步细化，并去除少部分无用标签\n- 弃用 Adaseq ，国产的玩意是真不如 Transformers 好用\n- 找一个新的预训练模型进行训练（其实已经找到了）\n- 多模型对比训练\n\n以上修改标签预计最少3天，用 Transformers 训练最少2天，多模型能做多少算多少\n\n\n\n## 本周反思\n\n- 每一步的数据尽可能的量化并记录，方便日后发论文\n- 对课题各个工作部分理解浅显，应当在阅读部分文献后再进行",
+    "summary": "",
+    "tags": [
+      "WeeklyWorking"
+    ],
+    "category": "WeeklyWorking",
+    "date": "2024-07-28"
+  },
+  {
     "title": "《基于预训练模型的医药说明书实体抽取方法研究》笔记",
     "url": "/posts/PaperNotes/基于预训练模型的医药说明书实体抽取方法研究_陈仲永/",
     "content": "## 基于预训练模型的部分标签命名实体识别模型\n\n![](/img/PaperNotes/基于预训练模型的医药说明书实体抽取方法研究_陈仲永/img1.png)\n\n对于输入的药品说明书文本先利用少量样本微调的预训练模型进行实体抽取，如上图所示，“云南白药成分：三七、麝香、草乌等”通过预训练模型识别出 “麝香”和“草乌”两个“成分”类型的实体。由于受标注样本数量限制，预训练模型经少量样本微调后，其召回率不高，如例子中“云南白药”“三七”两个实体未能识别，但把预训练模型识别出的部分实体及该实体的类型标签作为一种提示信息输入到后面的部分标签模型，这将有助于部分标签模型进行实体抽取任务。\n\n部分标签模型采用平面格结构对输入文本及预训练语言模型识别的部分实体进行整合，整合信息包括字符或实体词 token、标签 tag、头部位置标记 head 和尾部位置标记 tail。部分标签模型使用 Transformer 建模平面格结构的编码输入，通过 Transformer 的自注意力机制使字符可以与潜在实体词直接交互。最后将 Transformer 提取特征表示，输入到 CRF层预测实体标签。\n\n## 训...",
@@ -953,17 +980,6 @@
       "NER"
     ],
     "category": "PaperNotes",
-    "date": "2024-07-28"
-  },
-  {
-    "title": "7.22-7.28：一周总结",
-    "url": "/posts/WeeklyWorking/2024_07_22-2024_07_28/",
-    "content": "## 本周任务\n\n本周主要还是做计组知识图谱课题。以下为本周具体进度：\n\n- 把数据集分割为了训练集、验证集、测试集，对训练集以随机抽样进行进一步分割，以减小工作量\n- 第一次标注采用预标注，之后用词典不断迭代标注\n- 完成了第一份训练集1000条和验证集、测试集的标注，总共2000余条语料，用新标签PCC 标注\n- 用 Adaseq 训练模型，但是遇到了诸多问题，尚未解决\n\n\n\n## 课题下周改进\n\n- PCC 标签过于笼统，下周对标签进一步细化，并去除少部分无用标签\n- 弃用 Adaseq ，国产的玩意是真不如 Transformers 好用\n- 找一个新的预训练模型进行训练（其实已经找到了）\n- 多模型对比训练\n\n以上修改标签预计最少3天，用 Transformers 训练最少2天，多模型能做多少算多少\n\n\n\n## 本周反思\n\n- 每一步的数据尽可能的量化并记录，方便日后发论文\n- 对课题各个工作部分理解浅显，应当在阅读部分文献后再进行",
-    "summary": "",
-    "tags": [
-      "WeeklyWorking"
-    ],
-    "category": "WeeklyWorking",
     "date": "2024-07-28"
   },
   {
@@ -1038,18 +1054,6 @@
     "date": "2024-07-06"
   },
   {
-    "title": "Lecture 5: Language Models and Recurrent Neural Network",
-    "url": "/posts/CS224N/lesson_5/",
-    "content": "## Basic Tricks on NN\n\n### L2 Regularization\n\nA full loss function includes regularization over all parameters $\\theta$ , e.g., L2 regularization:\n$$\nJ(\\theta)=f(x)+\\lambda \\sum_k \\theta^2_k\n$$\nRegularization produces models that generalize well when we have a “big” model.\n\n### Dropout\n\n- Training time: at each instance of evaluation (in online SGD-training), randomly set  50% of the inputs to each neuron to 0\n- Test time: halve the model weights (now twice as many)\n- This prevents feature co-ad...",
-    "summary": "",
-    "tags": [
-      "CS224N",
-      "NLP"
-    ],
-    "category": "CS224N",
-    "date": "2024-07-05"
-  },
-  {
     "title": "Named Entity Recognition 相关概念与技术",
     "url": "/posts/NLP/NER/",
     "content": "## 基本概念\n\n1. **实体**：通常指文本中具有特定意义或指代性强的词或短语，如人名、地名、机构名等。\n2. **边界识别**：确定实体在文本中的起始和结束位置。\n3. **分类**：将识别出的实体归类到预定义的类别，如人名、地名、组织名、时间表达式、数量、货币值、百分比等。\n4. **序列标注**：NER任务中常用的一种方法，将文本中的每个词标注为实体的一部分或非实体。\n5. **特征提取**：从文本中提取有助于实体识别的特征，如词性、上下文信息等。\n6. **评估指标**：用于衡量NER系统性能的指标，常见的有精确率（Precision）、召回率（Recall）和F1分数。\n\n\n\n## 分类命名方法\n\n1. **BIO**：这是最基本的标注方法，其中\"B\"代表实体的开始（Begin），\"I\"代表实体的内部（Inside），而\"O\"代表非实体（Outside）。\n2. **BIOES**：这种方法在BIO的基础上增加了\"E\"表示实体的结束（End），和\"S\"表示单独的实体（Single）。\n3. **BMES**：这种方法使用\"B\"表示实体的开始，\"M\"表示实体的中间（Midd...",
@@ -1060,6 +1064,18 @@
       "KnowledgeGraph"
     ],
     "category": "NLP",
+    "date": "2024-07-05"
+  },
+  {
+    "title": "Lecture 5: Language Models and Recurrent Neural Network",
+    "url": "/posts/CS224N/lesson_5/",
+    "content": "## Basic Tricks on NN\n\n### L2 Regularization\n\nA full loss function includes regularization over all parameters $\\theta$ , e.g., L2 regularization:\n$$\nJ(\\theta)=f(x)+\\lambda \\sum_k \\theta^2_k\n$$\nRegularization produces models that generalize well when we have a “big” model.\n\n### Dropout\n\n- Training time: at each instance of evaluation (in online SGD-training), randomly set  50% of the inputs to each neuron to 0\n- Test time: halve the model weights (now twice as many)\n- This prevents feature co-ad...",
+    "summary": "",
+    "tags": [
+      "CS224N",
+      "NLP"
+    ],
+    "category": "CS224N",
     "date": "2024-07-05"
   },
   {
@@ -1111,31 +1127,9 @@
     "date": "2024-06-27"
   },
   {
-    "title": "VGG",
-    "url": "/posts/ClassicPaperTranslation/VGG/",
-    "content": "# VGG\n\n## ABSTRACT\n\n本文研究了卷积网络深度在大规模的图像识别环境下对准确性的影响。主要贡献是使用非常小的（3×3）卷积滤波器架构对网络深度的增加进行了全面评估，这表明通过将深度推到16-19加权层可以实现对现有技术配置的显著改进。这些发现是ImageNet Challenge 2014提交的基础，本文作者团队在定位和分类过程中分别获得了第一名和第二名。\n\n\n\n## 1 INTRODUCTION\n\n随着ConvNets在计算机视觉领域越来越商品化，为了达到更好的准确性，已经进行了许多尝试来改进Krizhevsky等人（2012）最初的架构。例如，ILSVRC-2013（Zeiler＆Fergus，2013；Sermanet等，2014）表现最佳的提交使用了更小的感受窗口尺寸和更小的第一卷积层步长。另一条改进措施在整个图像和多个尺度上对网络进行密集地训练和测试（Sermanet等，2014；Howard，2014）。在本文中，解决了ConvNet架构设计的另一个重要方面——其深度。为此修正了架构的其它参数，并通过添加更多的卷积层来稳定地增加网络的深度，这是可行的，因为在...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "Inception V3",
-    "url": "/posts/ClassicPaperTranslation/InceptionV3/",
-    "content": "# Inception V3\n\n## Abstract\n\n对许多任务而言，卷积网络是目前最新的计算机视觉解决方案的核心。从2014年开始，深度卷积网络开始变成主流，在各种基准数据集上都取得了实质性成果。对于大多数任务而言，虽然增加的模型大小和计算成本都趋向于转化为直接的质量收益（只要提供足够的标注数据去训练），但计算效率和低参数计数仍是各种应用场景的限制因素，例如移动视觉和大数据场景。目前，我们正在探索增大网络的方法，目标是通过适当的分解卷积和积极的正则化来尽可能地有效利用增加的计算。我们在ILSVRC 2012分类挑战赛的验证集上评估了我们的方法，结果证明我们的方法超过了目前最先进的方法并取得了实质性收益：对于单一框架评估错误率为：`21.2% top-1`和`5.6% top-5`，使用的网络计算代价为每次推断需要进行50亿次乘加运算并使用不到2500万的参数。通过四个模型组合和多次评估，我们报告了`3.5% top-5`和`17.3% top-1`的错误率。\n\n\n\n## 1. Introduction\n\n从2012年Krizhevsky等人[9]赢得了ImageNet竞赛[16]...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "NIN",
-    "url": "/posts/ClassicPaperTranslation/NIN/",
-    "content": "# NIN\n\n## Abstract\n\n本文提出了一种新的网络结构，称为 \"网络中的网络\"(NIN)，以提高模型对感受野内局部图块的可辨别性。传统的卷积层使用线性滤波器和非线性激活函数来扫描输入。相反，本文建立了结构更复杂的微神经网络，以抽象出感受野内的数据。本文用MLP来实例化微神经网络，MLP是一个有效的函数近似器。通过类似CNN的方式在输入上滑动微网络来提取特征图，然后将它们送入下一层。深度NIN可以通过堆叠多个上述结构来实现。通过微网络加强局部建模，能够在分类层中利用全局平均池化的特征图，这比传统的全连接层更容易解释，也更不容易过拟合。本文在CIFAR-10和CIFAR-100上用NIN取得了最先进的分类性能，其在SVHN和MNIST数据集上也有合理的表现。\n\n\n\n## 1 Introduction\n\n卷积神经网络[1]由交替的卷积层和池化层组成。卷积层采取线性滤波器和底层感受野的内积，然后在输入的每个局部使用非线性激活函数，由此产生的输出称为特征图。\n\nCNN中的卷积滤波器是基础数据块的广义线性模型（GLM），本文认为GLM的抽象程度很低。这里所说的抽象性是指特征对同一概念的...",
+    "title": "ResNet",
+    "url": "/posts/ClassicPaperTranslation/ResNet/",
+    "content": "# ResNet\n\n## Abstract\n\n更深的神经网络更难训练。我们提出了一种残差学习框架来减轻网络训练，这些网络比以前使用的网络更深。我们明确地将层变为学习关于层输入的残差函数，而不是学习未参考的函数。我们提供了全面的经验证据说明这些残差网络很容易优化，并可以显著增加深度来提高准确性。在ImageNet数据集上我们评估了深度高达152层的残差网络——比VGG[40]深8倍但仍具有较低的复杂度。这些残差网络的集合在ImageNet测试集上取得了`3.57%`的错误率。这个结果在ILSVRC 2015分类任务上赢得了第一名。我们也在CIFAR-10上分析了100层和1000层的残差网络。\n\n对于许多视觉识别任务而言，表示的深度是至关重要的。仅由于我们非常深度的表示，我们便在COCO目标检测数据集上得到了28%的相对提高。深度残差网络是我们向ILSVRC和COCO 2015竞赛提交的基础，我们也赢得了ImageNet检测任务，ImageNet定位任务，COCO检测和COCO分割任务的第一名。\n\n\n\n## 1. Introduction\n\n深度卷积神经网络[22, 21]导致了图像分类...",
     "summary": "",
     "tags": [
       "NN"
@@ -1155,17 +1149,6 @@
     "date": "2024-06-26"
   },
   {
-    "title": "ResNet",
-    "url": "/posts/ClassicPaperTranslation/ResNet/",
-    "content": "# ResNet\n\n## Abstract\n\n更深的神经网络更难训练。我们提出了一种残差学习框架来减轻网络训练，这些网络比以前使用的网络更深。我们明确地将层变为学习关于层输入的残差函数，而不是学习未参考的函数。我们提供了全面的经验证据说明这些残差网络很容易优化，并可以显著增加深度来提高准确性。在ImageNet数据集上我们评估了深度高达152层的残差网络——比VGG[40]深8倍但仍具有较低的复杂度。这些残差网络的集合在ImageNet测试集上取得了`3.57%`的错误率。这个结果在ILSVRC 2015分类任务上赢得了第一名。我们也在CIFAR-10上分析了100层和1000层的残差网络。\n\n对于许多视觉识别任务而言，表示的深度是至关重要的。仅由于我们非常深度的表示，我们便在COCO目标检测数据集上得到了28%的相对提高。深度残差网络是我们向ILSVRC和COCO 2015竞赛提交的基础，我们也赢得了ImageNet检测任务，ImageNet定位任务，COCO检测和COCO分割任务的第一名。\n\n\n\n## 1. Introduction\n\n深度卷积神经网络[22, 21]导致了图像分类...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
     "title": "GoogleNet V1",
     "url": "/posts/ClassicPaperTranslation/GoogleNetV1/",
     "content": "# GoogleNet V1\n\n## Abstract\n\n本文作者在ImageNet大规模视觉识别挑战赛2014（ILSVRC14）上提出了一种代号为Inception的深度卷积神经网络结构，并在分类和检测上取得了新的最好结果。这个架构的主要特点是提高了网络内部计算资源的利用率。通过精心的手工设计，在增加了网络深度和广度的同时保持了计算预算不变。为了优化质量，架构的设计以赫布理论和多尺度处理直觉为基础。作者在ILSVRC14提交中应用的一个特例被称为GoogLeNet，一个22层的深度网络，其质量在分类和检测的背景下进行了评估。\n\n\n\n## 1. Introduction\n\n过去三年中，由于深度学习和卷积网络的发展[10]，目标分类和检测能力得到了显著提高。一个令人鼓舞的消息是，大部分的进步不仅仅是更强大硬件、更大数据集、更大模型的结果，而主要是新的想法、算法和网络结构改进的结果。例如，ILSVRC 2014竞赛中最靠前的输入除了用于检测目的的分类数据集之外，没有使用新的数据资源。本文在ILSVRC 2014中的GoogLeNet提交实际使用的参数只有两年前Krizhevsky等人[9...",
@@ -1177,14 +1160,14 @@
     "date": "2024-06-26"
   },
   {
-    "title": "SQL",
-    "url": "/posts/DailyDev/Mysql必知必会读书笔记/",
-    "content": "## 第一章：数据库基础\n\n----------------\n\n数据库：保存有组织的数据的容器（通常是一个文件或一组文件）\n\n数据库软件（DBMS）：MySql，Oracle，MongoDB之类。人们通常用数据库来代替数据库软件的名称\n\n表（table）：某种特定类型数据的结构化清单\n\n模式：关于数据库和表的布局及特性的信息\n\n列（column）：表中的一个字段（该列由字段来唯一标识），所有表都是由一个或多个列组成的，每一列都有自己的数据类型\n\n行（row）：表中的一条数据是由行来存储的\n\n主键（primary key）：唯一标识表中每行的这个列就是主键，应该总是定义主键\n\n\u003e 关于主键：\n\u003e\n\u003e - 任意两行都不具有相同的主键值\n\u003e - 每个行都必须有一个主键值\n\nSQL：结构化查询语言\n\n\n\n## 第二章：MySQL简介\n\n--------\n\n略\n\n\n\n## 第三章：使用MySQL\n\n-------\n\n1. 登录数据库\n\n   默认主机名：localhost\n\n   默认端口：3306\n\n   ```shell\n   mysql -u root -p\n   # 然后输入密码\n   ...",
+    "title": "VGG",
+    "url": "/posts/ClassicPaperTranslation/VGG/",
+    "content": "# VGG\n\n## ABSTRACT\n\n本文研究了卷积网络深度在大规模的图像识别环境下对准确性的影响。主要贡献是使用非常小的（3×3）卷积滤波器架构对网络深度的增加进行了全面评估，这表明通过将深度推到16-19加权层可以实现对现有技术配置的显著改进。这些发现是ImageNet Challenge 2014提交的基础，本文作者团队在定位和分类过程中分别获得了第一名和第二名。\n\n\n\n## 1 INTRODUCTION\n\n随着ConvNets在计算机视觉领域越来越商品化，为了达到更好的准确性，已经进行了许多尝试来改进Krizhevsky等人（2012）最初的架构。例如，ILSVRC-2013（Zeiler＆Fergus，2013；Sermanet等，2014）表现最佳的提交使用了更小的感受窗口尺寸和更小的第一卷积层步长。另一条改进措施在整个图像和多个尺度上对网络进行密集地训练和测试（Sermanet等，2014；Howard，2014）。在本文中，解决了ConvNet架构设计的另一个重要方面——其深度。为此修正了架构的其它参数，并通过添加更多的卷积层来稳定地增加网络的深度，这是可行的，因为在...",
     "summary": "",
     "tags": [
-      "MySQL"
+      "NN"
     ],
-    "category": "Daily Dev",
+    "category": "ClassicPaperTranslation",
     "date": "2024-06-26"
   },
   {
@@ -1207,6 +1190,39 @@
       "Neo4j"
     ],
     "category": "Daily Dev",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "SQL",
+    "url": "/posts/DailyDev/Mysql必知必会读书笔记/",
+    "content": "## 第一章：数据库基础\n\n----------------\n\n数据库：保存有组织的数据的容器（通常是一个文件或一组文件）\n\n数据库软件（DBMS）：MySql，Oracle，MongoDB之类。人们通常用数据库来代替数据库软件的名称\n\n表（table）：某种特定类型数据的结构化清单\n\n模式：关于数据库和表的布局及特性的信息\n\n列（column）：表中的一个字段（该列由字段来唯一标识），所有表都是由一个或多个列组成的，每一列都有自己的数据类型\n\n行（row）：表中的一条数据是由行来存储的\n\n主键（primary key）：唯一标识表中每行的这个列就是主键，应该总是定义主键\n\n\u003e 关于主键：\n\u003e\n\u003e - 任意两行都不具有相同的主键值\n\u003e - 每个行都必须有一个主键值\n\nSQL：结构化查询语言\n\n\n\n## 第二章：MySQL简介\n\n--------\n\n略\n\n\n\n## 第三章：使用MySQL\n\n-------\n\n1. 登录数据库\n\n   默认主机名：localhost\n\n   默认端口：3306\n\n   ```shell\n   mysql -u root -p\n   # 然后输入密码\n   ...",
+    "summary": "",
+    "tags": [
+      "MySQL"
+    ],
+    "category": "Daily Dev",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "NIN",
+    "url": "/posts/ClassicPaperTranslation/NIN/",
+    "content": "# NIN\n\n## Abstract\n\n本文提出了一种新的网络结构，称为 \"网络中的网络\"(NIN)，以提高模型对感受野内局部图块的可辨别性。传统的卷积层使用线性滤波器和非线性激活函数来扫描输入。相反，本文建立了结构更复杂的微神经网络，以抽象出感受野内的数据。本文用MLP来实例化微神经网络，MLP是一个有效的函数近似器。通过类似CNN的方式在输入上滑动微网络来提取特征图，然后将它们送入下一层。深度NIN可以通过堆叠多个上述结构来实现。通过微网络加强局部建模，能够在分类层中利用全局平均池化的特征图，这比传统的全连接层更容易解释，也更不容易过拟合。本文在CIFAR-10和CIFAR-100上用NIN取得了最先进的分类性能，其在SVHN和MNIST数据集上也有合理的表现。\n\n\n\n## 1 Introduction\n\n卷积神经网络[1]由交替的卷积层和池化层组成。卷积层采取线性滤波器和底层感受野的内积，然后在输入的每个局部使用非线性激活函数，由此产生的输出称为特征图。\n\nCNN中的卷积滤波器是基础数据块的广义线性模型（GLM），本文认为GLM的抽象程度很低。这里所说的抽象性是指特征对同一概念的...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "Inception V3",
+    "url": "/posts/ClassicPaperTranslation/InceptionV3/",
+    "content": "# Inception V3\n\n## Abstract\n\n对许多任务而言，卷积网络是目前最新的计算机视觉解决方案的核心。从2014年开始，深度卷积网络开始变成主流，在各种基准数据集上都取得了实质性成果。对于大多数任务而言，虽然增加的模型大小和计算成本都趋向于转化为直接的质量收益（只要提供足够的标注数据去训练），但计算效率和低参数计数仍是各种应用场景的限制因素，例如移动视觉和大数据场景。目前，我们正在探索增大网络的方法，目标是通过适当的分解卷积和积极的正则化来尽可能地有效利用增加的计算。我们在ILSVRC 2012分类挑战赛的验证集上评估了我们的方法，结果证明我们的方法超过了目前最先进的方法并取得了实质性收益：对于单一框架评估错误率为：`21.2% top-1`和`5.6% top-5`，使用的网络计算代价为每次推断需要进行50亿次乘加运算并使用不到2500万的参数。通过四个模型组合和多次评估，我们报告了`3.5% top-5`和`17.3% top-1`的错误率。\n\n\n\n## 1. Introduction\n\n从2012年Krizhevsky等人[9]赢得了ImageNet竞赛[16]...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
     "date": "2024-06-26"
   },
   {
