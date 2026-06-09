@@ -1,5 +1,21 @@
 [
   {
+    "title": "从零开始学A股量化：沪深300指数策略实战教程",
+    "url": "/posts/QuantLearning/A股量化入门实战教程/",
+    "content": "## 前言\n\n量化交易，听起来很高大上。但其实用一句话就能说清楚：\n\n**用量化的方法做交易决策**——把\"这只股票感觉要涨\"变成\"当MA5上穿MA20时买入\"这样可验证、可回测、可优化的规则。\n\n这篇文章是为完全零基础的你准备的。我们会用 Python + 沪深300指数，一步步搭建一个完整的量化分析系统。读完你会：\n\n- 知道量化交易是怎么回事\n- 能自己获取A股数据\n- 会计算常用技术指标\n- 能写策略并回测验证\n- 能看懂回测报告里的各种指标\n\n整个教程用的代码，都在这个 GitHub 仓库里：[Quant-Learning](https://github.com/KurongTohsaka/Quant-Learning)\n\n---\n\n## 第一章：量化交易是什么\n\n### 1.1 投资 vs 量化\n\n传统的投资决策，靠的是\"感觉\"和\"经验\"：\n\n- \"茅台是好公司，买了放着\"\n- \"最近大盘跌了很多，应该抄底了\"\n- \"这个K线形态像头肩底，要涨\"\n\n这些判断没法验证——你说\"感觉要涨\"，怎么证明你是对的还是错的？\n\n量化交易把决策过程变成**可编程的规则**：\n\n- \"当 ...",
+    "summary": "这是一篇面向纯小白的A股量化入门教程，用沪深300指数为标的，从环境搭建到多策略对比，一步步带你走进量化交易的大门。全文约8000字，包含完整可运行的Python代码。",
+    "tags": [
+      "量化交易",
+      "Python",
+      "沪深300",
+      "策略回测",
+      "AKShare",
+      "初学者"
+    ],
+    "category": "QuantLearning",
+    "date": "2026-06-09"
+  },
+  {
     "title": "让 Hermes 看见、听见：视觉模型与 TTS 的集成折腾记",
     "url": "/posts/AI/hermes-vision-tts-setup/",
     "content": "## 缘起\n\n在上一篇《AI Native 探索：我的 Hermes Agent 使用手记》中，我记录了 Hermes Agent 的安装配置、WeChat 集成和 Skills 系统。但当时的配置还缺两块能力：**视觉**和**语音**。\n\n我的主力模型是 DeepSeek V4 Flash，它没有原生多模态能力——给它一张图片，它看不懂。与此同时，日常使用中我经常需要它帮我读截图、分析图表、识别验证码。另一面是**语音合成**——我希望它能用中文念出回复，甚至用特定的音色说话。\n\n这篇文章就记录下这两块能力的集成过程，以及在阿里云百炼（DashScope）平台上踩过的坑。\n\n## 一、辅助视觉模型：让 Hermes 能\"看见\"\n\n### 架构设计\n\nHermes 的视觉能力设计很优雅：它不要求主模型有原生视觉能力，而是提供了一个 **auxiliary vision** 机制。当主模型不支持视觉时，Agent 会自动调用 `vision_analyze` 工具，把图片传给一个专门的辅助视觉模型，再将分析结果以文本形式送回上下文。这样，即使主模型是纯文本的，也能间接\"看见\"。\n\n这个...",
@@ -61,32 +77,6 @@
     "date": "2026-06-01"
   },
   {
-    "title": "提示工程(Prompt Engineering)",
-    "url": "/posts/AI/04-提示工程Prompt Engineering/",
-    "content": "# 提示工程(Prompt Engineering)面试知识\n\n## 一、概述\n\n提示工程（Prompt Engineering）是设计与优化输入提示词以引导大语言模型（LLM）产生期望输出的技术与艺术。2025-2026年，随着模型能力的持续提升和Agent/工具调用范式的普及，Prompt Engineering 已从简单的\"写提示词\"演变为系统化的工程实践，涉及消息结构设计、推理策略、结构化输出、安全防护和自动优化等多个维度。\n\n---\n\n## 二、知识点详解\n\n### 1. Prompt基本结构\n\n#### 1.1 消息角色体系\n\n现代LLM（OpenAI、Anthropic、Gemini等）使用多轮消息体系，核心角色包括：\n\n**System Message（系统消息）**\n- 设置全局行为规范和上下文\n- 定义模型角色、能力边界、输出格式\n- 优先级最高，后续User消息受其约束\n\n**User Message（用户消息）**\n- 用户的真实输入\n- 可以是问题、指令、数据\n\n**Assistant Message（助手消息）**\n- 模型的回复\n- 在多轮对话中用于提供示...",
-    "summary": "",
-    "tags": [
-      "Prompt",
-      "提示工程",
-      "Few-Shot"
-    ],
-    "category": "AI",
-    "date": "2026-06-01"
-  },
-  {
-    "title": "RAG与检索增强生成",
-    "url": "/posts/AI/05-RAG与检索增强生成/",
-    "content": "# RAG与检索增强生成面试知识\n\n## 一、概述\n\n检索增强生成（Retrieval-Augmented Generation，RAG）是2024-2026年间大模型落地的核心范式。RAG通过在生成前检索外部知识库中的相关信息，有效解决LLM的知识截止、幻觉和领域知识不足等关键问题。随着模型上下文窗口的扩展（128K-1M tokens）和Agent范式的兴起，RAG技术也在快速演进——从简单的Retrieve-Read到Self-RAG、GraphRAG、Agentic RAG等高级形态。面试中需要系统掌握RAG的全链路知识，包括架构设计、向量数据库、Embedding、检索策略、重排序、评估等。\n\n---\n\n## 二、知识点详解\n\n### 1. RAG架构\n\n#### 1.1 基础架构：Retrieve-Read\n\n最简单的RAG架构：用户查询 → 检索相关文档 → 将文档作为上下文注入Prompt → LLM生成回答。\n\n```python\n# 基础Retrieve-Read流程\ndef simple_rag(query, vector_store, llm):\n    # S...",
-    "summary": "",
-    "tags": [
-      "RAG",
-      "检索增强",
-      "向量数据库"
-    ],
-    "category": "AI",
-    "date": "2026-06-01"
-  },
-  {
     "title": "模型微调与训练",
     "url": "/posts/AI/07-模型微调与训练/",
     "content": "# 07 - 模型微调与训练\n\n## 一、概述\n\n大模型微调（Fine-tuning）是将预训练基座模型适配到特定任务或领域的关键技术。2025-2026年，LoRA 及其变体已成为行业标准，RLHF/DPO 等对齐技术持续演进，GRPO 等新方法在推理模型中广泛应用。分布式训练工具链日趋成熟，Axolotl、Unsloth、LLaMA-Factory 等工具大幅降低了微调门槛。\n\n---\n\n## 二、知识点详解\n\n### 1. 全量微调 vs PEFT\n\n#### 全量微调（Full Fine-tuning）\n\n更新模型所有参数。效果上限高，但计算和存储成本巨大。\n\n- 显存需求：以 LLaMA-70B 为例，全量微调需 8x80G A100+\n- 存储需求：每个微调版本需存储完整模型权重（~140GB for 70B）\n- 适用场景：有充足算力、需要极致效果\n\n#### PEFT（Parameter-Efficient Fine-Tuning）\n\n只更新少量参数，大部分参数冻结。\n\n##### Adapter\n\n在 Transformer 层中插入小的瓶颈层（bottleneck）...",
@@ -139,6 +129,19 @@
     "date": "2026-06-01"
   },
   {
+    "title": "提示工程(Prompt Engineering)",
+    "url": "/posts/AI/04-提示工程Prompt Engineering/",
+    "content": "# 提示工程(Prompt Engineering)面试知识\n\n## 一、概述\n\n提示工程（Prompt Engineering）是设计与优化输入提示词以引导大语言模型（LLM）产生期望输出的技术与艺术。2025-2026年，随着模型能力的持续提升和Agent/工具调用范式的普及，Prompt Engineering 已从简单的\"写提示词\"演变为系统化的工程实践，涉及消息结构设计、推理策略、结构化输出、安全防护和自动优化等多个维度。\n\n---\n\n## 二、知识点详解\n\n### 1. Prompt基本结构\n\n#### 1.1 消息角色体系\n\n现代LLM（OpenAI、Anthropic、Gemini等）使用多轮消息体系，核心角色包括：\n\n**System Message（系统消息）**\n- 设置全局行为规范和上下文\n- 定义模型角色、能力边界、输出格式\n- 优先级最高，后续User消息受其约束\n\n**User Message（用户消息）**\n- 用户的真实输入\n- 可以是问题、指令、数据\n\n**Assistant Message（助手消息）**\n- 模型的回复\n- 在多轮对话中用于提供示...",
+    "summary": "",
+    "tags": [
+      "Prompt",
+      "提示工程",
+      "Few-Shot"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
     "title": "AI应用开发框架",
     "url": "/posts/AI/03-AI应用开发框架/",
     "content": "# AI应用开发框架面试知识\n\n## 一、概述\n\nAI应用开发框架是当前大模型落地工程化的核心基础设施。2025-2026年，主流框架已从单纯的LLM调用封装演进为完整的AI应用开发平台，涵盖模型编排、状态管理、检索增强、多智能体协作等能力。面试中，候选人需要理解各框架的核心设计理念、适用场景、关键差异以及最新演进方向。\n\n---\n\n## 二、知识点详解\n\n### 1. LangChain 核心概念\n\n#### 1.1 Chain\nChain是LangChain最原始的设计抽象，代表一系列组件的有序组合。典型如 LLMChain（Prompt + Model + OutputParser）、SequentialChain（串联多个Chain）、RouterChain（条件路由）。但自 v0.2 起，Chain 已被标记为 Legacy，推荐使用 LCEL。\n```python\n# Legacy Chain 方式\nfrom langchain.chains import LLMChain\nfrom langchain.prompts import PromptTemplate\nfrom ...",
@@ -160,6 +163,19 @@
       "LLM",
       "Transformer",
       "GPT"
+    ],
+    "category": "AI",
+    "date": "2026-06-01"
+  },
+  {
+    "title": "RAG与检索增强生成",
+    "url": "/posts/AI/05-RAG与检索增强生成/",
+    "content": "# RAG与检索增强生成面试知识\n\n## 一、概述\n\n检索增强生成（Retrieval-Augmented Generation，RAG）是2024-2026年间大模型落地的核心范式。RAG通过在生成前检索外部知识库中的相关信息，有效解决LLM的知识截止、幻觉和领域知识不足等关键问题。随着模型上下文窗口的扩展（128K-1M tokens）和Agent范式的兴起，RAG技术也在快速演进——从简单的Retrieve-Read到Self-RAG、GraphRAG、Agentic RAG等高级形态。面试中需要系统掌握RAG的全链路知识，包括架构设计、向量数据库、Embedding、检索策略、重排序、评估等。\n\n---\n\n## 二、知识点详解\n\n### 1. RAG架构\n\n#### 1.1 基础架构：Retrieve-Read\n\n最简单的RAG架构：用户查询 → 检索相关文档 → 将文档作为上下文注入Prompt → LLM生成回答。\n\n```python\n# 基础Retrieve-Read流程\ndef simple_rag(query, vector_store, llm):\n    # S...",
+    "summary": "",
+    "tags": [
+      "RAG",
+      "检索增强",
+      "向量数据库"
     ],
     "category": "AI",
     "date": "2026-06-01"
@@ -352,6 +368,17 @@
     "date": "2025-09-13"
   },
   {
+    "title": "sync包详解",
+    "url": "/posts/DailyDev/sync包详解/",
+    "content": "## 一、`sync` 包概述\n\n`sync` 包是 Go 标准库中用于处理并发和同步的核心工具包。在 Go 语言中，我们通过 Goroutine 实现并发，而当多个 Goroutine 需要访问共享资源时，为了避免数据竞争（Data Race）等问题，就需要使用 `sync` 包提供的同步原语来保证并发安全。\n\n面试官通过 `sync` 包相关的问题，主要考察你对 Go 并发模型的理解、处理并发问题的能力以及对底层原理的掌握程度。\n\n## 二、`sync.Mutex`与`sync.RWMutex` (互斥锁与读写锁)\n\n### 1. 作用与目的\n\n这是最基础和最常用的同步原语。\n\n- **`sync.Mutex` (互斥锁)**: 保证在同一时刻，只有一个 Goroutine 可以访问被其保护的共享资源。当一个 Goroutine 获取了锁，其他试图获取该锁的 Goroutine 都会被阻塞，直到锁被释放。\n- **`sync.RWMutex` (读写锁)**: `Mutex` 的一种更细粒度的实现，它将访问分为“读”和“写”。\n  - **多个读**：可以共存，多个 Gorouti...",
+    "summary": "",
+    "tags": [
+      "Golang"
+    ],
+    "category": "Daily Dev",
+    "date": "2025-08-30"
+  },
+  {
     "title": "TCP的三次握手与四次挥手",
     "url": "/posts/DailyDev/TCP的三次握手与四次挥手/",
     "content": "# 深入理解TCP：三次握手与四次挥手（含面试高频考点）\n\nTCP (Transmission Control Protocol) 作为互联网核心协议簇中的基石，保证了数据传输的可靠性和顺序性。而要理解 TCP 的可靠性，就必须掌握其经典的连接管理机制——**三次握手**与**四次挥手**。\n\n本文将用通俗易懂的比喻和清晰的技术图解，带你彻底搞懂这两个过程，并深入剖析面试中关于它们的高频考点。\n\n## 一、三次握手：建立可靠的连接\n\n在进行数据传输之前，通信双方（客户端和服务器）必须建立一个可靠的连接。这个建立连接的过程，就是“三次握手”。\n\n### 一个生动的比喻：打电话\n\n想象一下你给朋友打电话确认双方都能正常通信的过程：\n\n\u003e 1. **你**：“喂，能听到我说话吗？” (发送 `SYN`)\n\u003e 2. **朋友**：“我能听到你，你能听到我吗？” (回复 `SYN+ACK`)\n\u003e 3. **你**：“我也能听到你，那我们可以开始聊天了。” (发送 `ACK`)\n\n经过这三步，双方都确认了彼此的发送和接收能力都正常，通话（连接）才正式建立。\n\n### 技术流程详解\n\n- **第一次...",
@@ -363,12 +390,12 @@
     "date": "2025-08-30"
   },
   {
-    "title": "sync包详解",
-    "url": "/posts/DailyDev/sync包详解/",
-    "content": "## 一、`sync` 包概述\n\n`sync` 包是 Go 标准库中用于处理并发和同步的核心工具包。在 Go 语言中，我们通过 Goroutine 实现并发，而当多个 Goroutine 需要访问共享资源时，为了避免数据竞争（Data Race）等问题，就需要使用 `sync` 包提供的同步原语来保证并发安全。\n\n面试官通过 `sync` 包相关的问题，主要考察你对 Go 并发模型的理解、处理并发问题的能力以及对底层原理的掌握程度。\n\n## 二、`sync.Mutex`与`sync.RWMutex` (互斥锁与读写锁)\n\n### 1. 作用与目的\n\n这是最基础和最常用的同步原语。\n\n- **`sync.Mutex` (互斥锁)**: 保证在同一时刻，只有一个 Goroutine 可以访问被其保护的共享资源。当一个 Goroutine 获取了锁，其他试图获取该锁的 Goroutine 都会被阻塞，直到锁被释放。\n- **`sync.RWMutex` (读写锁)**: `Mutex` 的一种更细粒度的实现，它将访问分为“读”和“写”。\n  - **多个读**：可以共存，多个 Gorouti...",
+    "title": "WebSocket面试详解",
+    "url": "/posts/DailyDev/WebSocket面试详解/",
+    "content": "## 第一部分：核心概念\n\n### 1.1 什么是 WebSocket？\n\nWebSocket 是一种在单个 TCP 连接上进行**全双工通信**的协议。它诞生于 HTML5，旨在解决浏览器与服务器之间低延迟、实时、双向通信的需求。\n\n- **全双工 (Full-duplex)**：与 HTTP 的“请求-响应”模式不同，WebSocket 连接一旦建立，客户端和服务器双方可以随时主动向对方发送数据，无需等待对方的请求。\n- **单个 TCP 连接**：所有通信都在一个 TCP 连接上完成，减少了重复建立和关闭连接的开销。\n- **协议标识符**：WebSocket 的 URL 方案是 `ws://`（非加密）和 `wss://`（加密，运行在 TLS 之上）。\n\n### 1.2 为什么需要 WebSocket？(解决了什么问题？)\n\n在 WebSocket 出现之前，为了模拟实时通信，开发者通常采用以下技术，但它们都有明显的缺陷：\n\n1. **轮询 (Polling)**：客户端定时向服务器发送 HTTP 请求，询问是否有新数据。\n   - **缺点**：大量无效请求，浪费带宽和服务...",
     "summary": "",
     "tags": [
-      "Golang"
+      "WebSocket"
     ],
     "category": "Daily Dev",
     "date": "2025-08-30"
@@ -381,17 +408,6 @@
     "tags": [
       "IO",
       "epoll"
-    ],
-    "category": "Daily Dev",
-    "date": "2025-08-30"
-  },
-  {
-    "title": "WebSocket面试详解",
-    "url": "/posts/DailyDev/WebSocket面试详解/",
-    "content": "## 第一部分：核心概念\n\n### 1.1 什么是 WebSocket？\n\nWebSocket 是一种在单个 TCP 连接上进行**全双工通信**的协议。它诞生于 HTML5，旨在解决浏览器与服务器之间低延迟、实时、双向通信的需求。\n\n- **全双工 (Full-duplex)**：与 HTTP 的“请求-响应”模式不同，WebSocket 连接一旦建立，客户端和服务器双方可以随时主动向对方发送数据，无需等待对方的请求。\n- **单个 TCP 连接**：所有通信都在一个 TCP 连接上完成，减少了重复建立和关闭连接的开销。\n- **协议标识符**：WebSocket 的 URL 方案是 `ws://`（非加密）和 `wss://`（加密，运行在 TLS 之上）。\n\n### 1.2 为什么需要 WebSocket？(解决了什么问题？)\n\n在 WebSocket 出现之前，为了模拟实时通信，开发者通常采用以下技术，但它们都有明显的缺陷：\n\n1. **轮询 (Polling)**：客户端定时向服务器发送 HTTP 请求，询问是否有新数据。\n   - **缺点**：大量无效请求，浪费带宽和服务...",
-    "summary": "",
-    "tags": [
-      "WebSocket"
     ],
     "category": "Daily Dev",
     "date": "2025-08-30"
@@ -499,17 +515,6 @@
     "date": "2025-03-14"
   },
   {
-    "title": "《深入理解设计模式》记录",
-    "url": "/posts/DailyDev/《深入理解设计模式》记录/",
-    "content": "# 《深入理解设计模式》记录\n\n**这里只记录了相对常用、面试常问的设计模式。**\n\n## 单例模式\n\n单例模式（Singleton Pattern）是一种创建型设计模式，其核心目标是确保一个类仅有一个实例，并提供全局访问点。它适用于需要全局唯一对象且频繁访问的场景，例如配置管理、线程池、日志记录器等。\n\n单例模式需要注意三点：\n\n- 私有化构造函数：防止外部通过 `new` 直接创建实例。\n- 自行创建实例：类内部负责生成唯一实例。\n- 全局访问方法：提供静态方法供外部获取实例。\n\n### 懒汉模式\n\n特点：延迟实例化，首次调用时创建实例，需处理线程安全问题。\n\n```go\npackage singleton\n\nimport \"sync\"\n\ntype lazySingleton struct {\n  \n}\n\nvar (\n\tinstance *lazySingleton\n  once sync.Once\n)\n\nfunc GetLazyInstance() *lazySingleton {\n  once.Do(func() {\n    instance = \u0026lazySingleton{...",
-    "summary": "",
-    "tags": [
-      "Design Pattern"
-    ],
-    "category": "Daliy Dev",
-    "date": "2025-03-08"
-  },
-  {
     "title": "动态规划经典问题学习记录",
     "url": "/posts/AlgorithmLearning/动态规划经典问题学习记录/",
     "content": "# 动态规划经典问题学习记录\n\n ## 0-1 背包\n\n### 问题描述\n\n有 $n$ 个物品，第 $i$ 个物品的体积为 $w[i]$ ，价值为 $v[i]$ ，每个物品最多选一次，求体积和不超过 $capacity$ 时的最大价值和。\n\n### 通过回溯去思考解题思路\n\n1. 先去思考当前的操作，即枚举第 $i$ 个物品选与不选：\n   - 不选，剩余容量不变。\n   - 选，剩余容量减少 $w[i]$  。\n2. 递归到子问题，在剩余容量为 $c$ 时，从前 $i$ 个物品中得到的最大价值和。\n3. 下一个递归子问题：\n   - 不选，在剩余容量为 $c$ 时，从前 $i-1$ 个物品中得到的最大价值和。\n   - 选，在剩余容量为 $c-w[i]$ 时，从前 $i-1$ 个物品中得到的最大价值和。\n\n最终得到的递归公式：$dfs(i,c) = max(dfs(i-1, c),dfs(i-1, c-w[i])+v[i])$\n\n对应的代码就是：\n\n```python\ndef zero_one_backpack(capacity: int, w: List[int], v: List...",
@@ -518,6 +523,17 @@
       "DP"
     ],
     "category": "Algorithm Learning",
+    "date": "2025-03-08"
+  },
+  {
+    "title": "《深入理解设计模式》记录",
+    "url": "/posts/DailyDev/《深入理解设计模式》记录/",
+    "content": "# 《深入理解设计模式》记录\n\n**这里只记录了相对常用、面试常问的设计模式。**\n\n## 单例模式\n\n单例模式（Singleton Pattern）是一种创建型设计模式，其核心目标是确保一个类仅有一个实例，并提供全局访问点。它适用于需要全局唯一对象且频繁访问的场景，例如配置管理、线程池、日志记录器等。\n\n单例模式需要注意三点：\n\n- 私有化构造函数：防止外部通过 `new` 直接创建实例。\n- 自行创建实例：类内部负责生成唯一实例。\n- 全局访问方法：提供静态方法供外部获取实例。\n\n### 懒汉模式\n\n特点：延迟实例化，首次调用时创建实例，需处理线程安全问题。\n\n```go\npackage singleton\n\nimport \"sync\"\n\ntype lazySingleton struct {\n  \n}\n\nvar (\n\tinstance *lazySingleton\n  once sync.Once\n)\n\nfunc GetLazyInstance() *lazySingleton {\n  once.Do(func() {\n    instance = \u0026lazySingleton{...",
+    "summary": "",
+    "tags": [
+      "Design Pattern"
+    ],
+    "category": "Daliy Dev",
     "date": "2025-03-08"
   },
   {
@@ -556,24 +572,24 @@
     "date": "2025-02-07"
   },
   {
-    "title": "minikube：Ubuntu部署本地集群踩坑",
-    "url": "/posts/DailyDev/minikube：Ubuntu部署本地集群踩坑/",
-    "content": "# minikube：Ubuntu 部署本地集群踩坑\n\n## 官方安装教程\n\n[minikube start | minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download)\n\n再次感叹 homebrew 的伟大，一行命令就安装、后续也没有问题。\n\n\n\n## 仪表盘\n\n使用 `minikube dashboard` 启动仪表盘。如果在服务器上启动、本地访问，就运行类似于的下面命令：\n\n```bash\nkubectl proxy --address='0.0.0.0' --disable-filter=true\n```\n\n然后把 http://127.0.0.1:46749/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/ 这样的 URL 改为 http://ServerIP:8001/api/v1/namespaces/kuberne...",
-    "summary": "",
-    "tags": [
-      "minikube",
-      "Kubernetes"
-    ],
-    "category": "Daily Dev",
-    "date": "2025-01-25"
-  },
-  {
     "title": "《Kubernetes微服务实战》记录",
     "url": "/posts/DailyDev/《Kubernetes微服务实战》记录/",
     "content": "# 《Kubernetes微服务实战》记录\n\n## 面向开发人员的 Kubernetes 简介\n\n### 部分核心概念\n\n- Node：Node 是 Kubernetes 集群中的一个工作单元，表示集群中的一台物理机或虚拟机。Node 的作用是为运行容器化应用提供计算资源，一个 Node 可以运行多个 Pod。Node 分为：\n  - Master Node：负责集群的控制平面，管理所有工作节点。\n  - Worker Node：运行实际的应用程序工作负载，实际上就是 Pod。\n- Pod：Pod 是 Kubernetes 中最小的可部署单位，表示一个或多个容器的集合。有以下特性：\n  - Pod 内的容器共享一个 IP 地址，可以通过 `localhost` 相互通信。\n  - Pod 内的容器可以共享挂载的存储卷（Volume）。\n  - Pod 通常包含运行同一应用程序组件的容器，如主应用程序容器、日志采集容器等。\n- Namespace：用于逻辑上隔离资源。可以在同一集群中运行多个项目或团队的工作负载。\n- Service：用于将一组 Pod 的访问暴露给外部或集群内部的其他 ...",
     "summary": "",
     "tags": [
       "Micro Service",
+      "Kubernetes"
+    ],
+    "category": "Daily Dev",
+    "date": "2025-01-25"
+  },
+  {
+    "title": "minikube：Ubuntu部署本地集群踩坑",
+    "url": "/posts/DailyDev/minikube：Ubuntu部署本地集群踩坑/",
+    "content": "# minikube：Ubuntu 部署本地集群踩坑\n\n## 官方安装教程\n\n[minikube start | minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download)\n\n再次感叹 homebrew 的伟大，一行命令就安装、后续也没有问题。\n\n\n\n## 仪表盘\n\n使用 `minikube dashboard` 启动仪表盘。如果在服务器上启动、本地访问，就运行类似于的下面命令：\n\n```bash\nkubectl proxy --address='0.0.0.0' --disable-filter=true\n```\n\n然后把 http://127.0.0.1:46749/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/ 这样的 URL 改为 http://ServerIP:8001/api/v1/namespaces/kuberne...",
+    "summary": "",
+    "tags": [
+      "minikube",
       "Kubernetes"
     ],
     "category": "Daily Dev",
@@ -859,17 +875,6 @@
     "date": "2024-08-16"
   },
   {
-    "title": "《实体关系抽取方法研究综述》笔记",
-    "url": "/posts/PaperNotes/实体关系抽取方法研究综述_李冬梅/",
-    "content": "## 关系抽取 Relation Extraction\n\n定义：\n\n- 通常将实体间的关系形式化地描述为关系三元组 $\\{E_1,R,E_2\\}$ ，其中 $E$ 为实体类型，$R$ 为关系描述类型。\n\n关系抽取与命名实体识别、关系触发词识别构成一个端到端任务的框架：\n\n- 命名实体识别 Name Entity Recognition：是指识别文本中具有特定意义的实体，主要包括人名、地名、机构名、专有名词等；\n- 关系触发词识别 Relation trigger word identification：是指对触发实体关系的词进行分类，识别出是触发词还是非触发词，判定抽取出的关系是正类还是负类。\n\n关系抽取是一个文本分类问题，相比于情感分类等任物，其具有以下特点：\n\n- 领域众多，关系模型构建复杂。由于限定了关系类别，可采用基于规则、词典以及本体的方法，也可采用传统机器学习的有监督、半监督以及无监督方法，深度学习的有监督、远程监督方法。这类方法的模型构建难度相对于开放领域难度较低，但是移植性和扩展性较差。而针对开放领域的关系抽取，由于关系类型多样且不确定，可以采用无监督和远程监督等方法\n...",
-    "summary": "",
-    "tags": [
-      "PaperNotes"
-    ],
-    "category": "PaperNotes",
-    "date": "2024-08-14"
-  },
-  {
     "title": "😺 Is All You Need——Transformer补充",
     "url": "/posts/NLP/Attention-Is-All-You-Need/",
     "content": "## 关于本文动机\n\nTransformer主要内容请见 [Lecture 9: Transformer | KurongBlog (kurongtohsaka.github.io)](https://kurongtohsaka.github.io/posts/cs224n/lesson_9/)，对 Transformer 已经进行比较详细的介绍和讲解了，但还是有一些细节问题不好在该篇文章提及，所以单开一篇讨论。\n\n\n\n## Q，K，V 的理解\n\n假设我们想让所有的词都与第一个词 $v_1$ 相似，我们可以让 $v_1$ 作为查询。 然后，将该查询与句子中所有词进行点积，这里的词就是键。 所以查询和键的组合给了我们权重，接着再将这些权重与作为值的所有单词相乘。\n\n通过下面的公式可以理解这个过程，并理解查询、键、值分别代表什么意思：\n$$\nsoftmax(QK)=W \\\\\nWV=Y\n$$\n一种比较感性的理解：想要得到某个 $V$ 对应的某个可能的相似信息需要先 $Q$ 这个 $V$ 的 $K$ ，$QK$ 得到注意力分数，之后经过 softmax 平滑后得到概率 $W $，然后 $WV$...",
@@ -878,6 +883,17 @@
       "NLP"
     ],
     "category": "NLP",
+    "date": "2024-08-14"
+  },
+  {
+    "title": "《实体关系抽取方法研究综述》笔记",
+    "url": "/posts/PaperNotes/实体关系抽取方法研究综述_李冬梅/",
+    "content": "## 关系抽取 Relation Extraction\n\n定义：\n\n- 通常将实体间的关系形式化地描述为关系三元组 $\\{E_1,R,E_2\\}$ ，其中 $E$ 为实体类型，$R$ 为关系描述类型。\n\n关系抽取与命名实体识别、关系触发词识别构成一个端到端任务的框架：\n\n- 命名实体识别 Name Entity Recognition：是指识别文本中具有特定意义的实体，主要包括人名、地名、机构名、专有名词等；\n- 关系触发词识别 Relation trigger word identification：是指对触发实体关系的词进行分类，识别出是触发词还是非触发词，判定抽取出的关系是正类还是负类。\n\n关系抽取是一个文本分类问题，相比于情感分类等任物，其具有以下特点：\n\n- 领域众多，关系模型构建复杂。由于限定了关系类别，可采用基于规则、词典以及本体的方法，也可采用传统机器学习的有监督、半监督以及无监督方法，深度学习的有监督、远程监督方法。这类方法的模型构建难度相对于开放领域难度较低，但是移植性和扩展性较差。而针对开放领域的关系抽取，由于关系类型多样且不确定，可以采用无监督和远程监督等方法\n...",
+    "summary": "",
+    "tags": [
+      "PaperNotes"
+    ],
+    "category": "PaperNotes",
     "date": "2024-08-14"
   },
   {
@@ -893,17 +909,6 @@
     "date": "2024-08-13"
   },
   {
-    "title": "Encoder-Decoder 架构",
-    "url": "/posts/NLP/Encoder-Decoder/",
-    "content": "## 原理\n\nEncoder-Decoder架构通常由两个主要部分组成：编码器（Encoder）和解码器（Decoder）。\n\n1. **编码器（Encoder）**：编码器的任务是将输入序列（如一句话）转换为一个固定长度的上下文向量（context vector）。这个过程通常通过递归神经网络（RNN）、长短期记忆网络（LSTM）或门控循环单元（GRU）来实现。编码器逐步读取输入序列的每个元素，并将其信息压缩到上下文向量中。\n2. **解码器（Decoder）**：解码器接收编码器生成的上下文向量，并将其转换为输出序列。解码器同样可以使用RNN、LSTM或GRU。解码器在生成每个输出元素时，会考虑上下文向量以及之前生成的输出元素。\n\n\n\n## 作用\n\nEncoder-Decoder架构主要用于处理需要将一个序列转换为另一个序列的任务，例如：\n\n- **机器翻译**：将一种语言的句子翻译成另一种语言。\n- **文本摘要**：将长文本压缩成简短摘要。\n- **对话系统**：生成对用户输入的响应。\n\n近年来，基于Transformer的Encoder-Decoder架构（如BERT、GPT...",
-    "summary": "",
-    "tags": [
-      "NLP"
-    ],
-    "category": "NLP",
-    "date": "2024-08-11"
-  },
-  {
     "title": "8.06-8.11：一周总结",
     "url": "/posts/WeeklyWorking/2024_08_06-2024_08_11/",
     "content": "## 本周工作\n\n本周工作是从8月10号vpn重置之后才开始进行的，所以内容有点少\n\n- 完成了第一版训练、验证代码\n- 调试第一个模型，修复各种bug\n- 学习 Transformer 相关内容\n\n\n\n## 课题下周改进\n\n- 先快速训练出几个模型出来，选出一个最好的模型\n- 进行第二次及多次迭代训练，更新词典\n- 关系抽取看相关文献\n\n\n\n## 本周反思\n\n本周算是玩爽了，课题下周尽快开展关系抽取的调研工作。",
@@ -912,6 +917,17 @@
       "WeeklyWorking"
     ],
     "category": "WeeklyWorking",
+    "date": "2024-08-11"
+  },
+  {
+    "title": "Encoder-Decoder 架构",
+    "url": "/posts/NLP/Encoder-Decoder/",
+    "content": "## 原理\n\nEncoder-Decoder架构通常由两个主要部分组成：编码器（Encoder）和解码器（Decoder）。\n\n1. **编码器（Encoder）**：编码器的任务是将输入序列（如一句话）转换为一个固定长度的上下文向量（context vector）。这个过程通常通过递归神经网络（RNN）、长短期记忆网络（LSTM）或门控循环单元（GRU）来实现。编码器逐步读取输入序列的每个元素，并将其信息压缩到上下文向量中。\n2. **解码器（Decoder）**：解码器接收编码器生成的上下文向量，并将其转换为输出序列。解码器同样可以使用RNN、LSTM或GRU。解码器在生成每个输出元素时，会考虑上下文向量以及之前生成的输出元素。\n\n\n\n## 作用\n\nEncoder-Decoder架构主要用于处理需要将一个序列转换为另一个序列的任务，例如：\n\n- **机器翻译**：将一种语言的句子翻译成另一种语言。\n- **文本摘要**：将长文本压缩成简短摘要。\n- **对话系统**：生成对用户输入的响应。\n\n近年来，基于Transformer的Encoder-Decoder架构（如BERT、GPT...",
+    "summary": "",
+    "tags": [
+      "NLP"
+    ],
+    "category": "NLP",
     "date": "2024-08-11"
   },
   {
@@ -1127,80 +1143,14 @@
     "date": "2024-06-27"
   },
   {
-    "title": "ResNet",
-    "url": "/posts/ClassicPaperTranslation/ResNet/",
-    "content": "# ResNet\n\n## Abstract\n\n更深的神经网络更难训练。我们提出了一种残差学习框架来减轻网络训练，这些网络比以前使用的网络更深。我们明确地将层变为学习关于层输入的残差函数，而不是学习未参考的函数。我们提供了全面的经验证据说明这些残差网络很容易优化，并可以显著增加深度来提高准确性。在ImageNet数据集上我们评估了深度高达152层的残差网络——比VGG[40]深8倍但仍具有较低的复杂度。这些残差网络的集合在ImageNet测试集上取得了`3.57%`的错误率。这个结果在ILSVRC 2015分类任务上赢得了第一名。我们也在CIFAR-10上分析了100层和1000层的残差网络。\n\n对于许多视觉识别任务而言，表示的深度是至关重要的。仅由于我们非常深度的表示，我们便在COCO目标检测数据集上得到了28%的相对提高。深度残差网络是我们向ILSVRC和COCO 2015竞赛提交的基础，我们也赢得了ImageNet检测任务，ImageNet定位任务，COCO检测和COCO分割任务的第一名。\n\n\n\n## 1. Introduction\n\n深度卷积神经网络[22, 21]导致了图像分类...",
+    "title": "Inception V3",
+    "url": "/posts/ClassicPaperTranslation/InceptionV3/",
+    "content": "# Inception V3\n\n## Abstract\n\n对许多任务而言，卷积网络是目前最新的计算机视觉解决方案的核心。从2014年开始，深度卷积网络开始变成主流，在各种基准数据集上都取得了实质性成果。对于大多数任务而言，虽然增加的模型大小和计算成本都趋向于转化为直接的质量收益（只要提供足够的标注数据去训练），但计算效率和低参数计数仍是各种应用场景的限制因素，例如移动视觉和大数据场景。目前，我们正在探索增大网络的方法，目标是通过适当的分解卷积和积极的正则化来尽可能地有效利用增加的计算。我们在ILSVRC 2012分类挑战赛的验证集上评估了我们的方法，结果证明我们的方法超过了目前最先进的方法并取得了实质性收益：对于单一框架评估错误率为：`21.2% top-1`和`5.6% top-5`，使用的网络计算代价为每次推断需要进行50亿次乘加运算并使用不到2500万的参数。通过四个模型组合和多次评估，我们报告了`3.5% top-5`和`17.3% top-1`的错误率。\n\n\n\n## 1. Introduction\n\n从2012年Krizhevsky等人[9]赢得了ImageNet竞赛[16]...",
     "summary": "",
     "tags": [
       "NN"
     ],
     "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "GoogleNet V2",
-    "url": "/posts/ClassicPaperTranslation/GoogLeNetV2/",
-    "content": "# GoogLeNet V2\n\n## Abstract\n\n训练深度神经网络的复杂性在于，每层输入的分布在训练过程中会发生变化，因为前面的层的参数会发生变化。通过要求较低的学习率和仔细的参数初始化减慢了训练，并且使具有饱和非线性的模型训练起来非常困难。本文将这种现象称为*内部协变量转移*，并通过标准化层输入来解决这个问题。本文力图使标准化成为模型架构的一部分，并为*每个训练小批量数据*执行标准化。批标准化使我们能够使用更高的学习率，并且不用太注意初始化。它也作为一个正则化项，在某些情况下不需要Dropout。将批量标准化应用到最先进的图像分类模型上，批标准化在取得相同的精度的情况下，减少了14倍的训练步骤，并以显著的差距击败了原始模型。使用批标准化网络的组合，我们改进了在ImageNet分类上公布的最佳结果：达到了`4.9％ top-5`的验证误差（和`4.8％`测试误差），超过了人类评估者的准确性。\n\n\n\n## 1. Introduction\n\n随机梯度下降（SGD）已经被证明是训练深度网络的有效方式，并且已经使用诸如动量（Sutskever等，2013）和Adagrad（Duchi等...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "GoogleNet V1",
-    "url": "/posts/ClassicPaperTranslation/GoogleNetV1/",
-    "content": "# GoogleNet V1\n\n## Abstract\n\n本文作者在ImageNet大规模视觉识别挑战赛2014（ILSVRC14）上提出了一种代号为Inception的深度卷积神经网络结构，并在分类和检测上取得了新的最好结果。这个架构的主要特点是提高了网络内部计算资源的利用率。通过精心的手工设计，在增加了网络深度和广度的同时保持了计算预算不变。为了优化质量，架构的设计以赫布理论和多尺度处理直觉为基础。作者在ILSVRC14提交中应用的一个特例被称为GoogLeNet，一个22层的深度网络，其质量在分类和检测的背景下进行了评估。\n\n\n\n## 1. Introduction\n\n过去三年中，由于深度学习和卷积网络的发展[10]，目标分类和检测能力得到了显著提高。一个令人鼓舞的消息是，大部分的进步不仅仅是更强大硬件、更大数据集、更大模型的结果，而主要是新的想法、算法和网络结构改进的结果。例如，ILSVRC 2014竞赛中最靠前的输入除了用于检测目的的分类数据集之外，没有使用新的数据资源。本文在ILSVRC 2014中的GoogLeNet提交实际使用的参数只有两年前Krizhevsky等人[9...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "VGG",
-    "url": "/posts/ClassicPaperTranslation/VGG/",
-    "content": "# VGG\n\n## ABSTRACT\n\n本文研究了卷积网络深度在大规模的图像识别环境下对准确性的影响。主要贡献是使用非常小的（3×3）卷积滤波器架构对网络深度的增加进行了全面评估，这表明通过将深度推到16-19加权层可以实现对现有技术配置的显著改进。这些发现是ImageNet Challenge 2014提交的基础，本文作者团队在定位和分类过程中分别获得了第一名和第二名。\n\n\n\n## 1 INTRODUCTION\n\n随着ConvNets在计算机视觉领域越来越商品化，为了达到更好的准确性，已经进行了许多尝试来改进Krizhevsky等人（2012）最初的架构。例如，ILSVRC-2013（Zeiler＆Fergus，2013；Sermanet等，2014）表现最佳的提交使用了更小的感受窗口尺寸和更小的第一卷积层步长。另一条改进措施在整个图像和多个尺度上对网络进行密集地训练和测试（Sermanet等，2014；Howard，2014）。在本文中，解决了ConvNet架构设计的另一个重要方面——其深度。为此修正了架构的其它参数，并通过添加更多的卷积层来稳定地增加网络的深度，这是可行的，因为在...",
-    "summary": "",
-    "tags": [
-      "NN"
-    ],
-    "category": "ClassicPaperTranslation",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "正则表达式",
-    "url": "/posts/DailyDev/正则表达式必知必会__读书笔记/",
-    "content": "## 第二章. 匹配单个字符\n\n- ' . ' 用来匹配任意单一字符, 元字符的一种\n\n- ' \\ '为转义字符, 属于元字符的一种, 元字符: 有特殊含义的字符\n\n- 正则表达式被称为模式(pattern)\n\n\n\n## 第三章. 匹配一组字符\n\n- ' [ ] '为元字符, 表示一个字符集合, 必须匹配其中的一个或多个字符, 也可以全部匹配. ' [ ] '可以用来匹配大小写, 如[Aa].*就匹配任意以A或a或Aa开头的字符串. 还有几种常见的用法, 如[a-z] [A-Z] [0-9], 这几种很常用, 还有一个用法[A-Za-z0-9] 这个字符集可以匹配以上三种用法的合集\n\n- ' - '表示连字符, 是一种较为特殊的元字符, 只有在' [ ] ' 里才是元字符, 在其他地方就是一个普通的字符' - ', 也因此在这种情况下它不需要转义\n\n- ' ^ ' 表示排除, 也是元字符. 在上面的几种用法中, 在集合的最前面加上' ^ ', 就表示匹配除了该集合以外的字符, 而且需要注意的是, ' ^ '的作用域是整个字符集合, 而不是紧跟在其身后的单个字符什么的\n\n  \n\n## 第...",
-    "summary": "",
-    "tags": [
-      "Regular Expression"
-    ],
-    "category": "Daily Dev",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "neo4j常用命令",
-    "url": "/posts/DailyDev/neo4j/",
-    "content": "## neo4j启动与访问\n\n启动neo4j\n\n```bash\ndocker start test_neo4j\ndocker exec -it test_neo4j /bin/bash\n```\n\n访问browser\n\n```\nhttp://localhost:7474/browser/\n```\n\n访问database\n\n```\nneo4j://localhost:7687\nauth: neo4j\npw: 5225400599\n```\n\n\n\n## CQL语法\n\n### create 创建节点\n\n```cypher\nCREATE (\n   \u003cnode-name\u003e:\u003clabel-name\u003e\n   { \t\n      \u003cProperty1-name\u003e:\u003cProperty1-Value\u003e\n      ........\n      \u003cPropertyn-name\u003e:\u003cPropertyn-Value\u003e\n   }\n)\n```\n\n\n\n### match 查询节点或属性\n\n```cypher\n# 查询Dept下的内容\nMATCH (dept:Dept) return dept\n\n# 查询Employee标...",
-    "summary": "",
-    "tags": [
-      "Neo4j"
-    ],
-    "category": "Daily Dev",
-    "date": "2024-06-26"
-  },
-  {
-    "title": "SQL",
-    "url": "/posts/DailyDev/Mysql必知必会读书笔记/",
-    "content": "## 第一章：数据库基础\n\n----------------\n\n数据库：保存有组织的数据的容器（通常是一个文件或一组文件）\n\n数据库软件（DBMS）：MySql，Oracle，MongoDB之类。人们通常用数据库来代替数据库软件的名称\n\n表（table）：某种特定类型数据的结构化清单\n\n模式：关于数据库和表的布局及特性的信息\n\n列（column）：表中的一个字段（该列由字段来唯一标识），所有表都是由一个或多个列组成的，每一列都有自己的数据类型\n\n行（row）：表中的一条数据是由行来存储的\n\n主键（primary key）：唯一标识表中每行的这个列就是主键，应该总是定义主键\n\n\u003e 关于主键：\n\u003e\n\u003e - 任意两行都不具有相同的主键值\n\u003e - 每个行都必须有一个主键值\n\nSQL：结构化查询语言\n\n\n\n## 第二章：MySQL简介\n\n--------\n\n略\n\n\n\n## 第三章：使用MySQL\n\n-------\n\n1. 登录数据库\n\n   默认主机名：localhost\n\n   默认端口：3306\n\n   ```shell\n   mysql -u root -p\n   # 然后输入密码\n   ...",
-    "summary": "",
-    "tags": [
-      "MySQL"
-    ],
-    "category": "Daily Dev",
     "date": "2024-06-26"
   },
   {
@@ -1215,9 +1165,75 @@
     "date": "2024-06-26"
   },
   {
-    "title": "Inception V3",
-    "url": "/posts/ClassicPaperTranslation/InceptionV3/",
-    "content": "# Inception V3\n\n## Abstract\n\n对许多任务而言，卷积网络是目前最新的计算机视觉解决方案的核心。从2014年开始，深度卷积网络开始变成主流，在各种基准数据集上都取得了实质性成果。对于大多数任务而言，虽然增加的模型大小和计算成本都趋向于转化为直接的质量收益（只要提供足够的标注数据去训练），但计算效率和低参数计数仍是各种应用场景的限制因素，例如移动视觉和大数据场景。目前，我们正在探索增大网络的方法，目标是通过适当的分解卷积和积极的正则化来尽可能地有效利用增加的计算。我们在ILSVRC 2012分类挑战赛的验证集上评估了我们的方法，结果证明我们的方法超过了目前最先进的方法并取得了实质性收益：对于单一框架评估错误率为：`21.2% top-1`和`5.6% top-5`，使用的网络计算代价为每次推断需要进行50亿次乘加运算并使用不到2500万的参数。通过四个模型组合和多次评估，我们报告了`3.5% top-5`和`17.3% top-1`的错误率。\n\n\n\n## 1. Introduction\n\n从2012年Krizhevsky等人[9]赢得了ImageNet竞赛[16]...",
+    "title": "ResNet",
+    "url": "/posts/ClassicPaperTranslation/ResNet/",
+    "content": "# ResNet\n\n## Abstract\n\n更深的神经网络更难训练。我们提出了一种残差学习框架来减轻网络训练，这些网络比以前使用的网络更深。我们明确地将层变为学习关于层输入的残差函数，而不是学习未参考的函数。我们提供了全面的经验证据说明这些残差网络很容易优化，并可以显著增加深度来提高准确性。在ImageNet数据集上我们评估了深度高达152层的残差网络——比VGG[40]深8倍但仍具有较低的复杂度。这些残差网络的集合在ImageNet测试集上取得了`3.57%`的错误率。这个结果在ILSVRC 2015分类任务上赢得了第一名。我们也在CIFAR-10上分析了100层和1000层的残差网络。\n\n对于许多视觉识别任务而言，表示的深度是至关重要的。仅由于我们非常深度的表示，我们便在COCO目标检测数据集上得到了28%的相对提高。深度残差网络是我们向ILSVRC和COCO 2015竞赛提交的基础，我们也赢得了ImageNet检测任务，ImageNet定位任务，COCO检测和COCO分割任务的第一名。\n\n\n\n## 1. Introduction\n\n深度卷积神经网络[22, 21]导致了图像分类...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "neo4j常用命令",
+    "url": "/posts/DailyDev/neo4j/",
+    "content": "## neo4j启动与访问\n\n启动neo4j\n\n```bash\ndocker start test_neo4j\ndocker exec -it test_neo4j /bin/bash\n```\n\n访问browser\n\n```\nhttp://localhost:7474/browser/\n```\n\n访问database\n\n```\nneo4j://localhost:7687\nauth: neo4j\npw: 5225400599\n```\n\n\n\n## CQL语法\n\n### create 创建节点\n\n```cypher\nCREATE (\n   \u003cnode-name\u003e:\u003clabel-name\u003e\n   { \t\n      \u003cProperty1-name\u003e:\u003cProperty1-Value\u003e\n      ........\n      \u003cPropertyn-name\u003e:\u003cPropertyn-Value\u003e\n   }\n)\n```\n\n\n\n### match 查询节点或属性\n\n```cypher\n# 查询Dept下的内容\nMATCH (dept:Dept) return dept\n\n# 查询Employee标...",
+    "summary": "",
+    "tags": [
+      "Neo4j"
+    ],
+    "category": "Daily Dev",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "正则表达式",
+    "url": "/posts/DailyDev/正则表达式必知必会__读书笔记/",
+    "content": "## 第二章. 匹配单个字符\n\n- ' . ' 用来匹配任意单一字符, 元字符的一种\n\n- ' \\ '为转义字符, 属于元字符的一种, 元字符: 有特殊含义的字符\n\n- 正则表达式被称为模式(pattern)\n\n\n\n## 第三章. 匹配一组字符\n\n- ' [ ] '为元字符, 表示一个字符集合, 必须匹配其中的一个或多个字符, 也可以全部匹配. ' [ ] '可以用来匹配大小写, 如[Aa].*就匹配任意以A或a或Aa开头的字符串. 还有几种常见的用法, 如[a-z] [A-Z] [0-9], 这几种很常用, 还有一个用法[A-Za-z0-9] 这个字符集可以匹配以上三种用法的合集\n\n- ' - '表示连字符, 是一种较为特殊的元字符, 只有在' [ ] ' 里才是元字符, 在其他地方就是一个普通的字符' - ', 也因此在这种情况下它不需要转义\n\n- ' ^ ' 表示排除, 也是元字符. 在上面的几种用法中, 在集合的最前面加上' ^ ', 就表示匹配除了该集合以外的字符, 而且需要注意的是, ' ^ '的作用域是整个字符集合, 而不是紧跟在其身后的单个字符什么的\n\n  \n\n## 第...",
+    "summary": "",
+    "tags": [
+      "Regular Expression"
+    ],
+    "category": "Daily Dev",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "VGG",
+    "url": "/posts/ClassicPaperTranslation/VGG/",
+    "content": "# VGG\n\n## ABSTRACT\n\n本文研究了卷积网络深度在大规模的图像识别环境下对准确性的影响。主要贡献是使用非常小的（3×3）卷积滤波器架构对网络深度的增加进行了全面评估，这表明通过将深度推到16-19加权层可以实现对现有技术配置的显著改进。这些发现是ImageNet Challenge 2014提交的基础，本文作者团队在定位和分类过程中分别获得了第一名和第二名。\n\n\n\n## 1 INTRODUCTION\n\n随着ConvNets在计算机视觉领域越来越商品化，为了达到更好的准确性，已经进行了许多尝试来改进Krizhevsky等人（2012）最初的架构。例如，ILSVRC-2013（Zeiler＆Fergus，2013；Sermanet等，2014）表现最佳的提交使用了更小的感受窗口尺寸和更小的第一卷积层步长。另一条改进措施在整个图像和多个尺度上对网络进行密集地训练和测试（Sermanet等，2014；Howard，2014）。在本文中，解决了ConvNet架构设计的另一个重要方面——其深度。为此修正了架构的其它参数，并通过添加更多的卷积层来稳定地增加网络的深度，这是可行的，因为在...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "SQL",
+    "url": "/posts/DailyDev/Mysql必知必会读书笔记/",
+    "content": "## 第一章：数据库基础\n\n----------------\n\n数据库：保存有组织的数据的容器（通常是一个文件或一组文件）\n\n数据库软件（DBMS）：MySql，Oracle，MongoDB之类。人们通常用数据库来代替数据库软件的名称\n\n表（table）：某种特定类型数据的结构化清单\n\n模式：关于数据库和表的布局及特性的信息\n\n列（column）：表中的一个字段（该列由字段来唯一标识），所有表都是由一个或多个列组成的，每一列都有自己的数据类型\n\n行（row）：表中的一条数据是由行来存储的\n\n主键（primary key）：唯一标识表中每行的这个列就是主键，应该总是定义主键\n\n\u003e 关于主键：\n\u003e\n\u003e - 任意两行都不具有相同的主键值\n\u003e - 每个行都必须有一个主键值\n\nSQL：结构化查询语言\n\n\n\n## 第二章：MySQL简介\n\n--------\n\n略\n\n\n\n## 第三章：使用MySQL\n\n-------\n\n1. 登录数据库\n\n   默认主机名：localhost\n\n   默认端口：3306\n\n   ```shell\n   mysql -u root -p\n   # 然后输入密码\n   ...",
+    "summary": "",
+    "tags": [
+      "MySQL"
+    ],
+    "category": "Daily Dev",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "GoogleNet V1",
+    "url": "/posts/ClassicPaperTranslation/GoogleNetV1/",
+    "content": "# GoogleNet V1\n\n## Abstract\n\n本文作者在ImageNet大规模视觉识别挑战赛2014（ILSVRC14）上提出了一种代号为Inception的深度卷积神经网络结构，并在分类和检测上取得了新的最好结果。这个架构的主要特点是提高了网络内部计算资源的利用率。通过精心的手工设计，在增加了网络深度和广度的同时保持了计算预算不变。为了优化质量，架构的设计以赫布理论和多尺度处理直觉为基础。作者在ILSVRC14提交中应用的一个特例被称为GoogLeNet，一个22层的深度网络，其质量在分类和检测的背景下进行了评估。\n\n\n\n## 1. Introduction\n\n过去三年中，由于深度学习和卷积网络的发展[10]，目标分类和检测能力得到了显著提高。一个令人鼓舞的消息是，大部分的进步不仅仅是更强大硬件、更大数据集、更大模型的结果，而主要是新的想法、算法和网络结构改进的结果。例如，ILSVRC 2014竞赛中最靠前的输入除了用于检测目的的分类数据集之外，没有使用新的数据资源。本文在ILSVRC 2014中的GoogLeNet提交实际使用的参数只有两年前Krizhevsky等人[9...",
+    "summary": "",
+    "tags": [
+      "NN"
+    ],
+    "category": "ClassicPaperTranslation",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "GoogleNet V2",
+    "url": "/posts/ClassicPaperTranslation/GoogLeNetV2/",
+    "content": "# GoogLeNet V2\n\n## Abstract\n\n训练深度神经网络的复杂性在于，每层输入的分布在训练过程中会发生变化，因为前面的层的参数会发生变化。通过要求较低的学习率和仔细的参数初始化减慢了训练，并且使具有饱和非线性的模型训练起来非常困难。本文将这种现象称为*内部协变量转移*，并通过标准化层输入来解决这个问题。本文力图使标准化成为模型架构的一部分，并为*每个训练小批量数据*执行标准化。批标准化使我们能够使用更高的学习率，并且不用太注意初始化。它也作为一个正则化项，在某些情况下不需要Dropout。将批量标准化应用到最先进的图像分类模型上，批标准化在取得相同的精度的情况下，减少了14倍的训练步骤，并以显著的差距击败了原始模型。使用批标准化网络的组合，我们改进了在ImageNet分类上公布的最佳结果：达到了`4.9％ top-5`的验证误差（和`4.8％`测试误差），超过了人类评估者的准确性。\n\n\n\n## 1. Introduction\n\n随机梯度下降（SGD）已经被证明是训练深度网络的有效方式，并且已经使用诸如动量（Sutskever等，2013）和Adagrad（Duchi等...",
     "summary": "",
     "tags": [
       "NN"
