@@ -1,7 +1,8 @@
 ---
 title: "关于镇海"
 date: "2026-05-28"
-layout: about
+url: "/about/"
+toc: true
 ---
 
 碧蓝航线角色 **镇海（Zhenhai）** 的主题展示页面。以下收录了镇海的设定图、皮肤、不同形态的官方素材。
