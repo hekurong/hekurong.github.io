@@ -2423,3 +2423,59 @@ body,
 }
 
 /* ----------------------------------------------------------------- */
+/*  29. AI Badge & Series                                             */
+/* ----------------------------------------------------------------- */
+.ai-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 0.65rem;
+  font-family: var(--font-ui);
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 0.4em;
+  vertical-align: middle;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.post-card-title .ai-badge {
+  margin-left: 0.4em;
+}
+
+.article-meta .ai-badge {
+  margin-left: 0;
+}
+
+/* Series badge in article meta */
+.series-badge {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+}
+.series-badge a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+.series-badge a:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+/* Series annotation on post cards */
+.post-card-series {
+  margin-top: 0.4em;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-ui);
+}
+.post-card-series a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.post-card-series a:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+/* ----------------------------------------------------------------- */
