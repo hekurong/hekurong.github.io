@@ -208,6 +208,15 @@
     "date": "2026-05-28"
   },
   {
+    "title": "关于镇海",
+    "url": "/about/",
+    "content": "碧蓝航线角色 **镇海（Zhenhai）** 的主题展示页面。以下收录了镇海的设定图、皮肤、不同形态的官方素材。",
+    "summary": "",
+    "tags": null,
+    "category": "",
+    "date": "2026-05-28"
+  },
+  {
     "title": "Agent三大经典范式学习",
     "url": "/posts/DailyDev/Agent三大经典范式学习/",
     "content": "当前大模型智能体（LLM-based Agents）设计中最为核心的三种认知范式。\n\n- ReAct (Reasoning + Acting)\n- Plan-and-Solve (P\u0026S)\n- Self-Reflection (Reflexion)\n\n## 1. ReAct (Reasoning + Acting)\n\n### 核心概念\n\nReAct 由 Google 和普林斯顿大学提出。其核心思想是让大模型交替进行**推理（Thought）\\**和\\**行动（Action）**。\n\n- **Thought**: 帮助模型明确当前目标、分析环境、追踪状态。\n- **Action**: 允许模型通过工具（如搜索引擎、计算器）与外部环境交互。\n- **Observation**: 观察行动的结果并将其反馈给模型。\n\n### 流程细节\n\n1. **接收任务**: 输入用户指令。\n2. **推理循环**:\n   - 模型生成 `Thought`：分析当前进度，决定下一步做什么。\n   - 模型生成 `Action`：指定调用的工具和参数。\n   - 环境执行 `Action` 并返回 `Obse...",
