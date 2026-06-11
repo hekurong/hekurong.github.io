@@ -173,7 +173,7 @@
     if (!searchResults) return;
 
     if (!query || query.trim() === "") {
-      searchResults.textContent = "输入关键词搜索文章...";
+      renderSearchHistory();
       activeResultIdx = -1;
       return;
     }
@@ -216,6 +216,45 @@
   }
 
   /* ================================================================ */
+  /*  4.5. Search History                                             */
+  /* ================================================================ */
+
+  var HISTORY_KEY = "chenhai-search-history";
+  var MAX_HISTORY = 5;
+
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+    catch (e) { return []; }
+  }
+
+  function saveToHistory(query) {
+    if (!query || !query.trim()) return;
+    var h = getHistory();
+    h = h.filter(function (q) { return q !== query; });
+    h.unshift(query);
+    if (h.length > MAX_HISTORY) h = h.slice(0, MAX_HISTORY);
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch (e) {}
+  }
+
+  function renderSearchHistory() {
+    var h = getHistory();
+    if (h.length === 0 || (searchInput.value && searchInput.value.trim())) { return; }
+    var html = '<div class="search-history"><div class="search-history-title">最近搜索</div>';
+    for (var i = 0; i < h.length; i++) {
+      html += '<span class="search-history-item" data-query="' + escapeHtml(h[i]) + '">' + escapeHtml(h[i]) + '</span>';
+    }
+    html += '</div>';
+    searchResults.innerHTML = html;
+
+    document.querySelectorAll(".search-history-item").forEach(function (el) {
+      el.addEventListener("click", function () {
+        searchInput.value = this.getAttribute("data-query");
+        performSearch(searchInput.value);
+      });
+    });
+  }
+
+  /* ================================================================ */
   /*  5. Perform Search (debounced)                                   */
   /* ================================================================ */
 
@@ -228,10 +267,14 @@
       }
       if (!searchIndexLoaded) {
         loadSearchIndex(function () {
-          renderResults(search(query), query);
+          var r = search(query);
+          saveToHistory(query);
+          renderResults(r, query);
         });
       } else {
-        renderResults(search(query), query);
+        var r = search(query);
+        saveToHistory(query);
+        renderResults(r, query);
       }
     }, 300);
   }

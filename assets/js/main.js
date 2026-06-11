@@ -382,9 +382,8 @@
       a.setAttribute('aria-label', 'Link to this heading');
       a.addEventListener('click', function (e) {
         e.preventDefault();
-        history.replaceState(null, '', a.href);
-        navigator.clipboard.writeText(location.origin + location.pathname + a.href).catch(function () {});
-        h.scrollIntoView({ behavior: 'smooth' });
+        location.hash = h.id;
+        navigator.clipboard.writeText(location.origin + location.pathname + '#' + h.id).catch(function () {});
       });
       h.appendChild(a);
     });

@@ -1710,6 +1710,36 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   font-size: 0.85rem;
 }
 
+/* Search history */
+.search-history {
+  padding: 1rem 1.5rem;
+}
+.search-history-title {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.search-history-item {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--color-link);
+  background: var(--color-bg-alt);
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin: 2px 4px 2px 0;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.search-history-item:hover {
+  background: var(--color-link);
+  color: var(--color-bg);
+}
+}
+
 /* Keyboard shortcut hint */
 .search-modal-input-wrap {
   display: flex;
