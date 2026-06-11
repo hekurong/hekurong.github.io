@@ -237,8 +237,9 @@
   }
 
   function renderSearchHistory() {
+    if (searchInput.value && searchInput.value.trim()) { return; }
     var h = getHistory();
-    if (h.length === 0 || (searchInput.value && searchInput.value.trim())) { return; }
+    if (h.length === 0) { searchResults.textContent = "输入关键词搜索文章..."; return; }
     var html = '<div class="search-history"><div class="search-history-title">最近搜索</div>';
     for (var i = 0; i < h.length; i++) {
       html += '<span class="search-history-item" data-query="' + escapeHtml(h[i]) + '">' + escapeHtml(h[i]) + '</span>';
@@ -267,14 +268,10 @@
       }
       if (!searchIndexLoaded) {
         loadSearchIndex(function () {
-          var r = search(query);
-          saveToHistory(query);
-          renderResults(r, query);
+          renderResults(search(query), query);
         });
       } else {
-        var r = search(query);
-        saveToHistory(query);
-        renderResults(r, query);
+        renderResults(search(query), query);
       }
     }, 300);
   }
@@ -382,6 +379,7 @@
         } else if (e.key === "Enter") {
           if (isComposing) return;
           e.preventDefault();
+          saveToHistory(searchInput.value);
           if (activeResultIdx >= 0) {
             activateCurrentResult();
           } else {
