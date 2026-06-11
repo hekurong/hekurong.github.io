@@ -1629,6 +1629,13 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   color: var(--color-text);
 }
 
+.search-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
 .search-modal-hint {
   font-family: var(--font-ui);
   font-size: 0.68rem;
