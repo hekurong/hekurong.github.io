@@ -1610,28 +1610,30 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
 }
 
 .search-modal-close {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border: none;
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
-  border-radius: 6px;
-  font-size: 1.1rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  opacity: 0.4;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.15s;
 }
 .search-modal-close:hover {
-  background: var(--color-bg-alt);
+  opacity: 0.8;
   color: var(--color-text);
 }
 
 .search-modal-hint {
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--color-text-secondary);
-  opacity: 0.5;
+  opacity: 0.35;
   white-space: nowrap;
   margin-left: 0.5rem;
 }

@@ -238,7 +238,7 @@
   function renderSearchHistory() {
     if (searchInput.value && searchInput.value.trim()) { return; }
     var h = getHistory();
-    if (h.length === 0) { searchResults.textContent = "输入关键词搜索文章..."; return; }
+    if (h.length === 0) { searchResults.innerHTML = ""; return; }
     var html = '<div class="search-history"><div class="search-history-title">最近搜索</div>';
     for (var i = 0; i < h.length; i++) {
       html += '<span class="search-history-item" data-query="' + escapeHtml(h[i]) + '">' + escapeHtml(h[i]) + '</span>';
