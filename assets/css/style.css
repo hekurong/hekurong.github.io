@@ -1744,11 +1744,34 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   transition: background 0.15s, color 0.15s;
 }
 .search-history-item:hover {
+
+.search-history-row {
+  display: inline-flex;
+  align-items: center;
+  margin: 2px 4px 2px 0;
+}
+.search-history-del {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+.search-history-row:hover .search-history-del {
+  opacity: 0.5;
+}
+.search-history-del:hover {
+  opacity: 1 !important;
+  color: var(--color-emphasis);
+}
   background: var(--color-link);
   color: var(--color-bg);
 }
 }
-
 /* Keyboard shortcut hint */
 .search-modal-input-wrap {
   display: flex;

@@ -219,7 +219,7 @@
   /* ================================================================ */
 
   var HISTORY_KEY = "chenhai-search-history";
-  var MAX_HISTORY = 5;
+  var MAX_HISTORY = 32;
 
   function getHistory() {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
@@ -241,17 +241,30 @@
     if (h.length === 0) { searchResults.innerHTML = ""; return; }
     var html = '<div class="search-history"><div class="search-history-title">最近搜索</div>';
     for (var i = 0; i < h.length; i++) {
-      html += '<span class="search-history-item" data-query="' + escapeHtml(h[i]) + '">' + escapeHtml(h[i]) + '</span>';
+      html += '<div class="search-history-row"><span class="search-history-item" data-query="' + escapeHtml(h[i]) + '">' + escapeHtml(h[i]) + '</span><button class="search-history-del" data-query="' + escapeHtml(h[i]) + '" title="删除">&times;</button></div>';
     }
     html += '</div>';
     searchResults.innerHTML = html;
 
     document.querySelectorAll(".search-history-item").forEach(function (el) {
-      el.addEventListener("click", function () {
+      el.addEventListener("click", function (e) {
+        e.stopPropagation();
         searchInput.value = this.getAttribute("data-query");
         performSearch(searchInput.value);
       });
     });
+    document.querySelectorAll(".search-history-del").forEach(function (el) {
+      el.addEventListener("click", function (e) {
+        e.stopPropagation();
+        removeFromHistory(this.getAttribute("data-query"));
+        renderSearchHistory();
+      });
+    });
+  }
+
+  function removeFromHistory(query) {
+    var h = getHistory().filter(function (q) { return q !== query; });
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch (e) {}
   }
 
   /* ================================================================ */
