@@ -291,10 +291,10 @@
 
     if (searchIndexLoadFailed) {
       searchResults.textContent = "搜索索引加载失败，请刷新页面重试";
-    } else {
-      searchResults.textContent = searchIndexLoaded
-        ? "输入关键词搜索文章..."
-        : "正在加载搜索索引...";
+    } else if (!searchInput || !searchInput.value.trim()) {
+      renderSearchHistory();
+    } else if (searchIndexLoaded) {
+      renderResults(search(searchInput.value), searchInput.value);
     }
 
     setTimeout(function () {
@@ -307,8 +307,6 @@
       loadSearchIndex(function () {
         if (searchInput && searchInput.value.trim()) {
           renderResults(search(searchInput.value), searchInput.value);
-        } else if (searchResults) {
-          searchResults.textContent = "输入关键词搜索文章...";
         }
       });
     }
@@ -366,6 +364,10 @@
     if (searchOverlay) searchOverlay.addEventListener("click", closeSearch);
 
     if (searchInput) {
+      var isComposing = false;
+      searchInput.addEventListener("compositionstart", function () { isComposing = true; });
+      searchInput.addEventListener("compositionend", function () { isComposing = false; });
+
       searchInput.addEventListener("input", function () {
         performSearch(searchInput.value);
       });
@@ -378,6 +380,7 @@
           e.preventDefault();
           navigateResults(-1);
         } else if (e.key === "Enter") {
+          if (isComposing) return;
           e.preventDefault();
           if (activeResultIdx >= 0) {
             activateCurrentResult();
