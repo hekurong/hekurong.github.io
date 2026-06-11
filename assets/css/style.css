@@ -2133,6 +2133,46 @@ body,
               box-shadow var(--transition-normal);
 }
 
+/* Prevent code blocks from overflowing on mobile */
+.article-content pre {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Dark mode image brightness — avoid blinding bright images */
+body.dark img:not(.site-hero-bg) {
+    filter: brightness(0.9);
+}
+
+body.dark .chroma img,
+body.dark .mermaid img {
+    filter: none;
+}
+
+/* Smoother transitions for code blocks */
+.highlight {
+    transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+/* ================================================================= */
+/*  M1. Mobile Responsive                                             */
+/* ================================================================= */
+@media (max-width: 768px) {
+  .floating-toc { display: none; }
+  .pagination { flex-wrap: wrap; gap: 0.3rem; }
+  .pagination a,
+  .pagination span { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+  .article-content pre { padding: 0.6rem 0.8rem; font-size: 0.75rem; margin: 1em 0; }
+  .post-card { padding: 0.8rem 0; }
+  .site-hero { padding: 2rem 0 1.5rem; }
+  .site-hero-title { font-size: 1.6rem; }
+}
+
+@media (max-width: 480px) {
+  .site-hero-title { font-size: 1.3rem; }
+  .post-card-title { font-size: 1rem; }
+  .article-content pre { padding: 0.4rem 0.6rem; font-size: 0.7rem; }
+}
+
 /* ----------------------------------------------------------------- */
 /*  25. Utility Classes                                               */
 /* ----------------------------------------------------------------- */

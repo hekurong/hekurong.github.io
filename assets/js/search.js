@@ -53,7 +53,7 @@
 
     searchIndexLoading = true;
     if (searchResults) {
-      searchResults.textContent = "Loading search index...";
+      searchResults.textContent = "正在加载搜索索引...";
     }
 
     var xhr = new XMLHttpRequest();
@@ -91,38 +91,54 @@
   }
 
   /* ================================================================ */
-  /*  3. Fuse.js Fuzzy Search                                         */
+  /*  3. Custom Scoring Search (weighted + recency boost)              */
   /* ================================================================ */
-
-  var fuseOptions = {
-    keys: [
-      { name: "title", weight: 0.4 },
-      { name: "summary", weight: 0.2 },
-      { name: "content", weight: 0.1 },
-      { name: "tags", weight: 0.2 },
-      { name: "category", weight: 0.1 }
-    ],
-    threshold: 0.4,
-    includeScore: true,
-    ignoreLocation: true
-  };
-
-  var _fuse = null;
-
-  function getFuse() {
-    if (!_fuse && searchIndex.length > 0) {
-      _fuse = new Fuse(searchIndex, fuseOptions);
-    }
-    return _fuse;
-  }
 
   function search(query) {
     if (!query || query.trim() === "") return [];
-    var fuse = getFuse();
-    if (!fuse) return [];
+    var terms = query.trim().toLowerCase().split(/\s+/).filter(function (t) { return t.length > 0; });
+    if (terms.length === 0) return [];
 
-    var results = fuse.search(query.trim());
-    return results.map(function (r) { return r.item; });
+    var now = Date.now();
+    var yearMs = 365.25 * 24 * 60 * 60 * 1000;
+    var results = [];
+
+    for (var i = 0; i < searchIndex.length; i++) {
+      var entry = searchIndex[i];
+      var titleLower = (entry.title || "").toLowerCase();
+      var contentLower = (entry.content || "").toLowerCase();
+      var summaryLower = (entry.summary || "").toLowerCase();
+      var score = 0;
+
+      for (var t = 0; t < terms.length; t++) {
+        var term = terms[t];
+        if (titleLower.indexOf(term) >= 0) score += 10;
+        if (entry.tags && entry.tags.some(function (tag) { return tag.toLowerCase().indexOf(term) >= 0; })) score += 5;
+        if (summaryLower.indexOf(term) >= 0) score += 3;
+        if (contentLower.indexOf(term) >= 0) score += 1;
+      }
+
+      if (score > 0) {
+        // Recency boost: newer articles get up to +5 extra points
+        if (entry.date) {
+          var entryDate = new Date(entry.date).getTime();
+          if (!isNaN(entryDate)) {
+            var ageMs = now - entryDate;
+            if (ageMs < yearMs) {
+              score += 5;
+            } else if (ageMs < 2 * yearMs) {
+              score += 3;
+            } else if (ageMs < 3 * yearMs) {
+              score += 1;
+            }
+          }
+        }
+        results.push({ entry: entry, score: score });
+      }
+    }
+
+    results.sort(function (a, b) { return b.score - a.score; });
+    return results.slice(0, 20).map(function (r) { return r.entry; });
   }
 
   /* ================================================================ */
@@ -157,13 +173,13 @@
     if (!searchResults) return;
 
     if (!query || query.trim() === "") {
-      searchResults.textContent = "Enter keyword to search...";
+      searchResults.textContent = "输入关键词搜索文章...";
       activeResultIdx = -1;
       return;
     }
 
     if (results.length === 0) {
-      searchResults.textContent = "未找到相关内容";
+      searchResults.textContent = "未找到相关内容，请尝试其他关键词";
       activeResultIdx = -1;
       return;
     }
@@ -207,7 +223,7 @@
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(function () {
       if (searchIndexLoadFailed) {
-        if (searchResults) searchResults.textContent = "搜索不可用";
+        if (searchResults) searchResults.textContent = "搜索索引加载失败，请刷新页面重试";
         return;
       }
       if (!searchIndexLoaded) {
@@ -231,11 +247,11 @@
     searchModal.classList.add("active");
 
     if (searchIndexLoadFailed) {
-      searchResults.textContent = "搜索不可用";
+      searchResults.textContent = "搜索索引加载失败，请刷新页面重试";
     } else {
       searchResults.textContent = searchIndexLoaded
-        ? "Enter keyword to search..."
-        : "Loading search index...";
+        ? "输入关键词搜索文章..."
+        : "正在加载搜索索引...";
     }
 
     setTimeout(function () {
@@ -249,7 +265,7 @@
         if (searchInput && searchInput.value.trim()) {
           renderResults(search(searchInput.value), searchInput.value);
         } else if (searchResults) {
-          searchResults.textContent = "Enter keyword to search...";
+          searchResults.textContent = "输入关键词搜索文章...";
         }
       });
     }
