@@ -53,7 +53,6 @@
 
     searchIndexLoading = true;
     if (searchResults) {
-      searchResults.textContent = "正在加载搜索索引...";
     }
 
     var xhr = new XMLHttpRequest();
