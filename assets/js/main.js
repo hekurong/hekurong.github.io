@@ -470,6 +470,8 @@
 
     var countMap = hm.data;
     var currentYear = hm.years[0];
+    var DAY_MS = 86400000;
+    var dayNames = ['', '一', '', '三', '', '五', '']; // Mon, Wed, Fri labels
 
     function renderHeatmap(year) {
       container.innerHTML = '';
@@ -488,46 +490,121 @@
         container.appendChild(switcher);
       }
 
-      // Grid wrapper
-      var gridWrap = document.createElement('div');
-      gridWrap.className = 'heatmap-grid-wrap';
+      var wrapper = document.createElement('div');
+      wrapper.className = 'heatmap-wrapper';
 
-      // Month labels
-      var monthLabels = document.createElement('div');
-      monthLabels.className = 'heatmap-month-labels';
-      var months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-      months.forEach(function (m) {
-        var span = document.createElement('span');
-        span.textContent = m;
-        monthLabels.appendChild(span);
-      });
-      gridWrap.appendChild(monthLabels);
+      // Build week-based grid for the year
+      var yearStart = new Date(year, 0, 1);
+      var yearEnd = new Date(year, 11, 31);
+      var today = new Date();
+      if (yearEnd > today) yearEnd = today;
 
-      // Day cells grid (365 days)
-      var grid = document.createElement('div');
-      grid.className = 'heatmap-grid';
-      var start = new Date(year, 0, 1);
-      var end = new Date(year, 11, 31);
-      if (end > new Date()) end = new Date();
+      // Find the Monday on or before Jan 1
+      var gridStart = new Date(yearStart);
+      var startDay = gridStart.getDay(); // 0=Sun, 1=Mon, ...
+      var daysToMonday = startDay === 0 ? 6 : startDay - 1;
+      gridStart.setDate(gridStart.getDate() - daysToMonday);
 
-      for (var d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        var ds = d.toISOString().slice(0, 10);
-        var cell = document.createElement('div');
-        cell.className = 'heatmap-cell';
-        var c = countMap[ds] || 0;
-        if (c > 0) cell.dataset.count = Math.min(c, 5);
-        cell.title = ds + ': ' + c + ' 篇';
-        grid.appendChild(cell);
+      // Build weeks: each week is 7 cells (Mon-Sun)
+      var weeks = [];
+      var weekLabels = []; // month labels per week
+      var currentMonth = -1;
+      var d = new Date(gridStart);
+
+      while (d <= yearEnd) {
+        var week = [];
+        for (var i = 0; i < 7; i++) {
+          var ds = d.toISOString().slice(0, 10);
+          var isInYear = d.getFullYear() === year;
+          week.push({
+            date: ds,
+            count: isInYear ? (countMap[ds] || 0) : -1,
+            inYear: isInYear,
+            month: d.getMonth()
+          });
+          d = new Date(d.getTime() + DAY_MS);
+        }
+        weeks.push(week);
+
+        // Check if a new month starts in this week
+        var firstInYear = null;
+        for (var j = 0; j < 7; j++) {
+          if (week[j].inYear) { firstInYear = week[j]; break; }
+        }
+        if (firstInYear && firstInYear.month !== currentMonth) {
+          currentMonth = firstInYear.month;
+          weekLabels.push({ weekIdx: weeks.length - 1, label: (currentMonth + 1) + '月' });
+        }
       }
-      gridWrap.appendChild(grid);
+
+      // Render month labels row
+      var monthRow = document.createElement('div');
+      monthRow.className = 'heatmap-month-row';
+      monthRow.style.paddingLeft = '30px'; // space for day labels
+      var nextLabel = 0;
+      for (var wi = 0; wi < weeks.length; wi++) {
+        var cell = document.createElement('div');
+        cell.className = 'heatmap-month-cell';
+        if (nextLabel < weekLabels.length && weekLabels[nextLabel].weekIdx === wi) {
+          cell.textContent = weekLabels[nextLabel].label;
+          nextLabel++;
+        }
+        monthRow.appendChild(cell);
+      }
+      wrapper.appendChild(monthRow);
+
+      // Render grid with day labels
+      var gridContainer = document.createElement('div');
+      gridContainer.className = 'heatmap-grid-container';
+
+      // Day labels (left side)
+      var dayCol = document.createElement('div');
+      dayCol.className = 'heatmap-day-labels';
+      for (var di = 0; di < 7; di++) {
+        var dl = document.createElement('div');
+        dl.className = 'heatmap-day-label';
+        dl.textContent = dayNames[di];
+        dayCol.appendChild(dl);
+      }
+      gridContainer.appendChild(dayCol);
+
+      // Cell grid
+      var cellGrid = document.createElement('div');
+      cellGrid.className = 'heatmap-cell-grid';
+      // Column gap as CSS variable
+      cellGrid.style.display = 'flex';
+      cellGrid.style.gap = '3px';
+
+      for (var wi2 = 0; wi2 < weeks.length; wi2++) {
+        var col = document.createElement('div');
+        col.style.display = 'flex';
+        col.style.flexDirection = 'column';
+        col.style.gap = '3px';
+        for (var di2 = 0; di2 < 7; di2++) {
+          var cellData = weeks[wi2][di2];
+          var cellEl = document.createElement('div');
+          cellEl.className = 'heatmap-cell';
+          if (cellData.count < 0) {
+            cellEl.style.visibility = 'hidden';
+          } else {
+            var c = cellData.count;
+            if (c > 0) cellEl.dataset.count = Math.min(c, 5);
+            cellEl.title = cellData.date + ': ' + c + ' 篇';
+          }
+          col.appendChild(cellEl);
+        }
+        cellGrid.appendChild(col);
+      }
+      gridContainer.appendChild(cellGrid);
+      wrapper.appendChild(gridContainer);
 
       // Legend
       var legend = document.createElement('div');
       legend.className = 'heatmap-legend';
       legend.innerHTML = '少 <span style="background:var(--color-border-light)"></span> <span style="background:#9be9a8"></span> <span style="background:#40c463"></span> <span style="background:#30a14e"></span> <span style="background:#216e39"></span> <span style="background:#0e4429"></span> 多';
-      gridWrap.appendChild(legend);
+      wrapper.appendChild(legend);
 
-      container.appendChild(gridWrap);
+      container.appendChild(wrapper);
     }
 
     renderHeatmap(currentYear);
