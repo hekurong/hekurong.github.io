@@ -540,7 +540,7 @@
       // Render month labels row
       var monthRow = document.createElement('div');
       monthRow.className = 'heatmap-month-row';
-      monthRow.style.paddingLeft = '30px'; // space for day labels
+      monthRow.style.paddingLeft = '22px'; // space for day labels
       var nextLabel = 0;
       for (var wi = 0; wi < weeks.length; wi++) {
         var cell = document.createElement('div');
@@ -571,15 +571,12 @@
       // Cell grid
       var cellGrid = document.createElement('div');
       cellGrid.className = 'heatmap-cell-grid';
-      // Column gap as CSS variable
       cellGrid.style.display = 'flex';
-      cellGrid.style.gap = '3px';
 
       for (var wi2 = 0; wi2 < weeks.length; wi2++) {
         var col = document.createElement('div');
         col.style.display = 'flex';
         col.style.flexDirection = 'column';
-        col.style.gap = '3px';
         for (var di2 = 0; di2 < 7; di2++) {
           var cellData = weeks[wi2][di2];
           var cellEl = document.createElement('div');
