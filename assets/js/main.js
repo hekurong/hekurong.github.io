@@ -390,33 +390,6 @@
   }
 
   /* ================================================================ */
-  /*  Tag Filter Bar (E5)                                              */
-  /* ================================================================ */
-
-  function initTagFilter() {
-    var bar = document.querySelector('.tag-filter-bar');
-    if (!bar) return;
-
-    bar.querySelectorAll('.tag-filter-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        bar.querySelectorAll('.tag-filter-btn').forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-
-        var tag = btn.dataset.tag;
-        document.querySelectorAll('.post-card').forEach(function (card) {
-          if (tag === '*') {
-            card.style.display = '';
-            return;
-          }
-          var tagEls = card.querySelectorAll('.post-card-tags .tag');
-          var hasTag = Array.from(tagEls).some(function (t) { return t.textContent.trim() === tag; });
-          card.style.display = hasTag ? '' : 'none';
-        });
-      });
-    });
-  }
-
-  /* ================================================================ */
   /*  Keyboard Shortcuts (E8)                                          */
   /* ================================================================ */
 
@@ -479,64 +452,6 @@
   }
 
   /* ================================================================ */
-  /*  Code Toolbar (E9) — line numbers & word wrap toggle              */
-  /* ================================================================ */
-
-  function initCodeToolbar() {
-    var lineVisible = localStorage.getItem('zhenhai-code-lines') !== 'hidden';
-    var wrapEnabled = localStorage.getItem('zhenhai-code-wrap') === 'enabled';
-
-    applyCodeSettings(lineVisible, wrapEnabled);
-
-    // Add toolbar to each code wrapper
-    document.querySelectorAll('.code-wrapper, .article-content pre.chroma').forEach(function (wrapper) {
-      if (!wrapper.classList.contains('code-wrapper') && wrapper.closest('.code-wrapper')) return;
-      if (wrapper.querySelector('.code-toolbar')) return;
-
-      var toolbar = document.createElement('div');
-      toolbar.className = 'code-toolbar';
-
-      var lineBtn = document.createElement('button');
-      lineBtn.className = 'code-toolbar-btn' + (lineVisible ? ' active' : '');
-      lineBtn.textContent = '行号';
-      lineBtn.addEventListener('click', function () {
-        lineVisible = !lineVisible;
-        localStorage.setItem('zhenhai-code-lines', lineVisible ? 'visible' : 'hidden');
-        applyCodeSettings(lineVisible, wrapEnabled);
-        syncCodeToolbarBtns();
-      });
-      toolbar.appendChild(lineBtn);
-
-      var wrapBtn = document.createElement('button');
-      wrapBtn.className = 'code-toolbar-btn' + (wrapEnabled ? ' active' : '');
-      wrapBtn.textContent = '换行';
-      wrapBtn.addEventListener('click', function () {
-        wrapEnabled = !wrapEnabled;
-        localStorage.setItem('zhenhai-code-wrap', wrapEnabled ? 'enabled' : 'disabled');
-        applyCodeSettings(lineVisible, wrapEnabled);
-        syncCodeToolbarBtns();
-      });
-      toolbar.appendChild(wrapBtn);
-
-      wrapper.insertBefore(toolbar, wrapper.firstChild);
-    });
-  }
-
-  function applyCodeSettings(lineV, wrapV) {
-    document.documentElement.classList.toggle('code-no-lines', !lineV);
-    document.documentElement.classList.toggle('code-wrap', wrapV);
-  }
-
-  function syncCodeToolbarBtns() {
-    var lineV = localStorage.getItem('zhenhai-code-lines') !== 'hidden';
-    var wrapV = localStorage.getItem('zhenhai-code-wrap') === 'enabled';
-    document.querySelectorAll('.code-toolbar-btn').forEach(function (btn) {
-      if (btn.textContent === '行号') btn.classList.toggle('active', lineV);
-      if (btn.textContent === '换行') btn.classList.toggle('active', wrapV);
-    });
-  }
-
-  /* ================================================================ */
   /*  Tag Cloud Sort (E14)                                             */
   /* ================================================================ */
 
@@ -549,30 +464,73 @@
     if (!container) return;
     var raw = container.dataset.heatmap;
     if (!raw) return;
-    var data;
-    try { data = JSON.parse(raw); } catch (e) { return; }
-    if (!data.length) { container.style.display = 'none'; return; }
-    var countMap = {};
-    data.forEach(function (d) { countMap[d.date] = d.count; });
-    var today = new Date();
-    var start = new Date(today);
-    start.setFullYear(start.getFullYear() - 1);
-    var grid = document.createElement('div');
-    grid.className = 'heatmap-grid';
-    for (var d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
-      var ds = d.toISOString().slice(0, 10);
-      var cell = document.createElement('div');
-      cell.className = 'heatmap-cell';
-      var c = countMap[ds] || 0;
-      if (c > 0) cell.dataset.count = Math.min(c, 5);
-      cell.title = ds + ': ' + c + ' 篇';
-      grid.appendChild(cell);
+    var hm;
+    try { hm = JSON.parse(raw); } catch (e) { return; }
+    if (!hm.years || !hm.years.length) { container.style.display = 'none'; return; }
+
+    var countMap = hm.data;
+    var currentYear = hm.years[0];
+
+    function renderHeatmap(year) {
+      container.innerHTML = '';
+
+      // Year switcher
+      if (hm.years.length > 1) {
+        var switcher = document.createElement('div');
+        switcher.className = 'heatmap-year-switcher';
+        hm.years.forEach(function (y) {
+          var btn = document.createElement('button');
+          btn.className = 'heatmap-year-btn' + (y === year ? ' active' : '');
+          btn.textContent = y + '年';
+          btn.addEventListener('click', function () { renderHeatmap(y); });
+          switcher.appendChild(btn);
+        });
+        container.appendChild(switcher);
+      }
+
+      // Grid wrapper
+      var gridWrap = document.createElement('div');
+      gridWrap.className = 'heatmap-grid-wrap';
+
+      // Month labels
+      var monthLabels = document.createElement('div');
+      monthLabels.className = 'heatmap-month-labels';
+      var months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+      months.forEach(function (m) {
+        var span = document.createElement('span');
+        span.textContent = m;
+        monthLabels.appendChild(span);
+      });
+      gridWrap.appendChild(monthLabels);
+
+      // Day cells grid (365 days)
+      var grid = document.createElement('div');
+      grid.className = 'heatmap-grid';
+      var start = new Date(year, 0, 1);
+      var end = new Date(year, 11, 31);
+      if (end > new Date()) end = new Date();
+
+      for (var d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        var ds = d.toISOString().slice(0, 10);
+        var cell = document.createElement('div');
+        cell.className = 'heatmap-cell';
+        var c = countMap[ds] || 0;
+        if (c > 0) cell.dataset.count = Math.min(c, 5);
+        cell.title = ds + ': ' + c + ' 篇';
+        grid.appendChild(cell);
+      }
+      gridWrap.appendChild(grid);
+
+      // Legend
+      var legend = document.createElement('div');
+      legend.className = 'heatmap-legend';
+      legend.innerHTML = '少 <span style="background:var(--color-border-light)"></span> <span style="background:#9be9a8"></span> <span style="background:#40c463"></span> <span style="background:#30a14e"></span> <span style="background:#216e39"></span> <span style="background:#0e4429"></span> 多';
+      gridWrap.appendChild(legend);
+
+      container.appendChild(gridWrap);
     }
-    container.appendChild(grid);
-    var legend = document.createElement('div');
-    legend.className = 'heatmap-legend';
-    legend.innerHTML = '少 <span style="background:var(--color-border-light)"></span> <span style="background:#9be9a8"></span> <span style="background:#40c463"></span> <span style="background:#30a14e"></span> <span style="background:#216e39"></span> <span style="background:#0e4429"></span> 多';
-    container.appendChild(legend);
+
+    renderHeatmap(currentYear);
   }
 
   function initTagSort() {
@@ -635,10 +593,8 @@
     initMobileMenu();
     initReadingProgress();
     initSettingsPanel();
-    initTagFilter();
     initTagSort();
     initKeyboardShortcuts();
-    initCodeToolbar();
     initHeatmap();
 
     // Delay Mermaid init slightly to ensure DOM is fully rendered

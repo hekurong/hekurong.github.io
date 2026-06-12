@@ -2142,7 +2142,6 @@ body.dark .site-hero-title {
   .post-nav,
   .related-posts,
   .series-playlist,
-  .tag-filter-bar,
   .theme-toggle-btn,
   .settings-btn,
   .settings-panel,
@@ -2156,8 +2155,7 @@ body.dark .site-hero-title {
   .post-card-cover,
   .post-card-tags,
   .copy-btn,
-  .heading-anchor,
-  .code-toolbar {
+  .heading-anchor {
     display: none !important;
   }
 
@@ -2762,14 +2760,14 @@ body.dark .mermaid img {
 }
 
 /* E1: Font size via data attribute */
-[data-font-size="small"] { --font-size-base: 15px; }
-[data-font-size="medium"] { --font-size-base: 17px; }
-[data-font-size="large"] { --font-size-base: 19px; }
-body { font-size: var(--font-size-base, 17px); }
+html[data-font-size="small"] { --font-size-base: 15px; }
+html[data-font-size="medium"] { --font-size-base: 17px; }
+html[data-font-size="large"] { --font-size-base: 19px; }
+html { font-size: var(--font-size-base, 17px); }
 
 /* E2: Reading width via data attribute */
-[data-reading-width="narrow"] { --content-max-width: 680px; }
-[data-reading-width="wide"] { --content-max-width: 95%; }
+html[data-reading-width="narrow"] { --content-max-width: 680px; }
+html[data-reading-width="wide"] { --content-max-width: 95%; }
 
 /* E3: Dark mode brightness levels */
 body.dark[data-dark-level="deep"] {
@@ -2781,41 +2779,6 @@ body.dark[data-dark-level="medium"] {
   /* medium is the default dark mode — no change needed */
 }
 /* soft is the default already */
-
-/* ----------------------------------------------------------------- */
-/*  E5: Tag filter bar on homepage                                     */
-/* ----------------------------------------------------------------- */
-.tag-filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 1.5rem 0;
-  justify-content: center;
-}
-
-.tag-filter-btn {
-  padding: 0.25em 0.75em;
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  background: var(--color-bg);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all var(--transition-fast);
-  font-family: var(--font-ui);
-  white-space: nowrap;
-}
-
-.tag-filter-btn:hover {
-  border-color: var(--color-link);
-  color: var(--color-link);
-}
-
-.tag-filter-btn.active {
-  background: var(--color-link);
-  color: #fff;
-  border-color: var(--color-link);
-}
 
 /* Keyboard shortcuts panel (E8) */
 .shortcuts-panel {
@@ -2851,35 +2814,6 @@ body.dark[data-dark-level="medium"] {
   white-space: nowrap;
 }
 
-/* Code block toolbar (E9) */
-.code-no-lines .code-ln { display: none !important; }
-.code-wrap pre,
-.code-wrap .chroma { white-space: pre-wrap !important; word-break: break-all !important; }
-
-.code-toolbar {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-bottom: 0.3rem;
-}
-.code-toolbar-btn {
-  font-size: 0.75rem;
-  padding: 0.15em 0.5em;
-  border: 1px solid var(--color-border);
-  border-radius: 3px;
-  background: var(--color-bg);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-family: var(--font-ui);
-  transition: all var(--transition-fast);
-}
-.code-toolbar-btn:hover { border-color: var(--color-link); }
-.code-toolbar-btn.active {
-  background: var(--color-link);
-  color: #fff;
-  border-color: var(--color-link);
-}
-
 /* Tag sort bar (E14) */
 .tag-sort-bar {
   display: flex;
@@ -2906,7 +2840,7 @@ body.dark[data-dark-level="medium"] {
   border-color: var(--color-link);
 }
 
-/* Tag cloud colored cards (E10) */
+/* Tag cloud — ink-wash palette */
 .tag-cloud {
   display: flex;
   flex-wrap: wrap;
@@ -2921,14 +2855,19 @@ body.dark[data-dark-level="medium"] {
   padding: 0.6rem 1.1rem;
   border-radius: 10px;
   text-decoration: none;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  color: #fff;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+  border: 1px solid var(--color-border);
   font-weight: 600;
   gap: 0.1rem;
 }
 .tag-cloud-item:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  background: var(--color-tag-hover-bg);
+  border-color: var(--color-link);
+  color: var(--color-link);
 }
 .tag-cloud-item small {
   opacity: 0.85;
@@ -2943,16 +2882,6 @@ body.dark[data-dark-level="medium"] {
 .tag-size-lg { font-size: 1.15rem; padding: 0.6rem 1.1rem; }
 .tag-size-xl { font-size: 1.3rem; padding: 0.65rem 1.2rem; }
 
-/* Color by position — gradient palette */
-.tag-cloud-item:nth-child(8n+1) { background: linear-gradient(135deg, #6366f1, #818cf8); }
-.tag-cloud-item:nth-child(8n+2) { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
-.tag-cloud-item:nth-child(8n+3) { background: linear-gradient(135deg, #ec4899, #f472b6); }
-.tag-cloud-item:nth-child(8n+4) { background: linear-gradient(135deg, #ef4444, #f87171); }
-.tag-cloud-item:nth-child(8n+5) { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #333; }
-.tag-cloud-item:nth-child(8n+6) { background: linear-gradient(135deg, #10b981, #34d399); }
-.tag-cloud-item:nth-child(8n+7) { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
-.tag-cloud-item:nth-child(8n+8) { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-
 /* ----------------------------------------------------------------- */
 /*  E13. Archive Heatmap                                              */
 /* ----------------------------------------------------------------- */
@@ -2963,14 +2892,49 @@ body.dark[data-dark-level="medium"] {
   border-radius: 8px;
   border: 1px solid var(--color-border);
 }
+.heatmap-year-switcher {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+.heatmap-year-btn {
+  padding: 0.25em 0.75em;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: var(--font-ui);
+  transition: all var(--transition-fast);
+}
+.heatmap-year-btn.active {
+  background: var(--color-link);
+  color: #fff;
+  border-color: var(--color-link);
+}
+.heatmap-grid-wrap { overflow-x: auto; }
+.heatmap-month-labels {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 4px;
+  padding-left: 0;
+}
+.heatmap-month-labels span {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  width: 0;
+  flex: 1;
+  text-align: left;
+}
 .heatmap-grid {
   display: flex;
   gap: 3px;
   flex-wrap: wrap;
 }
 .heatmap-cell {
-  width: 12px;
-  height: 12px;
+  width: 12px; height: 12px;
   border-radius: 2px;
   background: var(--color-border-light);
 }
@@ -2980,17 +2944,10 @@ body.dark[data-dark-level="medium"] {
 .heatmap-cell[data-count="4"] { background: #216e39; }
 .heatmap-cell[data-count="5"] { background: #0e4429; }
 .heatmap-legend {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 0.75rem;
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
+  display: flex; gap: 4px; align-items: center;
+  justify-content: flex-end; margin-top: 0.75rem;
+  font-size: 0.75rem; color: var(--color-text-secondary);
 }
 .heatmap-legend span {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  display: inline-block;
+  width: 12px; height: 12px; border-radius: 2px; display: inline-block;
 }
