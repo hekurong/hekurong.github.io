@@ -1601,10 +1601,10 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
 }
 
 .search-modal-input {
-  width: 100%;
+  flex: 1;
   border: none;
   background: transparent;
-  padding: 0.9rem 3.5rem 0.9rem 2.5rem;
+  padding: 0.9rem 3.5rem 0.9rem 2.8rem;
   font-family: var(--font-ui);
   font-size: 1rem;
   color: var(--color-text);
@@ -1795,7 +1795,177 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   opacity: 0.85;
   background-color: rgba(128,128,128,0.12);
 }
-/* Keyboardty: 0.18; }
+/* Keyboard shortcut hint */
+.search-modal-input-wrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+/* ----------------------------------------------------------------- */
+/*  17. Reading Progress Bar                                          */
+/* ----------------------------------------------------------------- */
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: var(--color-progress-bar);
+  z-index: 999;
+  transition: width 0.05s linear;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------- */
+/*  18. Tag Filter / List Pages                                       */
+/* ----------------------------------------------------------------- */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  margin: 0 0 0.4rem;
+}
+
+.page-description {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+/* Generic item list (for list.html, taxonomy detail) */
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.item-list li:last-child {
+  border-bottom: none;
+}
+
+.item-list-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.item-list-title a {
+  color: var(--color-heading);
+}
+.item-list-title a:hover {
+  color: var(--color-link);
+}
+
+.item-list-date {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Category tree */
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.category-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-list a {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+.category-list a:hover {
+  color: var(--color-link);
+}
+
+.category-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 0.4rem;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+  border-radius: 10px;
+}
+
+/* ----------------------------------------------------------------- */
+/*  19. Site Title (Homepage)                                         */
+/* ----------------------------------------------------------------- */
+.site-hero {
+  position: relative;
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #e8e4da;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 2rem;
+}
+
+.site-hero-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0.18;
+  pointer-events: none;
+  animation: hero-fade-in 0.6s ease-out;
+}
+
+.site-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.site-hero-title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.site-hero-subtitle {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+  to { opacity: 0.18; }
 }
 
 /* Dark mode: override hero placeholder background for text contrast */
