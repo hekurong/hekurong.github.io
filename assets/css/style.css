@@ -1745,29 +1745,7 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
 }
 .search-history-item:hover {
 
-.search-history-row {
-  display: inline-flex;
-  align-items: center;
-  margin: 2px 4px 2px 0;
-}
-.search-history-del {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: 0.7rem;
-  padding: 0 2px;
-  opacity: 0;
-  transition: opacity 0.15s;
-  line-height: 1;
-}
-.search-history-row:hover .search-history-del {
-  opacity: 0.5;
-}
-.search-history-del:hover {
-  opacity: 1 !important;
-  color: var(--color-emphasis);
-}
+
   background: var(--color-link);
   color: var(--color-bg);
 }
@@ -1778,6 +1756,7 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   align-items: center;
   flex: 1;
   position: relative;
+  z-index: 0;
 }
 
 /* ----------------------------------------------------------------- */

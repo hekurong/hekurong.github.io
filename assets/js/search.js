@@ -241,16 +241,16 @@
     if (h.length === 0) { searchResults.innerHTML = ""; return; }
     var html = '<div class="search-history"><div class="search-history-title">最近搜索</div>';
     for (var i = 0; i < h.length; i++) {
-      html += '<div class="search-history-row"><span class="search-history-item" data-query="' + escapeHtml(h[i]) + '">' + escapeHtml(h[i]) + '</span><button class="search-history-del" data-query="' + escapeHtml(h[i]) + '" title="删除">&times;</button></div>';
+      html += '<span class="search-history-item"><span class="search-history-text">' + escapeHtml(h[i]) + '</span><button class="search-history-del" data-query="' + escapeHtml(h[i]) + '" title="移除">&times;</button></span>';
     }
     html += '</div>';
     searchResults.innerHTML = html;
 
-    document.querySelectorAll(".search-history-item").forEach(function (el) {
-      el.addEventListener("click", function (e) {
-        e.stopPropagation();
-        searchInput.value = this.getAttribute("data-query");
-        performSearch(searchInput.value);
+    document.querySelectorAll(".search-history-text").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var query = el.parentElement.querySelector(".search-history-del").getAttribute("data-query");
+        searchInput.value = query;
+        performSearch(query);
       });
     });
     document.querySelectorAll(".search-history-del").forEach(function (el) {
