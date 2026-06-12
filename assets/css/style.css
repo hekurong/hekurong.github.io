@@ -1451,6 +1451,7 @@ body.dark .admonition-danger .admonition-title { color: #f85149; }
   white-space: nowrap;
 }
 
+.archive-months.collapsed { display: none; }
 .archive-month-posts.collapsed {
   display: none;
 }
