@@ -2770,15 +2770,12 @@ html[data-reading-width="narrow"] { --content-max-width: 680px; }
 html[data-reading-width="wide"] { --content-max-width: 95%; }
 
 /* E3: Dark mode brightness levels */
-body.dark[data-dark-level="deep"] {
+html[data-dark-level="deep"] body.dark {
   --color-bg: #111115;
   --color-bg-card: #1a1a20;
   --color-bg-alt: #18181e;
 }
-body.dark[data-dark-level="medium"] {
-  /* medium is the default dark mode — no change needed */
-}
-/* soft is the default already */
+/* medium and soft use the default dark mode variables */
 
 /* Keyboard shortcuts panel (E8) */
 .shortcuts-panel {
