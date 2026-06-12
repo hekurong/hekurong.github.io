@@ -537,21 +537,19 @@
         }
       }
 
-      // Render month labels row
-      var monthRow = document.createElement('div');
-      monthRow.className = 'heatmap-month-row';
-      monthRow.style.paddingLeft = '22px'; // space for day labels
-      var nextLabel = 0;
-      for (var wi = 0; wi < weeks.length; wi++) {
-        var cell = document.createElement('div');
-        cell.className = 'heatmap-month-cell';
-        if (nextLabel < weekLabels.length && weekLabels[nextLabel].weekIdx === wi) {
-          cell.textContent = weekLabels[nextLabel].label;
-          nextLabel++;
-        }
-        monthRow.appendChild(cell);
-      }
-      wrapper.appendChild(monthRow);
+      // Month labels — absolutely positioned over the grid
+      var COL_W = 14; // 12px cell + 2px gap
+      var DAY_W = 20; // day label column width
+      var monthBar = document.createElement('div');
+      monthBar.className = 'heatmap-month-bar';
+      weekLabels.forEach(function (wl) {
+        var label = document.createElement('span');
+        label.className = 'heatmap-month-label';
+        label.textContent = wl.label;
+        label.style.left = (DAY_W + wl.weekIdx * COL_W) + 'px';
+        monthBar.appendChild(label);
+      });
+      wrapper.appendChild(monthBar);
 
       // Render grid with day labels
       var gridContainer = document.createElement('div');
@@ -571,12 +569,10 @@
       // Cell grid
       var cellGrid = document.createElement('div');
       cellGrid.className = 'heatmap-cell-grid';
-      cellGrid.style.display = 'flex';
 
       for (var wi2 = 0; wi2 < weeks.length; wi2++) {
         var col = document.createElement('div');
-        col.style.display = 'flex';
-        col.style.flexDirection = 'column';
+        col.className = 'heatmap-week-col';
         for (var di2 = 0; di2 < 7; di2++) {
           var cellData = weeks[wi2][di2];
           var cellEl = document.createElement('div');

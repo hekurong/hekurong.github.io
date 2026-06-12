@@ -2900,20 +2900,23 @@ html[data-dark-level="deep"] body.dark {
 }
 .heatmap-year-btn.active { background: var(--color-link); color: #fff; border-color: var(--color-link); }
 .heatmap-wrapper { display: flex; flex-direction: column; align-items: center; }
-.heatmap-month-row { display: flex; gap: 2px; margin-bottom: 2px; }
-.heatmap-month-cell {
-  width: 10px; font-size: 0.5rem; color: var(--color-text-secondary);
-  text-align: left; overflow: hidden;
+.heatmap-month-bar {
+  position: relative; height: 18px; width: 100%; margin-bottom: 2px;
+}
+.heatmap-month-label {
+  position: absolute; top: 0; font-size: 0.75rem; color: var(--color-text-secondary);
+  font-family: var(--font-ui);
 }
 .heatmap-grid-container { display: flex; gap: 0; }
-.heatmap-day-labels { display: flex; flex-direction: column; gap: 2px; padding-right: 3px; }
+.heatmap-day-labels { display: flex; flex-direction: column; gap: 2px; padding-right: 4px; }
 .heatmap-day-label {
-  width: 18px; height: 10px; font-size: 0.55rem; color: var(--color-text-secondary);
+  width: 16px; height: 12px; font-size: 0.6rem; color: var(--color-text-secondary);
   display: flex; align-items: center; justify-content: flex-end; padding-right: 2px;
 }
 .heatmap-cell-grid { display: flex; gap: 2px; }
+.heatmap-week-col { display: flex; flex-direction: column; gap: 2px; }
 .heatmap-cell {
-  width: 10px; height: 10px; border-radius: 2px; background: var(--color-border-light);
+  width: 12px; height: 12px; border-radius: 3px; background: var(--color-border-light);
 }
 .heatmap-cell[data-count="1"] { background: #9be9a8; }
 .heatmap-cell[data-count="2"] { background: #40c463; }
