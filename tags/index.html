@@ -50,6 +50,7 @@
     <div class="header-actions">
       <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
       <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
       <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
     </div>
   </div>
@@ -102,245 +103,727 @@
   
   
   
+  <div class="tag-sort-bar">
+    <span style="font-size:0.85rem;color:var(--color-text-secondary)">排序：</span>
+    <button class="tag-sort-btn active" data-sort="name">按名称</button>
+    <button class="tag-sort-btn" data-sort="count">按文章数</button>
+  </div>
+  
   <div class="tag-cloud">
     
-    <a class="tag-cloud-item tag-size-xs" href="/tags/ACL/">ACL <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/AI/">AI <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/AI%20Native/">AI Native <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/AKShare/">AKShare <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Abstract/">Abstract <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Agent/">Agent <small>(4)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Apollo/">Apollo <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Architecture/">Architecture <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/BackTracking/">BackTracking <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/COLING/">COLING <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-sm" href="/tags/CS224N/">CS224N <small>(8)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Chenhai/">Chenhai <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Cloud%20Native/">Cloud Native <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/DP/">DP <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-sm" href="/tags/Daily%20Dev/">Daily Dev <small>(5)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/DeepSeek/">DeepSeek <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Design%20Pattern/">Design Pattern <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-sm" href="/tags/EMNLP/">EMNLP <small>(5)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/FastAPI/">FastAPI <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Few-Shot/">Few-Shot <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-sm" href="/tags/Few-Shot%20Learning/">Few-Shot Learning <small>(5)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/GPT/">GPT <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Go/">Go <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-sm" href="/tags/Golang/">Golang <small>(8)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Graph/">Graph <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/HTTP/">HTTP <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Hermes%20Agent/">Hermes Agent <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/IO/">IO <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Kafka/">Kafka <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/KnowledgeGraph/">KnowledgeGraph <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Kubernetes/">Kubernetes <small>(4)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/LLM/">LLM <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/LRU/">LRU <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/LangChain/">LangChain <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/LangGraph/">LangGraph <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Leetcode/">Leetcode <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Linked%20List/">Linked List <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Linux/">Linux <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/LlamaIndex/">LlamaIndex <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/LoRA/">LoRA <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Meta%20Learning/">Meta Learning <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Micro%20Service/">Micro Service <small>(3)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Mock%20Testing/">Mock Testing <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/MongoDB/">MongoDB <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/MultiAgent/">MultiAgent <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/MySQL/">MySQL <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/NAACL/">NAACL <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-sm" href="/tags/NER/">NER <small>(5)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xl" href="/tags/NLP/">NLP <small>(16)</small></a>
-    
-    <a class="tag-cloud-item tag-size-sm" href="/tags/NN/">NN <small>(7)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Neo4j/">Neo4j <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-lg" href="/tags/PaperNotes/">PaperNotes <small>(14)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Paxos/">Paxos <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/PostgreSQL/">PostgreSQL <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Practise/">Practise <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-sm" href="/tags/Project%20Dev/">Project Dev <small>(5)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Prompt/">Prompt <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Python/">Python <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Qwen/">Qwen <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/RAG/">RAG <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-md" href="/tags/RE/">RE <small>(9)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/RNN/">RNN <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/RPC/">RPC <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/RabbitMQ/">RabbitMQ <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Raft/">Raft <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Redis/">Redis <small>(3)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Regular%20Expression/">Regular Expression <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/System%20Design/">System Design <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/TCP/">TCP <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/TTS/">TTS <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Tool%20Calling/">Tool Calling <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Tool%20Use/">Tool Use <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Transformer/">Transformer <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Tree/">Tree <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Unit%20Testing/">Unit Testing <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/WeChat/">WeChat <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/WebSocket/">WebSocket <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/Website/">Website <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/WeeklyWorking/">WeeklyWorking <small>(3)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/epoll/">epoll <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/golang/">golang <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/minikube/">minikube <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/neo4j/">neo4j <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/pprof/">pprof <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/word2vec/">word2vec <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/xxl-job/">xxl-job <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%8d%9a%e5%ae%a2/">博客 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%ae%9e%e6%88%98/">实战 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%be%ae%e8%b0%83/">微调 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%97%a5%e6%96%99/">日料 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%9e%b6%e6%9e%84/">架构 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e7%9c%9f%e9%a2%98/">真题 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e8%ae%ad%e7%bb%83/">训练 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统 <small>(2)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%83%a8%e7%bd%b2/">部署 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%87%8f%e5%8c%96/">量化 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%9d%a2%e8%af%95/">面试 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜 <small>(1)</small></a>
-    
-    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱 <small>(1)</small></a>
+    <a class="tag-cloud-item tag-size-xs" href="/tags/ACL/" data-name="ACL" data-count="2">
+      <span class="tag-cloud-name">ACL</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/AI/" data-name="AI" data-count="1">
+      <span class="tag-cloud-name">AI</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/AI%20Native/" data-name="AI Native" data-count="1">
+      <span class="tag-cloud-name">AI Native</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/AI%e5%ba%94%e7%94%a8/" data-name="AI应用" data-count="1">
+      <span class="tag-cloud-name">AI应用</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/AKShare/" data-name="AKShare" data-count="1">
+      <span class="tag-cloud-name">AKShare</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Abstract/" data-name="Abstract" data-count="1">
+      <span class="tag-cloud-name">Abstract</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Agent/" data-name="Agent" data-count="4">
+      <span class="tag-cloud-name">Agent</span>
+      <small>(4)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Apollo/" data-name="Apollo" data-count="1">
+      <span class="tag-cloud-name">Apollo</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Architecture/" data-name="Architecture" data-count="1">
+      <span class="tag-cloud-name">Architecture</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/BackTracking/" data-name="BackTracking" data-count="1">
+      <span class="tag-cloud-name">BackTracking</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/COLING/" data-name="COLING" data-count="1">
+      <span class="tag-cloud-name">COLING</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-sm" href="/tags/CS224N/" data-name="CS224N" data-count="8">
+      <span class="tag-cloud-name">CS224N</span>
+      <small>(8)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Chenhai/" data-name="Chenhai" data-count="1">
+      <span class="tag-cloud-name">Chenhai</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Cloud%20Native/" data-name="Cloud Native" data-count="2">
+      <span class="tag-cloud-name">Cloud Native</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/DP/" data-name="DP" data-count="2">
+      <span class="tag-cloud-name">DP</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-sm" href="/tags/Daily%20Dev/" data-name="Daily Dev" data-count="5">
+      <span class="tag-cloud-name">Daily Dev</span>
+      <small>(5)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/DeepSeek/" data-name="DeepSeek" data-count="2">
+      <span class="tag-cloud-name">DeepSeek</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Design%20Pattern/" data-name="Design Pattern" data-count="1">
+      <span class="tag-cloud-name">Design Pattern</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-sm" href="/tags/EMNLP/" data-name="EMNLP" data-count="5">
+      <span class="tag-cloud-name">EMNLP</span>
+      <small>(5)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/FastAPI/" data-name="FastAPI" data-count="1">
+      <span class="tag-cloud-name">FastAPI</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Few-Shot/" data-name="Few-Shot" data-count="1">
+      <span class="tag-cloud-name">Few-Shot</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-sm" href="/tags/Few-Shot%20Learning/" data-name="Few-Shot Learning" data-count="5">
+      <span class="tag-cloud-name">Few-Shot Learning</span>
+      <small>(5)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/GPT/" data-name="GPT" data-count="1">
+      <span class="tag-cloud-name">GPT</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Go/" data-name="Go" data-count="1">
+      <span class="tag-cloud-name">Go</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-sm" href="/tags/Golang/" data-name="Golang" data-count="8">
+      <span class="tag-cloud-name">Golang</span>
+      <small>(8)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Graph/" data-name="Graph" data-count="1">
+      <span class="tag-cloud-name">Graph</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/HTTP/" data-name="HTTP" data-count="1">
+      <span class="tag-cloud-name">HTTP</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Hermes%20Agent/" data-name="Hermes Agent" data-count="2">
+      <span class="tag-cloud-name">Hermes Agent</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/IO/" data-name="IO" data-count="1">
+      <span class="tag-cloud-name">IO</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Kafka/" data-name="Kafka" data-count="2">
+      <span class="tag-cloud-name">Kafka</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/KnowledgeGraph/" data-name="KnowledgeGraph" data-count="2">
+      <span class="tag-cloud-name">KnowledgeGraph</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Kubernetes/" data-name="Kubernetes" data-count="4">
+      <span class="tag-cloud-name">Kubernetes</span>
+      <small>(4)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/LLM/" data-name="LLM" data-count="1">
+      <span class="tag-cloud-name">LLM</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/LRU/" data-name="LRU" data-count="1">
+      <span class="tag-cloud-name">LRU</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/LangChain/" data-name="LangChain" data-count="2">
+      <span class="tag-cloud-name">LangChain</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/LangGraph/" data-name="LangGraph" data-count="1">
+      <span class="tag-cloud-name">LangGraph</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Leetcode/" data-name="Leetcode" data-count="1">
+      <span class="tag-cloud-name">Leetcode</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Linked%20List/" data-name="Linked List" data-count="1">
+      <span class="tag-cloud-name">Linked List</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Linux/" data-name="Linux" data-count="1">
+      <span class="tag-cloud-name">Linux</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/LlamaIndex/" data-name="LlamaIndex" data-count="1">
+      <span class="tag-cloud-name">LlamaIndex</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/LoRA/" data-name="LoRA" data-count="1">
+      <span class="tag-cloud-name">LoRA</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Meta%20Learning/" data-name="Meta Learning" data-count="1">
+      <span class="tag-cloud-name">Meta Learning</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Micro%20Service/" data-name="Micro Service" data-count="3">
+      <span class="tag-cloud-name">Micro Service</span>
+      <small>(3)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Mock%20Testing/" data-name="Mock Testing" data-count="1">
+      <span class="tag-cloud-name">Mock Testing</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/MongoDB/" data-name="MongoDB" data-count="1">
+      <span class="tag-cloud-name">MongoDB</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/MultiAgent/" data-name="MultiAgent" data-count="1">
+      <span class="tag-cloud-name">MultiAgent</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/MySQL/" data-name="MySQL" data-count="2">
+      <span class="tag-cloud-name">MySQL</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/NAACL/" data-name="NAACL" data-count="1">
+      <span class="tag-cloud-name">NAACL</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-sm" href="/tags/NER/" data-name="NER" data-count="5">
+      <span class="tag-cloud-name">NER</span>
+      <small>(5)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xl" href="/tags/NLP/" data-name="NLP" data-count="16">
+      <span class="tag-cloud-name">NLP</span>
+      <small>(16)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-sm" href="/tags/NN/" data-name="NN" data-count="7">
+      <span class="tag-cloud-name">NN</span>
+      <small>(7)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Neo4j/" data-name="Neo4j" data-count="1">
+      <span class="tag-cloud-name">Neo4j</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-lg" href="/tags/PaperNotes/" data-name="PaperNotes" data-count="14">
+      <span class="tag-cloud-name">PaperNotes</span>
+      <small>(14)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Paxos/" data-name="Paxos" data-count="1">
+      <span class="tag-cloud-name">Paxos</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/PostgreSQL/" data-name="PostgreSQL" data-count="1">
+      <span class="tag-cloud-name">PostgreSQL</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Practise/" data-name="Practise" data-count="2">
+      <span class="tag-cloud-name">Practise</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-sm" href="/tags/Project%20Dev/" data-name="Project Dev" data-count="5">
+      <span class="tag-cloud-name">Project Dev</span>
+      <small>(5)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Prompt/" data-name="Prompt" data-count="1">
+      <span class="tag-cloud-name">Prompt</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Python/" data-name="Python" data-count="1">
+      <span class="tag-cloud-name">Python</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Qwen/" data-name="Qwen" data-count="1">
+      <span class="tag-cloud-name">Qwen</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/RAG/" data-name="RAG" data-count="2">
+      <span class="tag-cloud-name">RAG</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-md" href="/tags/RE/" data-name="RE" data-count="9">
+      <span class="tag-cloud-name">RE</span>
+      <small>(9)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/RNN/" data-name="RNN" data-count="2">
+      <span class="tag-cloud-name">RNN</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/RPC/" data-name="RPC" data-count="1">
+      <span class="tag-cloud-name">RPC</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/RabbitMQ/" data-name="RabbitMQ" data-count="1">
+      <span class="tag-cloud-name">RabbitMQ</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Raft/" data-name="Raft" data-count="1">
+      <span class="tag-cloud-name">Raft</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Redis/" data-name="Redis" data-count="3">
+      <span class="tag-cloud-name">Redis</span>
+      <small>(3)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Regular%20Expression/" data-name="Regular Expression" data-count="1">
+      <span class="tag-cloud-name">Regular Expression</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Self-Supervision%20Learning/" data-name="Self-Supervision Learning" data-count="1">
+      <span class="tag-cloud-name">Self-Supervision Learning</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/System%20Design/" data-name="System Design" data-count="1">
+      <span class="tag-cloud-name">System Design</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/TCP/" data-name="TCP" data-count="1">
+      <span class="tag-cloud-name">TCP</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/TTS/" data-name="TTS" data-count="1">
+      <span class="tag-cloud-name">TTS</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Tool%20Calling/" data-name="Tool Calling" data-count="1">
+      <span class="tag-cloud-name">Tool Calling</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Tool%20Use/" data-name="Tool Use" data-count="1">
+      <span class="tag-cloud-name">Tool Use</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Transformer/" data-name="Transformer" data-count="1">
+      <span class="tag-cloud-name">Transformer</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Tree/" data-name="Tree" data-count="1">
+      <span class="tag-cloud-name">Tree</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Unit%20Testing/" data-name="Unit Testing" data-count="1">
+      <span class="tag-cloud-name">Unit Testing</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/WeChat/" data-name="WeChat" data-count="1">
+      <span class="tag-cloud-name">WeChat</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/WebSocket/" data-name="WebSocket" data-count="1">
+      <span class="tag-cloud-name">WebSocket</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/Website/" data-name="Website" data-count="1">
+      <span class="tag-cloud-name">Website</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/WeeklyWorking/" data-name="WeeklyWorking" data-count="3">
+      <span class="tag-cloud-name">WeeklyWorking</span>
+      <small>(3)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/epoll/" data-name="epoll" data-count="1">
+      <span class="tag-cloud-name">epoll</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/golang/" data-name="golang" data-count="1">
+      <span class="tag-cloud-name">golang</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/minikube/" data-name="minikube" data-count="1">
+      <span class="tag-cloud-name">minikube</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/neo4j/" data-name="neo4j" data-count="1">
+      <span class="tag-cloud-name">neo4j</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/pprof/" data-name="pprof" data-count="1">
+      <span class="tag-cloud-name">pprof</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/word2vec/" data-name="word2vec" data-count="2">
+      <span class="tag-cloud-name">word2vec</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/xxl-job/" data-name="xxl-job" data-count="1">
+      <span class="tag-cloud-name">xxl-job</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/" data-name="初学者" data-count="1">
+      <span class="tag-cloud-name">初学者</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/" data-name="半成品" data-count="1">
+      <span class="tag-cloud-name">半成品</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%8d%9a%e5%ae%a2/" data-name="博客" data-count="1">
+      <span class="tag-cloud-name">博客</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/" data-name="向量数据库" data-count="1">
+      <span class="tag-cloud-name">向量数据库</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/" data-name="在家做饭" data-count="1">
+      <span class="tag-cloud-name">在家做饭</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%ae%9e%e6%88%98/" data-name="实战" data-count="1">
+      <span class="tag-cloud-name">实战</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/" data-name="开发框架" data-count="1">
+      <span class="tag-cloud-name">开发框架</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e5%be%ae%e8%b0%83/" data-name="微调" data-count="1">
+      <span class="tag-cloud-name">微调</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/" data-name="推理优化" data-count="1">
+      <span class="tag-cloud-name">推理优化</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/" data-name="提示工程" data-count="1">
+      <span class="tag-cloud-name">提示工程</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/" data-name="数学基础" data-count="1">
+      <span class="tag-cloud-name">数学基础</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%97%a5%e6%96%99/" data-name="日料" data-count="1">
+      <span class="tag-cloud-name">日料</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/" data-name="机器学习" data-count="1">
+      <span class="tag-cloud-name">机器学习</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%9e%b6%e6%9e%84/" data-name="架构" data-count="1">
+      <span class="tag-cloud-name">架构</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/" data-name="检索增强" data-count="1">
+      <span class="tag-cloud-name">检索增强</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%b2%aa%e6%b7%b1300/" data-name="沪深300" data-count="1">
+      <span class="tag-cloud-name">沪深300</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/" data-name="深度学习" data-count="1">
+      <span class="tag-cloud-name">深度学习</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e7%9c%9f%e9%a2%98/" data-name="真题" data-count="1">
+      <span class="tag-cloud-name">真题</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/" data-name="策略回测" data-count="1">
+      <span class="tag-cloud-name">策略回测</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/" data-name="系统设计" data-count="1">
+      <span class="tag-cloud-name">系统设计</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/" data-name="视觉模型" data-count="1">
+      <span class="tag-cloud-name">视觉模型</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e8%ae%ad%e7%bb%83/" data-name="训练" data-count="1">
+      <span class="tag-cloud-name">训练</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/" data-name="记忆系统" data-count="2">
+      <span class="tag-cloud-name">记忆系统</span>
+      <small>(2)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%83%a8%e7%bd%b2/" data-name="部署" data-count="1">
+      <span class="tag-cloud-name">部署</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%87%8f%e5%8c%96/" data-name="量化" data-count="1">
+      <span class="tag-cloud-name">量化</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/" data-name="量化交易" data-count="1">
+      <span class="tag-cloud-name">量化交易</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/" data-name="阿里云百炼" data-count="1">
+      <span class="tag-cloud-name">阿里云百炼</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/" data-name="静态网站生成器" data-count="1">
+      <span class="tag-cloud-name">静态网站生成器</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%9d%a2%e8%af%95/" data-name="面试" data-count="1">
+      <span class="tag-cloud-name">面试</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/" data-name="预制菜" data-count="1">
+      <span class="tag-cloud-name">预制菜</span>
+      <small>(1)</small>
+      
+    </a>
+    
+    <a class="tag-cloud-item tag-size-xs" href="/tags/%e9%a3%9f%e8%b0%b1/" data-name="食谱" data-count="1">
+      <span class="tag-cloud-name">食谱</span>
+      <small>(1)</small>
+      
+    </a>
     
   </div>
   
@@ -876,5 +1359,54 @@
 <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
 </body>
 </html>

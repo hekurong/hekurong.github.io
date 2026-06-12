@@ -390,6 +390,226 @@
   }
 
   /* ================================================================ */
+  /*  Tag Filter Bar (E5)                                              */
+  /* ================================================================ */
+
+  function initTagFilter() {
+    var bar = document.querySelector('.tag-filter-bar');
+    if (!bar) return;
+
+    bar.querySelectorAll('.tag-filter-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        bar.querySelectorAll('.tag-filter-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+
+        var tag = btn.dataset.tag;
+        document.querySelectorAll('.post-card').forEach(function (card) {
+          if (tag === '*') {
+            card.style.display = '';
+            return;
+          }
+          var tagEls = card.querySelectorAll('.post-card-tags .tag');
+          var hasTag = Array.from(tagEls).some(function (t) { return t.textContent.trim() === tag; });
+          card.style.display = hasTag ? '' : 'none';
+        });
+      });
+    });
+  }
+
+  /* ================================================================ */
+  /*  Keyboard Shortcuts (E8)                                          */
+  /* ================================================================ */
+
+  function initKeyboardShortcuts() {
+    var shortcutsPanel = document.getElementById('shortcuts-panel');
+    if (!shortcutsPanel) return;
+
+    var ghTimer = null;
+
+    document.addEventListener('keydown', function (e) {
+      // Don't trigger in inputs
+      var tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+
+      // ? toggle shortcuts (no modifier)
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        shortcutsPanel.classList.toggle('active');
+        return;
+      }
+
+      // Esc close
+      if (e.key === 'Escape' && shortcutsPanel.classList.contains('active')) {
+        shortcutsPanel.classList.remove('active');
+        return;
+      }
+
+      // j/k navigation (only on single post pages)
+      if (e.key === 'j' && !e.ctrlKey && !e.metaKey) {
+        var next = document.querySelector('.post-nav-link.next');
+        if (next) { e.preventDefault(); next.click(); }
+      }
+      if (e.key === 'k' && !e.ctrlKey && !e.metaKey) {
+        var prev = document.querySelector('.post-nav-link.prev');
+        if (prev) { e.preventDefault(); prev.click(); }
+      }
+
+      // g + h → home, g + t → top (vim-style)
+      if (e.key === 'g' && !e.ctrlKey && !e.metaKey) {
+        if (ghTimer) clearTimeout(ghTimer);
+        ghTimer = setTimeout(function () { ghTimer = null; }, 500);
+        return;
+      }
+      if (e.key === 'h' && ghTimer) {
+        e.preventDefault();
+        window.location.href = '/';
+        ghTimer = null;
+      }
+      if (e.key === 't' && ghTimer) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        ghTimer = null;
+      }
+    });
+
+    // Close shortcuts on click outside
+    shortcutsPanel.addEventListener('click', function (e) {
+      if (e.target === shortcutsPanel) shortcutsPanel.classList.remove('active');
+    });
+  }
+
+  /* ================================================================ */
+  /*  Code Toolbar (E9) — line numbers & word wrap toggle              */
+  /* ================================================================ */
+
+  function initCodeToolbar() {
+    var lineVisible = localStorage.getItem('zhenhai-code-lines') !== 'hidden';
+    var wrapEnabled = localStorage.getItem('zhenhai-code-wrap') === 'enabled';
+
+    applyCodeSettings(lineVisible, wrapEnabled);
+
+    // Add toolbar to each code wrapper
+    document.querySelectorAll('.code-wrapper, .article-content pre.chroma').forEach(function (wrapper) {
+      if (!wrapper.classList.contains('code-wrapper') && wrapper.closest('.code-wrapper')) return;
+      if (wrapper.querySelector('.code-toolbar')) return;
+
+      var toolbar = document.createElement('div');
+      toolbar.className = 'code-toolbar';
+
+      var lineBtn = document.createElement('button');
+      lineBtn.className = 'code-toolbar-btn' + (lineVisible ? ' active' : '');
+      lineBtn.textContent = '行号';
+      lineBtn.addEventListener('click', function () {
+        lineVisible = !lineVisible;
+        localStorage.setItem('zhenhai-code-lines', lineVisible ? 'visible' : 'hidden');
+        applyCodeSettings(lineVisible, wrapEnabled);
+        syncCodeToolbarBtns();
+      });
+      toolbar.appendChild(lineBtn);
+
+      var wrapBtn = document.createElement('button');
+      wrapBtn.className = 'code-toolbar-btn' + (wrapEnabled ? ' active' : '');
+      wrapBtn.textContent = '换行';
+      wrapBtn.addEventListener('click', function () {
+        wrapEnabled = !wrapEnabled;
+        localStorage.setItem('zhenhai-code-wrap', wrapEnabled ? 'enabled' : 'disabled');
+        applyCodeSettings(lineVisible, wrapEnabled);
+        syncCodeToolbarBtns();
+      });
+      toolbar.appendChild(wrapBtn);
+
+      wrapper.insertBefore(toolbar, wrapper.firstChild);
+    });
+  }
+
+  function applyCodeSettings(lineV, wrapV) {
+    document.documentElement.classList.toggle('code-no-lines', !lineV);
+    document.documentElement.classList.toggle('code-wrap', wrapV);
+  }
+
+  function syncCodeToolbarBtns() {
+    var lineV = localStorage.getItem('zhenhai-code-lines') !== 'hidden';
+    var wrapV = localStorage.getItem('zhenhai-code-wrap') === 'enabled';
+    document.querySelectorAll('.code-toolbar-btn').forEach(function (btn) {
+      if (btn.textContent === '行号') btn.classList.toggle('active', lineV);
+      if (btn.textContent === '换行') btn.classList.toggle('active', wrapV);
+    });
+  }
+
+  /* ================================================================ */
+  /*  Tag Cloud Sort (E14)                                             */
+  /* ================================================================ */
+
+  /* ================================================================ */
+  /*  Archive Heatmap (E13)                                            */
+  /* ================================================================ */
+
+  function initHeatmap() {
+    var container = document.getElementById('archive-heatmap');
+    if (!container) return;
+    var raw = container.dataset.heatmap;
+    if (!raw) return;
+    var data;
+    try { data = JSON.parse(raw); } catch (e) { return; }
+    if (!data.length) { container.style.display = 'none'; return; }
+    var countMap = {};
+    data.forEach(function (d) { countMap[d.date] = d.count; });
+    var today = new Date();
+    var start = new Date(today);
+    start.setFullYear(start.getFullYear() - 1);
+    var grid = document.createElement('div');
+    grid.className = 'heatmap-grid';
+    for (var d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+      var ds = d.toISOString().slice(0, 10);
+      var cell = document.createElement('div');
+      cell.className = 'heatmap-cell';
+      var c = countMap[ds] || 0;
+      if (c > 0) cell.dataset.count = Math.min(c, 5);
+      cell.title = ds + ': ' + c + ' 篇';
+      grid.appendChild(cell);
+    }
+    container.appendChild(grid);
+    var legend = document.createElement('div');
+    legend.className = 'heatmap-legend';
+    legend.innerHTML = '少 <span style="background:var(--color-border-light)"></span> <span style="background:#9be9a8"></span> <span style="background:#40c463"></span> <span style="background:#30a14e"></span> <span style="background:#216e39"></span> <span style="background:#0e4429"></span> 多';
+    container.appendChild(legend);
+  }
+
+  function initTagSort() {
+    var bar = document.querySelector('.tag-sort-bar');
+    if (!bar) return;
+    var cloud = document.querySelector('.tag-cloud');
+    if (!cloud) return;
+
+    // Collect tag data from DOM
+    function getItems() {
+      return Array.from(cloud.querySelectorAll('.tag-cloud-item')).map(function (el) {
+        return {
+          el: el,
+          name: (el.querySelector('.tag-cloud-name') || {}).textContent || '',
+          count: parseInt(el.dataset.count) || 0
+        };
+      });
+    }
+
+    bar.querySelectorAll('.tag-sort-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        bar.querySelectorAll('.tag-sort-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+
+        var sort = btn.dataset.sort;
+        var items = getItems();
+        if (sort === 'name') {
+          items.sort(function (a, b) { return a.name.localeCompare(b.name, 'zh'); });
+        } else if (sort === 'count') {
+          items.sort(function (a, b) { return b.count - a.count; });
+        }
+        items.forEach(function (item) { cloud.appendChild(item.el); });
+      });
+    });
+  }
+
+  /* ================================================================ */
   /*  8. Initialization on DOM ready                                  */
   /* ================================================================ */
 
@@ -414,6 +634,12 @@
     initArchiveToggle();
     initMobileMenu();
     initReadingProgress();
+    initSettingsPanel();
+    initTagFilter();
+    initTagSort();
+    initKeyboardShortcuts();
+    initCodeToolbar();
+    initHeatmap();
 
     // Delay Mermaid init slightly to ensure DOM is fully rendered
     setTimeout(initMermaid, 100);
@@ -448,3 +674,113 @@
     }
   });
 })();
+
+  /* ================================================================ */
+  /*  Settings Panel (E1/E2/E3)                                       */
+  /* ================================================================ */
+
+  function initSettingsPanel() {
+    var btn = document.getElementById('settings-btn');
+    var panel = document.getElementById('settings-panel');
+    var close = document.getElementById('settings-close');
+    if (!btn || !panel) return;
+
+    function open() {
+      panel.classList.add('active');
+      panel.setAttribute('aria-hidden', 'false');
+    }
+    function closeFn() {
+      panel.classList.remove('active');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.classList.contains('active') ? closeFn() : open();
+    });
+    if (close) close.addEventListener('click', closeFn);
+
+    // Close on outside click
+    document.addEventListener('click', function (e) {
+      if (panel.classList.contains('active') &&
+          !panel.contains(e.target) &&
+          e.target !== btn) {
+        closeFn();
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && panel.classList.contains('active')) {
+        closeFn();
+      }
+    });
+
+    // Hide dark level settings when in light mode
+    var darkGroup = document.getElementById('dark-level-group');
+    function updateDarkLevelVisibility() {
+      if (darkGroup) {
+        darkGroup.style.display = document.body.classList.contains('dark') ? '' : 'none';
+      }
+    }
+    updateDarkLevelVisibility();
+    document.addEventListener('zhenhai-theme-change', updateDarkLevelVisibility);
+
+    // Load saved settings on init
+    ['font-size', 'reading-width', 'dark-level'].forEach(function (key) {
+      var val = localStorage.getItem('zhenhai-' + key);
+      if (val) {
+        applySetting(key, val, false);
+      }
+    });
+
+    // Bind option buttons
+    panel.querySelectorAll('.settings-options').forEach(function (group) {
+      var key = group.dataset.setting;
+      group.querySelectorAll('.setting-option').forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          group.querySelectorAll('.setting-option').forEach(function (o) { o.classList.remove('active'); });
+          opt.classList.add('active');
+          var val = opt.dataset.value;
+          localStorage.setItem('zhenhai-' + key, val);
+          applySetting(key, val, true);
+        });
+      });
+    });
+  }
+
+  function applySetting(key, val, updateUI) {
+    if (key === 'font-size') {
+      document.documentElement.setAttribute('data-font-size', val);
+      if (updateUI) {
+        var group = document.querySelector('[data-setting="font-size"]');
+        if (group) {
+          group.querySelectorAll('.setting-option').forEach(function (o) {
+            o.classList.toggle('active', o.dataset.value === val);
+          });
+        }
+      }
+    }
+    if (key === 'reading-width') {
+      document.documentElement.setAttribute('data-reading-width', val);
+      if (updateUI) {
+        var group = document.querySelector('[data-setting="reading-width"]');
+        if (group) {
+          group.querySelectorAll('.setting-option').forEach(function (o) {
+            o.classList.toggle('active', o.dataset.value === val);
+          });
+        }
+      }
+    }
+    if (key === 'dark-level') {
+      document.documentElement.setAttribute('data-dark-level', val);
+      if (updateUI) {
+        var group = document.querySelector('[data-setting="dark-level"]');
+        if (group) {
+          group.querySelectorAll('.setting-option').forEach(function (o) {
+            o.classList.toggle('active', o.dataset.value === val);
+          });
+        }
+      }
+    }
+  }

@@ -50,6 +50,7 @@
     <div class="header-actions">
       <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
       <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
       <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
     </div>
   </div>
@@ -106,9 +107,257 @@
 
 
 
+<div class="tag-filter-bar">
+  <button class="tag-filter-btn active" data-tag="*">全部</button>
+  
+  <button class="tag-filter-btn" data-tag="ACL">ACL</button>
+  
+  <button class="tag-filter-btn" data-tag="AI">AI</button>
+  
+  <button class="tag-filter-btn" data-tag="AI Native">AI Native</button>
+  
+  <button class="tag-filter-btn" data-tag="AI应用">AI应用</button>
+  
+  <button class="tag-filter-btn" data-tag="AKShare">AKShare</button>
+  
+  <button class="tag-filter-btn" data-tag="Abstract">Abstract</button>
+  
+  <button class="tag-filter-btn" data-tag="Agent">Agent</button>
+  
+  <button class="tag-filter-btn" data-tag="Apollo">Apollo</button>
+  
+  <button class="tag-filter-btn" data-tag="Architecture">Architecture</button>
+  
+  <button class="tag-filter-btn" data-tag="BackTracking">BackTracking</button>
+  
+  <button class="tag-filter-btn" data-tag="COLING">COLING</button>
+  
+  <button class="tag-filter-btn" data-tag="CS224N">CS224N</button>
+  
+  <button class="tag-filter-btn" data-tag="Chenhai">Chenhai</button>
+  
+  <button class="tag-filter-btn" data-tag="Cloud Native">Cloud Native</button>
+  
+  <button class="tag-filter-btn" data-tag="DP">DP</button>
+  
+  <button class="tag-filter-btn" data-tag="Daily Dev">Daily Dev</button>
+  
+  <button class="tag-filter-btn" data-tag="DeepSeek">DeepSeek</button>
+  
+  <button class="tag-filter-btn" data-tag="Design Pattern">Design Pattern</button>
+  
+  <button class="tag-filter-btn" data-tag="EMNLP">EMNLP</button>
+  
+  <button class="tag-filter-btn" data-tag="FastAPI">FastAPI</button>
+  
+  <button class="tag-filter-btn" data-tag="Few-Shot">Few-Shot</button>
+  
+  <button class="tag-filter-btn" data-tag="Few-Shot Learning">Few-Shot Learning</button>
+  
+  <button class="tag-filter-btn" data-tag="GPT">GPT</button>
+  
+  <button class="tag-filter-btn" data-tag="Go">Go</button>
+  
+  <button class="tag-filter-btn" data-tag="Golang">Golang</button>
+  
+  <button class="tag-filter-btn" data-tag="Graph">Graph</button>
+  
+  <button class="tag-filter-btn" data-tag="HTTP">HTTP</button>
+  
+  <button class="tag-filter-btn" data-tag="Hermes Agent">Hermes Agent</button>
+  
+  <button class="tag-filter-btn" data-tag="IO">IO</button>
+  
+  <button class="tag-filter-btn" data-tag="Kafka">Kafka</button>
+  
+  <button class="tag-filter-btn" data-tag="KnowledgeGraph">KnowledgeGraph</button>
+  
+  <button class="tag-filter-btn" data-tag="Kubernetes">Kubernetes</button>
+  
+  <button class="tag-filter-btn" data-tag="LLM">LLM</button>
+  
+  <button class="tag-filter-btn" data-tag="LRU">LRU</button>
+  
+  <button class="tag-filter-btn" data-tag="LangChain">LangChain</button>
+  
+  <button class="tag-filter-btn" data-tag="LangGraph">LangGraph</button>
+  
+  <button class="tag-filter-btn" data-tag="Leetcode">Leetcode</button>
+  
+  <button class="tag-filter-btn" data-tag="Linked List">Linked List</button>
+  
+  <button class="tag-filter-btn" data-tag="Linux">Linux</button>
+  
+  <button class="tag-filter-btn" data-tag="LlamaIndex">LlamaIndex</button>
+  
+  <button class="tag-filter-btn" data-tag="LoRA">LoRA</button>
+  
+  <button class="tag-filter-btn" data-tag="Meta Learning">Meta Learning</button>
+  
+  <button class="tag-filter-btn" data-tag="Micro Service">Micro Service</button>
+  
+  <button class="tag-filter-btn" data-tag="Mock Testing">Mock Testing</button>
+  
+  <button class="tag-filter-btn" data-tag="MongoDB">MongoDB</button>
+  
+  <button class="tag-filter-btn" data-tag="MultiAgent">MultiAgent</button>
+  
+  <button class="tag-filter-btn" data-tag="MySQL">MySQL</button>
+  
+  <button class="tag-filter-btn" data-tag="NAACL">NAACL</button>
+  
+  <button class="tag-filter-btn" data-tag="NER">NER</button>
+  
+  <button class="tag-filter-btn" data-tag="NLP">NLP</button>
+  
+  <button class="tag-filter-btn" data-tag="NN">NN</button>
+  
+  <button class="tag-filter-btn" data-tag="Neo4j">Neo4j</button>
+  
+  <button class="tag-filter-btn" data-tag="PaperNotes">PaperNotes</button>
+  
+  <button class="tag-filter-btn" data-tag="Paxos">Paxos</button>
+  
+  <button class="tag-filter-btn" data-tag="PostgreSQL">PostgreSQL</button>
+  
+  <button class="tag-filter-btn" data-tag="Practise">Practise</button>
+  
+  <button class="tag-filter-btn" data-tag="Project Dev">Project Dev</button>
+  
+  <button class="tag-filter-btn" data-tag="Prompt">Prompt</button>
+  
+  <button class="tag-filter-btn" data-tag="Python">Python</button>
+  
+  <button class="tag-filter-btn" data-tag="Qwen">Qwen</button>
+  
+  <button class="tag-filter-btn" data-tag="RAG">RAG</button>
+  
+  <button class="tag-filter-btn" data-tag="RE">RE</button>
+  
+  <button class="tag-filter-btn" data-tag="RNN">RNN</button>
+  
+  <button class="tag-filter-btn" data-tag="RPC">RPC</button>
+  
+  <button class="tag-filter-btn" data-tag="RabbitMQ">RabbitMQ</button>
+  
+  <button class="tag-filter-btn" data-tag="Raft">Raft</button>
+  
+  <button class="tag-filter-btn" data-tag="Redis">Redis</button>
+  
+  <button class="tag-filter-btn" data-tag="Regular Expression">Regular Expression</button>
+  
+  <button class="tag-filter-btn" data-tag="Self-Supervision Learning">Self-Supervision Learning</button>
+  
+  <button class="tag-filter-btn" data-tag="System Design">System Design</button>
+  
+  <button class="tag-filter-btn" data-tag="TCP">TCP</button>
+  
+  <button class="tag-filter-btn" data-tag="TTS">TTS</button>
+  
+  <button class="tag-filter-btn" data-tag="Tool Calling">Tool Calling</button>
+  
+  <button class="tag-filter-btn" data-tag="Tool Use">Tool Use</button>
+  
+  <button class="tag-filter-btn" data-tag="Transformer">Transformer</button>
+  
+  <button class="tag-filter-btn" data-tag="Tree">Tree</button>
+  
+  <button class="tag-filter-btn" data-tag="Unit Testing">Unit Testing</button>
+  
+  <button class="tag-filter-btn" data-tag="WeChat">WeChat</button>
+  
+  <button class="tag-filter-btn" data-tag="WebSocket">WebSocket</button>
+  
+  <button class="tag-filter-btn" data-tag="Website">Website</button>
+  
+  <button class="tag-filter-btn" data-tag="WeeklyWorking">WeeklyWorking</button>
+  
+  <button class="tag-filter-btn" data-tag="epoll">epoll</button>
+  
+  <button class="tag-filter-btn" data-tag="golang">golang</button>
+  
+  <button class="tag-filter-btn" data-tag="minikube">minikube</button>
+  
+  <button class="tag-filter-btn" data-tag="neo4j">neo4j</button>
+  
+  <button class="tag-filter-btn" data-tag="pprof">pprof</button>
+  
+  <button class="tag-filter-btn" data-tag="word2vec">word2vec</button>
+  
+  <button class="tag-filter-btn" data-tag="xxl-job">xxl-job</button>
+  
+  <button class="tag-filter-btn" data-tag="初学者">初学者</button>
+  
+  <button class="tag-filter-btn" data-tag="半成品">半成品</button>
+  
+  <button class="tag-filter-btn" data-tag="博客">博客</button>
+  
+  <button class="tag-filter-btn" data-tag="向量数据库">向量数据库</button>
+  
+  <button class="tag-filter-btn" data-tag="在家做饭">在家做饭</button>
+  
+  <button class="tag-filter-btn" data-tag="实战">实战</button>
+  
+  <button class="tag-filter-btn" data-tag="开发框架">开发框架</button>
+  
+  <button class="tag-filter-btn" data-tag="微调">微调</button>
+  
+  <button class="tag-filter-btn" data-tag="推理优化">推理优化</button>
+  
+  <button class="tag-filter-btn" data-tag="提示工程">提示工程</button>
+  
+  <button class="tag-filter-btn" data-tag="数学基础">数学基础</button>
+  
+  <button class="tag-filter-btn" data-tag="日料">日料</button>
+  
+  <button class="tag-filter-btn" data-tag="机器学习">机器学习</button>
+  
+  <button class="tag-filter-btn" data-tag="架构">架构</button>
+  
+  <button class="tag-filter-btn" data-tag="检索增强">检索增强</button>
+  
+  <button class="tag-filter-btn" data-tag="沪深300">沪深300</button>
+  
+  <button class="tag-filter-btn" data-tag="深度学习">深度学习</button>
+  
+  <button class="tag-filter-btn" data-tag="真题">真题</button>
+  
+  <button class="tag-filter-btn" data-tag="策略回测">策略回测</button>
+  
+  <button class="tag-filter-btn" data-tag="系统设计">系统设计</button>
+  
+  <button class="tag-filter-btn" data-tag="视觉模型">视觉模型</button>
+  
+  <button class="tag-filter-btn" data-tag="训练">训练</button>
+  
+  <button class="tag-filter-btn" data-tag="记忆系统">记忆系统</button>
+  
+  <button class="tag-filter-btn" data-tag="部署">部署</button>
+  
+  <button class="tag-filter-btn" data-tag="量化">量化</button>
+  
+  <button class="tag-filter-btn" data-tag="量化交易">量化交易</button>
+  
+  <button class="tag-filter-btn" data-tag="阿里云百炼">阿里云百炼</button>
+  
+  <button class="tag-filter-btn" data-tag="静态网站生成器">静态网站生成器</button>
+  
+  <button class="tag-filter-btn" data-tag="面试">面试</button>
+  
+  <button class="tag-filter-btn" data-tag="预制菜">预制菜</button>
+  
+  <button class="tag-filter-btn" data-tag="食谱">食谱</button>
+  
+</div>
+
+
+
+
 <ul class="post-cards">
   
   <li class="post-card">
+    
+    
     <h2 class="post-card-title"><a href="/posts/ClassicPaperTranslation/ResNet/">ResNet</a></h2>
     <div class="post-card-meta">
       <time datetime="2024-06-26">2024-06-26</time>
@@ -128,6 +377,8 @@
   </li>
   
   <li class="post-card">
+    
+    
     <h2 class="post-card-title"><a href="/posts/ClassicPaperTranslation/VGG/">VGG</a></h2>
     <div class="post-card-meta">
       <time datetime="2024-06-26">2024-06-26</time>
@@ -147,6 +398,8 @@
   </li>
   
   <li class="post-card">
+    
+    
     <h2 class="post-card-title"><a href="/posts/DailyDev/Mysql%e5%bf%85%e7%9f%a5%e5%bf%85%e4%bc%9a%e8%af%bb%e4%b9%a6%e7%ac%94%e8%ae%b0/">SQL</a></h2>
     <div class="post-card-meta">
       <time datetime="2024-06-26">2024-06-26</time>
@@ -166,6 +419,8 @@
   </li>
   
   <li class="post-card">
+    
+    
     <h2 class="post-card-title"><a href="/posts/DailyDev/neo4j/">neo4j常用命令</a></h2>
     <div class="post-card-meta">
       <time datetime="2024-06-26">2024-06-26</time>
@@ -185,6 +440,8 @@
   </li>
   
   <li class="post-card">
+    
+    
     <h2 class="post-card-title"><a href="/posts/DailyDev/%e6%ad%a3%e5%88%99%e8%a1%a8%e8%be%be%e5%bc%8f%e5%bf%85%e7%9f%a5%e5%bf%85%e4%bc%9a__%e8%af%bb%e4%b9%a6%e7%ac%94%e8%ae%b0/">正则表达式</a></h2>
     <div class="post-card-meta">
       <time datetime="2024-06-26">2024-06-26</time>
@@ -204,6 +461,8 @@
   </li>
   
   <li class="post-card">
+    
+    
     <h2 class="post-card-title"><a href="/posts/KnowledgeGraph/%e9%a2%86%e5%9f%9f%e7%bb%bc%e8%bf%b0/">KnowledgeGraph Abstract</a></h2>
     <div class="post-card-meta">
       <time datetime="2024-06-25">2024-06-25</time>
@@ -225,6 +484,8 @@
   </li>
   
   <li class="post-card">
+    
+    
     <h2 class="post-card-title"><a href="/posts/ClassicPaperTranslation/AlexNet/">AlexNet</a></h2>
     <div class="post-card-meta">
       <time datetime="2024-06-24">2024-06-24</time>
@@ -244,6 +505,8 @@
   </li>
   
   <li class="post-card">
+    
+    
     <h2 class="post-card-title"><a href="/posts/DailyDev/%e8%ae%b0%e4%b8%80%e6%ac%a1%e5%8d%9a%e5%ae%a2%e6%90%ad%e5%bb%ba/">记一次博客搭建</a></h2>
     <div class="post-card-meta">
       <time datetime="2024-06-24">2024-06-24</time>
@@ -836,5 +1099,54 @@
 <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script defer src="/assets/js/search.js"></script>
 <button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
 </body>
 </html>
