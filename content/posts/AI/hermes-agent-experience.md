@@ -7,6 +7,7 @@ tags: ["Hermes Agent", "AI Native", "Agent", "WeChat", "Tool Use"]
 series: "AI Native探索"
 description: "从配置到日常使用，记录我使用 Hermes Agent（由 Nous Research 开发的开源 AI Agent 框架）三个月来的真实经验与感悟。涵盖安装配置、WeChat 集成、Skills 系统、记忆机制和踩坑记录。"
 toc: true
+ai_generated: true
 ---
 
 ## 缘起

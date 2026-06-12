@@ -6,6 +6,7 @@ tags: ["RAG", "检索增强", "向量数据库"]
 series: "AI应用开发面试宝典"
 toc: true
 weight: 6
+ai_generated: true
 ---
 
 # RAG与检索增强生成面试知识

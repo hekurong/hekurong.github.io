@@ -6,6 +6,7 @@ tags: ["Prompt", "提示工程", "Few-Shot"]
 series: "AI应用开发面试宝典"
 toc: true
 weight: 7
+ai_generated: true
 ---
 
 # 提示工程(Prompt Engineering)面试知识

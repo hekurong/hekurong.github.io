@@ -7,6 +7,7 @@ tags: ["Hermes Agent", "视觉模型", "TTS", "阿里云百炼", "Qwen", "DeepSe
 series: "AI Native探索"
 description: "记录给 Hermes Agent 配置辅助视觉模型（qwen3-vl-flash）和语音合成（qwen3-tts-flash）的全过程，包括架构设计、配置踩坑、CLI 工具开发与 bug 修复。"
 toc: true
+ai_generated: true
 ---
 
 ## 缘起
