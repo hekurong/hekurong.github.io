@@ -30,3 +30,7 @@ social:
 seo:
   enableSitemap: true
   enableRobotsTXT: true
+tagDescriptions:
+  Go: "Go 语言学习与实践"
+  机器学习: "机器学习与深度学习"
+  Python: "Python 编程笔记"
