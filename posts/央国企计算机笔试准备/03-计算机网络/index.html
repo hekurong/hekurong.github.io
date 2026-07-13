@@ -1,0 +1,2392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>计算机网络 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">计算机网络</h1>
+    <div class="article-meta">
+      <time datetime="2026-07-12">2026-07-12</time>
+      
+      <span class="series-badge" title="系列"><a href="/series/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/">央国企计算机笔试准备</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/%e8%ae%a1%e7%ae%97%e6%9c%ba%e5%9f%ba%e7%a1%80/">计算机基础</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="heading">计算机网络</h1>
+<blockquote>
+<p>主来源：CyC2018/CS-Notes 计算机网络章节（7篇）｜补充来源：Snailclimb/JavaGuide 计算机网络笔记（24篇）
+央国企考察特点：计算机网络与数据结构同属笔试权重最高的科目。建行IT类占比41%中计网题量最大，国网专业知识80%涵盖计网，中行/工行/农行均重点考查。考查重点集中于<strong>TCP/IP体系结构、传输层协议、HTTP演进、网络层路由</strong>四大模块。</p>
+</blockquote>
+<hr>
+<h2 id="heading-1">一、计算机网络体系结构</h2>
+<h3 id="1-">1. 网络基本概念</h3>
+<p>网络（Network）把若干主机连接起来实现资源共享；互连网（internet）是把多个不同的网络连接起来形成的网络的网络。互联网（Internet）是特指全球范围的、最大的特定互连网。</p>
+<p>互联网服务提供商（ISP）从互联网管理机构获得IP地址并拥有通信线路和路由器等联网设备，个人或机构向ISP缴费即可接入互联网。目前的互联网是一种多层次ISP结构，按覆盖面积分为第一层ISP（骨干网）、区域ISP和接入ISP。互联网交换点（IXP）允许两个ISP直接相连而无需经过第三个ISP。</p>
+<p>主机之间的通信方式分为两类：<strong>客户-服务器（C/S）模式</strong>，客户端是服务的请求方，服务器是服务的提供方；<strong>对等（P2P）模式</strong>，不区分客户和服务器的角色，每台主机既可以是请求方也可以是服务方。</p>
+<h3 id="2-">2. 电路交换与分组交换</h3>
+<p><strong>电路交换</strong>用于电话通信系统，通信前需建立一条专用物理链路并全程占用该链路。由于通信过程中并不一直用满线路带宽，电路交换的线路利用率很低，通常不到10%。</p>
+<p><strong>分组交换</strong>将数据划分为一个个分组（Packet），每个分组含有首部和尾部，包含源地址、目的地址等控制信息。同一传输线路上可以同时传输多个分组而互不影响。分组交换采用<strong>存储转发</strong>机制：路由器收到一个分组后先存储下来，再根据目的地址转发到下一跳。</p>
+<h3 id="3-">3. 时延的四种类型</h3>
+<p>端到端总时延由四部分构成：<strong>排队时延</strong>（分组在路由器输入/输出队列中等待的时间，取决于网络通信量）、<strong>处理时延</strong>（分析首部、差错检验、查找路由表等处理时间）、<strong>传输时延</strong>（主机或路由器将数据帧发送到传输介质上的时间，由帧长度和传输速率决定）、<strong>传播时延</strong>（电磁波在信道中的传播时间，由信道长度和电磁波传播速度决定）。</p>
+<h3 id="4-">4. 计算机网络体系结构</h3>
+<p>主流体系结构有三种划分方式：</p>
+<p><strong>五层协议</strong>（教学常用）：物理层 → 数据链路层 → 网络层 → 传输层 → 应用层。</p>
+<p><strong>OSI七层模型</strong>：在五层基础上增加<strong>表示层</strong>（数据压缩、加密、数据格式描述）和<strong>会话层</strong>（建立及管理会话）。</p>
+<p><strong>TCP/IP四层模型</strong>：将五层协议中的数据链路层和物理层合并为网络接口层，一共四层。TCP/IP不严格遵循OSI分层概念，应用层可以直接使用IP层或网络接口层。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">层级</th>
+<th>功能</th>
+<th style="text-align:center">代表性设备</th>
+<th style="text-align:center">PDU名称</th>
+<th style="text-align:center">主要协议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">应用层</td>
+<td>为特定应用程序提供网络服务</td>
+<td style="text-align:center">—</td>
+<td style="text-align:center">报文</td>
+<td style="text-align:center">HTTP、DNS、FTP、SMTP、DHCP</td>
+</tr>
+<tr>
+<td style="text-align:center">传输层</td>
+<td>为进程提供端到端通信服务</td>
+<td style="text-align:center">—</td>
+<td style="text-align:center">报文段（TCP）/用户数据报（UDP）</td>
+<td style="text-align:center">TCP、UDP</td>
+</tr>
+<tr>
+<td style="text-align:center">网络层</td>
+<td>为主机间通信提供路由与转发</td>
+<td style="text-align:center">路由器</td>
+<td style="text-align:center">分组/包</td>
+<td style="text-align:center">IP、ARP、ICMP、OSPF、RIP、BGP</td>
+</tr>
+<tr>
+<td style="text-align:center">数据链路层</td>
+<td>为同一条链路上的主机提供服务</td>
+<td style="text-align:center">交换机、网桥、集线器（物理层）</td>
+<td style="text-align:center">帧</td>
+<td style="text-align:center">以太网、PPP、VLAN 802.1Q</td>
+</tr>
+<tr>
+<td style="text-align:center">物理层</td>
+<td>在传输介质上传输比特流</td>
+<td style="text-align:center">中继器、集线器</td>
+<td style="text-align:center">比特</td>
+<td style="text-align:center">—</td>
+</tr>
+</tbody>
+</table>
+<p>数据在各层之间的传递遵循<strong>封装与解封装</strong>过程：发送端在向下逐层传递时，每层添加本层协议所需的首部（有时还有尾部）；接收端在向上逐层传递时，逐层拆掉首部和尾部。路由器只处理下面三层（物理层、链路层、网络层），不涉及传输层和应用层。</p>
+<blockquote>
+<p><strong>高频题点</strong>：OSI七层每层功能及对应设备、各层PDU名称、TCP/IP与OSI的对应关系、数据封装过程、分组交换与电路交换的区别。</p>
+</blockquote>
+<hr>
+<h2 id="heading-2">二、物理层</h2>
+<h3 id="1--1">1. 通信方式</h3>
+<p>根据传输方向，物理层通信方式分为三种：<strong>单工通信</strong>（单向传输，一条信道）、<strong>半双工通信</strong>（双向交替传输，双方不可同时发送）、<strong>全双工通信</strong>（双向同时传输，需两条信道或复用技术）。</p>
+<h3 id="2--1">2. 带通调制</h3>
+<p>计算机内部处理的是离散的数字信号，而实际传输介质上传输的是连续的模拟信号。<strong>带通调制</strong>将数字信号转换为模拟信号，使其能在带通信道（限定了频率范围的信道）上传输。常见的调制方式包括调幅、调频和调相。</p>
+<blockquote>
+<p><strong>高频题点</strong>：三种通信方式区分、数字信号与模拟信号的转换。</p>
+</blockquote>
+<hr>
+<h2 id="heading-3">三、数据链路层</h2>
+<h3 id="1--2">1. 基本问题</h3>
+<p>数据链路层有三个基本问题：</p>
+<p><strong>封装成帧</strong>：将网络层传下来的分组添加首部和尾部作为帧的定界符，标识帧的开始和结束。</p>
+<p><strong>透明传输</strong>：若帧的数据部分中出现了与首部/尾部相同的内容，则会在该内容前插入转义字符（字节填充法）；若出现转义字符本身，则在其前再加一个转义字符。接收端处理后可还原原始数据——对用户来说&quot;看不见&quot;转义字符的存在，故称透明传输。</p>
+<p><strong>差错检测</strong>：数据链路层广泛使用**循环冗余检验（CRC）**来检查比特差错。发送端在帧尾附加冗余码（FCS），接收端用相同的除数做模2除法，若余数不为零则判定帧出错。</p>
+<h3 id="2--2">2. 信道分类</h3>
+<p><strong>广播信道</strong>：一对多通信，一个节点发送的数据能被广播信道上所有节点接收到。由于多个节点共享同一信道，需要有协调机制避免冲突，主要的协调方式包括信道复用技术和CSMA/CD协议。</p>
+<p><strong>点对点信道</strong>：一对一通信，不会发生碰撞，使用PPP协议进行控制。</p>
+<h3 id="3--1">3. 信道复用技术</h3>
+<p><strong>频分复用（FDM）</strong>：所有主机在相同的时间占用不同的频率带宽资源。每个用户始终占有不同的频段。</p>
+<p><strong>时分复用（TDM）</strong>：所有主机在不同的时间占用相同的频率带宽资源。每个用户在分配的时间片内使用全部带宽。</p>
+<p><strong>统计时分复用（STDM）</strong>：对时分复用的改进。不固定每个用户在TDM帧中的位置，只要用户有数据就集中起来组成STDM帧发送，提高了信道利用率。</p>
+<p><strong>波分复用（WDM）</strong>：光的频分复用。由于光的频率很高，习惯上用波长而非频率来表示光载波。</p>
+<p><strong>码分复用（CDM）</strong>：为每个用户分配一个互相正交的码片（Chip Sequence）。用户在发送比特1时发送自身的码片，发送比特0时发送码片的二进制反码。接收端用该用户的码片对接收信号做内积运算：结果为1表示收到比特1，结果为-1表示收到比特0，结果为0表示其他用户的数据。码分复用需要发送的数据量是原始数据的m倍（m为码片长度）。</p>
+<h3 id="4-csmacd">4. CSMA/CD协议</h3>
+<p>载波监听多点接入/碰撞检测（CSMA/CD）是广播信道（尤其是总线型以太网）采用的介质访问控制协议。<strong>多点接入</strong>指多台主机以总线方式连接到同一信道；<strong>载波监听</strong>指每台主机在发送前持续监听信道，若信道忙则等待；<strong>碰撞检测</strong>指发送过程中同时监听信道，若发现信号冲突则立即停止发送。</p>
+<p>记端到端传播时延为τ，发送站最多经过<strong>2τ</strong>（争用期）就能判断是否发生碰撞。只有经过争用期而未检测到碰撞，才能确认这次发送不会碰撞。发生碰撞后，站点采用<strong>截断二进制指数退避算法</strong>确定重传等待时间：从{0, 1, &hellip;, 2^k-1}中随机取一个数r，以r倍争用期作为重传等待时间。</p>
+<h3 id="5-ppp">5. PPP协议</h3>
+<p>点对点协议（PPP）是用户计算机和ISP进行通信时使用的数据链路层协议。PPP帧依次包含：标志字段F（定界符）、地址字段A、控制字段C、协议字段、信息部分（不超过1500字节）、帧检验序列FCS（CRC检验）。</p>
+<h3 id="6-mac">6. MAC地址</h3>
+<p>MAC地址是链路层地址，长度为6字节（48位），用于唯一标识网络适配器（网卡）。一台主机有多少个网络适配器就有多少个MAC地址。</p>
+<h3 id="7-">7. 局域网与以太网</h3>
+<p><strong>局域网</strong>是一种典型的广播信道，特征为网络由一个单位所拥有，地理范围和站点数目均有限。主要技术包括以太网、令牌环网、FDDI和ATM，目前以太网占据主导地位。</p>
+<p><strong>以太网</strong>采用星型拓扑结构。早期使用集线器（物理层设备）连接，集线器收到一个比特后重新生成并放大后发送到所有其他接口，若同时收到两个不同接口的帧则发生碰撞。现代以太网使用交换机替代集线器，交换机是链路层设备，根据MAC地址进行存储转发，不会发生碰撞。</p>
+<p>以太网帧包含：目的MAC地址、源MAC地址、类型（标记上层协议）、数据（46~1500字节，不足时填充）、帧检验序列FCS（CRC检验）。</p>
+<h3 id="8-">8. 交换机自学习</h3>
+<p>交换机内部维护一张<strong>交换表</strong>，记录MAC地址到接口的映射关系。自学习过程：当主机A向主机B发送帧时，交换机首先将A的MAC地址与此帧到来的接口写入交换表；若表中没有B的条目，则向所有接口广播该帧；B收到后回复时，交换机根据已记录的A的接口信息将回复帧直接转发给A，同时将B的MAC地址与其接口写入交换表。交换机的自学习特性使其成为即插即用设备。</p>
+<h3 id="9-">9. 虚拟局域网</h3>
+<p>虚拟局域网（VLAN）可以在同一物理网络基础上建立与物理位置无关的逻辑分组。只有属于同一VLAN的成员才会收到广播帧。VLAN通过<strong>干线连接</strong>跨交换机扩展，IEEE 802.1Q标准在标准以太网帧中增加4字节VLAN标签，标识帧所属的VLAN。</p>
+<blockquote>
+<p><strong>高频题点</strong>：CSMA/CD碰撞检测与退避算法、MAC地址长度与作用、交换机自学习流程、VLAN隔离广播域、CRC差错检测原理、信道复用技术五种方式对比。</p>
+</blockquote>
+<hr>
+<h2 id="heading-4">四、网络层</h2>
+<h3 id="1--3">1. 概述</h3>
+<p>网络层是互联网的核心，设计原则是<strong>尽可能简单</strong>：向上只提供简单灵活、无连接、尽最大努力交付的数据报服务。IP协议将异构的物理网络连接起来，使网络层看起来像一个统一的网络。</p>
+<p>与IP协议配套使用的三个协议：地址解析协议（ARP）、网际控制报文协议（ICMP）、网际组管理协议（IGMP）。</p>
+<h3 id="2-ip">2. IP数据报格式</h3>
+<p>IP数据报由首部和数据两部分组成。首部固定部分为20字节，包含以下关键字段：</p>
+<p><strong>版本</strong>：IPv4或IPv6。<strong>首部长度</strong>：占4位，以4字节为单位，最小为5（即20字节），最大为15（60字节）。<strong>区分服务</strong>：一般情况下不使用。<strong>总长度</strong>：首部长度加数据部分长度。<strong>标识/标志/片偏移</strong>：当数据报长度超过链路MTU需要分片时使用，同一数据报的不同分片具有相同标识符，片偏移以8字节为单位。<strong>生存时间（TTL）</strong>：以路由器跳数为单位，每经过一个路由器TTL减1，减到0时丢弃，防止数据报无限制循环。<strong>协议</strong>：指示数据部分应该交给哪个上层协议处理（如TCP=6，UDP=17，ICMP=1）。<strong>首部检验和</strong>：每经过一个路由器重新计算。<strong>源地址和目的地址</strong>：各32位。</p>
+<h3 id="3-ip">3. IP地址编址方式</h3>
+<p>IP地址编址经历了三个阶段：</p>
+<p><strong>分类编址</strong>：将IP地址分为A（0开头，8位网络号+24位主机号）、B（10开头，16+16）、C（110开头，24+8）、D（组播地址）、E（保留）五类。A/B/C类地址的网络号和主机号长度固定。</p>
+<p><strong>子网划分</strong>：从主机号中借用一部分作为子网号，将两级IP地址变为三级（网络号、子网号、主机号）。使用子网时需配置<strong>子网掩码</strong>，子网掩码中网络号和子网号部分全为1，主机号部分全为0。外部网络看不到子网的存在。</p>
+<p><strong>无分类编址CIDR</strong>：消除传统ABC类及子网划分概念，采用<strong>网络前缀</strong>和主机号编码，网络前缀长度可变。CIDR表示法在IP地址后加&quot;/&ldquo;和前缀长度（如128.14.35.7/20表示前20位为网络前缀）。CIDR支持<strong>路由聚合</strong>（构成超网），将多个小的子网聚合成一个大的网络，减少路由表项数量。路由匹配时采用<strong>最长前缀匹配</strong>——若有多条匹配记录，则选择网络前缀最长的那条。</p>
+<h3 id="4-arp">4. 地址解析协议ARP</h3>
+<p>网络层实现主机到主机的通信，链路层实现具体每段链路之间的通信。在通信过程中，IP数据报的源地址和目的地址始终不变，而MAC地址随链路改变而改变。ARP实现从IP地址到MAC地址的映射。</p>
+<p>每个主机维护一个ARP高速缓存（IP地址到MAC地址的映射表）。若主机A需要向主机B发送数据但缓存中没有B的MAC地址，A会广播ARP请求分组（包含B的IP地址），B收到后单播回复ARP响应分组告知自己的MAC地址，A随后将映射写入缓存。ARP不仅用于将下一跳路由器的IP解析为MAC，也用于同一子网内主机间的MAC地址解析。</p>
+<h3 id="5-icmp">5. 网际控制报文协议ICMP</h3>
+<p>ICMP用于更有效地转发IP数据报和提高交付成功率。ICMP报文封装在IP数据报中，但不属于高层协议。</p>
+<p>ICMP报文分为<strong>差错报告报文</strong>（终点不可达、时间超过、参数问题、源点抑制等）和<strong>询问报文</strong>（回送请求/回答、时间戳请求/回答）。</p>
+<p><strong>Ping应用</strong>：测试两台主机的连通性。Ping向目的主机发送ICMP回送请求报文，目的主机回复回送回答报文，通过时间和成功响应次数估算往返时间和丢包率。</p>
+<p><strong>Traceroute应用</strong>：跟踪分组从源点到终点的路径。源主机发送一连串IP数据报，第一个TTL=1，第二个TTL=2，依此类推。每跳路由器在TTL减到0时丢弃数据报并返回ICMP时间超过报文；最后一个数据报到达目的主机时，因封装的是不可交付的UDP数据报，目的主机返回ICMP终点不可达报文。源主机由此获得经过的所有路由器的IP地址和往返时间。</p>
+<h3 id="6-vpn">6. 虚拟专用网VPN</h3>
+<p>由于IP地址紧缺，机构内部的主机可以使用仅在本机构有效的<strong>专用地址</strong>（10.0.0.0/8、172.16.0.0/12、192.168.0.0/16）。VPN使用公共互联网作为各专用网之间的通信载体——通信数据经过公网时被加密，在出公网时解密还原，从而在逻辑上形成一条&quot;虚拟&quot;的专用网络。</p>
+<h3 id="7-nat">7. 网络地址转换NAT</h3>
+<p>专用网内部的主机通过NAT将本地IP转换为全球IP与互联网通信。早期的NAT是一对一映射，现在常用的**网络地址与端口转换（NAPT）**将传输层端口号也纳入转换表，使多个内部主机共用一个全球IP地址。</p>
+<h3 id="8--1">8. 路由器结构与分组转发流程</h3>
+<p>路由器功能上分为<strong>路由选择</strong>（维护路由表，确定转发路径）和<strong>分组转发</strong>（实际处理进入的数据报）。分组转发结构由<strong>交换结构、一组输入端口和一组输出端口</strong>三部分组成。</p>
+<p>分组转发基本流程：</p>
+<ol>
+<li>从数据报首部提取目的IP地址D，得到目的网络地址N；</li>
+<li>若N是与此路由器直连的网络，直接交付；</li>
+<li>若路由表中有目的地址为D的特定主机路由，传给指明的下一跳；</li>
+<li>若路由表中有到达网络N的路由，传给指明的下一跳；</li>
+<li>若路由表中有默认路由，传给默认路由器；</li>
+<li>报告转发分组出错。</li>
+</ol>
+<h3 id="9--1">9. 路由选择协议</h3>
+<p>互联网划分为许多<strong>自治系统（AS）</strong>，每个AS内部可使用不同的路由协议。路由协议分为内部网关协议（RIP、OSPF）和外部网关协议（BGP）。</p>
+<p><strong>RIP（路由信息协议）</strong>：基于<strong>距离向量</strong>算法。距离以跳数计量，直连路由器跳数为1，最大15跳（16表示不可达）。RIP每隔固定时间仅与相邻路由器交换完整的路由表，收敛速度较慢。更新规则：若有新网络则添加；若下一跳相同则更新；若新距离更短则更新；若相邻路由器3分钟无更新则将其标记为不可达（跳数置16）。RIP实现简单、开销小，但限制了网络规模（不超过15跳），故障信息传播慢。</p>
+<p><strong>OSPF（开放最短路径优先）</strong>：基于<strong>链路状态</strong>算法。每个路由器通过洪泛法向本AS内所有路由器发送链路状态信息（与哪些路由器相连、链路度量），所有路由器最终保持全网一致的拓扑结构图，使用Dijkstra最短路径算法独立计算路由。OSPF只在链路状态变化时才发送信息，收敛速度快，支持多度量值（费用、距离、时延、带宽），适用于大型网络。</p>
+<p><strong>BGP（边界网关协议）</strong>：AS之间采用<strong>路径向量</strong>协议。BGP不寻找最佳路由，只寻找一条能到达目的地且符合策略的较好路由。每个AS需配置BGP发言人，相邻BGP发言人通过TCP连接交换路由信息。BGP考虑了AS之间的管理策略和政治因素，适用于互联网规模的跨域路由。</p>
+<blockquote>
+<p><strong>高频题点</strong>：IP编址三阶段、子网掩码的作用、CIDR和路由聚合、ARP工作过程、ICMP的Ping/Traceroute原理、RIP与OSPF对比、NAT转换原理、路由器转发流程、TTL的作用。</p>
+</blockquote>
+<hr>
+<h2 id="heading-5">五、传输层</h2>
+<h3 id="1--4">1. 传输层概述</h3>
+<p>网络层只将分组送达目的主机，而真正通信的是主机中的进程。传输层提供<strong>进程间的逻辑通信</strong>，向高层用户屏蔽网络层核心细节。传输层主要提供两种协议：面向连接可靠的TCP和无连接尽最大努力的UDP。</p>
+<h3 id="2-udptcp">2. UDP与TCP的特点对比</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">特性</th>
+<th style="text-align:center">UDP</th>
+<th style="text-align:center">TCP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">连接状态</td>
+<td style="text-align:center">无连接</td>
+<td style="text-align:center">面向连接</td>
+</tr>
+<tr>
+<td style="text-align:center">可靠性</td>
+<td style="text-align:center">尽最大努力交付，不可靠</td>
+<td style="text-align:center">提供可靠交付</td>
+</tr>
+<tr>
+<td style="text-align:center">拥塞控制</td>
+<td style="text-align:center">无拥塞控制</td>
+<td style="text-align:center">有流量控制和拥塞控制</td>
+</tr>
+<tr>
+<td style="text-align:center">通信方式</td>
+<td style="text-align:center">一对一、一对多、多对一、多对多</td>
+<td style="text-align:center">点对点（一对一）</td>
+</tr>
+<tr>
+<td style="text-align:center">数据服务方式</td>
+<td style="text-align:center">面向报文（不合并/不拆分报文）</td>
+<td style="text-align:center">面向字节流（组织成大小不等的报文段）</td>
+</tr>
+<tr>
+<td style="text-align:center">首部开销</td>
+<td style="text-align:center">8字节</td>
+<td style="text-align:center">20~60字节</td>
+</tr>
+</tbody>
+</table>
+<p>UDP主要提供<strong>及时性</strong>服务，适用于实时应用（音视频通话、在线游戏）；TCP主要提供<strong>完整性</strong>服务，适用于要求数据准确的应用（文件传输、网页浏览）。</p>
+<h3 id="3-udp">3. UDP首部格式</h3>
+<p>UDP首部只有8字节，包含：源端口（2字节）、目的端口（2字节）、长度（2字节，首部+数据）、检验和（2字节）。计算检验和时临时添加12字节的<strong>伪首部</strong>（包含源IP、目的IP、协议类型、UDP长度），伪首部不参与传输。</p>
+<h3 id="4-tcp">4. TCP首部格式</h3>
+<p>TCP首部固定部分20字节，主要字段：</p>
+<p><strong>序号（SEQ）</strong>：对字节流中的每个字节编号。若某报文段序号为301，携带100字节数据，则下一个报文段序号为401。</p>
+<p><strong>确认号（ACK）</strong>：期望收到对方下一个报文段的序号。若A收到序号为501且携带200字节数据的报文段，则A回复的确认号应为701。</p>
+<p><strong>数据偏移</strong>：TCP首部的长度，以4字节为单位。</p>
+<p><strong>标志位</strong>：URG（紧急指针有效）、ACK（确认号有效，连接建立后所有报文段ACK必须置1）、PSH（推送，接收方应尽快交付应用）、RST（重置连接）、SYN（同步序号，连接建立时使用）、FIN（终止连接，发送方数据发送完毕）。</p>
+<p><strong>窗口</strong>：接收方告诉发送方自己还能接收多少数据，是流量控制的依据。</p>
+<h3 id="5-tcp">5. TCP三次握手</h3>
+<p>建立TCP连接需要三次报文交换（以客户端A向服务器B请求连接为例）：</p>
+<p><strong>第一次握手</strong>：A向B发送SYN=1的报文段，选择初始序号seq=x。A进入SYN_SENT状态。</p>
+<p><strong>第二次握手</strong>：B收到后若同意连接，回复SYN=1、ACK=1的报文段，确认号ack=x+1，同时选择自己的初始序号seq=y。B进入SYN_RCVD状态。</p>
+<p><strong>第三次握手</strong>：A收到B的SYN+ACK后，发送ACK=1的报文段，确认号ack=y+1，序号seq=x+1。A进入ESTABLISHED状态。B收到后也进入ESTABLISHED状态。</p>
+<p><strong>为什么需要三次握手而不是两次？</strong></p>
+<p>核心原因有二：一是<strong>同步双方的初始序列号</strong>，让两边确认双向通信能力。两次握手只能让服务端确认客户端能发，无法让服务端确认客户端是否收到了自己的SYN+ACK。二是<strong>防止失效的连接请求被错误建立</strong>。若第一个连接请求在网络中滞留，客户端超时重发请求并成功建立连接后释放，此时滞留的旧请求到达服务端。两次握手会让服务端误以为是新连接而建立无效连接；三次握手中，服务端回复SYN+ACK后需等待客户端ACK，客户端因为没有此连接状态而不会回复ACK（或回复RST），避免了错误连接。</p>
+<p><strong>半连接队列与全连接队列</strong>：服务端收到第一次SYN后，将连接放入<strong>半连接队列（SYN队列）</strong>，状态为SYN_RCVD；收到第三次ACK后，将连接移入<strong>全连接队列（Accept队列）</strong>，状态变为ESTABLISHED，等待应用层accept()取走。</p>
+<h3 id="6-tcp">6. TCP四次挥手</h3>
+<p>TCP是全双工通信，每个方向需要单独关闭，通常需要四次报文交换（以客户端主动关闭为例）：</p>
+<p><strong>第一次挥手</strong>：A发送FIN=1的报文段，表示A的数据已发送完毕。A进入FIN_WAIT_1状态。</p>
+<p><strong>第二次挥手</strong>：B收到后回复ACK，确认号ack=u+1。B进入CLOSE_WAIT状态（半关闭状态：A→B方向关闭，B仍可向A发送数据）。A收到ACK后进入FIN_WAIT_2状态。</p>
+<p><strong>第三次挥手</strong>：B确认剩余数据发送完毕后，发送FIN=1的报文段。B进入LAST_ACK状态。</p>
+<p><strong>第四次挥手</strong>：A收到B的FIN后回复ACK，确认号ack=v+1。A进入TIME_WAIT状态，等待2MSL后进入CLOSED状态。B收到ACK后直接进入CLOSED状态。</p>
+<p><strong>为什么需要四次挥手？</strong> TCP是全双工的，A停止发送不代表B也没有数据要发。ACK（确认收到对方的FIN）和FIN（自己停止发送）的触发时机不同——ACK由内核自动回复，FIN需要在应用层调用close()之后才发送。</p>
+<p><strong>为什么需要TIME_WAIT状态（等待2MSL）？</strong> 两个作用：一是确保最后一个ACK能到达对方。若ACK丢失，B会重传FIN，A在TIME_WAIT中可以重新回复ACK；若A直接关闭，收到重传FIN后会回复RST，导致B异常关闭。二是让本连接持续时间内产生的所有报文段从网络中消失，防止被后续新连接误接收。MSL是报文段在网络中的最大生存时间，Linux中TIME_WAIT时长固定为60秒。</p>
+<h3 id="7-tcp">7. TCP可靠传输与滑动窗口</h3>
+<p>TCP通过<strong>超时重传</strong>实现可靠传输：若已发送的报文段在超时时间内未收到确认，则重传该报文段。超时时间（RTO）基于加权平均往返时间（RTTs）和偏差（RTTd）动态计算。</p>
+<p>滑动窗口机制：发送方和接收方各维护一个窗口，窗口是缓存的组成部分，用来暂时存放字节流。接收方通过TCP报文段的窗口字段告知发送方其可用缓存大小，发送方据此调整发送窗口。发送窗口左部的字节已发送并收到确认后，窗口向右滑动；接收窗口对最后一个按序到达的字节进行确认。</p>
+<h3 id="8-tcp">8. TCP流量控制</h3>
+<p>流量控制目的是让发送方发送速率与接收方接收能力相匹配。接收方在确认报文中通过<strong>窗口字段</strong>告知发送方自己的接收窗口大小；若置为0，则发送方停止发送数据。流量控制是端到端的控制，让接收方&quot;来得及接收&rdquo;。</p>
+<h3 id="9-tcp">9. TCP拥塞控制</h3>
+<p>拥塞控制目的是防止过多数据注入网络导致网络性能恶化。与流量控制不同，拥塞控制是全局性控制，让网络&quot;不拥塞&quot;。TCP通过维护**拥塞窗口（cwnd）**状态变量实现，实际决定发送量的是发送方窗口=min(接收方通告窗口，拥塞窗口)。</p>
+<p>四个主要算法：</p>
+<p><strong>慢开始</strong>：cwnd初始为1，每收到一个报文段的确认，cwnd翻倍（指数增长）。设置慢开始门限ssthresh，当cwnd达到ssthresh时转入拥塞避免。</p>
+<p><strong>拥塞避免</strong>：每个往返时间RTT内cwnd增加1（线性增长）。若发生超时，令ssthresh=cwnd/2，cwnd重置为1，重新执行慢开始。</p>
+<p><strong>快重传</strong>：接收方每收到一个失序报文段就立即发送对最后一个有序报文段的重复确认。发送方收到3个重复确认时，立即重传丢失的报文段（不等超时）。</p>
+<p><strong>快恢复</strong>：收到3个重复确认后，执行快恢复：ssthresh=cwnd/2，cwnd=ssthresh，直接进入拥塞避免（不做慢开始）。快恢复基于&quot;只是丢了个别报文段，并非网络拥塞&quot;的判断。</p>
+<blockquote>
+<p><strong>高频题点</strong>：TCP与UDP区别、三次握手过程及原因、四次挥手过程、TIME_WAIT作用、滑动窗口与流量控制、拥塞控制四算法及状态切换、半连接队列与全连接队列。</p>
+</blockquote>
+<hr>
+<h2 id="heading-6">六、应用层</h2>
+<h3 id="1-dns">1. 域名系统DNS</h3>
+<p>DNS是一个分布式数据库，提供主机名到IP地址的转换服务。DNS采用层次结构设计，自底向上分为四类服务器：</p>
+<ul>
+<li><strong>根DNS服务器</strong>：顶级域（TLD）服务器的IP地址来源。全球有13组根服务器（逻辑上13个IP地址，通过任播技术在全球分布超过1700台物理实例）。</li>
+<li><strong>顶级域DNS服务器</strong>（TLD）：负责顶级域名（com、org、net、edu等）和国家顶级域（uk、fr、cn等）的解析。</li>
+<li><strong>权威DNS服务器</strong>：每个组织机构维护自己的权威DNS服务器，记录本组织主机名到IP地址的映射。</li>
+<li><strong>本地DNS服务器</strong>：每个ISP拥有本地DNS服务器，起代理作用，将客户请求转发到DNS层次结构中（不属于DNS层级结构）。</li>
+</ul>
+<p><strong>解析过程</strong>（以递归查询+迭代查询结合为例）：</p>
+<ol>
+<li>主机将DNS查询发送给自己的本地DNS服务器；</li>
+<li>若本地缓存无记录，本地DNS向根服务器发起迭代查询；</li>
+<li>根服务器返回对应TLD服务器的IP地址；</li>
+<li>本地DNS再向TLD服务器查询，TLD服务器返回权威DNS服务器的IP地址；</li>
+<li>本地DNS向权威DNS服务器查询，获得目标域名对应的IP地址；</li>
+<li>本地DNS将结果缓存在本地，并返回给请求主机。</li>
+</ol>
+<p>在实际中，由于本地DNS服务器通常已经缓存了大量TLD服务器的地址，根服务器往往被直接跳过。</p>
+<p>DNS使用UDP传输（端口53），当响应超过512字节（UDP报文长度限制）或进行区域传送（Zone Transfer）时改用TCP。</p>
+<p><strong>DNS资源记录</strong>：数据库中每条记录称为资源记录（RR），包含Name、Value、Type、TTL四个字段。Type=A（主机名→IPv4地址）、Type=AAAA（主机名→IPv6地址）、Type=CNAME（别名→规范主机名）、Type=NS（域→权威DNS服务器主机名）、Type=MX（邮件服务器别名→规范主机名）。</p>
+<h3 id="2-ftp">2. 文件传送协议FTP</h3>
+<p>FTP使用TCP进行连接，需要两个连接传送一个文件：<strong>控制连接</strong>（端口21，传输命令与应答）和<strong>数据连接</strong>（端口20或随机端口，传输文件数据）。</p>
+<p><strong>主动模式</strong>：服务器主动从端口20向客户端建立数据连接，需客户端开放端口。<strong>被动模式</strong>：客户端主动建立数据连接，服务器端口随机，只需服务器开放端口。</p>
+<h3 id="3-dhcp">3. 动态主机配置协议DHCP</h3>
+<p>DHCP提供即插即用连网方式，自动配置IP地址、子网掩码、默认网关和DNS服务器等参数。</p>
+<p><strong>工作过程</strong>：</p>
+<ol>
+<li>客户端广播Discover报文（目的地址255.255.255.255:67，源地址0.0.0.0:68）；</li>
+<li>DHCP服务器回复Offer报文（含所需配置信息）；</li>
+<li>客户端选择其中一个Offer并广播Request报文；</li>
+<li>服务器回复Ack报文确认，客户端使用分配的信息。</li>
+</ol>
+<p>若客户端和DHCP服务器不在同一子网，需使用中继代理（DHCP Relay Agent）。</p>
+<h3 id="4-telnet">4. 远程登录协议TELNET</h3>
+<p>TELNET用于登录远程主机，可适应不同操作系统之间的差异（如换行符定义不同）。</p>
+<h3 id="5-">5. 电子邮件协议</h3>
+<p>电子邮件系统由用户代理（UA）、邮件服务器和邮件协议组成。</p>
+<p><strong>SMTP（简单邮件传送协议）</strong>：用于发送邮件，使用TCP端口25。SMTP只能发送ASCII码文本，**MIME（多用途互联网邮件扩展）**为邮件增加了多媒体和二进制附件支持，但并未取代SMTP。</p>
+<p><strong>POP3（邮局协议第三版）</strong>：读取邮件，默认从服务器读取后删除邮件（新版可配置不删除）。</p>
+<p><strong>IMAP（互联网邮件访问协议）</strong>：读取邮件，客户端与服务器端邮件保持同步，不手动删除则服务器端也不会删除，实现随时随地的邮件访问。</p>
+<h3 id="6-">6. 常用端口汇总</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">应用层协议</th>
+<th style="text-align:center">端口号</th>
+<th style="text-align:center">传输层协议</th>
+<th style="text-align:center">用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">DNS</td>
+<td style="text-align:center">53</td>
+<td style="text-align:center">UDP/TCP</td>
+<td style="text-align:center">域名解析</td>
+</tr>
+<tr>
+<td style="text-align:center">DHCP</td>
+<td style="text-align:center">67/68</td>
+<td style="text-align:center">UDP</td>
+<td style="text-align:center">动态主机配置</td>
+</tr>
+<tr>
+<td style="text-align:center">FTP</td>
+<td style="text-align:center">20/21</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">文件传输（控制21/数据20）</td>
+</tr>
+<tr>
+<td style="text-align:center">TELNET</td>
+<td style="text-align:center">23</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">远程终端</td>
+</tr>
+<tr>
+<td style="text-align:center">SMTP</td>
+<td style="text-align:center">25</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">邮件发送</td>
+</tr>
+<tr>
+<td style="text-align:center">POP3</td>
+<td style="text-align:center">110</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">邮件读取</td>
+</tr>
+<tr>
+<td style="text-align:center">IMAP</td>
+<td style="text-align:center">143</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">邮件读取</td>
+</tr>
+<tr>
+<td style="text-align:center">HTTP</td>
+<td style="text-align:center">80</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">超文本传输</td>
+</tr>
+<tr>
+<td style="text-align:center">HTTPS</td>
+<td style="text-align:center">443</td>
+<td style="text-align:center">TCP</td>
+<td style="text-align:center">安全超文本传输</td>
+</tr>
+</tbody>
+</table>
+<h3 id="7-web">7. Web页面请求全过程</h3>
+<p>从用户在浏览器输入URL到页面显示，数据包依次经历以下步骤：</p>
+<p><strong>DHCP配置主机信息</strong>：主机广播DHCP请求，DHCP服务器返回IP地址、DNS服务器IP、默认网关IP和子网掩码，主机据此配置自己的网络参数。</p>
+<p><strong>ARP解析MAC地址</strong>：主机通过ARP协议获取默认网关路由器的MAC地址。由于DHCP只给了网关IP，需用ARP广播查询网关IP对应的MAC地址，网关单播回复。</p>
+<p><strong>DNS解析域名</strong>：主机向DNS服务器发送域名查询请求，数据包经网关路由器和互联网逐跳转发到达DNS服务器，DNS返回目标域名的IP地址。</p>
+<p><strong>TCP三次握手</strong>：主机与HTTP服务器建立TCP连接（三次握手），目的端口80（HTTP）或443（HTTPS）。</p>
+<p><strong>HTTP请求与响应</strong>：连接建立后，浏览器发送HTTP GET请求报文，HTTP服务器处理请求后将Web页面内容放入响应报文返回，浏览器解析渲染后显示页面。</p>
+<blockquote>
+<p><strong>高频题点</strong>：DNS递归与迭代查询流程、DHCP四步交互、FTP主动/被动模式区别、SMTP与POP3/IMAP区别、常用端口号记忆、Web页面请求全过程详解。</p>
+</blockquote>
+<hr>
+<h2 id="http">七、HTTP协议</h2>
+<h3 id="1-http">1. HTTP基础概念</h3>
+<p>HTTP（超文本传输协议）是一种无状态的应用层协议，默认使用TCP端口80。HTTP客户端发送请求报文给服务器，服务器返回响应报文。</p>
+<p><strong>请求报文结构</strong>：请求行（方法 + URL + 协议版本）+ 请求首部 + 空行 + 请求体。</p>
+<p><strong>响应报文结构</strong>：状态行（协议版本 + 状态码 + 原因短语）+ 响应首部 + 空行 + 响应体。</p>
+<p><strong>URL与URI</strong>：URI（统一资源标识符）包含URL（统一资源定位符）和URN（统一资源名称）。URL具备资源定位能力，URN只定义资源名称。</p>
+<h3 id="2-http">2. HTTP方法</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方法</th>
+<th style="text-align:center">作用</th>
+<th style="text-align:center">是否安全</th>
+<th style="text-align:center">是否幂等</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">GET</td>
+<td style="text-align:center">获取资源</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">HEAD</td>
+<td style="text-align:center">获取报文首部</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">POST</td>
+<td style="text-align:center">传输实体主体</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">否</td>
+</tr>
+<tr>
+<td style="text-align:center">PUT</td>
+<td style="text-align:center">上传文件</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">PATCH</td>
+<td style="text-align:center">对资源部分修改</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">否</td>
+</tr>
+<tr>
+<td style="text-align:center">DELETE</td>
+<td style="text-align:center">删除文件</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">OPTIONS</td>
+<td style="text-align:center">查询支持的方法</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">CONNECT</td>
+<td style="text-align:center">建立隧道（SSL/TLS）</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">否</td>
+</tr>
+<tr>
+<td style="text-align:center">TRACE</td>
+<td style="text-align:center">追踪路径</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">是</td>
+</tr>
+</tbody>
+</table>
+<p><strong>安全方法</strong>：不会改变服务器状态（只读）。</p>
+<p><strong>幂等方法</strong>：相同请求执行多次与执行一次效果相同，服务器状态不变。</p>
+<h3 id="3-http">3. HTTP状态码</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类别</th>
+<th style="text-align:center">含义</th>
+<th style="text-align:center">代表状态码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1XX</td>
+<td style="text-align:center">信息性</td>
+<td style="text-align:center">100 Continue</td>
+</tr>
+<tr>
+<td style="text-align:center">2XX</td>
+<td style="text-align:center">成功</td>
+<td style="text-align:center">200 OK、201 Created、204 No Content、206 Partial Content</td>
+</tr>
+<tr>
+<td style="text-align:center">3XX</td>
+<td style="text-align:center">重定向</td>
+<td style="text-align:center">301 Moved Permanently、302 Found、303 See Other、304 Not Modified、307 Temporary Redirect</td>
+</tr>
+<tr>
+<td style="text-align:center">4XX</td>
+<td style="text-align:center">客户端错误</td>
+<td style="text-align:center">400 Bad Request、401 Unauthorized、403 Forbidden、404 Not Found</td>
+</tr>
+<tr>
+<td style="text-align:center">5XX</td>
+<td style="text-align:center">服务器错误</td>
+<td style="text-align:center">500 Internal Server Error、502 Bad Gateway、503 Service Unavailable</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>200 OK</strong>：请求成功处理，返回数据。</li>
+<li><strong>204 No Content</strong>：请求成功处理但无返回内容（如删除操作）。</li>
+<li><strong>301 Moved Permanently</strong>：永久重定向。</li>
+<li><strong>302 Found</strong>：临时重定向（大多数浏览器会把POST改为GET）。</li>
+<li><strong>304 Not Modified</strong>：缓存资源有效，无需重新传输。</li>
+<li><strong>400 Bad Request</strong>：请求报文存在语法错误。</li>
+<li><strong>401 Unauthorized</strong>：未提供认证信息或认证失败。</li>
+<li><strong>403 Forbidden</strong>：请求被服务器拒绝。</li>
+<li><strong>404 Not Found</strong>：资源不存在。</li>
+<li><strong>500 Internal Server Error</strong>：服务器执行请求时发生错误。</li>
+<li><strong>502 Bad Gateway</strong>：网关或代理收到上游服务器的无效响应。</li>
+</ul>
+<h3 id="4-http">4. HTTP首部字段</h3>
+<p>首部字段分为四种类型：</p>
+<p><strong>通用首部</strong>：Cache-Control（缓存控制）、Connection（连接管理）、Date（日期）、Transfer-Encoding（传输编码）、Via（代理服务器信息）、Warning（错误通知）。</p>
+<p><strong>请求首部</strong>：Accept（可接受媒体类型）、Accept-Encoding（可接受内容编码）、Accept-Language（可接受语言）、Authorization（认证信息）、Host（目标服务器）、If-Modified-Since/If-None-Match（缓存验证）、Referer（请求来源）、User-Agent（客户端信息）、Range（范围请求）。</p>
+<p><strong>响应首部</strong>：Age（资源已存在时间）、ETag（资源唯一标识）、Location（重定向目标URL）、Server（服务器信息）、Retry-After（重试时间）、Accept-Ranges（是否接受范围请求）。</p>
+<p><strong>实体首部</strong>：Allow（支持的HTTP方法）、Content-Encoding（内容编码方式）、Content-Language（内容语言）、Content-Length（主体大小）、Content-Type（媒体类型）、Content-Range（范围请求位置信息）、Expires（过期时间）、Last-Modified（最后修改时间）。</p>
+<h3 id="5-http">5. HTTP连接管理</h3>
+<p><strong>短连接</strong>：每次HTTP通信新建一个TCP连接，通信结束后关闭，开销大。HTTP/1.0默认短连接。</p>
+<p><strong>长连接</strong>：建立一次TCP连接后进行多次HTTP通信。HTTP/1.1默认长连接，使用Connection: keep-alive标识（HTTP/1.0需手动设置）。断开连接时由客户端或服务器提出，使用Connection: close。</p>
+<p><strong>流水线</strong>：在长连接上连续发出多个请求，无需等待响应返回，减少延迟。</p>
+<h3 id="6-cookiesession">6. Cookie与Session</h3>
+<p>HTTP是无状态协议，<strong>Cookie</strong>在客户端保存状态信息。服务器在响应报文中放入Set-Cookie首部，浏览器保存后在下次请求时通过Cookie首部带回。Cookie用途包括：会话状态管理（登录状态、购物车）、个性化设置、用户行为跟踪。</p>
+<p><strong>Session</strong>在服务器端保存用户信息，可存储在文件、数据库或内存型数据库（如Redis）中。用户登录后服务器将Session ID通过Set-Cookie发送给浏览器，后续请求携带Session ID以识别用户。Session安全性高于Cookie（敏感信息存服务器端）。</p>
+<h3 id="7--1">7. 缓存机制</h3>
+<p>HTTP缓存减少网络延迟和服务器负载。两种实现方式：代理服务器缓存和客户端浏览器缓存。</p>
+<p>HTTP/1.1通过<strong>Cache-Control</strong>首部控制缓存：no-store（禁止缓存）、no-cache（强制验证后再使用缓存）、public/private（公共/私有缓存）、max-age（缓存过期时间，秒为单位）。<strong>Expires</strong>首部指定绝对过期时间（HTTP/1.0）。当max-age与Expires共存时，优先处理max-age。</p>
+<p><strong>缓存验证</strong>：通过ETag（资源唯一标识）和Last-Modified（最后修改时间）进行。客户端在请求中带上If-None-Match（对应ETag）或If-Modified-Since（对应Last-Modified），服务器判断资源是否已更新：未更新返回304 Not Modified（不传输实体数据，使用缓存）；已更新返回200 OK（传输新数据）。</p>
+<h3 id="8--2">8. 内容协商与内容编码</h3>
+<p><strong>内容协商</strong>让服务器根据客户端偏好返回最适合的内容。服务器驱动型：客户端在请求首部中声明偏好（Accept-Language等），服务器据此返回；代理驱动型：服务器返回300 Multiple Choices让客户端选择。</p>
+<p><strong>内容编码</strong>对实体主体进行压缩，减少传输数据量。常用编码：gzip、compress、deflate、identity。</p>
+<p><strong>范围请求</strong>：允许客户端只请求资源的某一部分。客户端在请求中添加Range首部（如Range: bytes=0-1023），服务器返回206 Partial Content。用于断点续传、分段下载场景。</p>
+<p><strong>分块传输编码</strong>：将数据分割成多个块，让浏览器逐步显示页面，适用于动态生成页面内容。</p>
+<h3 id="9-https">9. HTTPS</h3>
+<p>HTTPS并非新协议，而是在HTTP和TCP之间加入SSL/TLS层，使用TCP端口443。通过SSL/TLS实现了<strong>加密</strong>（防窃听）、<strong>认证</strong>（防伪装）和<strong>完整性保护</strong>（防篡改）。</p>
+<p><strong>混合加密机制</strong>：使用非对称加密（公钥加密、私钥解密）来传输对称加密的密钥（会话密钥），后续通信使用对称加密（如AES-128-GCM）保护数据，兼顾安全性和效率。</p>
+<p><strong>CA数字证书</strong>：服务器向CA申请公开密钥证书，CA用其私钥对证书做数字签名。客户端收到证书后，用CA的公钥验证签名——对证书数据做Hash得到摘要，与签名中解码出的摘要对比。验证通过后，客户端即可信任证书中包含的服务器公钥。</p>
+<p><strong>数字证书解决了&quot;中间人攻击&quot;</strong>：攻击者无法伪造由CA签名的证书，因此无法冒充服务器。但数字证书也有使用成本（CA证书费用）和性能开销（加密解密过程比HTTP慢）。</p>
+<h3 id="10-http">10. HTTP版本演进</h3>
+<p><strong>HTTP/1.0</strong>：默认短连接，每个HTTP请求建立一个新的TCP连接。</p>
+<p><strong>HTTP/1.1新特性</strong>：默认长连接、支持流水线、支持同时打开多个TCP连接、支持虚拟主机、新增状态码100 Continue、支持分块传输编码、新增缓存处理指令max-age。</p>
+<p><strong>HTTP/2.0</strong>：<strong>二进制分帧层</strong>替代HTTP/1.x的文本格式，将报文分为HEADERS帧和DATA帧；只有一个TCP连接（复用），内部承载任意数量的双向数据流；<strong>服务器推送</strong>（主动推送相关资源如CSS/JS给客户端）；<strong>首部压缩</strong>（客户端和服务器维护首部字段表，避免重复传输，并使用Huffman编码压缩）。</p>
+<h3 id="11-getpost">11. GET与POST比较</h3>
+<p>GET用于获取资源，参数以查询字符串形式附加在URL中；POST用于传输实体主体，参数在请求体中。GET请求参数只支持ASCII码，POST支持标准字符集。从安全性看，GET是安全的（只读，不改变服务器状态），POST不是安全的（可能修改服务器数据）。从幂等性看，GET是幂等的，POST不是幂等的（每次执行可能产生不同结果）。GET请求默认可被浏览器缓存，POST在多数情况下不可缓存。</p>
+<blockquote>
+<p><strong>高频题点</strong>：GET与POST对比、HTTP状态码分类及常见码含义、HTTPS混合加密机制、CA证书验证流程、HTTP/1.0→1.1→2.0关键演进、Cookie与Session区别、缓存验证机制（ETag/Last-Modified）。</p>
+</blockquote>
+<hr>
+<h2 id="heading-7">八、网络安全概述</h2>
+<h3 id="1--5">1. 常见的网络攻击类型</h3>
+<p><strong>SYN Flood攻击</strong>：攻击者发送大量SYN连接请求而不回复第三次ACK，使服务端的半连接队列被占满，合法的连接请求无法被处理。防御手段包括SYN Cookie（将连接信息编码进SYN+ACK响应中，不保留半连接状态）和调整半连接队列大小。</p>
+<p><strong>DNS劫持</strong>：攻击者篡改DNS解析结果，将合法域名指向恶意IP地址。防御手段包括DNSSEC（DNS安全扩展）和对DNS服务器实施访问控制。</p>
+<p><strong>HTTP劫持</strong>：在HTTP通信中注入恶意内容（如运营商插入广告）。通过启用HTTPS加密通信可有效防范。</p>
+<p><strong>ARP欺骗</strong>：攻击者发送伪造的ARP响应，将合法主机的MAC地址与错误的IP地址关联，从而截获数据。防御方法包括静态ARP表、ARP监听检测。</p>
+<p><strong>中间人攻击</strong>：攻击者拦截客户端与服务器之间的通信，在双方不知情的情况下窃听或篡改数据。HTTPS通过CA数字证书和PKI体系有效防御中间人攻击。</p>
+<h3 id="2--3">2. 防火墙的基本概念</h3>
+<p>防火墙作为网络安全的第一道防线，部署在网络边界，根据预设规则控制进出网络的流量。主要类型：<strong>包过滤防火墙</strong>（检查IP包首部信息，按规则允许或拒绝）、<strong>状态检测防火墙</strong>（维护连接状态表，检测整个会话状态）、<strong>应用层防火墙</strong>（深入检查应用层内容，如URL过滤、内容审计）。</p>
+<h3 id="3--2">3. 加密与数字签名</h3>
+<p><strong>对称加密</strong>：加密和解密使用同一密钥，运算速度快（如AES），但密钥分发存在安全风险。</p>
+<p><strong>非对称加密</strong>：使用一对密钥（公钥和私钥），公钥用于加密，私钥用于解密（如RSA、ECC），密钥分发安全但运算慢。</p>
+<p><strong>数字签名</strong>：发送方用私钥对消息摘要加密形成签名，接收方用发送方公钥解密验证，确保消息来源可靠且未被篡改。</p>
+<p><strong>数字证书</strong>：CA机构将服务器的公钥与身份信息绑定，用CA私钥签名后颁发证书，客户端通过验证CA签名确认证书合法。</p>
+<blockquote>
+<p><strong>高频题点</strong>：SYN Flood攻击原理与防御、中间人攻击原理、对称与非对称加密对比、数字签名的作用。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>备考建议</strong>：</p>
+<ol>
+<li>TCP三次握手和四次挥手是绝对高频题点，建议重点掌握每个状态的名称、触发条件、报文标志位设置；</li>
+<li>HTTP相关的知识点（状态码、方法、缓存、HTTPS、版本演进）出题密度高，需注意细节区分；</li>
+<li>网络层中CIDR、子网掩码、路由协议对比、ARP和ICMP是常见考点；</li>
+<li>央国企笔试中计算类题目较少，概念理解比数值计算更受重视；</li>
+<li>建议配合TCP/IP协议栈的层级视角理解问题——只要确定&quot;这个问题属于哪一层&quot;，就能快速定位对应协议和机制。</li>
+</ol>
+</blockquote>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">央国企计算机笔试准备（5 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+      
+    </li>
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">计算机网络</span>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">操作系统</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">数据库与SQL</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8aHTTP%e6%9d%83%e5%a8%81%e6%8c%87%e5%8d%97%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《HTTP权威指南》记录</span>
+      <span class="related-card-date">2025-03-14</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>

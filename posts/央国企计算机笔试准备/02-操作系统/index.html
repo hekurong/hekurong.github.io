@@ -1,0 +1,2551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>操作系统 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">操作系统</h1>
+    <div class="article-meta">
+      <time datetime="2026-07-12">2026-07-12</time>
+      
+      <span class="series-badge" title="系列"><a href="/series/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/">央国企计算机笔试准备</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/%e8%ae%a1%e7%ae%97%e6%9c%ba%e5%9f%ba%e7%a1%80/">计算机基础</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="tag" href="/tags/I/O/">I/O</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="heading">操作系统</h1>
+<blockquote>
+<p>来源：CyC2018/CS-Notes 计算机操作系统章节 + Snailclimb/JavaGuide 操作系统笔记
+考情：六大行笔试必考科目，国家电网占比显著。重点覆盖进程同步、调度算法、死锁、页面置换、分页分段辨析等概念层内容。</p>
+</blockquote>
+<hr>
+<h2 id="heading-1">一、操作系统概述</h2>
+<h3 id="1-">1. 定义与功能</h3>
+<p>操作系统是管理计算机硬件资源、提供用户接口、协调程序运行的底层系统软件，是计算机系统中最重要的系统软件。</p>
+<p><strong>四大基本功能</strong>：</p>
+<ul>
+<li><strong>处理器管理</strong>：负责进程与线程的创建、撤销、调度，以及对 CPU 的分配与控制。</li>
+<li><strong>存储器管理</strong>：内存分配与回收、地址映射（虚拟地址到物理地址）、内存保护、虚拟内存管理。</li>
+<li><strong>设备管理</strong>：负责 I/O 设备的驱动、分配、缓冲和虚拟化（如 SPOOLing 技术）。</li>
+<li><strong>文件管理</strong>：文件存储空间管理、目录组织、文件的读写与保护、权限控制。</li>
+</ul>
+<h3 id="2-">2. 操作系统基本特征</h3>
+<p><strong>并发（Concurrency）</strong>：宏观上在一段时间内可以同时运行多个程序。并发与并行的区别在于：并发是逻辑上的同时执行，并行是物理上的同时执行（需要多核或多处理器支持）。操作系统通过引入进程和线程来支持并发。</p>
+<p><strong>共享（Sharing）</strong>：系统中的资源可以被多个并发进程共同使用。两种共享方式：互斥共享（如打印机，同一时刻只允许一个进程访问）和同时共享（如磁盘文件，多个进程可同时读）。</p>
+<p><strong>虚拟（Virtual）</strong>：将一个物理实体转换为多个逻辑实体。时分复用技术（如 CPU 分时调度）让多个进程轮流占用处理器，每个进程感受到自己独占 CPU；空分复用技术（如虚拟内存）将物理内存抽象为更大的逻辑地址空间。</p>
+<p><strong>异步（Asynchrony）</strong>：进程以不可预知的速度向前推进，走走停停，并非一次性执行完毕。只要运行环境相同，操作系统必须保证多次运行同一程序得到相同结果。</p>
+<h3 id="3-">3. 操作系统分类</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">特点</th>
+<th style="text-align:center">典型代表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">批处理操作系统</td>
+<td style="text-align:center">无交互，作业成批进入内存</td>
+<td style="text-align:center">早期操作系统</td>
+</tr>
+<tr>
+<td style="text-align:center">分时操作系统</td>
+<td style="text-align:center">时间片轮转，交互性强</td>
+<td style="text-align:center">UNIX、Linux</td>
+</tr>
+<tr>
+<td style="text-align:center">实时操作系统</td>
+<td style="text-align:center">严格响应时限，必须满足截止时间</td>
+<td style="text-align:center">μC/OS、VxWorks</td>
+</tr>
+<tr>
+<td style="text-align:center">分布式操作系统</td>
+<td style="text-align:center">多机协同，资源共享，对用户透明</td>
+<td style="text-align:center">Amoeba</td>
+</tr>
+<tr>
+<td style="text-align:center">嵌入式操作系统</td>
+<td style="text-align:center">资源受限，专用性强</td>
+<td style="text-align:center">FreeRTOS、嵌入式 Linux</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4-">4. 中断与异常</h3>
+<p><strong>中断（Interrupt）</strong>：CPU 暂停当前程序的执行，转而处理紧急事件，处理完成后返回原程序继续执行。中断是现代操作系统实现并发和响应的基础机制。</p>
+<p><strong>中断分类</strong>：</p>
+<ul>
+<li><strong>外中断（异步中断）</strong>：来自 CPU 外部的事件，如 I/O 设备完成中断、时钟中断、控制台中断等。</li>
+<li><strong>内中断（异常，同步中断）</strong>：来自 CPU 内部的事件，如除零、地址越界、缺页、非法操作码等。</li>
+<li><strong>陷入（Trap/系统调用）</strong>：用户程序主动触发的中断，用于请求操作系统服务。</li>
+</ul>
+<p><strong>中断响应过程</strong>：关中断 → 保护断点（将 PC、PSW 等压栈）→ 查询中断向量表，转入中断服务程序 → 保存现场（通用寄存器入栈）→ 执行中断处理 → 恢复现场 → 开中断 → 返回断点。</p>
+<h3 id="5-">5. 系统调用</h3>
+<p><strong>系统调用（System Call）</strong>：用户程序请求操作系统内核服务的接口。用户程序通过陷入指令从用户态进入内核态，由操作系统完成内核态操作后返回用户态。</p>
+<p><strong>用户态与内核态</strong>：</p>
+<ul>
+<li><strong>用户态（目态）</strong>：受限执行状态，不能执行特权指令（如 I/O 操作、中断开关）。</li>
+<li><strong>内核态（管态）</strong>：可执行全部指令，包括特权指令。</li>
+<li>切换时机仅三种：中断、异常、系统调用——这是用户态切换到内核态的唯一途径。</li>
+</ul>
+<p><strong>常见系统调用</strong>：进程控制（fork、exit、wait）、文件操作（open、read、write）、设备操作（ioctl、read）、信息维护（getpid、alarm）、通信（pipe、shmget、mmap）。</p>
+<h3 id="6-">6. 宏内核与微内核</h3>
+<p><strong>宏内核（Monolithic Kernel）</strong>：操作系统所有核心功能（进程管理、内存管理、文件系统、设备驱动等）均运行在内核态，模块之间可以直接调用，性能高。典型代表：Linux、Unix。</p>
+<p><strong>微内核（Microkernel）</strong>：只将最基本的功能放在内核态（如进程间通信、CPU 调度、基本内存管理），其他功能以服务形式运行在用户态。优点是内核小、扩展性好、安全性高；缺点是用户态/内核态频繁切换导致性能损失。典型代表：Minix、QNX。</p>
+<hr>
+<h2 id="heading-2">二、进程与线程</h2>
+<h3 id="1--1">1. 进程的概念</h3>
+<p><strong>进程（Process）</strong>：程序的一次执行过程，是系统进行资源分配和调度的基本单位。</p>
+<p><strong>进程与程序的区别</strong>：程序是静态的指令集合，存储在磁盘上；进程是动态的执行过程，包含程序代码、数据和运行时上下文。同一程序可以对应多个进程（如同时打开多个浏览器窗口）。</p>
+<p><strong>进程控制块（PCB, Process Control Block）</strong>：操作系统管理进程的数据结构，是操作系统感知和管理进程的唯一依据。PCB 记录了：</p>
+<ul>
+<li><strong>标识信息</strong>：进程 ID（PID）、父进程 ID、用户 ID</li>
+<li><strong>状态信息</strong>：程序计数器（PC）、寄存器值、栈指针</li>
+<li><strong>控制信息</strong>：进程状态（就绪/运行/阻塞）、优先级、内存指针、打开文件表、调度信息</li>
+</ul>
+<h3 id="2--1">2. 进程状态与转换</h3>
+<p><strong>五状态模型</strong>：</p>
+<ol>
+<li><strong>新建态（New）</strong>：进程正在创建，尚未进入就绪队列。</li>
+<li><strong>就绪态（Ready）</strong>：进程已获得除 CPU 之外的所有需要的资源，等待调度程序分配 CPU。</li>
+<li><strong>运行态（Running）</strong>：进程正在 CPU 上执行。</li>
+<li><strong>阻塞态（Blocked/Waiting）</strong>：进程因等待某个事件（如 I/O 完成、信号量）而暂停执行。</li>
+<li><strong>终止态（Terminated）</strong>：进程执行结束，系统回收资源。</li>
+</ol>
+<p><strong>状态转换规则</strong>：</p>
+<ul>
+<li>就绪态 → 运行态：调度程序选择该进程占用 CPU。</li>
+<li>运行态 → 就绪态：时间片用完，或被更高优先级进程抢占。</li>
+<li>运行态 → 阻塞态：进程发起 I/O 请求或等待资源。</li>
+<li>阻塞态 → 就绪态：等待的事件完成。</li>
+</ul>
+<h3 id="3--1">3. 线程</h3>
+<p><strong>线程（Thread）</strong>：CPU 调度的基本单位，是进程中的一条执行路径。一个进程可以包含多个线程，同一进程的线程共享进程资源。</p>
+<p><strong>进程与线程的区别</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">对比维度</th>
+<th style="text-align:center">进程</th>
+<th style="text-align:center">线程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">基本定位</td>
+<td style="text-align:center">资源分配的基本单位</td>
+<td style="text-align:center">CPU 调度的基本单位</td>
+</tr>
+<tr>
+<td style="text-align:center">地址空间</td>
+<td style="text-align:center">独立的虚拟地址空间</td>
+<td style="text-align:center">共享所属进程的地址空间</td>
+</tr>
+<tr>
+<td style="text-align:center">资源拥有</td>
+<td style="text-align:center">拥有独立的资源（文件表、信号处理等）</td>
+<td style="text-align:center">只拥有少量执行现场（栈、寄存器、PC）</td>
+</tr>
+<tr>
+<td style="text-align:center">切换开销</td>
+<td style="text-align:center">大（需切换地址空间、可能刷新 TLB）</td>
+<td style="text-align:center">小（同一进程内切换无须切换地址空间）</td>
+</tr>
+<tr>
+<td style="text-align:center">通信方式</td>
+<td style="text-align:center">需要 IPC（管道、消息队列、共享内存）</td>
+<td style="text-align:center">可直接读写共享内存</td>
+</tr>
+<tr>
+<td style="text-align:center">故障影响</td>
+<td style="text-align:center">一个进程崩溃不影响其他进程</td>
+<td style="text-align:center">一个线程崩溃可能导致整个进程退出</td>
+</tr>
+</tbody>
+</table>
+<p><strong>多线程模型</strong>：</p>
+<ul>
+<li><strong>用户级线程</strong>：由用户空间的线程库管理，内核不可见。切换快但一个线程阻塞会影响整个进程。</li>
+<li><strong>内核级线程</strong>：由内核管理，可被调度到不同 CPU 上并行执行。切换开销大。</li>
+<li><strong>混合模型</strong>：用户级线程映射到少量内核线程，综合两者优点。现代操作系统多采用此模型。</li>
+</ul>
+<h3 id="4-ipc">4. 进程通信（IPC）</h3>
+<p>进程间的通信方式，按数据交换量和使用频率排序：</p>
+<p><strong>管道（Pipe）</strong>：半双工通信，数据在内存中流动，常用于父子进程之间。命名管道（FIFO）可用于无亲缘关系的进程。</p>
+<p><strong>消息队列（Message Queue）</strong>：消息的链表，存放在内核中。进程通过系统调用发送和接收消息，有明确的边界。</p>
+<p><strong>共享内存（Shared Memory）</strong>：多个进程映射同一块物理内存，是最快的 IPC 方式。但需要信号量等机制同步访问。</p>
+<p><strong>信号量（Semaphore）</strong>：用于进程间同步和互斥，也可作为通信手段。</p>
+<p><strong>套接字（Socket）</strong>：可用于不同机器之间的进程通信，是最通用的 IPC 方式。</p>
+<h3 id="5--1">5. 调度算法</h3>
+<p><strong>调度层次</strong>：</p>
+<ul>
+<li><strong>长程调度（作业调度）</strong>：将外存中的作业调入内存，创建进程。发生频率低。</li>
+<li><strong>中程调度（交换调度）</strong>：内存不足时将进程挂起，换出到外存。发生频率中等。</li>
+<li><strong>短程调度（进程调度）</strong>：从就绪队列中选择一个进程分配 CPU。发生频率最高。</li>
+</ul>
+<p><strong>主要调度算法</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">算法</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">特点</th>
+<th style="text-align:center">适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">先来先服务（FCFS）</td>
+<td style="text-align:center">非抢占</td>
+<td style="text-align:center">按请求顺序调度，公平但平均等待时间长，对短作业不利</td>
+<td style="text-align:center">批处理系统</td>
+</tr>
+<tr>
+<td style="text-align:center">短作业优先（SJF）</td>
+<td style="text-align:center">非抢占</td>
+<td style="text-align:center">选估计运行时间最短的作业，最小平均周转时间，长作业可能饿死</td>
+<td style="text-align:center">批处理系统</td>
+</tr>
+<tr>
+<td style="text-align:center">最短剩余时间优先（SRTN）</td>
+<td style="text-align:center">抢占</td>
+<td style="text-align:center">SJF 的抢占版本，新作业剩余时间更短则抢占当前作业</td>
+<td style="text-align:center">批处理系统</td>
+</tr>
+<tr>
+<td style="text-align:center">时间片轮转（RR）</td>
+<td style="text-align:center">抢占</td>
+<td style="text-align:center">每个进程轮流执行一个时间片。时间片太大退化为 FCFS，太小切换开销过大</td>
+<td style="text-align:center">分时系统</td>
+</tr>
+<tr>
+<td style="text-align:center">优先级调度</td>
+<td style="text-align:center">均可</td>
+<td style="text-align:center">按优先级调度，低优先级可能饿死（可通过老化提高等待进程的优先级）</td>
+<td style="text-align:center">通用系统</td>
+</tr>
+<tr>
+<td style="text-align:center">多级反馈队列</td>
+<td style="text-align:center">抢占</td>
+<td style="text-align:center">多个队列，各队列时间片不同，进程可在队列间升降级。综合兼顾交互型和计算型任务</td>
+<td style="text-align:center">现代通用操作系统</td>
+</tr>
+</tbody>
+</table>
+<p><strong>调度指标</strong>：</p>
+<ul>
+<li><strong>周转时间</strong> = 完成时间 − 到达时间</li>
+<li><strong>平均周转时间</strong> = 总周转时间 / 作业数</li>
+<li><strong>等待时间</strong> = 周转时间 − 服务时间</li>
+<li><strong>响应时间</strong> = 首次被调度时间 − 到达时间</li>
+</ul>
+<hr>
+<h2 id="heading-3">三、进程同步与互斥</h2>
+<h3 id="1--2">1. 临界区问题</h3>
+<p><strong>临界资源</strong>：一次只允许一个进程使用的资源（如打印机、共享变量、文件等）。</p>
+<p><strong>临界区（Critical Section）</strong>：访问临界资源的代码段。对临界区的访问必须满足三条原则：</p>
+<ul>
+<li><strong>互斥</strong>：任意时刻最多只有一个进程在临界区内执行。</li>
+<li><strong>前进</strong>：当临界区空闲时，若多个进程同时请求进入，应能在有限时间内选择一个进入。</li>
+<li><strong>有限等待</strong>：进程发出进入请求后，必须在有限时间内获准进入。</li>
+</ul>
+<h3 id="2--pv-">2. 信号量与 PV 操作</h3>
+<p><strong>信号量（Semaphore）</strong>：一个整型变量 S，用于表示可用资源的数量。S &gt; 0 表示有 S 个资源可用；S ≤ 0 表示有 |S| 个进程在等待该资源。</p>
+<p><strong>PV 操作</strong>（均为原子操作）：</p>
+<ul>
+<li><strong>P(S)</strong>（wait/down）：S = S - 1；若 S &lt; 0，则将当前进程阻塞并放入等待队列。</li>
+<li><strong>V(S)</strong>（signal/up）：S = S + 1；若 S ≤ 0，则从等待队列中唤醒一个进程。</li>
+</ul>
+<p>当信号量的取值只能为 0 或 1 时，称为<strong>互斥量（Mutex）</strong>，用于实现临界区的互斥访问。</p>
+<p><strong>PV 操作使用的关键原则</strong>：P 操作测试资源是否可用（资源不够时阻塞），V 操作释放资源（可能有等待者被唤醒）。P 和 V 必须成对出现且不可分割。</p>
+<h3 id="3-monitor">3. 管程（Monitor）</h3>
+<p>管程是一种高级同步机制，它将共享变量和对这些变量的操作封装在一个模块中。管程的特性是：<strong>同一时刻只能有一个进程在管程内执行</strong>。管程使用条件变量（Condition Variable）和 wait()/signal() 操作实现同步，比直接使用信号量更加结构化、不易出错。</p>
+<h3 id="4--1">4. 经典同步问题</h3>
+<p><strong>① 生产者-消费者问题</strong>：</p>
+<ul>
+<li>问题描述：生产者向有限缓冲区中放入数据，消费者从缓冲区取走数据。</li>
+<li>同步要求：缓冲区满时生产者不能放，缓冲区空时消费者不能取；生产者和消费者不能同时访问缓冲区。</li>
+<li>解决方案：使用三个信号量——<code>mutex</code>（互斥访问缓冲区）、<code>empty</code>（空槽数量）、<code>full</code>（满槽数量）。生产者先 P(empty) 再 P(mutex)，消费者先 P(full) 再 P(mutex)。注意 P(empty/full) 必须在 P(mutex) 之前，否则可能发生死锁。</li>
+</ul>
+<p><strong>② 读者-写者问题</strong>：</p>
+<ul>
+<li>问题描述：允许多个读者同时读数据，但不允许读者和写者同时操作，也不允许多个写者同时写。</li>
+<li>读者优先方案：第一个读者进入时锁定写者，最后一个读者离开时解锁写者；用 <code>read_count</code> 计数读者数量，用 <code>count_mutex</code> 保护 <code>read_count</code>，用 <code>data_mutex</code> 控制读者和写者的互斥。</li>
+<li>可能存在写者饥饿问题，可通过增加 <code>write_count</code> 和对应的互斥信号量实现写者优先或公平策略。</li>
+</ul>
+<p><strong>③ 哲学家进餐问题</strong>：</p>
+<ul>
+<li>问题描述：五位哲学家围坐圆桌，每人间放一根筷子。哲学家思考时不需要筷子，吃饭时必须同时拿起左右两根筷子。</li>
+<li>风险：如果所有哲学家同时拿起左边的筷子，将全部等待右边的筷子，导致死锁。</li>
+<li>解决方案：① 最多允许四位哲学家同时就餐；② 奇数号哲学家先拿左边再拿右边，偶数号先拿右边再拿左边；③ 用互斥信号量保护拿筷子的操作（一次性拿两把筷子）。</li>
+</ul>
+<p><strong>④ 吸烟者问题</strong>：三个吸烟者各有不同缺失的材料，供应者随机提供两种材料，用信号量同步协调。</p>
+<hr>
+<h2 id="heading-4">四、死锁</h2>
+<h3 id="1--3">1. 死锁的定义与必要条件</h3>
+<p><strong>死锁（Deadlock）</strong>：多个进程因互相等待对方持有的资源而陷入无限等待的状态。</p>
+<p><strong>四个必要条件</strong>（必须同时满足）：</p>
+<ol>
+<li><strong>互斥</strong>：资源一次只能分配给一个进程使用。</li>
+<li><strong>占有并等待</strong>（持有并等待）：进程已持有部分资源，同时等待其他进程释放资源。</li>
+<li><strong>非抢占</strong>：已分配给进程的资源不能被强制剥夺，只能由进程主动释放。</li>
+<li><strong>循环等待</strong>：存在一条进程资源的循环等待链，链中每个进程都在等待下一个进程占有的资源。</li>
+</ol>
+<p><strong>资源分配图</strong>：用有向图描述进程和资源之间的分配与请求关系。当图中存在环时，可能发生死锁（每类资源只有一个实例时，有环即死锁；有多个实例时需要进一步判断）。</p>
+<h3 id="2--2">2. 死锁处理策略</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">策略</th>
+<th style="text-align:center">方法</th>
+<th style="text-align:center">效果</th>
+<th style="text-align:center">实际应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">预防</td>
+<td style="text-align:center">破坏四个条件之一</td>
+<td style="text-align:center">降低资源利用率</td>
+<td style="text-align:center">常见于应用代码</td>
+</tr>
+<tr>
+<td style="text-align:center">避免</td>
+<td style="text-align:center">分配前判断是否安全</td>
+<td style="text-align:center">需预知最大需求</td>
+<td style="text-align:center">银行家算法</td>
+</tr>
+<tr>
+<td style="text-align:center">检测</td>
+<td style="text-align:center">允许死锁发生，定期检测</td>
+<td style="text-align:center">检测有成本</td>
+<td style="text-align:center">数据库系统常见</td>
+</tr>
+<tr>
+<td style="text-align:center">恢复</td>
+<td style="text-align:center">检测到死锁后解除</td>
+<td style="text-align:center">可能丢失工作</td>
+<td style="text-align:center">终止进程或回滚事务</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3--2">3. 死锁预防</h3>
+<ul>
+<li><strong>破坏互斥</strong>：将资源改为共享（如只读文件、假脱机打印机技术）。但大多数资源本质互斥，不可行。</li>
+<li><strong>破坏占有并等待</strong>：进程在开始执行前一次申请全部所需资源。资源利用率低，可能饥饿。</li>
+<li><strong>破坏非抢占</strong>：进程申请新资源被拒时，必须释放已占有的资源。实现复杂。</li>
+<li><strong>破坏循环等待</strong>：为所有资源编号，进程只能按编号递增顺序申请资源。最常用的预防手段。</li>
+</ul>
+<h3 id="4--2">4. 死锁避免——银行家算法</h3>
+<p><strong>银行家算法（Banker&rsquo;s Algorithm）</strong>：在资源分配前模拟分配，判断分配后的系统状态是否安全。只有安全状态才允许分配。</p>
+<p><strong>数据结构</strong>：</p>
+<ul>
+<li>Available[m]：每种资源的可用数量</li>
+<li>Max[n][m]：每个进程对每种资源的最大需求</li>
+<li>Allocation[n][m]：每个进程已分配的资源数</li>
+<li>Need[n][m] = Max − Allocation：每个进程还需要的资源数</li>
+</ul>
+<p><strong>安全状态检测步骤</strong>：</p>
+<ol>
+<li>找一个 Need 向量 ≤ Available 的未完成进程 Pi。</li>
+<li>假设 Pi 完成并释放资源：Available += Allocation[i]。</li>
+<li>标记 Pi 为已完成，重复步骤 1。</li>
+<li>若所有进程均能标记完成，则状态安全；否则不安全。</li>
+</ol>
+<p><strong>核心思想</strong>：不阻止死锁的发生条件，而是确保系统始终处于可以避免死锁的安全状态。</p>
+<h3 id="5--2">5. 死锁检测与恢复</h3>
+<p><strong>检测</strong>：定期检测资源分配图中是否存在循环等待，或使用类似银行家算法的矩阵检测法判断是否有进程无限等待。</p>
+<p><strong>恢复方式</strong>：</p>
+<ul>
+<li><strong>终止进程</strong>：终止所有参与死锁的进程，或逐个终止直到死锁解除。</li>
+<li><strong>抢占资源</strong>：从某些进程中强制剥夺资源给其他进程，需考虑回滚成本。</li>
+<li><strong>回滚</strong>：将进程回滚到安全状态点，重新执行。</li>
+</ul>
+<hr>
+<h2 id="heading-5">五、内存管理</h2>
+<h3 id="1--4">1. 连续内存分配</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">分配方式</th>
+<th style="text-align:center">特点</th>
+<th style="text-align:center">碎片类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">单一连续分配</td>
+<td style="text-align:center">一道程序独占全部内存</td>
+<td style="text-align:center">无</td>
+</tr>
+<tr>
+<td style="text-align:center">固定分区分配</td>
+<td style="text-align:center">内存划分成固定大小的分区</td>
+<td style="text-align:center">内部碎片</td>
+</tr>
+<tr>
+<td style="text-align:center">动态分区分配</td>
+<td style="text-align:center">按需分配分区，分区大小可变</td>
+<td style="text-align:center">外部碎片</td>
+</tr>
+</tbody>
+</table>
+<p><strong>动态分区分配算法</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">算法</th>
+<th style="text-align:center">选择策略</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">首次适应（FF）</td>
+<td style="text-align:center">从低地址查找第一个合适分区</td>
+<td style="text-align:center">简单，低地址易产生小碎片</td>
+</tr>
+<tr>
+<td style="text-align:center">最佳适应（BF）</td>
+<td style="text-align:center">查找最小的合适分区</td>
+<td style="text-align:center">碎片最小但需排序，产生大量小碎片</td>
+</tr>
+<tr>
+<td style="text-align:center">最坏适应（WF）</td>
+<td style="text-align:center">查找最大的合适分区</td>
+<td style="text-align:center">减少小碎片，但大分区快速被分割</td>
+</tr>
+<tr>
+<td style="text-align:center">循环适应（NF）</td>
+<td style="text-align:center">从上次分配位置继续查找</td>
+<td style="text-align:center">使内存分配更均匀</td>
+</tr>
+</tbody>
+</table>
+<p><strong>外部碎片</strong>的解决方式：<strong>紧凑（Compaction）</strong>——移动已分配分区使之连续，但成本较高。</p>
+<h3 id="2--3">2. 分页存储管理</h3>
+<p><strong>基本思想</strong>：将进程的逻辑地址空间划分为固定大小的&quot;页&quot;（Page），物理内存划分为等大的&quot;页框&quot;/&ldquo;帧&rdquo;（Frame）。通过页表（Page Table）建立页到页框的映射。</p>
+<p><strong>地址转换</strong>：</p>
+<ul>
+<li>逻辑地址 = 页号 P + 页内偏移 W</li>
+<li>物理地址 = 页框号 f × 页面大小 + W（其中 f = 页表[P]）</li>
+</ul>
+<p><strong>页表项结构</strong>：页框号 + 标志位（有效位/存在位表示页面是否在内存中；修改位表示页面是否被写过；访问位表示页面是否被访问过；权限位控制读写执行等）。</p>
+<p><strong>快表（TLB, Translation Lookaside Buffer）</strong>：</p>
+<ul>
+<li>CPU 内部的关联存储器，缓存最近使用的页表项。</li>
+<li>TLB 命中时可直接得到物理地址，避免内存访问查页表。</li>
+<li>TLB 未命中时需查内存页表，然后将结果加入 TLB。</li>
+</ul>
+<p><strong>多级页表</strong>：</p>
+<ul>
+<li>单级页表空间开销大：32位系统页表需约 4MB 空间。</li>
+<li>多级页表按需创建下级页表，节省空间。x86-64 通常使用 4 级分页。</li>
+<li>多级页表增加了地址转换的访问次数，这正是 TLB 发挥重要作用的场景。</li>
+</ul>
+<p><strong>分页的优点</strong>：无外部碎片（页可离散存放）；方便实现虚拟内存（只将需要的页调入内存）。</p>
+<h3 id="3--3">3. 分段存储管理</h3>
+<p><strong>基本思想</strong>：按程序的逻辑结构将地址空间划分为段（如代码段、数据段、堆栈段），每段有独立的基址和界限。</p>
+<p><strong>逻辑地址 = 段号 S + 段内偏移 W</strong>：地址转换时查段表获得基址，将基址 + 偏移即可。偏移不能超过段界限。</p>
+<p><strong>分段的特点</strong>：贴近程序员的逻辑视角，便于数据和代码的共享与保护。但段长不固定，易产生外部碎片。</p>
+<h3 id="4--3">4. 段页式存储管理</h3>
+<p>先按逻辑分段，每个段内再分页。一个逻辑地址需要三次转换：段号 → 段内页号 → 页内偏移。兼顾了分段的逻辑清晰和分页的离散分配优势，但地址转换过程更复杂。</p>
+<h3 id="5--3">5. 分页与分段的对比</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">对比维度</th>
+<th style="text-align:center">分页</th>
+<th style="text-align:center">分段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">划分依据</td>
+<td style="text-align:center">固定大小（系统决定）</td>
+<td style="text-align:center">程序逻辑结构（程序员决定）</td>
+</tr>
+<tr>
+<td style="text-align:center">地址空间</td>
+<td style="text-align:center">一维</td>
+<td style="text-align:center">二维</td>
+</tr>
+<tr>
+<td style="text-align:center">大小是否可变</td>
+<td style="text-align:center">固定</td>
+<td style="text-align:center">可变（动态增长）</td>
+</tr>
+<tr>
+<td style="text-align:center">主要目的</td>
+<td style="text-align:center">实现虚拟内存，消除外部碎片</td>
+<td style="text-align:center">便于共享和保护</td>
+</tr>
+<tr>
+<td style="text-align:center">对程序员透明</td>
+<td style="text-align:center">透明</td>
+<td style="text-align:center">不透明（需显式分段）</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="heading-6">六、虚拟内存</h2>
+<h3 id="1--5">1. 基本概念</h3>
+<p><strong>虚拟内存（Virtual Memory）</strong>：使程序可以使用比物理内存更大的地址空间的技术。其核心原理是<strong>局部性原理</strong>：</p>
+<ul>
+<li><strong>时间局部性</strong>：刚访问过的地址很可能很快再次被访问。</li>
+<li><strong>空间局部性</strong>：刚访问过的地址附近很可能也将被访问。</li>
+</ul>
+<p><strong>按需调页（Demand Paging）</strong>：只将进程当前需要的页面装入内存，其他页面暂存在外存（磁盘）中。当进程访问的页面不在内存时触发<strong>缺页中断</strong>（Page Fault），操作系统将该页从外存调入内存。</p>
+<p><strong>缺页中断与普通中断的区别</strong>：</p>
+<ul>
+<li>缺页中断在指令执行期间触发（指令可能访问多个内存地址）。</li>
+<li>缺页中断处理后需重新执行被中断的指令（因为该指令所需页面刚被调入）。</li>
+</ul>
+<h3 id="2--4">2. 页面置换算法</h3>
+<p>当物理内存已满且需要调入新页时，必须选择一个页面换出。页面置换算法的目标是使缺页率最低。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">算法</th>
+<th style="text-align:center">置换策略</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">OPT（最佳置换）</td>
+<td style="text-align:center">置换未来最长时间不会访问的页</td>
+<td style="text-align:center">理论最优，不可实现</td>
+</tr>
+<tr>
+<td style="text-align:center">FIFO（先进先出）</td>
+<td style="text-align:center">置换最早进入内存的页</td>
+<td style="text-align:center">简单，可能发生 Belady 异常</td>
+</tr>
+<tr>
+<td style="text-align:center">LRU（最近最久未使用）</td>
+<td style="text-align:center">置换最长时间未被访问的页</td>
+<td style="text-align:center">性能好，实现成本高</td>
+</tr>
+<tr>
+<td style="text-align:center">NRU（最近未使用）</td>
+<td style="text-align:center">按 R（访问位）和 M（修改位）分四类，选编号最小类随机置换</td>
+<td style="text-align:center">近似 LRU，成本低</td>
+</tr>
+<tr>
+<td style="text-align:center">第二次机会</td>
+<td style="text-align:center">检查最老页的 R 位：1 则清 0 放回链表尾，0 则置换</td>
+<td style="text-align:center">FIFO 的改进</td>
+</tr>
+<tr>
+<td style="text-align:center">Clock（时钟）</td>
+<td style="text-align:center">环形链表 + 指针遍历，R=1 清 0 继续，R=0 置换</td>
+<td style="text-align:center">第二次机会的环形实现</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Belady 异常</strong>：使用 FIFO 算法时，分配的物理块增多反而导致缺页率上升。其他算法（LRU、OPT）不存在此异常。</p>
+<p><strong>抖动（Thrashing）</strong>：进程频繁缺页，导致大量时间花在页面换入换出上，CPU 利用率急剧下降。根本原因是进程的工作集（活跃使用的页面集合）大于物理内存容量。</p>
+<h3 id="3--4">3. 页面分配策略</h3>
+<ul>
+<li><strong>固定分配局部置换</strong>：为每个进程分配固定数量的物理块，缺页时仅置换自己的页面。</li>
+<li><strong>可变分配全局置换</strong>：物理块数可变，可从全局空闲块中分配新块。</li>
+<li><strong>可变分配局部置换</strong>：缺页时系统可分配新块，但置换时只置换自己的页面。</li>
+</ul>
+<hr>
+<h2 id="heading-7">七、文件系统</h2>
+<h3 id="1--6">1. 文件的逻辑结构</h3>
+<ul>
+<li><strong>顺序文件</strong>：记录按顺序存放（如磁带文件、日志文件）。</li>
+<li><strong>索引文件</strong>：索引表 + 数据文件，支持快速随机访问。</li>
+<li><strong>索引顺序文件</strong>：索引表指向一组顺序记录，综合索引和顺序访问的优点。</li>
+</ul>
+<h3 id="2--5">2. 文件物理结构（存储方式）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方式</th>
+<th style="text-align:center">特点</th>
+<th style="text-align:center">适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">连续分配</td>
+<td style="text-align:center">文件在磁盘上连续存放</td>
+<td style="text-align:center">顺序访问快，便于扩展</td>
+</tr>
+<tr>
+<td style="text-align:center">链接分配</td>
+<td style="text-align:center">每个数据块包含指向下一块的指针</td>
+<td style="text-align:center">顺序访问好，随机访问差</td>
+</tr>
+<tr>
+<td style="text-align:center">索引分配</td>
+<td style="text-align:center">文件索引块存放所有数据块指针</td>
+<td style="text-align:center">随机访问好（如 inode）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>FAT（文件分配表）</strong>：链式分配的一种实现。整个文件系统有一张 FAT 表，记录每个块的下一块指针。根目录区 + 数据区 + FAT 表的结构。</p>
+<p><strong>Unix/Linux inode 结构</strong>：每个文件有一个索引节点（inode），存储文件元数据（权限、大小、时间）以及数据块指针。包含直接块指针、一级间接指针、二级间接指针、三级间接指针，可支持极大文件。</p>
+<h3 id="3--5">3. 目录结构</h3>
+<ul>
+<li><strong>单级目录</strong>：所有文件在同一目录下，简单但不能重名。</li>
+<li><strong>两级目录</strong>：主目录（MFD）→ 用户目录（UFD），不同用户文件可重名。</li>
+<li><strong>树形目录</strong>（现代操作系统）：路径名区分文件，支持目录嵌套，是使用最广泛的目录结构。</li>
+</ul>
+<p><strong>空闲空间管理</strong>：位图（Bitmap，用 0/1 标记每个块是否空闲）、空闲链表、成组链接（Unix 的成组链接法）。</p>
+<h3 id="4--4">4. 文件系统的可靠性</h3>
+<p><strong>硬链接</strong>：多个文件名指向同一个 inode，文件的 inode 引用计数减少后文件才真正删除。</p>
+<p><strong>软链接（符号链接）</strong>：一个文件包含指向另一个文件的路径，如果目标文件被删除则链接失效。</p>
+<hr>
+<h2 id="io-">八、I/O 管理</h2>
+<h3 id="1-io-">1. I/O 控制方式</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方式</th>
+<th style="text-align:center">CPU 参与程度</th>
+<th style="text-align:center">数据传输单位</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">程序查询方式（轮询）</td>
+<td style="text-align:center">持续查询设备状态</td>
+<td style="text-align:center">字/字节</td>
+<td style="text-align:center">CPU 效率极低，设备被动等待</td>
+</tr>
+<tr>
+<td style="text-align:center">中断驱动方式</td>
+<td style="text-align:center">每次传送后中断通知 CPU</td>
+<td style="text-align:center">字/字节</td>
+<td style="text-align:center">释放 CPU 等待时间，但中断处理有开销</td>
+</tr>
+<tr>
+<td style="text-align:center">DMA 方式</td>
+<td style="text-align:center">初始化 + 完成后中断</td>
+<td style="text-align:center">数据块</td>
+<td style="text-align:center">DMA 控制器直接搬运数据，不占用 CPU</td>
+</tr>
+<tr>
+<td style="text-align:center">通道方式</td>
+<td style="text-align:center">更智能的 DMA</td>
+<td style="text-align:center">数据块</td>
+<td style="text-align:center">专用 I/O 处理器，可执行通道程序</td>
+</tr>
+</tbody>
+</table>
+<p><strong>DMA 的工作流程</strong>：</p>
+<ol>
+<li>CPU 设置 DMA 控制器：传送方向、内存首地址、传送字节数。</li>
+<li>DMA 控制器控制总线进行数据传输（周期窃取方式最常用）。</li>
+<li>传输完成后 DMA 发起中断通知 CPU。</li>
+</ol>
+<h3 id="2--6">2. 缓冲技术</h3>
+<p>解决 CPU 与 I/O 设备间速度不匹配的问题：</p>
+<ul>
+<li><strong>单缓冲</strong>：一次处理一块数据，处理与输入可部分重叠。</li>
+<li><strong>双缓冲</strong>：交替使用两个缓冲区，可连续处理数据。</li>
+<li><strong>循环缓冲</strong>：多个缓冲区组成环形，生产与消费并行。</li>
+</ul>
+<h3 id="3-spooling-">3. SPOOLing 技术</h3>
+<p><strong>原理</strong>：用磁盘的输入/输出井模拟独占设备，使独占设备变为共享设备。</p>
+<p><strong>组成</strong>：输入进程 + 输出进程 + 输入井 + 输出井。典型应用是打印机共享——多个程序同时&quot;打印&quot;时先写磁盘输出井，由 SPOOLing 系统逐个输出到物理打印机。</p>
+<h3 id="4--5">4. 磁盘调度算法</h3>
+<p>磁盘访问时间由三部分组成：寻道时间（磁头移动到目标磁道，占主要部分）+ 旋转延迟（旋转到目标扇区）+ 传输时间（实际数据读写）。寻道时间是主要优化目标。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">算法</th>
+<th style="text-align:center">策略</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">FCFS（先来先服务）</td>
+<td style="text-align:center">按请求顺序服务</td>
+<td style="text-align:center">公平但平均寻道时间长</td>
+</tr>
+<tr>
+<td style="text-align:center">SSTF（最短寻道时间优先）</td>
+<td style="text-align:center">选择离当前磁头最近的请求</td>
+<td style="text-align:center">平均寻道时间短，磁道两端的请求可能饿死</td>
+</tr>
+<tr>
+<td style="text-align:center">SCAN（电梯算法）</td>
+<td style="text-align:center">沿一个方向移动直到该方向无请求，再反向</td>
+<td style="text-align:center">解决饥饿，但两端请求等待时间长</td>
+</tr>
+<tr>
+<td style="text-align:center">C-SCAN（循环扫描）</td>
+<td style="text-align:center">单向移动到尽头后立即返回起点，重新开始</td>
+<td style="text-align:center">各磁道等待时间均匀</td>
+</tr>
+</tbody>
+</table>
+<h3 id="5--4">5. 设备独立性</h3>
+<p>用户程序使用逻辑设备名（如 <code>/dev/lp0</code>），操作系统通过逻辑设备表（LUT）将其映射为物理设备。引入逻辑设备名后，用户程序与具体物理设备解耦，更换设备时只需修改映射关系。</p>
+<hr>
+<h2 id="heading-8">九、链接</h2>
+<h3 id="1--7">1. 编译系统</h3>
+<p>从源代码到可执行文件的完整过程：</p>
+<ul>
+<li><strong>预处理</strong>：处理以 <code>#</code> 开头的预处理指令（宏展开、文件包含、条件编译）。</li>
+<li><strong>编译</strong>：将预处理后的源文件翻译成汇编代码。</li>
+<li><strong>汇编</strong>：将汇编代码翻译成可重定位目标文件（机器指令 + 符号信息）。</li>
+<li><strong>链接</strong>：将多个可重定位目标文件和库文件合并为可执行文件。</li>
+</ul>
+<h3 id="2--7">2. 静态链接</h3>
+<p>静态链接器将一组可重定位目标文件组合为可执行目标文件。主要完成两件事：</p>
+<ul>
+<li><strong>符号解析</strong>：将每个符号引用与对应的符号定义关联起来。</li>
+<li><strong>重定位</strong>：为每个符号分配内存地址，并修改所有对它的引用。</li>
+</ul>
+<p><strong>静态库的缺点</strong>：库更新后所有引用程序需重新链接；多个程序引用相同库时，库代码被复制到每个可执行文件中，浪费磁盘和内存。</p>
+<h3 id="3--6">3. 动态链接</h3>
+<p><strong>共享库（动态链接库）</strong>：在 Linux 中以 <code>.so</code> 后缀存在，Windows 中为 DLL。动态链接有以下特点：</p>
+<ul>
+<li>库在文件系统中只有一个副本，不在每个可执行文件中重复。</li>
+<li>库的代码段在内存中可被多个进程共享（一个副本映射到多个进程的地址空间）。</li>
+<li>程序运行时才加载库，更新库时不需要重新链接程序。</li>
+</ul>
+<p><strong>动态链接的缺点</strong>：运行时需额外的加载和链接时间；可能引发&quot;DLL Hell&quot;（版本冲突问题）。</p>
+<hr>
+<h2 id="io--1">十、I/O 多路复用</h2>
+<p>I/O 多路复用是指用一个进程/线程同时监视多个 I/O 事件（如网络连接），任意一个事件就绪时通知应用程序处理。这是实现高并发网络服务器的关键技术。</p>
+<p><strong>三种主要实现机制</strong>：</p>
+<p><strong>select</strong>：</p>
+<ul>
+<li>将需要监视的文件描述符集合传递给内核，内核返回就绪的描述符。</li>
+<li>最大监视数量受限（通常 1024）。</li>
+<li>每次调用都需要将整个 fd 集合从用户态复制到内核态，效率随 fd 数量增加而下降。</li>
+<li>返回后需要遍历所有 fd 来确定哪些就绪。</li>
+</ul>
+<p><strong>poll</strong>：</p>
+<ul>
+<li>使用 pollfd 结构体数组，突破 select 的 1024 限制。</li>
+<li>但仍需遍历整个数组，且每次调用需从用户态复制 fd 集合。</li>
+<li>性能随 fd 数量增加而线性下降。</li>
+</ul>
+<p><strong>epoll</strong>（Linux 特有）：</p>
+<ul>
+<li><strong>事件驱动</strong>：只返回就绪的事件，无需遍历所有 fd。</li>
+<li><strong>mmap 共享内存</strong>：避免用户态和内核态之间的数据传输。</li>
+<li><strong>支持水平触发和边沿触发</strong>，后者只通知一次事件状态变化。</li>
+<li>在大规模并发连接场景下性能远优于 select 和 poll。</li>
+</ul>
+<p><strong>应用场景</strong>：Nginx、Node.js、Redis 等高性能网络服务均使用 epoll（Linux）或类似机制（如 kqueue、IOCP）。</p>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">央国企计算机笔试准备（5 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+    </li>
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">操作系统</span>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">数据结构</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">计算机网络</span>
+  </a>
+  
+</nav>
+
+
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>

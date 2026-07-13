@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>数据库与SQL - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">数据库与SQL</h1>
+    <div class="article-meta">
+      <time datetime="2026-07-12">2026-07-12</time>
+      
+      <span class="series-badge" title="系列"><a href="/series/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/">央国企计算机笔试准备</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/%e8%ae%a1%e7%ae%97%e6%9c%ba%e5%9f%ba%e7%a1%80/">计算机基础</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="sql">数据库与SQL</h1>
+<blockquote>
+<p>主来源：CyC2018/CS-Notes 数据库系统原理/MySQL/SQL/Redis（6篇）｜补充来源：Snailclimb/JavaGuide database/ 笔记
+央国企考察特点：数据库题目占计算机部分的20%~30%。<strong>事务隔离级别、索引原理、范式分解</strong>为绝对高频考点。Redis作为数据库补充也常考，重点在数据类型与持久化。</p>
+</blockquote>
+<hr>
+<h2 id="heading">一、数据库系统概论</h2>
+<h3 id="1-">1. 数据库系统组成</h3>
+<p><strong>数据库（DB）</strong>：长期存储在计算机内、有组织、可共享的大量数据集合。</p>
+<p><strong>数据库管理系统（DBMS）</strong>：位于用户与操作系统之间的数据管理软件，主要功能包括数据定义（DDL）、数据操纵（DML）、数据控制（DCL）、事务管理、存储管理。</p>
+<p><strong>数据库系统（DBS）</strong>：由数据库（DB）、数据库管理系统（DBMS）、应用程序和数据库管理员（DBA）四部分组成。</p>
+<h3 id="2-">2. 数据模型</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">模型类型</th>
+<th style="text-align:center">结构特点</th>
+<th style="text-align:center">典型代表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">层次模型</td>
+<td style="text-align:center">树形结构，节点之间为父子一对多关系</td>
+<td style="text-align:center">IMS</td>
+</tr>
+<tr>
+<td style="text-align:center">网状模型</td>
+<td style="text-align:center">有向图结构，支持多对多关系</td>
+<td style="text-align:center">DBTG</td>
+</tr>
+<tr>
+<td style="text-align:center">关系模型</td>
+<td style="text-align:center">二维表结构（行/列），基于集合论</td>
+<td style="text-align:center">MySQL、Oracle、SQL Server</td>
+</tr>
+<tr>
+<td style="text-align:center">NoSQL</td>
+<td style="text-align:center">非关系型（键值/文档/列族/图）</td>
+<td style="text-align:center">Redis、MongoDB、HBase、Neo4j</td>
+</tr>
+</tbody>
+</table>
+<p>关系模型三要素：<strong>数据结构</strong>（关系=元组的集合，表由行和列组成）、<strong>数据操作</strong>（选择、投影、连接、并、交、差等关系运算，以及增、删、改）、<strong>完整性约束</strong>（实体完整性——主键非空且唯一；参照完整性——外键必须引用已存在的主键值或为NULL；用户定义完整性——如某属性取值范围的约束）。</p>
+<h3 id="3-">3. 数据库三级模式与两级映射</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">模式层级</th>
+<th style="text-align:left">概念</th>
+<th style="text-align:center">对应物理对象</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">外模式（子模式）</td>
+<td style="text-align:left">用户看到的局部数据视图</td>
+<td style="text-align:center">视图（View）</td>
+</tr>
+<tr>
+<td style="text-align:center">模式（概念模式）</td>
+<td style="text-align:left">全体数据的逻辑结构</td>
+<td style="text-align:center">基本表（Table）</td>
+</tr>
+<tr>
+<td style="text-align:center">内模式（存储模式）</td>
+<td style="text-align:left">数据在存储介质上的物理组织</td>
+<td style="text-align:center">索引文件、存储文件</td>
+</tr>
+</tbody>
+</table>
+<p><strong>外模式/模式映射</strong>保证了<strong>逻辑独立性</strong>：表结构改变（如增加列）时，只需修改映射，视图可以不随之变化。<strong>模式/内模式映射</strong>保证了<strong>物理独立性</strong>：存储方式或索引结构变化时，应用程序和逻辑结构不受影响。</p>
+<blockquote>
+<p><strong>高频题点</strong>：三级模式与两级映射、逻辑独立性与物理独立性的区分、关系模型三要素、完整性约束三种类型。</p>
+</blockquote>
+<hr>
+<h2 id="heading-1">二、关系数据库设计理论</h2>
+<h3 id="1--1">1. 函数依赖</h3>
+<p>函数依赖是关系设计的基础概念。记A→B表示A函数决定B（即A的值能唯一确定B的值）。若能从A的真子集A&rsquo;得出A&rsquo;→B，则称A→B为<strong>部分函数依赖</strong>；否则为<strong>完全函数依赖</strong>。若A→B且B→C，则A→C为<strong>传递函数依赖</strong>。</p>
+<p>关系的**键码（候选键）**是能唯一确定关系中所有属性的最小属性集合。主键是从候选键中选出的一个。</p>
+<h3 id="2--1">2. 异常</h3>
+<p>不符合范式的关系会产生四类异常：<strong>冗余数据</strong>（同一数据在多个元组中重复存储）、<strong>修改异常</strong>（一个元组中修改了数据，但其他元组中的相同数据未被同步）、<strong>删除异常</strong>（删除某个信息时连带丢失其他信息）、<strong>插入异常</strong>（因键码部分为空而无法插入新数据）。</p>
+<h3 id="3--1">3. 范式</h3>
+<p>范式递进解决上述异常问题，高级别范式以低级别范式为前提。</p>
+<p><strong>第一范式（1NF）</strong>：关系中的每个属性都是不可再分的基本数据项（属性原子性）。这是关系模型的基本要求。</p>
+<p><strong>第二范式（2NF）</strong>：满足1NF，且每个非主属性完全函数依赖于键码（消除了非主属性对键码的部分函数依赖）。通常通过将表拆分为多个关系来实现。</p>
+<p><strong>第三范式（3NF）</strong>：满足2NF，且非主属性不传递函数依赖于键码（消除了非主属性对键码的传递函数依赖）。</p>
+<p><strong>BCNF（Boyce-Codd范式）</strong>：3NF的加强版，要求每个决定因素都是候选键。BCNF消除了主属性对候选键的部分和传递依赖。</p>
+<h3 id="4-er">4. ER图</h3>
+<p>实体-联系（ER）模型由<strong>实体</strong>（现实世界中可区分的对象）、<strong>属性</strong>（实体的特征）和<strong>联系</strong>（实体之间的关联）三部分组成，用于数据库的概念设计。</p>
+<p>实体间的联系分为三种：<strong>一对一（1:1）</strong>、<strong>一对多（1:N）</strong>、<strong>多对多（M:N）</strong>。</p>
+<blockquote>
+<p><strong>高频题点</strong>：范式递进关系（1NF→2NF→3NF→BCNF）、函数依赖类型判断、ER图三种联系、插入/删除/修改异常的识别。</p>
+</blockquote>
+<hr>
+<h2 id="sql-1">三、SQL语言概念</h2>
+<p>SQL（结构化查询语言）分为四大类：<strong>DDL（数据定义语言）</strong>——定义数据库和表的结构（CREATE、ALTER、DROP）；<strong>DML（数据操纵语言）</strong>——增删改查数据（INSERT、UPDATE、DELETE、SELECT）；<strong>DCL（数据控制语言）</strong>——控制权限（GRANT、REVOKE）；<strong>TCL（事务控制语言）</strong>——管理事务（COMMIT、ROLLBACK、SAVEPOINT）。</p>
+<blockquote>
+<p>下列SQL各子句以概念描述呈现，不含具体语句片段的逐行展示。</p>
+</blockquote>
+<h3 id="1-select">1. 查询（SELECT）</h3>
+<p>SELECT是SQL最核心的语句，包含多个子句：SELECT子句指定要查询的列（可用DISTINCT去重）；FROM子句指定数据来源的表；WHERE子句进行行级过滤（支持比较运算符=、&lt;、&gt;、!=，逻辑运算符AND/OR/NOT，范围判断BETWEEN，集合判断IN，空值判断IS NULL）；GROUP BY子句按指定列分组（常与聚合函数配合使用）；HAVING子句对分组进行过滤（与WHERE的区别在于WHERE过滤行、HAVING过滤组）；ORDER BY子句对结果排序（ASC升序/默认、DESC降序）；LIMIT子句限制返回的行数。</p>
+<p><strong>聚合函数</strong>包括COUNT（计数）、SUM（求和）、AVG（求平均值，忽略NULL行）、MAX（最大值）、MIN（最小值）。聚合函数常与GROUP BY配合使用，作用于每个分组而非整个结果集。</p>
+<p><strong>通配符过滤</strong>用于文本字段的模糊匹配：%（百分号）匹配零个或多个任意字符，_（下划线）匹配恰好一个任意字符。通配符位于模式开头时会导致查询性能下降，应尽量避免。</p>
+<h3 id="2-join">2. 连接（JOIN）</h3>
+<p>连接用于从多个表中组合数据。连接时需通过连接条件将表关联，条件写在ON子句中。</p>
+<p><strong>内连接（INNER JOIN）</strong>：只返回两个表中连接条件同时满足的行。若不指定连接条件，则产生两表的笛卡尔积。</p>
+<p><strong>自连接</strong>：表与自身进行连接。常用于在同一表中查找具有某种关联的行对（如员工与其上级的关联）。</p>
+<p><strong>自然连接（NATURAL JOIN）</strong>：自动基于所有同名列进行等值连接的左、右表一行对应的行，同名列在结果中只出现一次。内连接需显式指定连接列，自然连接自动匹配。</p>
+<p><strong>外连接</strong>：保留某个表中没有关联的行。左外连接（LEFT OUTER JOIN）保留左表的全部行，右表无匹配时结果中对应列为NULL；右外连接（RIGHT OUTER JOIN）同理。全外连接（FULL OUTER JOIN）保留两边的所有行。</p>
+<h3 id="3--2">3. 子查询与组合查询</h3>
+<p><strong>子查询</strong>是嵌套在另一个查询中的SELECT语句。子查询可出现在WHERE子句中（作为过滤条件的一部分）、FROM子句中（作为临时表）、或SELECT子句中（作为计算列）。子查询通常返回单个值（标量子查询）或单列多个值（用于IN判断）。</p>
+<p><strong>组合查询</strong>使用UNION操作符将多个SELECT语句的结果合并为单一结果集。UNION自动去除重复行，UNION ALL保留全部行。组合查询中各SELECT语句必须具有相同数量的列且对应列数据类型兼容。</p>
+<h3 id="4-">4. 数据修改</h3>
+<p>INSERT用于向表中插入新行（可指定列或省略）。UPDATE用于修改现有行的列值（必须配合WHERE子句限定范围，否则更新全表）。DELETE用于删除行（同样建议配合WHERE使用）。TRUNCATE TABLE清空全表（不可回滚，效率高于DELETE）。</p>
+<h3 id="5-">5. 视图、存储过程、触发器</h3>
+<p><strong>视图（View）</strong>：基于SELECT查询的虚拟表，不存储实际数据，只保存查询定义。视图可简化复杂查询、提供额外的安全层（只暴露特定列）。对视图的更新操作最终作用于基表。</p>
+<p><strong>存储过程（Stored Procedure）</strong>：预编译并存储在数据库中的一组SQL语句，可接受输入参数并返回结果。优点包括减少网络传输、封装业务逻辑、提升执行效率。</p>
+<p><strong>触发器（Trigger）</strong>：在表上发生INSERT、UPDATE、DELETE操作时自动执行的存储过程。常用于数据审计、级联更新、约束检查。</p>
+<blockquote>
+<p><strong>高频题点</strong>：WHERE与HAVING的区别、内连接与外连接的结果差异、UNION与UNION ALL、GROUP BY与聚合函数配合、视图与基本表的关系。</p>
+</blockquote>
+<hr>
+<h2 id="heading-2">四、事务与并发控制</h2>
+<h3 id="1-acid">1. 事务ACID特性</h3>
+<p><strong>原子性（Atomicity）</strong>：事务是最小的执行单元，所有操作要么全部成功提交，要么全部失败回滚。通过Undo Log（回滚日志）实现：日志记录事务执行前的数据状态，回滚时反向执行。</p>
+<p><strong>一致性（Consistency）</strong>：事务执行前后数据库保持一致性状态——所有数据满足预设的完整性约束。一致性与原子性、隔离性、持久性密切相关：串行执行时原子性即保证一致性；并发执行时还需隔离性。</p>
+<p><strong>隔离性（Isolation）</strong>：一个事务所做的修改在最终提交前，对其他事务不可见。隔离性通过并发控制机制（锁或MVCC）实现。</p>
+<p><strong>持久性（Durability）</strong>：事务一旦提交，其修改永久保存到数据库，即使系统崩溃也不丢失。通过Redo Log（重做日志）实现：日志记录数据页的物理修改，崩溃恢复时重放已提交的事务。</p>
+<h3 id="2--2">2. 并发一致性问题</h3>
+<p><strong>丢失修改</strong>：两个事务先后修改同一数据，后一个事务的修改覆盖了前一个事务的修改（第一个事务的更新结果丢失）。</p>
+<p><strong>读脏数据</strong>：事务T2读取了事务T1尚未提交的数据，若T1回滚，则T2读到的数据是无效的脏数据。</p>
+<p><strong>不可重复读</strong>：事务在两次读取同一数据之间，另一个事务修改了该数据并提交，导致两次读取结果不一致。</p>
+<p><strong>幻影读</strong>：事务在两次范围查询之间，另一个事务插入了新的数据行，导致第二次查询多出了行（幻影行）。幻读本质上也属于不可重复读，但侧重于数据行数量的变化而非值的修改。</p>
+<h3 id="3--3">3. 隔离级别</h3>
+<p>SQL标准定义了四种隔离级别，级别从低到高依次为：</p>
+<p><strong>未提交读（READ UNCOMMITTED）</strong>：一个事务可读到其他事务未提交的修改。可能发生脏读、不可重复读、幻读。</p>
+<p><strong>提交读（READ COMMITTED）</strong>：一个事务只能读到其他事务已提交的修改。解决了脏读，但不可重复读和幻读仍可能发生。多数数据库（如Oracle、SQL Server）的默认隔离级别。</p>
+<p><strong>可重复读（REPEATABLE READ）</strong>：在同一个事务内多次读取同一数据结果一致（通过锁或MVCC实现）。解决了脏读和不可重复读，但可能发生幻读。MySQL InnoDB的默认隔离级别。InnoDB通过MVCC+Next-Key Locks解决幻读。</p>
+<p><strong>可串行化（SERIALIZABLE）</strong>：强制事务串行执行，开销最大，但能解决所有并发一致性问题。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">隔离级别</th>
+<th style="text-align:center">脏读</th>
+<th style="text-align:center">不可重复读</th>
+<th style="text-align:center">幻读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">未提交读</td>
+<td style="text-align:center">可能</td>
+<td style="text-align:center">可能</td>
+<td style="text-align:center">可能</td>
+</tr>
+<tr>
+<td style="text-align:center">提交读</td>
+<td style="text-align:center">不可能</td>
+<td style="text-align:center">可能</td>
+<td style="text-align:center">可能</td>
+</tr>
+<tr>
+<td style="text-align:center">可重复读</td>
+<td style="text-align:center">不可能</td>
+<td style="text-align:center">不可能</td>
+<td style="text-align:center">可能（InnoDB可解决）</td>
+</tr>
+<tr>
+<td style="text-align:center">可串行化</td>
+<td style="text-align:center">不可能</td>
+<td style="text-align:center">不可能</td>
+<td style="text-align:center">不可能</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4--1">4. 封锁机制</h3>
+<p><strong>锁粒度</strong>：MySQL InnoDB支持行级锁和表级锁。粒度越细，并发程度越高，但锁管理开销也越大。</p>
+<p><strong>锁类型</strong>：<strong>共享锁（S锁）</strong>——读锁，加锁期间其他事务可加S锁但不能加X锁；<strong>排他锁（X锁）</strong>——写锁，加锁期间其他事务不能加任何锁。意向锁（IS/IX）用于快速判断表级别的锁冲突——事务想对某行加S锁前必须先获得表的IS锁。</p>
+<p><strong>封锁协议</strong>（三级封锁协议用于逐步解决问题）：</p>
+<ul>
+<li>一级：修改数据前加X锁直到事务结束——解决丢失修改</li>
+<li>二级：在一级基础上，读取数据前加S锁、读完立即释放——解决脏读</li>
+<li>三级：在二级基础上，S锁也持续到事务结束——解决不可重复读</li>
+</ul>
+<p><strong>两段锁协议</strong>：加锁和解锁分为两个阶段（先全部加锁、再逐步解锁）。满足两段锁协议是保证事务可串行化调度的充分条件。InnoDB采用两段锁协议自动加锁。</p>
+<h3 id="5-mvcc">5. MVCC（多版本并发控制）</h3>
+<p>MVCC是InnoDB实现提交读和可重复读隔离级别的核心技术。核心思想：写操作生成数据行的新版快照，读操作读取旧版快照，读写互不阻塞。</p>
+<p><strong>版本号</strong>：每开始一个新事务，系统版本号递增。事务版本号即事务开始时系统的版本号。</p>
+<p><strong>Undo日志</strong>：数据行的多个版本快照存储在Undo日志中，通过回滚指针（ROLL_PTR）串联成版本链。每个快照记录了创建它的事务版本号TRX_ID。</p>
+<p><strong>ReadView</strong>：MVCC通过ReadView判断某个数据行快照对当前事务是否可见。ReadView包含当前系统中未提交事务的列表TRX_IDs，以及最小值和最大值。判断规则：</p>
+<ul>
+<li>若快照的TRX_ID &lt; TRX_ID_MIN（快照在所有未提交事务之前创建），可见</li>
+<li>若快照的TRX_ID &gt; TRX_ID_MAX（快照在当前事务启动之后创建），不可见</li>
+<li>其他情况需根据隔离级别判断：提交读下，若TRX_ID在未提交列表中则不可见；可重复读下，任何未提交的快照均不可见</li>
+</ul>
+<p><strong>快照读与当前读</strong>：普通的SELECT是快照读（读取历史版本，不加锁）；INSERT、UPDATE、DELETE以及SELECT&hellip;FOR UPDATE和SELECT&hellip;LOCK IN SHARE MODE是当前读（读取最新版本，加锁）。</p>
+<h3 id="6-next-key-locks">6. Next-Key Locks</h3>
+<p>MVCC不能彻底解决幻读，InnoDB通过Next-Key Locks在可重复读隔离级别下解决幻读。Next-Key Lock是<strong>Record Lock（行锁）</strong> 和<strong>Gap Lock（间隙锁）</strong> 的结合：不仅锁定索引记录本身，还锁定索引记录之间的间隙（前开后闭区间）。例如一个索引包含值10、11、13、20，则锁定的区间为(-∞,10]、(10,11]、(11,13]、(13,20]、(20,+∞)——其他事务无法在这些区间内插入新的数据行。</p>
+<blockquote>
+<p><strong>高频题点</strong>：ACID四特性及依赖关系（一致性依赖于原子性+隔离性）、四种隔离级别及各自解决的问题、MVCC原理（Undo日志+ReadView）、Next-Key Lock解决幻读、两段锁协议。</p>
+</blockquote>
+<hr>
+<h2 id="mysql">五、MySQL索引与存储引擎</h2>
+<h3 id="1-b">1. B+树索引原理</h3>
+<p>索引是用于快速查询和检索数据的数据结构。MySQL InnoDB和MyISAM均采用B+树作为索引结构。</p>
+<p>B+树是B树（多路平衡查找树）的变体，特点为：只有叶子节点存放key和数据（data），内部节点只存放key和子节点指针；叶子节点之间通过顺序指针连接成有序链表。B+树的高度通常为2~4层，每次查找从根节点到叶子节点，IO次数稳定。</p>
+<p>B+树相比红黑树更适合数据库索引的原因：一是<strong>树高更低</strong>（B+树每个节点可存储多个key，出度大，树高远低于红黑树）；二是<strong>磁盘预读特性</strong>（操作系统每次读取一页，B+树节点大小=页大小，一次IO即可载入一个节点）；三是<strong>范围查询高效</strong>（叶子节点有序链表可直接遍历）。</p>
+<h3 id="2--3">2. 聚簇索引与非聚簇索引</h3>
+<p><strong>聚簇索引</strong>：索引结构（B+树）的叶子节点直接存储完整的数据行。InnoDB的主键索引就是聚簇索引。若表未显式定义主键，InnoDB会选择一个唯一非空索引作为聚簇索引，若没有则自动生成6字节隐藏主键。聚簇索引查询速度快（一次索引查找即定位数据），且对主键范围查询和排序有天然优势。缺点是对主键值的插入顺序敏感——使用自增主键可避免页分裂。</p>
+<p><strong>非聚簇索引（二级索引/辅助索引）</strong>：叶子节点存储的是主键值而非完整数据行。通过非聚簇索引查找数据时，先找到主键值，再通过聚簇索引回表读取完整行数据（这个过程称为<strong>回表</strong>）。MyISAM的所有索引（包括主键索引）都是非聚簇索引，其叶子节点存储的是数据记录的地址指针。</p>
+<p><strong>覆盖索引</strong>：当查询所需的列全部包含在索引中时，无需回表即可返回结果。覆盖索引能显著提升查询性能。</p>
+<h3 id="3--4">3. 联合索引与最左前缀原则</h3>
+<p><strong>联合索引（复合索引）</strong>：在多个列上同时创建的索引，叶子节点按索引列的先后顺序排序。联合索引遵循<strong>最左前缀原则</strong>：查询条件必须从索引的最左列开始匹配。例如对于(a,b,c)上的联合索引，只有查询条件涉及a、a和b、或a和b和c时才能用到索引；若跳过a仅查询b和c则无法使用。</p>
+<h3 id="4--2">4. 索引的优缺点与使用条件</h3>
+<p>优点：大幅减少需要扫描的数据行数、避免排序和分组操作（B+树有序）、将随机IO转化为顺序IO。缺点：创建和维护索引需额外开销（写入数据时需同步更新索引）、占用额外的存储空间、对小型表全表扫描可能更快。</p>
+<p>适合建立索引的场景：频繁出现在WHERE条件中的列、参与连接操作的列、需要排序或分组的列。不适合建立索引的场景：数据量很小的表、频繁更新的列、数据区分度低的列（如性别）。</p>
+<h3 id="5--1">5. 存储引擎对比</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">特性</th>
+<th style="text-align:center">InnoDB</th>
+<th style="text-align:center">MyISAM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">事务</td>
+<td style="text-align:center">支持（ACID）</td>
+<td style="text-align:center">不支持</td>
+</tr>
+<tr>
+<td style="text-align:center">锁粒度</td>
+<td style="text-align:center">行级锁 + 表级锁</td>
+<td style="text-align:center">仅表级锁</td>
+</tr>
+<tr>
+<td style="text-align:center">外键</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">不支持</td>
+</tr>
+<tr>
+<td style="text-align:center">索引类型</td>
+<td style="text-align:center">聚簇索引（主键）</td>
+<td style="text-align:center">非聚簇索引（所有索引）</td>
+</tr>
+<tr>
+<td style="text-align:center">全文索引</td>
+<td style="text-align:center">支持（5.6+）</td>
+<td style="text-align:center">支持</td>
+</tr>
+<tr>
+<td style="text-align:center">崩溃恢复</td>
+<td style="text-align:center">支持（redo log）</td>
+<td style="text-align:center">修复可能丢数据</td>
+</tr>
+<tr>
+<td style="text-align:center">在线热备份</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">不支持</td>
+</tr>
+<tr>
+<td style="text-align:center">适用场景</td>
+<td style="text-align:center">读写混合、事务型</td>
+<td style="text-align:center">大量只读查询、报表</td>
+</tr>
+</tbody>
+</table>
+<p>InnoDB是MySQL 5.5版本起的默认存储引擎。</p>
+<h3 id="6-mysqlsql">6. MySQL体系结构与SQL执行流程</h3>
+<p>MySQL体系分为Server层和存储引擎层。Server层包含<strong>连接器</strong>（身份认证与权限校验）、<strong>分析器</strong>（词法分析识别SQL关键字、语法分析检查语法正确性）、<strong>优化器</strong>（选择执行计划，如索引选择和连接顺序）、<strong>执行器</strong>（校验权限后调用存储引擎接口执行）。此外，Server层还包含binlog日志模块（所有引擎共享）。</p>
+<p><strong>查询语句执行流程</strong>：连接器→分析器→优化器→执行器→存储引擎，返回结果。</p>
+<p><strong>更新语句执行流程</strong>（以InnoDB为例）：分析器→优化器→执行器。执行器先从存储引擎读取要修改的行（内存或磁盘），修改后调用引擎写入。InnoDB先将数据写入内存并将操作记录到redo log（prepare状态），然后执行器记录binlog，最后InnoDB将redo log标记为commit。这种<strong>两阶段提交</strong>机制保证了redo log和binlog的一致性：若系统在prepare后崩溃，重启时检查binlog是否完整，若完整则提交，否则回滚。</p>
+<blockquote>
+<p><strong>高频题点</strong>：B+树索引特点、聚簇索引vs非聚簇索引、最左前缀原则、覆盖索引、InnoDB vs MyISAM对比、SQL执行全流程、redo log两阶段提交。</p>
+</blockquote>
+<hr>
+<h2 id="redis">六、Redis基础</h2>
+<h3 id="1-redis">1. Redis概述</h3>
+<p>Redis是基于内存的键值型NoSQL数据库，以极高的读写性能著称。键的类型只能为字符串，值支持多种数据类型。Redis支持数据持久化、主从复制、哨兵和集群分片等功能。</p>
+<h3 id="2--4">2. 五种基本数据类型</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">数据类型</th>
+<th style="text-align:center">存储内容</th>
+<th style="text-align:center">常用操作</th>
+<th style="text-align:center">应用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">STRING</td>
+<td style="text-align:center">字符串、整数或浮点数</td>
+<td style="text-align:center">设值/取值、自增/自减</td>
+<td style="text-align:center">计数器、缓存</td>
+</tr>
+<tr>
+<td style="text-align:center">LIST</td>
+<td style="text-align:center">有序字符串列表（双向链表）</td>
+<td style="text-align:center">两端压入/弹出、范围获取</td>
+<td style="text-align:center">消息队列、最新消息列表</td>
+</tr>
+<tr>
+<td style="text-align:center">SET</td>
+<td style="text-align:center">无序字符串集合</td>
+<td style="text-align:center">添加/删除、交集/并集/差集</td>
+<td style="text-align:center">共同好友、标签系统</td>
+</tr>
+<tr>
+<td style="text-align:center">HASH</td>
+<td style="text-align:center">键值对散列表</td>
+<td style="text-align:center">设值/取值/获取所有</td>
+<td style="text-align:center">对象存储（如用户信息）</td>
+</tr>
+<tr>
+<td style="text-align:center">ZSET（有序集合）</td>
+<td style="text-align:center">带分值的字符串集合</td>
+<td style="text-align:center">按分值范围获取、排名</td>
+<td style="text-align:center">排行榜、带权重的任务队列</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3--5">3. 持久化</h3>
+<p>Redis将内存数据持久化到磁盘，保证重启后数据不丢失，支持两种方式：</p>
+<p><strong>RDB（快照持久化）</strong>：将某一时间点的所有数据生成二进制快照存入磁盘。优点是文件紧凑、恢复速度快；缺点是快照创建间隔期间的数据可能丢失。</p>
+<p><strong>AOF（追加文件持久化）</strong>：将每条写命令追加到AOF文件末尾。支持三种同步策略：always（每写必同步，最安全但性能最差）、everysec（每秒同步，推荐，最多丢失1秒数据）、no（由操作系统决定）。AOF文件会随时间增大，Redis提供AOF重写功能去除冗余命令。</p>
+<h3 id="4--3">4. 数据淘汰策略</h3>
+<p>当Redis内存使用量超过设定的最大值时，根据淘汰策略决定删除哪些数据。常用策略：</p>
+<ul>
+<li><strong>allkeys-lru</strong>（最常用）：从所有键中淘汰最近最少使用的键</li>
+<li><strong>volatile-lru</strong>：从设置了过期时间的键中淘汰最近最少使用的</li>
+<li><strong>allkeys-random</strong>：从所有键中随机淘汰</li>
+<li><strong>volatile-ttl</strong>：从设置了过期时间的键中淘汰即将过期的</li>
+<li><strong>noeviction</strong>（默认）：不淘汰，写入操作返回错误</li>
+</ul>
+<p>实际应用中，若Redis作为缓存（可接受数据丢失），推荐使用allkeys-lru。</p>
+<h3 id="5-redis">5. Redis使用场景</h3>
+<p><strong>缓存</strong>：将热点数据放入Redis，减轻数据库负载。<strong>计数器</strong>：利用STRING的自增操作记录页面浏览量等。<strong>会话缓存</strong>：分布式应用中统一存储用户会话信息。<strong>消息队列</strong>：利用LIST的lpush/rpop实现简单队列（生产环境推荐专用消息队列中间件）。<strong>排行榜</strong>：利用ZSET按分值排序实现。<strong>分布式锁</strong>：利用SETNX命令实现互斥锁。</p>
+<h3 id="6-redismemcached">6. Redis与Memcached对比</h3>
+<p>两者都是键值型内存数据库，主要区别：Redis支持五种数据类型（Memcached仅支持STRING）；Redis支持持久化（Memcached不支持）；Redis支持集群和哨兵（Memcached需客户端一致性哈希实现分布式）；Redis可设置键过期时间并支持多种淘汰策略。</p>
+<blockquote>
+<p><strong>高频题点</strong>：五数据类型及应用场景、RDB与AOF对比、allkeys-lru淘汰策略、Redis缓存应用模式、Redis与Memcached区别。</p>
+</blockquote>
+<hr>
+<h2 id="heading-3">七、数据库设计</h2>
+<h3 id="1--2">1. 数据库设计步骤</h3>
+<p>数据库设计通常经历六个阶段：<strong>需求分析</strong>（确定系统需要处理的数据与功能）、<strong>概念结构设计</strong>（用ER图表达用户需求）、<strong>逻辑结构设计</strong>（将ER图转换为关系表结构并规范化）、<strong>物理结构设计</strong>（确定存储结构与索引策略）、<strong>数据库实施</strong>（建表并加载数据）、<strong>数据库运行与维护</strong>。</p>
+<h3 id="2--5">2. 反范式设计</h3>
+<p>反范式化的核心思想是以空间换时间、以冗余换性能。在数据量大的系统中，严格的范式化可能导致大量多表连接查询，严重降低性能。适当引入冗余列可以减少JOIN操作，大幅提升查询速度。如将用户姓名冗余在订单表中，查询订单时无需再查用户表。</p>
+<h3 id="3--6">3. 数据库切分</h3>
+<p>当单表数据量过大时，需进行切分。<strong>水平切分（Sharding）</strong>：将同一张表的记录拆分到多个结构相同的表中（按ID范围、哈希取模或映射表）。<strong>垂直切分</strong>：将一张表按列拆分为多个表（或将不同密集度的表部署到不同数据库）。切分后需要解决分布式事务、跨节点查询、ID唯一性等问题。</p>
+<h3 id="4--4">4. 主从复制与读写分离</h3>
+<p>MySQL主从复制涉及三个线程：主库的binlog线程将数据更改写入二进制日志；从库的I/O线程读取主库的binlog并写入中继日志（relay log）；从库的SQL线程读取中继日志并在从库上重放。<strong>读写分离</strong>以主从复制为基础：主库处理写操作和实时性要求高的读操作；从库处理延迟可容忍的读操作，减轻主库压力。</p>
+<blockquote>
+<p><strong>高频题点</strong>：ER图转关系表的规则、反范式与范式化的取舍、水平切分策略（hash/range/mapping）、主从复制的三种日志参与。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>备考建议</strong>：</p>
+<ol>
+<li>事务ACID与隔离级别是最高频考点，注意每种级别解决了哪些问题、未解决哪些问题。</li>
+<li>索引方面，重点掌握B+树特征、聚簇/非聚簇索引差异、最左前缀原则、覆盖索引的含义。</li>
+<li>SQL语法中，连接类型（内/左外/右外/自/自然连接）和GROUP BY+HAVING的用法出题最多。</li>
+<li>范式分解问题需掌握从1NF到BCNF的判定步骤，央国企笔试常有选择题。</li>
+<li>Redis以数据类型、持久化、淘汰策略为主，深度不超过基本概念。</li>
+</ol>
+</blockquote>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">央国企计算机笔试准备（5 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+    </li>
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">数据库与SQL</span>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">计算机网络</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">计算机组成原理</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/%e9%9d%a2%e8%af%95%e6%bc%ab%e8%b0%88%ef%bc%9a%e7%bc%93%e5%ad%98%e7%9a%84%e4%b8%89%e5%a4%a7%e5%9c%ba%e6%99%af%e4%b8%8e%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81/">
+      <span class="related-card-title">面试漫谈：缓存的三大场景与分布式锁</span>
+      <span class="related-card-date">2025-11-14</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8aRedis%e6%b7%b1%e5%ba%a6%e5%8e%86%e9%99%a9%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《Redis深度历险》记录</span>
+      <span class="related-card-date">2025-04-29</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8a%e9%ab%98%e6%80%a7%e8%83%bdMySQL%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《高性能MySQL》记录</span>
+      <span class="related-card-date">2025-04-12</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>

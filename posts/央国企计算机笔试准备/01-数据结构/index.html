@@ -1,0 +1,2830 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>数据结构 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">数据结构</h1>
+    <div class="article-meta">
+      <time datetime="2026-07-12">2026-07-12</time>
+      
+      <span class="series-badge" title="系列"><a href="/series/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/">央国企计算机笔试准备</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/%e8%ae%a1%e7%ae%97%e6%9c%ba%e5%9f%ba%e7%a1%80/">计算机基础</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="heading">数据结构</h1>
+<blockquote>
+<p>来源：CyC2018/CS-Notes 算法章节 + Krahets/hello-algo 图解数据结构
+考情：央国企笔试权重最高的科目，考查范围以基础概念和算法性质为主，侧重对数据结构核心性质的理解与辨析。</p>
+</blockquote>
+<hr>
+<h2 id="heading-1">一、线性表</h2>
+<p>线性表是最基本的数据结构，由 n（n ≥ 0）个相同类型数据元素组成的有限序列。逻辑上相邻的元素在物理存储上可能相邻（顺序存储）也可能不相邻（链式存储）。</p>
+<h3 id="1-array">1. 数组（Array）</h3>
+<p>数组是一组连续内存空间中存储的相同类型数据元素的集合，是最简单、最基础的数据结构。</p>
+<p><strong>核心性质</strong>：</p>
+<ul>
+<li>随机访问：通过下标直接计算地址，表达式为 <code>base + index × 元素大小</code>，时间复杂度为 O(1)。这是数组最显著的优势。</li>
+<li>插入与删除：需要移动后续元素以保持连续性，平均时间复杂度为 O(n)。插入位置越靠前，需要移动的元素越多。</li>
+<li>空间连续性：数据在内存中连续排列，有利于利用 CPU 缓存的空間局部性原理，遍历性能好。</li>
+</ul>
+<p><strong>动态数组（如 Java 的 ArrayList、C++ 的 vector）</strong>：</p>
+<ul>
+<li>底层仍使用固定数组，当元素数量达到容量上限时触发扩容。</li>
+<li>扩容策略通常是新容量为原容量的 1.5 倍（Java ArrayList）或 2 倍（C++ vector）。</li>
+<li>每次扩容涉及数据拷贝（将原数组内容复制到新分配的内存空间），但通过均摊分析，N 次插入操作的总时间复杂度仍为 O(N)，即均摊 O(1)。</li>
+<li>扩容是以空间换时间的典型设计。</li>
+</ul>
+<p><strong>多维数组的存储方式</strong>：</p>
+<ul>
+<li>行优先（C/C++、Python）：按行依次存储，<code>a[i][j]</code> 的地址 = 基地址 + <code>(i × 列数 + j) × 元素大小</code>。遍历时按行访问能充分利用缓存。</li>
+<li>列优先（Fortran、MATLAB）：按列依次存储，<code>a[i][j]</code> 的地址 = 基地址 + <code>(j × 行数 + i) × 元素大小</code>。适合按列访问的场景。</li>
+</ul>
+<p><strong>数组的局限</strong>：大小固定（动态数组也不能无限制增长，扩容有开销），插入和删除操作低效。</p>
+<h3 id="2-linked-list">2. 链表（Linked List）</h3>
+<p>链表通过指针将一组节点串联起来，每个节点包含数据域和指针域。节点在内存中不连续存储，依靠指针维持逻辑顺序。</p>
+<p><strong>三种基本类型</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">节点结构</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">单向链表</td>
+<td style="text-align:center">data + next（指向下一节点）</td>
+<td style="text-align:center">只能沿一个方向遍历，尾节点的 next 为空</td>
+</tr>
+<tr>
+<td style="text-align:center">双向链表</td>
+<td style="text-align:center">prev + data + next（各指向前驱和后继）</td>
+<td style="text-align:center">可双向遍历，删除操作更灵活，但每个节点多一个指针开销</td>
+</tr>
+<tr>
+<td style="text-align:center">循环链表</td>
+<td style="text-align:center">尾节点的 next 指向头节点</td>
+<td style="text-align:center">可从任意节点出发遍历整个链表，常用于循环队列</td>
+</tr>
+</tbody>
+</table>
+<p><strong>基本操作复杂度</strong>：</p>
+<ul>
+<li>查找：O(n)（需要从头遍历）</li>
+<li>插入与删除（已知目标节点的位置）：O(1)（只需修改指针）</li>
+<li>插入与删除（未知位置，需先查找）：O(n)</li>
+</ul>
+<p><strong>典型操作</strong>：</p>
+<ul>
+<li><strong>链表反转</strong>：可通过迭代法（维护三个指针 prev、curr、next 依次反转指向）或递归法实现。</li>
+<li><strong>快慢指针</strong>：用两个指针以不同速度遍历链表。典型应用包括检测环（Floyd 判环算法，快指针每次走两步、慢指针每次走一步，若相遇则有环）、找链表中点（快指针到末尾时慢指针正好在中点）、找倒数第 K 个节点（快指针先走 K 步，然后快慢指针同步移动）。</li>
+<li><strong>合并两个有序链表</strong>：通过比较两个链表当前节点的值，取较小者接入结果链表。</li>
+</ul>
+<p><strong>数组与链表的对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">对比维度</th>
+<th style="text-align:center">数组</th>
+<th style="text-align:center">链表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">访问方式</td>
+<td style="text-align:center">随机访问 O(1)</td>
+<td style="text-align:center">顺序访问 O(n)</td>
+</tr>
+<tr>
+<td style="text-align:center">插入/删除（已知位置）</td>
+<td style="text-align:center">O(n)</td>
+<td style="text-align:center">O(1)</td>
+</tr>
+<tr>
+<td style="text-align:center">空间利用率</td>
+<td style="text-align:center">连续存储，无额外指针开销</td>
+<td style="text-align:center">每个节点额外存储指针</td>
+</tr>
+<tr>
+<td style="text-align:center">缓存友好性</td>
+<td style="text-align:center">高（空间局部性好）</td>
+<td style="text-align:center">低（节点分散）</td>
+</tr>
+<tr>
+<td style="text-align:center">大小调整</td>
+<td style="text-align:center">动态数组扩容有拷贝成本</td>
+<td style="text-align:center">天然动态增长</td>
+</tr>
+</tbody>
+</table>
+<p><strong>适用场景</strong>：频繁随机访问选择数组；频繁插入删除且不常随机访问选择链表。</p>
+<h3 id="3-stack">3. 栈（Stack）</h3>
+<p>栈是后进先出（LIFO, Last In First Out）的线性结构，所有操作限制在栈顶一端进行。</p>
+<p><strong>实现方式</strong>：</p>
+<ul>
+<li><strong>顺序栈（数组实现）</strong>：用数组存储元素，栈顶指针指向当前栈顶位置。需要处理栈满时的扩容问题（可参考动态数组的扩容策略）。</li>
+<li><strong>链栈（链表实现）</strong>：用头插法链表实现，每次入栈将新节点插入链表头部，出栈移除头部节点。链栈不存在栈满限制。</li>
+</ul>
+<p><strong>基本操作</strong>：push（入栈，在栈顶插入元素）、pop（出栈，移除并返回栈顶元素）、peek（查看栈顶元素但不移除）、isEmpty（判断栈是否为空）。所有基本操作时间复杂度均为 O(1)。</p>
+<p><strong>典型应用场景</strong>：</p>
+<ul>
+<li><strong>函数调用栈</strong>：程序运行时，每次函数调用将返回地址、局部变量等压入调用栈；函数返回时出栈恢复执行现场。</li>
+<li><strong>表达式求值</strong>：将中缀表达式转换为后缀表达式（逆波兰式），需要操作数栈和运算符栈配合。计算后缀表达式时只需一个操作数栈。</li>
+<li><strong>括号匹配</strong>：遍历表达式时，左括号入栈；遇到右括号时出栈匹配，若匹配失败则括号不配对。</li>
+<li><strong>浏览器的前进后退</strong>：用两个栈分别存储后退历史记录和前进历史记录。</li>
+</ul>
+<h3 id="4-queue">4. 队列（Queue）</h3>
+<p>队列是先进先出（FIFO, First In First Out）的线性结构，在一端（队尾）插入，在另一端（队头）删除。</p>
+<p><strong>普通队列</strong>：可用数组或链表实现。链表实现时需要维护队头（first）和队尾（last）两个指针。</p>
+<p><strong>循环队列（数组实现）</strong>：</p>
+<ul>
+<li>为了解决数组队列的&quot;假溢出&quot;问题（队尾已满但队头有空位），将数组在逻辑上视为环形。</li>
+<li>判空条件：<code>front == rear</code>（队头指针等于队尾指针）</li>
+<li>判满条件：<code>(rear + 1) % capacity == front</code>（牺牲一个存储单元来区分空和满）</li>
+<li>元素个数计算：<code>(rear - front + capacity) % capacity</code></li>
+<li>另一种判满方式：维护一个 size 变量记录当前元素个数，可避免牺牲存储单元。</li>
+</ul>
+<p><strong>双端队列（Deque, Double-Ended Queue）</strong>：</p>
+<ul>
+<li>两端均可进行插入和删除操作，兼具栈和队列的功能。</li>
+<li>Java 的 <code>ArrayDeque</code>、Python 的 <code>collections.deque</code> 均为典型实现。</li>
+<li>应用场景：滑动窗口最大值、回文判断等。</li>
+</ul>
+<p><strong>优先队列（Priority Queue）</strong>：</p>
+<ul>
+<li>按优先级而不是插入顺序出队，优先级最高的元素最先出队。</li>
+<li>底层通常用堆实现（大根堆或小根堆）。</li>
+<li>基本操作的时间复杂度：插入 O(log n)，删除 O(log n)，查看优先级最高元素 O(1)。</li>
+<li>应用场景：任务调度（高优先级任务先执行）、Dijkstra 最短路径算法、Huffman 编码。</li>
+</ul>
+<p><strong>栈与队列的相互实现</strong>：</p>
+<ul>
+<li><strong>两个栈实现队列</strong>：一个栈负责入队（push 直接压入该栈），另一个栈负责出队（出队时若出队栈为空，则将入队栈所有元素依次弹出并压入出队栈）。均摊复杂度 O(1)。</li>
+<li><strong>两个队列实现栈</strong>：入栈时向非空队列插入元素；出栈时将当前队列中除最后一个元素外的所有元素移到另一个队列，然后移除最后一个元素。</li>
+</ul>
+<hr>
+<h2 id="heading-2">二、树与二叉树</h2>
+<p>树是一种非线性数据结构，以分层的方式组织数据。二叉树是每个节点最多有两个子树的树结构。</p>
+<h3 id="1-">1. 二叉树基础概念</h3>
+<p><strong>重要二叉树类型</strong>：</p>
+<p>| 类型 | 定义 | 特点 |
+|:&mdash;-:|:&mdash;-:|::&mdash;-:|
+| 满二叉树 | 除叶子节点外每个节点都有两个子节点，且所有叶子在同一层 | 节点数为 2^h - 1（h 为层数） |
+| 完全二叉树 | 除最底层外其余层均满，最底层节点尽可能靠左排列 | 可用数组高效存储，适合堆的实现 |
+| 二叉搜索树（BST） | 左子树所有节点值 &lt; 根节点值 &lt; 右子树所有节点值 | 中序遍历为递增序列 |
+| 平衡二叉树（AVL） | 任一节点的左右子树高度差的绝对值不超过 1 | 严格平衡，保证查找效率 |</p>
+<p><strong>二叉树的重要性质</strong>：</p>
+<ul>
+<li>第 i 层最多有 2^(i-1) 个节点（根节点为第 1 层）。</li>
+<li>深度为 k 的二叉树最多有 2^k - 1 个节点。</li>
+<li>叶子节点数 = 度为 2 的节点数 + 1（度为 2 表示有两个子节点）。</li>
+<li>完全二叉树中，节点 i（从 1 开始编号）的左子节点为 2i，右子节点为 2i+1，父节点为 i/2（向下取整）。</li>
+</ul>
+<p><strong>二叉树与度为 2 的树的区别</strong>：二叉树是<strong>有序树</strong>，左右子节点区分明确，即使只有一个子节点也要指明是左还是右；而度为 2 的树不要求区分左右次序。</p>
+<h3 id="2-">2. 二叉树的遍历</h3>
+<p>遍历是二叉树最基本的操作，分为深度优先遍历和广度优先遍历两大类。</p>
+<p><strong>深度优先遍历（DFS）</strong>——递归或栈实现：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">遍历方式</th>
+<th style="text-align:center">遍历顺序</th>
+<th style="text-align:center">特点</th>
+<th style="text-align:center">典型应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">前序遍历</td>
+<td style="text-align:center">根 → 左 → 右</td>
+<td style="text-align:center">先访问根节点，再递归遍历左右子树</td>
+<td style="text-align:center">树的序列化、表达式树求值</td>
+</tr>
+<tr>
+<td style="text-align:center">中序遍历</td>
+<td style="text-align:center">左 → 根 → 右</td>
+<td style="text-align:center">在 BST 中输出递增序列</td>
+<td style="text-align:center">BST 排序输出、判断是否为 BST</td>
+</tr>
+<tr>
+<td style="text-align:center">后序遍历</td>
+<td style="text-align:center">左 → 右 → 根</td>
+<td style="text-align:center">先处理子节点再处理父节点</td>
+<td style="text-align:center">树的删除、计算目录大小</td>
+</tr>
+</tbody>
+</table>
+<p><strong>广度优先遍历（BFS）</strong>——队列实现：</p>
+<ul>
+<li><strong>层序遍历</strong>：从上到下、从左到右逐层访问每个节点。</li>
+<li>每轮迭代记录当前层的节点数量，可将各层节点区分输出（如按层打印二叉树）。</li>
+<li>常用于求树的高度、宽度、判断是否为完全二叉树。</li>
+</ul>
+<p><strong>遍历序列的互推关系</strong>：</p>
+<ul>
+<li>前序遍历的第一个节点为根节点。</li>
+<li>中序遍历中，根节点左侧为左子树的中序序列，右侧为右子树的中序序列。</li>
+<li>后序遍历的最后一个节点为根节点。</li>
+<li>已知前序 + 中序可唯一确定一棵二叉树；已知后序 + 中序也可唯一确定；但仅知前序 + 后序不能唯一确定。</li>
+</ul>
+<h3 id="3-bst">3. 二叉搜索树（BST）</h3>
+<p><strong>定义与性质</strong>：</p>
+<ul>
+<li>左子树中所有节点的值均小于根节点的值。</li>
+<li>右子树中所有节点的值均大于根节点的值。</li>
+<li>左右子树本身也分别为二叉搜索树。</li>
+<li>对 BST 进行中序遍历，得到的结果是一个严格递增的序列。</li>
+</ul>
+<p><strong>核心操作</strong>：</p>
+<ul>
+<li><strong>查找</strong>：从根节点出发，若目标值等于当前节点值则返回；若目标值小于当前节点值则进入左子树继续查找；否则进入右子树。每轮比较排除一半子树，平均时间复杂度 O(log n)。</li>
+<li><strong>插入</strong>：先执行一次查找操作以定位插入位置，查找未命中时，在查找路径的最后空位插入新节点。</li>
+<li><strong>删除</strong>：分三种情况处理——
+<ul>
+<li>被删除节点为叶子节点（度为 0）：直接删除，将父节点的相应指针置空。</li>
+<li>被删除节点只有一个子节点（度为 1）：用该子节点替换被删除节点。</li>
+<li>被删除节点有两个子节点（度为 2）：用右子树的最小节点（或左子树的最大节点）替换被删除节点的值，然后删除该替换节点（右子树最小节点一定是叶子或只有右子树的节点，其删除可归为前两种情况）。</li>
+</ul>
+</li>
+</ul>
+<p><strong>BST 的退化问题</strong>：如果插入的数据是有序的（递增或递减），BST 会退化为一条单链表，所有操作退化为 O(n)。为解决这一问题，引入了平衡二叉树。</p>
+<p><strong>判定 BST 的方法</strong>：</p>
+<ul>
+<li>方法一：中序遍历是否严格递增（可以通过递归遍历时记录前驱节点值进行比较）。</li>
+<li>方法二：递归判断每个节点是否在允许的值范围内（以 min 和 max 参数约束左右子树的范围）。</li>
+</ul>
+<h3 id="4-avl-">4. 平衡二叉树（AVL 树）</h3>
+<p>AVL 树是严格平衡的二叉搜索树，任一节点的左右子树高度差不超过 1。</p>
+<p><strong>平衡因子</strong>：左子树高度 − 右子树高度。平衡因子取值只能为 -1、0 或 1，否则需要旋转调整。</p>
+<p><strong>四种旋转操作</strong>（在不破坏 BST 性质的前提下恢复平衡）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">失衡情形</th>
+<th style="text-align:center">平衡因子特征</th>
+<th style="text-align:center">旋转方式</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">LL（左左）</td>
+<td style="text-align:center">节点平衡因子 &gt;1，左子节点平衡因子 ≥0</td>
+<td style="text-align:center">右旋</td>
+<td style="text-align:center">在左子树的左子树插入了新节点</td>
+</tr>
+<tr>
+<td style="text-align:center">RR（右右）</td>
+<td style="text-align:center">节点平衡因子 &lt;−1，右子节点平衡因子 ≤0</td>
+<td style="text-align:center">左旋</td>
+<td style="text-align:center">在右子树的右子树插入了新节点</td>
+</tr>
+<tr>
+<td style="text-align:center">LR（左右）</td>
+<td style="text-align:center">节点平衡因子 &gt;1，左子节点平衡因子 &lt;0</td>
+<td style="text-align:center">先左旋左子节点，再右旋当前节点</td>
+<td style="text-align:center">在左子树的右子树插入了新节点</td>
+</tr>
+<tr>
+<td style="text-align:center">RL（右左）</td>
+<td style="text-align:center">节点平衡因子 &lt;−1，右子节点平衡因子 &gt;0</td>
+<td style="text-align:center">先右旋右子节点，再左旋当前节点</td>
+<td style="text-align:center">在右子树的左子树插入了新节点</td>
+</tr>
+</tbody>
+</table>
+<p><strong>旋转操作的核心</strong>：旋转后子树的中序遍历序列不变（保持 BST 性质），且使整棵子树恢复高度平衡。</p>
+<p><strong>AVL 树的性能</strong>：</p>
+<ul>
+<li>查找、插入、删除的时间复杂度均为 O(log n)。</li>
+<li>插入和删除后需要沿着节点到根节点的路径自底向上检查平衡因子，必要时进行旋转操作。</li>
+<li>AVL 树的平衡要求比红黑树更严格，因此旋转操作更频繁，但查找效率更高。</li>
+</ul>
+<h3 id="5-heap">5. 堆（Heap）</h3>
+<p>堆是一种特殊的完全二叉树，用数组存储。堆中的每个节点都满足特定的序关系。</p>
+<p><strong>两种基本类型</strong>：</p>
+<ul>
+<li><strong>大根堆（大顶堆）</strong>：每个节点的值大于等于其子节点的值，堆顶是最大值。</li>
+<li><strong>小根堆（小顶堆）</strong>：每个节点的值小于等于其子节点的值，堆顶是最小值。</li>
+</ul>
+<p><strong>数组表示</strong>（通常从下标 1 开始）：</p>
+<ul>
+<li>父节点索引 <code>parent = k / 2</code></li>
+<li>左子节点索引 <code>left = 2k</code></li>
+<li>右子节点索引 <code>right = 2k + 1</code></li>
+</ul>
+<p><strong>核心操作</strong>：</p>
+<ul>
+<li><strong>上浮（swim / shift-up）</strong>：插入新元素时先放至数组末尾，然后不断与其父节点比较，若不满足堆序则交换，直到堆序恢复或到达堆顶。时间复杂度 O(log n)。</li>
+<li><strong>下沉（sink / shift-down）</strong>：删除堆顶后，将数组末尾元素移至堆顶，然后不断与其子节点中较大（大根堆）或较小（小根堆）者交换，直到堆序恢复。时间复杂度 O(log n)。</li>
+<li><strong>建堆</strong>：从最后一个非叶子节点（索引 n/2）开始，逐一执行下沉操作，直到根节点。时间复杂度为 O(n)——这一结果符合直觉：大部分节点位于树的底层，从底层向上调整成本更低。</li>
+</ul>
+<p><strong>典型应用</strong>：</p>
+<ul>
+<li>优先队列的底层实现。</li>
+<li>堆排序：建堆 O(n) + n 次取堆顶并下沉 O(log n) = O(n log n)，空间复杂度 O(1)。</li>
+<li>Top K 问题：用大小为 K 的小根堆遍历数据，堆中始终保留当前最大的 K 个元素。</li>
+<li>求中位数：用一个大根堆存储较小的一半数据，一个小根堆存储较大的一半数据。</li>
+</ul>
+<h3 id="6-">6. 红黑树</h3>
+<p>红黑树是一种弱平衡二叉搜索树，通过节点颜色和约束条件保证树的大致平衡，从而使操作时间复杂度保持在 O(log n)。</p>
+<p><strong>五大性质</strong>：</p>
+<ol>
+<li>每个节点不是红色就是黑色。</li>
+<li>根节点为黑色。</li>
+<li>叶子节点（NIL 空节点）为黑色。</li>
+<li>红色节点的子节点必须是黑色（即不能出现连续的红色节点）。</li>
+<li>从任意节点到其每个叶子节点的所有路径上包含相同数量的黑色节点（黑色平衡）。</li>
+</ol>
+<p><strong>核心操作</strong>：</p>
+<ul>
+<li><strong>插入</strong>：新插入的节点默认为红色。插入后通过变色、左旋、右旋等操作恢复红黑性质。最多需要两次旋转。</li>
+<li><strong>删除</strong>：较为复杂，可能需要多次旋转和变色来恢复红黑性质。</li>
+</ul>
+<p><strong>实际应用</strong>：</p>
+<ul>
+<li>Java 的 <code>TreeMap</code> 和 <code>TreeSet</code> 基于红黑树实现。</li>
+<li>Java 8 的 <code>HashMap</code> 在链表长度 ≥8 且数组长度 ≥64 时，将链表转换为红黑树来优化冲突时的查找效率。</li>
+<li>Linux 内核中的完全公平调度器（CFS）和 <code>epoll</code> 事件驱动机制使用了红黑树。</li>
+<li>C++ STL 中的 <code>std::map</code> 和 <code>std::set</code> 通常也基于红黑树实现。</li>
+</ul>
+<p><strong>AVL 树与红黑树的对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">对比维度</th>
+<th style="text-align:center">AVL 树</th>
+<th style="text-align:center">红黑树</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">平衡程度</td>
+<td style="text-align:center">严格平衡（高度差 ≤1）</td>
+<td style="text-align:center">弱平衡（最长路径不超过最短路径的 2 倍）</td>
+</tr>
+<tr>
+<td style="text-align:center">查找效率</td>
+<td style="text-align:center">更高（更矮）</td>
+<td style="text-align:center">略低</td>
+</tr>
+<tr>
+<td style="text-align:center">插入/删除效率</td>
+<td style="text-align:center">较低（频繁旋转）</td>
+<td style="text-align:center">较高（旋转次数少）</td>
+</tr>
+<tr>
+<td style="text-align:center">每节点额外空间</td>
+<td style="text-align:center">平衡因子（通常存储高度）</td>
+<td style="text-align:center">颜色标记（1 比特）</td>
+</tr>
+<tr>
+<td style="text-align:center">适用场景</td>
+<td style="text-align:center">查找密集型</td>
+<td style="text-align:center">插入删除密集型</td>
+</tr>
+</tbody>
+</table>
+<h3 id="7-">7. 哈夫曼树与哈夫曼编码</h3>
+<p><strong>哈夫曼树（Huffman Tree）</strong>：带权路径长度（WPL, Weighted Path Length）最小的二叉树，也称最优二叉树。</p>
+<p><strong>构造方法</strong>：</p>
+<ol>
+<li>将所有节点视为独立的树（森林），每个节点对应一个权值。</li>
+<li>每次从森林中选取权值最小的两棵树合并为一棵新树，新树的根节点权值为两子树权值之和。</li>
+<li>重复步骤 2 直到森林中只剩一棵树，即为哈夫曼树。</li>
+</ol>
+<p><strong>带权路径长度（WPL）</strong>：所有叶子节点的权值乘以从根节点到该叶子节点的路径长度之和。哈夫曼树的 WPL 最小。</p>
+<p><strong>哈夫曼编码</strong>：</p>
+<ul>
+<li>将哈夫曼树中从根到每个叶子节点的路径编码为二进制序列：向左走编码为 0，向右走编码为 1。</li>
+<li>哈夫曼编码是前缀码（prefix code），即没有任何一个编码是另一个编码的前缀，因此可以无歧义地解码。</li>
+<li>出现频率越高的字符，对应的叶子节点越靠近根，编码越短，从而压缩数据。</li>
+<li>应用场景：数据压缩（JPEG、ZIP 等文件格式中的熵编码步骤）。</li>
+</ul>
+<hr>
+<h2 id="heading-3">三、图</h2>
+<p>图由顶点（Vertex）和边（Edge）组成，记为 G = (V, E)，用于表示任意多对多的关系。</p>
+<h3 id="1--1">1. 图的分类与术语</h3>
+<p><strong>按方向分类</strong>：</p>
+<ul>
+<li><strong>无向图</strong>：边没有方向，(u, v) 表示 u 和 v 之间的双向关系。好友关系图、交通路线图为典型应用。</li>
+<li><strong>有向图</strong>：边有方向，&lt;u, v&gt; 表示从 u 到 v 的单向关系。关注关系、网页链接图为典型应用。</li>
+</ul>
+<p><strong>按连通性分类</strong>：</p>
+<ul>
+<li><strong>连通图</strong>：无向图中任意两个顶点之间都存在路径。有向图中对应的概念为强连通图。</li>
+<li><strong>非连通图</strong>：存在至少一对顶点之间没有路径。</li>
+</ul>
+<p><strong>按边权重分类</strong>：</p>
+<ul>
+<li><strong>有权图</strong>：边带有权重值，表示距离、成本、容量等信息。</li>
+<li><strong>无权图</strong>：边不带权重，或认为所有边权重相同。</li>
+</ul>
+<p><strong>图的常用术语</strong>：</p>
+<ul>
+<li><strong>邻接</strong>：两个顶点之间存在边时称它们相互邻接。</li>
+<li><strong>路径</strong>：从顶点 A 到 B 经过的边构成的序列。</li>
+<li><strong>度</strong>：与顶点相关联的边数。在有向图中分为入度（指向该顶点的边数）和出度（从该顶点出发的边数）。</li>
+<li><strong>环/回路</strong>：起点和终点相同的路径。</li>
+</ul>
+<h3 id="2--1">2. 图的存储结构</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">存储方式</th>
+<th style="text-align:center">实现方法</th>
+<th style="text-align:center">空间复杂度</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">邻接矩阵</td>
+<td style="text-align:center">n × n 二维数组，元素表示边的存在与否</td>
+<td style="text-align:center">O(V²)</td>
+<td style="text-align:center">判断任意两点是否相邻 O(1)，适合稠密图；无向图的矩阵对称</td>
+</tr>
+<tr>
+<td style="text-align:center">邻接表</td>
+<td style="text-align:center">每个顶点维护一个链表（或动态数组），存储其所有邻接顶点</td>
+<td style="text-align:center">O(V+E)</td>
+<td style="text-align:center">遍历邻接点快，适合稀疏图；可进一步用哈希表或红黑树优化</td>
+</tr>
+</tbody>
+</table>
+<p><strong>邻接矩阵的优缺点</strong>：优点是判断边是否存在非常快速（直接读取矩阵元素），适合矩阵运算（如 Floyd 算法）；缺点是空间占用与顶点数的平方成正比，当图稀疏时浪费严重。</p>
+<p><strong>邻接表的优缺点</strong>：优点是空间效率高（只存储实际存在的边），遍历邻接点方便；缺点是需要遍历链表来判断两点之间是否有边。</p>
+<h3 id="3-">3. 图的遍历</h3>
+<p><strong>深度优先搜索（DFS）</strong>：</p>
+<ul>
+<li>从一个顶点出发，递归地访问其未访问的邻接顶点，直到无法继续，然后回溯。</li>
+<li>实现方式：递归或显式栈。</li>
+<li>应用：连通分量检测、拓扑排序、路径搜索、图的着色。</li>
+</ul>
+<p><strong>广度优先搜索（BFS）</strong>：</p>
+<ul>
+<li>从一个顶点出发，先访问其所有邻接顶点，再逐层向外扩展。</li>
+<li>实现方式：队列。</li>
+<li>应用：无权图的最短路径、拓扑排序、连通分量检测。</li>
+</ul>
+<p><strong>两者的对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">对比维度</th>
+<th style="text-align:center">DFS</th>
+<th style="text-align:center">BFS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">依赖数据结构</td>
+<td style="text-align:center">栈（递归或显式）</td>
+<td style="text-align:center">队列</td>
+</tr>
+<tr>
+<td style="text-align:center">遍历策略</td>
+<td style="text-align:center">沿一条路径深入到底再回溯</td>
+<td style="text-align:center">逐层向外扩张</td>
+</tr>
+<tr>
+<td style="text-align:center">适用场景</td>
+<td style="text-align:center">路径搜索、连通性判断</td>
+<td style="text-align:center">最短路径（无权图）、拓扑排序</td>
+</tr>
+<tr>
+<td style="text-align:center">空间复杂度</td>
+<td style="text-align:center">与图深度相关</td>
+<td style="text-align:center">与图宽度相关</td>
+</tr>
+</tbody>
+</table>
+<p><strong>遍历序列的非唯一性</strong>：DFS 和 BFS 的遍历序列都不唯一，取决于顶点被访问的先后次序。</p>
+<h3 id="4-">4. 最小生成树</h3>
+<p>在一个连通无向带权图中，最小生成树（MST, Minimum Spanning Tree）是包含所有顶点且边权值之和最小的树形子图。</p>
+<p><strong>Prim 算法</strong>：</p>
+<ul>
+<li>从一个初始顶点开始，每次选取与当前已选顶点集距离最近的顶点加入，直到覆盖所有顶点。</li>
+<li>适合稠密图。</li>
+<li>使用优先队列优化时时间复杂度为 O(E log V)，不使用时为 O(V²)。</li>
+</ul>
+<p><strong>Kruskal 算法</strong>：</p>
+<ul>
+<li>将所有边按权值从小到大排序，依次选取不构成环的边，直到选取了 V-1 条边。</li>
+<li>用并查集判断是否构成环。</li>
+<li>适合稀疏图。</li>
+<li>时间复杂度 O(E log E)。</li>
+</ul>
+<p><strong>两者的区别</strong>：Prim 从顶点出发&quot;生长&quot;出最小生成树，Kruskal 从边出发&quot;筛选&quot;出最小生成树。</p>
+<h3 id="5-">5. 最短路径</h3>
+<p><strong>Dijkstra 算法</strong>（单源最短路径，要求边权非负）：</p>
+<ul>
+<li>维护一个 dist 数组记录源点到各顶点的当前最短距离。</li>
+<li>每次从未确定最短路径的顶点中选取 dist 值最小的顶点，标记为已确定，并松弛其所有邻接边（更新邻接顶点的 dist 值）。</li>
+<li>使用优先队列优化时时间复杂度为 O(E log V)。</li>
+<li>Dijkstra 无法处理负权边，因为一旦标记为已确定，后续发现更短路径时无法修正。</li>
+</ul>
+<p><strong>Bellman-Ford 算法</strong>（单源最短路径，可处理负权）：</p>
+<ul>
+<li>对 V-1 轮迭代，每轮尝试松弛所有边。</li>
+<li>第 V 轮如果仍有边可松弛，则存在负权环。</li>
+<li>时间复杂度 O(VE)。</li>
+<li>适用场景：图中可能存在负权边，或需要检测负权环。</li>
+</ul>
+<p><strong>Floyd 算法</strong>（多源最短路径）：</p>
+<ul>
+<li>动态规划思想，递推公式：<code>dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])</code>。</li>
+<li>时间复杂度 O(V³)，空间复杂度 O(V²)。</li>
+<li>可同时处理所有顶点对之间的最短路径。</li>
+</ul>
+<h3 id="6--1">6. 拓扑排序</h3>
+<p>拓扑排序是对有向无环图（DAG, Directed Acyclic Graph）的所有顶点进行线性排序，使得对每条有向边 (u, v)，在排序中 u 都出现在 v 之前。</p>
+<p><strong>Kahn 算法</strong>：</p>
+<ol>
+<li>计算所有顶点的入度。</li>
+<li>将所有入度为 0 的顶点入队。</li>
+<li>出队一个顶点，加入拓扑序列，将其所有邻接顶点的入度减 1。若某个邻接顶点入度变为 0，则入队。</li>
+<li>重复步骤 3 直到队列为空。</li>
+<li>若拓扑序列中的顶点数小于总顶点数，说明图中存在环。</li>
+</ol>
+<p><strong>应用场景</strong>：课程安排（先修课程关系）、编译依赖解析（Makefile、项目构建工具）、任务调度中的依赖排序。</p>
+<h3 id="7-union-find">7. 并查集（Union-Find）</h3>
+<p>并查集用于解决动态连通性问题，主要支持两种操作：连接两个元素（union）和判断两个元素是否属于同一集合（find）。</p>
+<p><strong>四种实现及其性能</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">实现方式</th>
+<th style="text-align:center">find 复杂度</th>
+<th style="text-align:center">union 复杂度</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Quick Find</td>
+<td style="text-align:center">O(1)</td>
+<td style="text-align:center">O(n)</td>
+<td style="text-align:center">同一集合所有元素 id 相同，find 快速但 union 需遍历整个数组</td>
+</tr>
+<tr>
+<td style="text-align:center">Quick Union</td>
+<td style="text-align:center">树高（最坏 O(n)）</td>
+<td style="text-align:center">树高（最坏 O(n)）</td>
+<td style="text-align:center">用树结构表示集合，union 只需修改一个父指针，但树可能退化</td>
+</tr>
+<tr>
+<td style="text-align:center">加权 Quick Union</td>
+<td style="text-align:center">O(log n)</td>
+<td style="text-align:center">O(log n)</td>
+<td style="text-align:center">union 时将小树挂到大树根下，保证树高不超过 log n</td>
+</tr>
+<tr>
+<td style="text-align:center">路径压缩 + 加权</td>
+<td style="text-align:center">近乎 O(1)（反阿克曼函数 α(n)）</td>
+<td style="text-align:center">近乎 O(1)</td>
+<td style="text-align:center">在 find 时将路径上所有节点直接指向根，进一步压缩树高</td>
+</tr>
+</tbody>
+</table>
+<p><strong>路径压缩的原理</strong>：在执行 find 操作的同时，将沿途所有节点的父指针直接指向集合的根节点，使树结构更加扁平化。后续的 find 操作将更加高效。</p>
+<p><strong>应用场景</strong>：Kruskal 算法判环、社交网络中的好友关系检测、路径查找、集合划分问题。</p>
+<hr>
+<h2 id="heading-4">四、排序</h2>
+<p>排序是将一组数据按特定顺序重新排列的操作，是笔试中最常考查的算法知识领域。</p>
+<h3 id="1--2">1. 排序算法总对比</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">算法</th>
+<th style="text-align:center">平均时间复杂度</th>
+<th style="text-align:center">最坏时间复杂度</th>
+<th style="text-align:center">最好时间复杂度</th>
+<th style="text-align:center">空间复杂度</th>
+<th style="text-align:center">是否稳定</th>
+<th style="text-align:center">是否原地排序</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">冒泡排序</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n)</td>
+<td style="text-align:center">O(1)</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">选择排序</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(1)</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">插入排序</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n)</td>
+<td style="text-align:center">O(1)</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">希尔排序</td>
+<td style="text-align:center">O(n^1.3) 平均</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n)</td>
+<td style="text-align:center">O(1)</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">归并排序</td>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">O(n)</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">否</td>
+</tr>
+<tr>
+<td style="text-align:center">快速排序</td>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">O(log n)</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">堆排序</td>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">O(1)</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">是</td>
+</tr>
+<tr>
+<td style="text-align:center">计数排序</td>
+<td style="text-align:center">O(n + k)</td>
+<td style="text-align:center">O(n + k)</td>
+<td style="text-align:center">O(n + k)</td>
+<td style="text-align:center">O(k)</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">否</td>
+</tr>
+<tr>
+<td style="text-align:center">桶排序</td>
+<td style="text-align:center">O(n + k)</td>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">O(n + k)</td>
+<td style="text-align:center">O(n + k)</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">否</td>
+</tr>
+<tr>
+<td style="text-align:center">基数排序</td>
+<td style="text-align:center">O(d(n + k))</td>
+<td style="text-align:center">O(d(n + k))</td>
+<td style="text-align:center">O(d(n + k))</td>
+<td style="text-align:center">O(n + k)</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">否</td>
+</tr>
+</tbody>
+</table>
+<p>注：稳定指排序后相等元素的相对顺序保持不变；原地排序指不需要额外或只需常数级别的额外空间；k 表示计数/桶排序中的值范围或基数中的进制。</p>
+<h3 id="2--2">2. 各排序算法说明</h3>
+<p><strong>冒泡排序（Bubble Sort）</strong>：</p>
+<ul>
+<li>通过相邻元素的比较和交换，将最大（或最小）元素逐步&quot;冒泡&quot;到数组末尾。</li>
+<li>每趟排序确定一个元素的最终位置，共需 n-1 趟。</li>
+<li>可通过设置标志位优化：若一趟排序中没有发生交换，说明数组已有序，可提前终止。</li>
+</ul>
+<p><strong>选择排序（Selection Sort）</strong>：</p>
+<ul>
+<li>每趟从待排序区间中选出最小（或最大）元素，将其放在已排序区间的末尾。</li>
+<li>与输入数据的初始顺序无关，无论数据是否有序都需要执行完整的比较。</li>
+<li>交换次数少（最多 n-1 次），但比较次数固定为 O(n²)。</li>
+</ul>
+<p><strong>插入排序（Insertion Sort）</strong>：</p>
+<ul>
+<li>将数组分为已排序区和未排序区，每次从未排序区取出第一个元素，插入到已排序区的适当位置。</li>
+<li>当输入数据基本有序时效率极高，时间复杂度接近 O(n)。</li>
+<li>插入过程需要移动元素，平均时间复杂度 O(n²)。</li>
+</ul>
+<p><strong>希尔排序（Shell Sort）</strong>：</p>
+<ul>
+<li>插入排序的改进版。先将数组按一定增量分组，对每组进行插入排序，然后逐步缩小增量，增量为 1 时完成最终排序。</li>
+<li>突破了 O(n²) 的复杂度界限，但仍然是 O(n²) 级别的退化。</li>
+<li>增量序列的选择影响性能（如 Hibbard 增量、Sedgewick 增量等）。</li>
+</ul>
+<p><strong>归并排序（Merge Sort）</strong>：</p>
+<ul>
+<li>分治策略：将数组递归地一分为二，对两个子数组分别排序，然后合并两个有序子数组。</li>
+<li>合并操作需要借助临时数组，空间复杂度 O(n)。</li>
+<li>自顶向下（递归拆分）和自底向上（迭代合并）两种实现方式。</li>
+<li>外部排序的基础——处理大规模数据时需要将数据分块读入内存，逐块排序后再多路归并。</li>
+</ul>
+<p><strong>快速排序（Quick Sort）</strong>：</p>
+<ul>
+<li>分治策略：选择 pivot（基准元素），通过 partition（划分）操作将数组分为小于 pivot 和大于 pivot 两部分，然后递归排序两部分。</li>
+<li>Partition 的核心过程：从两端向中间扫描，将大于 pivot 的元素换到右边，小于 pivot 的换到左边。</li>
+<li>实际应用中最快的通用排序算法，内循环指令少且能充分利用 CPU 缓存。</li>
+<li>最坏情况发生在每次划分极不均匀时（如已有序数组且 pivot 选择不当），退化为 O(n²)。</li>
+<li>常用优化：随机选择 pivot、三数取中、小数组改用插入排序。</li>
+</ul>
+<p><strong>堆排序（Heap Sort）</strong>：</p>
+<ul>
+<li>利用堆这种数据结构进行排序，分为建堆和排序两个阶段。</li>
+<li>建堆：将无序数组构建为大根堆（或小根堆），时间复杂度 O(n)。</li>
+<li>排序：反复将堆顶元素与末尾元素交换，并下沉恢复堆序，共执行 n-1 次。</li>
+<li>无法利用 CPU 缓存的空間局部性，因为比较和交换的元素通常不相邻。</li>
+</ul>
+<p><strong>计数排序（Counting Sort）</strong>：</p>
+<ul>
+<li>非比较排序，适用于数据范围有限的整数排序。</li>
+<li>统计每个值出现的次数，然后根据计数信息将元素放到正确位置。</li>
+<li>时间复杂度 O(n + k)，其中 k 是值的范围。当 k 较小时效率极高。</li>
+</ul>
+<p><strong>桶排序（Bucket Sort）</strong>：</p>
+<ul>
+<li>将数据分到有限数量的桶中，每个桶内部独立排序（可用其他排序算法），然后按桶的顺序依次输出。</li>
+<li>桶内元素分布均匀时效率高，分布不均匀时可能退化。</li>
+</ul>
+<p><strong>基数排序（Radix Sort）</strong>：</p>
+<ul>
+<li>按位排序，从最低有效位到最高有效位依次进行排序。</li>
+<li>每位内部可以使用计数排序等稳定排序。</li>
+<li>适用于定长整数或短字符串的排序。</li>
+</ul>
+<h3 id="3--1">3. 排序选择指导</h3>
+<ul>
+<li>数据量较小（n &lt; 50）：插入排序。</li>
+<li>数据量较大且需要稳定排序：归并排序。</li>
+<li>数据量较大且对稳定性无要求：快速排序（一般场景）或堆排序（空间敏感场景）。</li>
+<li>数据范围很小且为整数：计数排序。</li>
+<li>数据已基本有序：插入排序（接近 O(n)）。</li>
+<li>需要外部排序（数据量大到无法全部装入内存）：归并排序的多路归并版本。</li>
+</ul>
+<hr>
+<h2 id="heading-5">五、查找</h2>
+<h3 id="1--3">1. 顺序查找</h3>
+<p>从线性表的一端开始逐个比较，直到找到目标或遍历完整个表。</p>
+<ul>
+<li>时间复杂度：O(n)。</li>
+<li>对数据的有序性没有要求，无序数据只能使用顺序查找。</li>
+<li>是查找算法中最基础、最普适的方法。</li>
+</ul>
+<h3 id="2--3">2. 二分查找</h3>
+<p>二分查找（Binary Search）是在有序数组中高效查找目标值的方法。</p>
+<p><strong>基本原理</strong>：每次将搜索范围缩小一半。比较中间元素与目标值，若相等则返回；若中间元素小于目标值，则在右半部分继续查找；否则在左半部分继续查找。</p>
+<p><strong>基本模板</strong>的三要素：</p>
+<ul>
+<li>左右边界初始化：<code>l = 0, h = n-1</code>（或 <code>h = n</code>，取决于边界定义）。</li>
+<li>循环条件：<code>l &lt;= h</code>（左右闭区间）或 <code>l &lt; h</code>（左闭右开区间）。</li>
+<li>中间值计算：<code>m = l + (h - l) / 2</code>（防止 l + h 溢出）。</li>
+</ul>
+<p><strong>主要变体</strong>：</p>
+<ul>
+<li><strong>查找第一个等于目标值的位置</strong>（左边界二分）：找到目标值后不立即返回，继续向左区间收缩。</li>
+<li><strong>查找最后一个等于目标值的位置</strong>（右边界二分）：找到目标值后不立即返回，继续向右区间收缩。</li>
+<li><strong>查找第一个不小于目标值的位置</strong>（lower_bound）：条件从 <code>a[m] == target</code> 变为 <code>a[m] &gt;= target</code>。</li>
+<li><strong>查找最后一个不大于目标值的位置</strong>（upper_bound − 1）：条件从 <code>a[m] == target</code> 变为 <code>a[m] &lt;= target</code>。</li>
+<li><strong>旋转数组中的查找</strong>：先判断 mid 位于旋转点的哪一侧（左半有序还是右半有序），再判断 target 是否在有序区间内。</li>
+</ul>
+<p><strong>二分查找的适用条件</strong>：数据必须有序且支持随机访问（即数组结构）。链表中无法使用二分查找。</p>
+<hr>
+<h2 id="heading-6">六、哈希表</h2>
+<p>哈希表（Hash Table）是一种根据键直接访问数据存储位置的数据结构，通过哈希函数将键映射为数组下标。</p>
+<h3 id="1--4">1. 哈希函数</h3>
+<p>哈希函数将任意大小的键转换为固定范围的整数值（哈希值）。</p>
+<p><strong>设计原则</strong>：</p>
+<ul>
+<li><strong>一致性</strong>：相等的键必须产生相等的哈希值。</li>
+<li><strong>高效性</strong>：计算过程简单快速。</li>
+<li><strong>均匀性</strong>：哈希值应尽可能均匀分布在地址空间中，减少冲突。</li>
+</ul>
+<p><strong>常用方法——除留余数法</strong>：<code>hash(k) = k % M</code>，其中 M 通常取素数。素数 M 能减少哈希碰撞的概率，因为如果 M 是合数，键的分布模式可能被保留。</p>
+<p><strong>Java 中 hashCode() 的设计</strong>：对于组合类型，如自定义类和字符串，通常使用 R 进制加权和的方式计算哈希值（如 <code>hash = 31 * hash + field.hashCode()</code>），其中乘数 31 是质数且有良好的乘法性能优化（<code>31 * i = (i &lt;&lt; 5) - i</code>）。</p>
+<h3 id="2--4">2. 冲突解决方法</h3>
+<p>当两个不同的键映射到同一个哈希值时，称为哈希冲突。以下是主要的解决策略：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方法</th>
+<th style="text-align:center">原理</th>
+<th style="text-align:center">优点</th>
+<th style="text-align:center">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">链地址法（Separate Chaining）</td>
+<td style="text-align:center">每个槽位存一个链表（或树），冲突的元素链接在链表中</td>
+<td style="text-align:center">实现简单，不受冲突数量限制</td>
+<td style="text-align:center">链表过长时查找退化为 O(k)</td>
+</tr>
+<tr>
+<td style="text-align:center">开放定址法——线性探测</td>
+<td style="text-align:center">冲突后依次检查下一个槽位（+1, +2, &hellip;）</td>
+<td style="text-align:center">空间利用率高，无额外指针开销</td>
+<td style="text-align:center">容易产生聚集现象，删除需要懒惰标记</td>
+</tr>
+<tr>
+<td style="text-align:center">开放定址法——平方探测</td>
+<td style="text-align:center">冲突后按平方增量探测（+1², +2², &hellip;）</td>
+<td style="text-align:center">缓解线性探测的聚集问题</td>
+<td style="text-align:center">可能探测不到所有槽位</td>
+</tr>
+<tr>
+<td style="text-align:center">再哈希法（Double Hashing）</td>
+<td style="text-align:center">冲突后用第二个哈希函数计算新地址</td>
+<td style="text-align:center">分布更均匀</td>
+<td style="text-align:center">计算开销大</td>
+</tr>
+</tbody>
+</table>
+<p><strong>链地址法的具体实现</strong>：每个桶中存储一个链表（或红黑树，用于优化长链表的查找效率）。Java 8 的 HashMap 中，当链表长度 ≥8 且数组长度 ≥64 时，将链表转换为红黑树，使查找时间复杂度从 O(k) 降至 O(log k)。</p>
+<h3 id="3--2">3. 负载因子与扩容</h3>
+<p><strong>负载因子（Load Factor）</strong>：<code>α = 元素个数 / 桶数</code>。负载因子衡量了哈希表的满度程度。</p>
+<ul>
+<li>α 越大，冲突概率越高，查找性能越差。</li>
+<li>α 越小，空间浪费越多。</li>
+</ul>
+<p><strong>扩容机制</strong>：当负载因子超过阈值（如 Java HashMap 的 0.75）时，触发扩容。扩容通常将桶数组大小翻倍（或近似翻倍），然后将所有已存在的键值对重新哈希到新的数组中。扩容是哈希表性能的保证，但也带来了偶发的 O(n) 开销。</p>
+<p><strong>Java HashMap 的核心实现要点</strong>：</p>
+<ul>
+<li>底层结构：数组 + 链表/红黑树。</li>
+<li>初始容量：16。</li>
+<li>负载因子阈值：0.75。</li>
+<li>put 流程：计算 key 的哈希值 → 定位桶 → 若为空则直接放入；若非空则遍历链表/红黑树查找 key——若找到则更新 value，否则插入新节点。插入后检查是否需要扩容或将链表转为红黑树。</li>
+<li>哈希表的优势：理想情况下查找、插入、删除操作均为 O(1)。</li>
+</ul>
+<hr>
+<h2 id="heading-7">七、算法分析与复杂度</h2>
+<h3 id="1--o-">1. 大 O 表示法</h3>
+<p>大 O 表示法描述算法运行时间的渐进上界，它忽略常数因子和低阶项，只关注输入规模趋近无穷大时算法的增长趋势。例如，对于表达式 <code>3n² + 5n + 10</code>，大 O 表示为 O(n²)。</p>
+<p><strong>增长数量级排序</strong>（从小到大）：</p>
+<p>O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(n³) &lt; O(2ⁿ) &lt; O(n!)</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">复杂度</th>
+<th style="text-align:center">对 n=10⁶ 的直观感受</th>
+<th style="text-align:center">典型算法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">O(1)</td>
+<td style="text-align:center">常数时间</td>
+<td style="text-align:center">数组随机访问</td>
+</tr>
+<tr>
+<td style="text-align:center">O(log n)</td>
+<td style="text-align:center">约 20 步</td>
+<td style="text-align:center">二分查找</td>
+</tr>
+<tr>
+<td style="text-align:center">O(n)</td>
+<td style="text-align:center">约 1 秒</td>
+<td style="text-align:center">线性遍历</td>
+</tr>
+<tr>
+<td style="text-align:center">O(n log n)</td>
+<td style="text-align:center">约 20 秒</td>
+<td style="text-align:center">归并排序、快速排序平均</td>
+</tr>
+<tr>
+<td style="text-align:center">O(n²)</td>
+<td style="text-align:center">约 11.5 天</td>
+<td style="text-align:center">选择排序、冒泡排序</td>
+</tr>
+<tr>
+<td style="text-align:center">O(2ⁿ)</td>
+<td style="text-align:center">不可计算</td>
+<td style="text-align:center">穷举搜索</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2--5">2. 递归复杂度分析——主定理</h3>
+<p>对于形如 <code>T(n) = aT(n/b) + f(n)</code> 的递归式（其中 a ≥ 1, b &gt; 1，f(n) 是渐进正的函数），主定理提供了三种情况的直接结论：</p>
+<ul>
+<li><strong>情况一</strong>：若 f(n) 的增长量级小于 <code>n^(log_b a)</code>，则 T(n) = Θ(n^(log_b a))。</li>
+<li><strong>情况二</strong>：若 f(n) 的增长量级等于 <code>n^(log_b a)</code>，则 T(n) = Θ(n^(log_b a) · log n)。</li>
+<li><strong>情况三</strong>：若 f(n) 的增长量级大于 <code>n^(log_b a)</code> 且满足正则条件 <code>af(n/b) ≤ cf(n)</code>（c &lt; 1），则 T(n) = Θ(f(n))。</li>
+</ul>
+<p>主定理的典型应用：二分查找 T(n) = T(n/2) + O(1) → 情况一 → O(log n)；归并排序 T(n) = 2T(n/2) + O(n) → 情况二 → O(n log n)。</p>
+<h3 id="3--3">3. 均摊分析</h3>
+<p>均摊分析用于评估一个操作序列的平均代价，而不是单个操作的最坏情况代价。</p>
+<p><strong>典型例子——动态数组扩容</strong>：向动态数组中插入元素，绝大多数插入操作是 O(1) 的，只有当数组满时才触发 O(n) 的扩容操作。通过均摊分析：N 次插入操作的总代价 = N 次普通插入 + 若干次扩容的数据拷贝 = 约 2N 次操作，均摊到每次插入为 O(1)。</p>
+<hr>
+<h2 id="heading-8">八、贪心与动态规划</h2>
+<h3 id="1--5">1. 贪心算法</h3>
+<p>贪心算法在每一步都做出当前看起来最优的选择，期望通过一系列局部最优选择来达到全局最优。</p>
+<p><strong>适用条件</strong>：</p>
+<ul>
+<li><strong>最优子结构</strong>：问题的最优解包含其子问题的最优解。</li>
+<li><strong>贪心选择性质</strong>：问题的全局最优解可以通过一系列局部最优选择得到（即一旦做出选择就不能回退）。</li>
+</ul>
+<p><strong>经典问题</strong>：</p>
+<ul>
+<li>活动选择（按结束时间最早排序，每次选结束时间最早的相容活动）。</li>
+<li>零钱找零（在特定硬币面额体系下，优先使用大面额硬币）。</li>
+<li>区间调度（求最多的不相交区间数）。</li>
+<li>哈夫曼编码（每次合并权值最小的两个节点）。</li>
+</ul>
+<h3 id="2--6">2. 动态规划</h3>
+<p>动态规划（DP, Dynamic Programming）通过将复杂问题分解为重叠子问题，并记录子问题的解来避免重复计算。</p>
+<p><strong>核心要素</strong>：</p>
+<ul>
+<li><strong>最优子结构</strong>：问题的最优解包含子问题的最优解。</li>
+<li><strong>重叠子问题</strong>：不同子问题会反复被求解（与分治法的关键区别——分治法的子问题通常是独立的）。</li>
+<li><strong>状态定义</strong>：如何表示一个子问题的解（如一维数组 <code>dp[i]</code> 或二维数组 <code>dp[i][j]</code>）。</li>
+<li><strong>状态转移方程</strong>：描述状态之间的递推关系。</li>
+<li><strong>备忘录或 DP 表</strong>：存储已求解的子问题结果，避免重复计算。</li>
+</ul>
+<p><strong>贪心与动态规划的区别</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">对比维度</th>
+<th style="text-align:center">贪心算法</th>
+<th style="text-align:center">动态规划</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">决策方式</td>
+<td style="text-align:center">一次选择，不回退</td>
+<td style="text-align:center">多阶段决策，保留所有可能</td>
+</tr>
+<tr>
+<td style="text-align:center">依赖关系</td>
+<td style="text-align:center">只依赖当前状态</td>
+<td style="text-align:center">依赖多个子问题</td>
+</tr>
+<tr>
+<td style="text-align:center">适用性</td>
+<td style="text-align:center">要求贪心选择性质</td>
+<td style="text-align:center">要求最优子结构</td>
+</tr>
+<tr>
+<td style="text-align:center">典型问题</td>
+<td style="text-align:center">活动选择、Huffman 编码</td>
+<td style="text-align:center">背包问题、LCS、LIS</td>
+</tr>
+</tbody>
+</table>
+<p><strong>经典动态规划问题</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">问题</th>
+<th style="text-align:center">状态定义</th>
+<th style="text-align:center">核心思想</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">斐波那契数列</td>
+<td style="text-align:center">dp[i] = 第 i 个数</td>
+<td style="text-align:center">dp[i] = dp[i-1] + dp[i-2]，最简单的 DP 入门</td>
+</tr>
+<tr>
+<td style="text-align:center">01 背包</td>
+<td style="text-align:center">dp[i][w] = 前 i 件物品在容量 w 下的最大价值</td>
+<td style="text-align:center">dp[i][w] = max(dp[i-1][w], dp[i-1][w-wi] + vi)，可选优化为滚动数组一维</td>
+</tr>
+<tr>
+<td style="text-align:center">最长公共子序列（LCS）</td>
+<td style="text-align:center">dp[i][j] = s1[0..i] 和 s2[0..j] 的 LCS 长度</td>
+<td style="text-align:center">若字符相等则 +1，否则取左/上的较大值</td>
+</tr>
+<tr>
+<td style="text-align:center">最长递增子序列（LIS）</td>
+<td style="text-align:center">dp[i] = 以 a[i] 结尾的最长递增子序列长度</td>
+<td style="text-align:center">dp[i] = max(dp[j] + 1) for j &lt; i and a[j] &lt; a[i]，可使用二分优化到 O(n log n)</td>
+</tr>
+</tbody>
+</table>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">央国企计算机笔试准备（5 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+    </li>
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">数据结构</span>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <div></div>
+  
+  
+  <a class="post-nav-link next" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">操作系统</span>
+  </a>
+  
+</nav>
+
+
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>

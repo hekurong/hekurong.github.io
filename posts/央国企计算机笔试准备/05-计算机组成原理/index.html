@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>计算机组成原理 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">计算机组成原理</h1>
+    <div class="article-meta">
+      <time datetime="2026-07-12">2026-07-12</time>
+      
+      <span class="series-badge" title="系列"><a href="/series/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/">央国企计算机笔试准备</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/%e8%ae%a1%e7%ae%97%e6%9c%ba%e5%9f%ba%e7%a1%80/">计算机基础</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="heading">计算机组成原理</h1>
+<blockquote>
+<p>来源：基于408统考大纲自编（CS-Notes/JavaGuide/hello-algo 均无计组内容）
+央国企考察特点：建设银行、工商银行曾出现计组题目，中行/国网偶有涉及。考察形式以概念辨析、数据表示计算、Cache映射计算、寻址方式判断为主，难度低于408统考但高于教材级概念。广度优先，重点掌握计算规则和概念对比。</p>
+</blockquote>
+<hr>
+<h2 id="heading-1">一、计算机系统概述</h2>
+<h3 id="1-">1. 冯·诺依曼结构</h3>
+<p>冯·诺依曼结构的核心思想是<strong>存储程序</strong>——程序和数据以二进制形式存放在存储器中，计算机按指令顺序自动执行。计算机由五大部件组成：**运算器（ALU）**负责算术运算与逻辑运算；<strong>控制器</strong>负责译码指令、产生控制信号、指挥各部件协同工作；<strong>存储器</strong>存放程序和数据；<strong>输入设备</strong>将外部信息送入计算机；<strong>输出设备</strong>将计算结果送出。</p>
+<p>冯·诺依曼结构的主要特点：指令和数据以同等地位存放在存储器中；指令按地址访问；每条指令由操作码和地址码组成；指令在CPU中默认顺序执行，可通过转移指令改变执行顺序。</p>
+<h3 id="2-">2. 计算机层次结构</h3>
+<p>从硬件到软件，计算机系统可分为多个抽象层次：微操作级（硬件直接执行）→ 机器语言/微程序级（CPU硬布线或微程序控制）→ 操作系统级（资源管理与指令扩展）→ 汇编语言级（符号化机器指令）→ 高级语言级（如C、Java）→ 应用层（用户程序）。每一层在下层的基础上提供更便捷的编程接口。各层之间通过接口（指令集架构、系统调用接口、应用程序编程接口等）进行交互，层与层之间相互隔离，下层的实现细节对上层的程序员透明。</p>
+<h3 id="3-">3. 计算机性能指标</h3>
+<p>CPU性能的基本公式：CPU执行时间 = 指令条数 × CPI（每条指令平均时钟周期数）× 时钟周期时长。时钟周期是主频的倒数，主频越高则每个时钟周期越短。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指标</th>
+<th style="text-align:left">含义</th>
+<th style="text-align:center">计算关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">主频（f）</td>
+<td style="text-align:left">时钟频率，单位为Hz</td>
+<td style="text-align:center">时钟周期 T = 1/f</td>
+</tr>
+<tr>
+<td style="text-align:center">CPI</td>
+<td style="text-align:left">每条指令平均时钟周期数</td>
+<td style="text-align:center">CPI = 总时钟周期数 ÷ 指令数</td>
+</tr>
+<tr>
+<td style="text-align:center">MIPS</td>
+<td style="text-align:left">每秒百万条指令</td>
+<td style="text-align:center">MIPS = 主频 ÷ (CPI × 10⁶)</td>
+</tr>
+<tr>
+<td style="text-align:center">FLOPS</td>
+<td style="text-align:left">每秒浮点运算次数</td>
+<td style="text-align:center">衡量科学计算性能</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Amdahl定律</strong>：系统性能提升的上限受限于可改进部分在总执行时间中的占比。加速比S = 1 / [(1 - Fe) + Fe/Se]，其中Fe为可改进部分占比，Se为改进部分的加速比。该定律说明了&quot;短板效应&quot;——即使将某一部分优化到极致，整体性能提升仍受限于不可改进部分。</p>
+<blockquote>
+<p><strong>高频题点</strong>：给定主频、CPI、指令数计算CPU执行时间（注意CPI可能是加权平均值）、Amdahl定律的比值计算、MIPS到执行时间的换算。</p>
+</blockquote>
+<hr>
+<h2 id="heading-2">二、数据的表示与运算（高频）</h2>
+<h3 id="1--1">1. 数制与基数转换</h3>
+<p>进位计数制由基数R和位权决定。二进制（基数为2）、八进制（基数为8）、十六进制（基数为16）是计算机中常用的数制。二进制转八进制以三位一组转换，二进制转十六进制以四位一组转换。十进制转二进制时，整数部分用除二取余法，小数部分用乘二取整法。</p>
+<h3 id="2--1">2. 定点数的编码表示</h3>
+<p>定点数在计算机中有三种编码方式：</p>
+<p><strong>原码</strong>：最高位为符号位（0正1负），其余位表示数值的绝对值。优点是直观，缺点是加减运算复杂（需根据符号位判断实际运算类型），且存在±0两个零。</p>
+<p><strong>反码</strong>：正数的反码与原码相同；负数的反码是原码除符号位外按位取反。反码也有±0两个零，负数加法需循环进位。</p>
+<p><strong>补码</strong>：正数的补码与原码相同；负数的补码为反码加1（即原码除符号位外取反加1）。补码最重要的性质是<strong>减法可以统一为加法运算</strong>，因此计算机中定点整数统一用补码表示。补码的零表示唯一（全0），表示范围为-2^(n-1) ~ 2^(n-1)-1（n为位数）。例如8位补码的范围是-128~127。补码的补码等于原码。</p>
+<p><strong>移码</strong>：补码的符号位取反即得移码，用于浮点数的阶码（偏移量表示），便于比较大小。</p>
+<p><strong>溢出判断</strong>：补码加减法运算中，溢出指运算结果超出了表示范围。溢出判断方法包括单符号位法（正+正=负或负+负=正则溢出）和双符号位法（00表示正数，11表示负数，01表示正溢，10表示负溢）。</p>
+<h3 id="3-ieee-754-">3. IEEE 754 浮点数标准（高频）</h3>
+<p>IEEE 754是计算机浮点数表示的国际标准。<strong>32位单精度浮点数</strong>（float）的格式为：1位符号位S + 8位阶码E（偏移127）+ 23位尾数M。其真值为：(-1)^S × 1.M × 2^(E-127)。尾数部分隐含了整数部分的1（规格化数），称为隐含位。</p>
+<p><strong>64位双精度浮点数</strong>（double）的格式为：1位符号位 + 11位阶码（偏移1023）+ 52位尾数。双精度浮点数的真值公式为：(-1)^S × 1.M × 2^(E-1023)。</p>
+<p>IEEE 754中定义了几种特殊值：阶码全0、尾数全0表示±0；阶码全0、尾数非0表示非规格化数（接近0的极小值）；阶码全1、尾数全0表示±∞；阶码全1、尾数非0表示NaN（非数值）。</p>
+<h3 id="4-">4. 浮点数的加减运算步骤</h3>
+<p>浮点数的加减运算比定点数复杂，主要分为五个步骤：</p>
+<ul>
+<li><strong>对阶</strong>：使两个操作数的阶码相等。规则是小阶向大阶看齐——阶码较小的数将其尾数右移，阶码每次加1，直至两数的阶码相等。对阶的实质是对齐小数点位置，因为浮点数的尾数表示的是小数部分。</li>
+<li><strong>尾数求和</strong>：对阶完成后，两数的尾数按定点数加减法规则进行运算。</li>
+<li><strong>规格化</strong>：将运算结果规格化，使尾数处于标准格式。若尾数发生溢出（两同号尾数相加绝对值≥1），需<strong>右规</strong>（尾数右移一位、阶码加1）；若尾数高位出现多个连续0（数值很小），需<strong>左规</strong>（尾数左移、阶码减1，直至尾数第一位非0）。</li>
+<li><strong>舍入</strong>：尾数右移或右规时，低位部分被丢弃，影响精度。常用的舍入方式有0舍1入（类似十进制四舍五入）、恒置1和截断法。</li>
+<li><strong>溢出判断</strong>：浮点数的溢出以阶码是否超出表示范围为依据。若阶码超出了最大允许值，则发生上溢（结果无穷大）；若阶码下溢到小于最小允许值，则下溢为0。</li>
+</ul>
+<h3 id="5-">5. 校验码（了解级）</h3>
+<p>校验码用于检测或纠正数据在传输和存储过程中可能出现的错误。常见的校验码有三种：</p>
+<p><strong>奇偶校验码</strong>：在数据位后增加一位校验位，使整个码字中1的个数为奇数（奇校验）或偶数（偶校验）。接收方通过统计码字中1的个数是否满足约定来判断数据是否出错。奇偶校验实现简单，但只能检测奇数个位的错误，无法定位错误位置，也无法纠错。</p>
+<p><strong>汉明码（海明码）</strong>：一种基于分组奇偶校验的检错纠错编码，能够检测并纠正一位错误。汉明码在数据位中插入多个校验位，每个校验位负责一组特定位置的检错。校验位的数量k必须满足条件：2^k ≥ n + k + 1（其中n为数据位数）。检错和纠错的过程是：接收方根据所有校验位计算出<strong>校正子</strong>（校验结果），校正子的二进制值直接指出错误位的位置，取反即可纠正。</p>
+<p><strong>循环冗余校验（CRC）</strong>：将数据视为一个二进制多项式，用约定的生成多项式进行模二除法运算，取余数作为校验码附加在数据末尾发送。接收方用同一生成多项式对带校验码的数据再做模二除法，余数为0则传输正确，否则出错。CRC有很强的检错能力（可检测全部奇数位错、双位错、突发长度小于生成多项式阶数的突发错误），广泛应用于网络传输和存储系统。注意CRC能检错但不能纠错（没有定位错误位的能力），这是它与汉明码的核心区别。</p>
+<blockquote>
+<p><strong>高频题点</strong>：原码/反码/补码相互转换（特别是负数的补码计算）、补码加减法的溢出判断、十进制浮点数与IEEE 754的相互转换（掌握&quot;对阶→尾数运算→规格化&quot;流程）、补码表示范围的边界值、奇偶校验与CRC的应用场景区别。</p>
+</blockquote>
+<h3 id="6-alu">6. ALU与加法器</h3>
+<p>算术逻辑单元（ALU）是运算器的核心部件，基本功能包括算术运算（加减乘除）、逻辑运算（与、或、非、异或）和移位运算。</p>
+<p>全加器实现一位二进制的加法：本位和S = A⊕B⊕C_in，进位C_out = A·B + (A⊕B)·C_in。为消除逐位进位带来的延迟，**先行进位加法器（CLA）**将进位生成函数G = A·B和进位传递函数P = A⊕B分离，使各级进位并行计算。先行进位加法器的进位可以同时产生，而无需等待低位进位逐级传递。</p>
+<p><strong>数据通路</strong>：数据在各功能部件之间传输的路径称为数据通路。数据通路的组织方式直接影响CPU的性能。常见的数据通路结构有单总线结构（所有部件共享一条总线，结构简单但有冲突）、双总线结构（运算器两侧各一条总线，可同时取两个操作数）和三总线结构（进一步分离指令和数据路径，提高并行度）。数据通路宽度（一次能传送的位数）通常等于CPU字长。</p>
+<hr>
+<h2 id="heading-3">三、存储器层次结构（超高频）</h2>
+<h3 id="1--2">1. 存储器分类</h3>
+<p>按存储介质分：<strong>半导体存储器</strong>（RAM/ROM，速度快）和<strong>磁表面存储器</strong>（磁盘/磁带，容量大速度慢）以及<strong>光盘</strong>。按存取方式分：<strong>随机存取</strong>（RAM按地址直接访问）、<strong>顺序存取</strong>（磁带线性访问）和<strong>直接存取</strong>（磁盘先寻道再旋转等待）。按数据的易失性分：<strong>易失性存储器</strong>（RAM，断电数据丢失）和<strong>非易失性存储器</strong>（ROM、磁盘、Flash，断电后数据保留）。</p>
+<p><strong>SRAM与DRAM</strong>的对比：SRAM（静态RAM）以触发器存储数据，不需要刷新，速度快但集成度低、功耗大，用于Cache；DRAM（动态RAM）以电容电荷存储数据，需要周期性刷新（每64ms），集成度高、功耗小，用于主存。DRAM的刷新方式有集中刷新（所有行连续刷新期间CPU无法访问）、分散刷新（每读一次刷新一行）和异步刷新（均匀分布刷新操作）。</p>
+<p><strong>ROM的类型演化</strong>：掩膜ROM（MROM，出厂写入）→ PROM（可编程一次）→ EPROM（紫外线擦除可重写）→ EEPROM（电擦除）→ Flash存储器（现代U盘、SSD，块擦写）。</p>
+<h3 id="2-cpu">2. 主存储器与CPU连接</h3>
+<p>主存的扩展方式：<strong>位扩展</strong>（增加字长，如用8片1M×1位的芯片组成1M×8位）、<strong>字扩展</strong>（增加存储单元数量，如用2片1M×8位组成2M×8位）、<strong>字位同时扩展</strong>（位扩展和字扩展的组合）。地址译码包括片选信号和片内地址两部分。</p>
+<p>地址译码方式有三种：<strong>全译码</strong>（所有高位地址线参与译码，地址唯一）、<strong>部分译码</strong>（部分高位地址线不参与译码，地址空间存在重叠区）、<strong>线选</strong>（用一根地址线选一片芯片，地址空间不连续且浪费）。</p>
+<p><strong>存储器与CPU的连接要点</strong>：CPU通过地址总线向存储器发送地址，通过数据总线交换数据，通过控制总线发送读写命令。连接时需考虑地址匹配（各芯片的地址范围由片选信号决定）、数据线宽度匹配（若CPU字长与芯片位数不同则需位扩展）和控制信号时序匹配（包括读写时序和访问周期）。</p>
+<h3 id="3-cache">3. 高速缓存Cache（超高频）</h3>
+<p>Cache利用了<strong>程序局部性原理</strong>：时间局部性（刚访问的地址很可能在短时间内再次被访问）和空间局部性（刚访问地址的相邻地址也很可能被访问）。Cache将主存中部分数据复制到高速缓存中，使CPU能更快获取数据。当CPU访问的数据在Cache中时称为<strong>命中</strong>，否则称为<strong>缺失</strong>。</p>
+<p><strong>地址映射方式</strong>将主存块定位到Cache行中：</p>
+<ul>
+<li><strong>直接映射</strong>：主存块只能映射到唯一的Cache行（行号 i = 主存块号 j mod Cache行数 m）。硬件简单但命中率低，容易出现<strong>抖动</strong>（多个主存块竞争同一Cache行）。</li>
+<li><strong>全相联映射</strong>：主存块可映射到任意Cache行。命中率高但硬件实现复杂（需大量比较器）。</li>
+<li><strong>组相联映射</strong>：将Cache分组，主存块按组号映射到指定组，组内可占用任何行（组号 s = 主存块号 j mod 组数 m）。在实现复杂度和命中率之间取得折中。常用的组相联度有2路、4路、8路组相联。</li>
+</ul>
+<p>Cache地址字段划分（以直接映射为例）：主存地址分为<strong>标记（t位）</strong>、<strong>组号/行号（s位）</strong>、**块内偏移（b位）**三部分。Cache容量 = Cache行数 × 每行大小。每行除数据块外还包含标记位、有效位、脏位（写回策略时使用）、LRU位（替换算法时使用）等。Cache总容量 = 数据存储容量 + 标记位总容量 + 有效位总容量 + 脏位总容量 + 其他辅助位。</p>
+<p><strong>替换算法</strong>：当Cache满且需要调入新块时，需选择一块替换出去。常见算法包括<strong>随机替换</strong>（简单但可能替换即将用到的块）、<strong>FIFO</strong>（先进先出，但可能将高频块替换出去，产生抖动）、<strong>LRU（最近最少使用）</strong>（替换最久未被访问的块，命中率高但需硬件记录访问顺序）。</p>
+<p><strong>写策略</strong>：当CPU修改Cache中的数据时，涉及Cache与主存的一致性维护。**写直达（Write-Through）**将数据同时写入Cache和主存，主存数据始终一致但写操作慢；**写回（Write-Back）**仅写入Cache并标记脏位，被替换出时再写回主存，速度快但主存数据可能暂时不一致。</p>
+<p><strong>多级Cache体系</strong>：现代CPU普遍采用多级Cache架构（L1/L2/L3）。<strong>L1 Cache</strong>容量最小（通常32<del>64KB）、速度最快（与CPU同频），常分为指令Cache（L1i）和数据Cache（L1d）以减少结构冒险。<strong>L2 Cache</strong>容量较大（256KB</del>1MB），速度比L1慢但比主存快得多，通常每个CPU核心独享。<strong>L3 Cache</strong>容量最大（数MB~数十MB），多个核心共享，进一步减少访存延迟。多级Cache之间遵循包含（inclusive，上级包含下级的子集，便于一致性维护）或互斥（exclusive，一级在二级则不在，容量利用率高）的包含关系。</p>
+<h3 id="4--1">4. 虚拟存储器</h3>
+<p>虚拟存储器将虚拟地址空间和物理地址空间分离，使每个程序拥有独立的连续地址空间。主流实现方式为<strong>页式虚拟存储器</strong>：将虚拟地址空间分为固定大小的页（通常4KB），物理内存按相同大小分页框，通过页表完成虚拟页号到物理页框号的映射。</p>
+<p><strong>页表项</strong>包含页框号、有效位（表示该页是否在内存中）、修改位（脏位）、访问位（用于页面置换算法）、权限位。</p>
+<p>**快表（TLB）**是页表的高速缓存，存放最近使用的页表项。TLB命中时可以直接获得物理地址，免去一次内存访问。TLB缺失时才去内存中查页表。</p>
+<p><strong>地址转换流程</strong>：CPU发出虚拟地址 → 在TLB中查找（若命中则直接得到物理地址）→ 若TLB缺失则查内存中的页表 → 若页表项有效位为1则得到物理页框号 → 若有效位为0则触发缺页中断，从磁盘调入页面并更新页表 → 更新TLB。</p>
+<p><strong>段式和段页式</strong>：段式按逻辑分段（每个段有段号和段内偏移），利于共享和保护；段页式先分段再分页，结合了两者的优点。</p>
+<blockquote>
+<p><strong>高频题点</strong>：直接映射下主存地址到Cache地址的字段划分计算（给定主存地址位数、Cache容量、块大小，计算标记/组号/块内偏移各占几位）、LRU替换算法的模拟过程、Cache总容量计算（含标记位和有效位）、TLB与Cache的区别（TLB加速地址转换，Cache加速数据访问）、缺页中断与普通中断的区别（缺页中断在指令执行期间触发且指令可重新执行）。</p>
+</blockquote>
+<hr>
+<h2 id="heading-4">四、指令系统</h2>
+<h3 id="1--3">1. 指令格式</h3>
+<p>一条指令通常包含<strong>操作码</strong>和<strong>地址码</strong>两部分。操作码指明指令要执行的操作类型，地址码指明操作数所在的位置。根据地址码的数量，指令分为：<strong>零地址指令</strong>（如栈顶操作指令）、<strong>一地址指令</strong>（隐含使用累加器ACC，格式为ACC = ACC OP A）、<strong>二地址指令</strong>（格式为A = A OP B，其中一个操作数同时作为目的操作数）、<strong>三地址指令</strong>（格式为C = A OP B，三个地址互不覆盖）。地址码越多，指令的功能越强，但指令长度也越大。</p>
+<p>指令字长度分为定长和变长两种：<strong>定长指令字</strong>中所有指令长度相同（RISC风格，便于流水线译码）；<strong>变长指令字</strong>中指令长度可变（CISC风格，可节省存储空间但译码复杂）。</p>
+<p><strong>操作码扩展技术</strong>：在变长指令字中，操作码的位数不固定，通过扩展操作码来增加指令数量。其基本思想是在地址码较少的指令格式中留出更多的位数给操作码，在地址码较多的指令格式中压缩操作码位数。操作码扩展技术需要在编码时保证无二义性。</p>
+<h3 id="2--2">2. 寻址方式（高频）</h3>
+<p>寻址方式是指令中确定操作数有效地址的方式。不同的寻址方式在灵活性和执行速度之间存在权衡。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">寻址方式</th>
+<th style="text-align:center">有效地址（EA）公式</th>
+<th style="text-align:center">特点</th>
+<th style="text-align:center">典型应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">立即寻址</td>
+<td style="text-align:center">操作数在指令中</td>
+<td style="text-align:center">速度最快，不需访存，操作数不能修改</td>
+<td style="text-align:center">常数加载</td>
+</tr>
+<tr>
+<td style="text-align:center">直接寻址</td>
+<td style="text-align:center">EA = 地址码A</td>
+<td style="text-align:center">简单直观，但寻址范围受地址码位数限制</td>
+<td style="text-align:center">访问固定地址</td>
+</tr>
+<tr>
+<td style="text-align:center">间接寻址</td>
+<td style="text-align:center">EA = (A)，即从A指向的存储单元中取地址</td>
+<td style="text-align:center">可扩大寻址范围，但需多次访存</td>
+<td style="text-align:center">多级指针</td>
+</tr>
+<tr>
+<td style="text-align:center">寄存器寻址</td>
+<td style="text-align:center">操作数在指定寄存器中</td>
+<td style="text-align:center">速度极快（无需访存），但寄存器数目有限</td>
+<td style="text-align:center">通用运算</td>
+</tr>
+<tr>
+<td style="text-align:center">寄存器间接寻址</td>
+<td style="text-align:center">EA = (R)，寄存器中存的是地址</td>
+<td style="text-align:center">灵活，寄存器内容可变</td>
+<td style="text-align:center">数组遍历</td>
+</tr>
+<tr>
+<td style="text-align:center">相对寻址</td>
+<td style="text-align:center">EA = PC + A（PC为程序计数器）</td>
+<td style="text-align:center">程序可重定位，常用于转移指令</td>
+<td style="text-align:center">分支跳转</td>
+</tr>
+<tr>
+<td style="text-align:center">基址寻址</td>
+<td style="text-align:center">EA = BR + A（BR为基址寄存器）</td>
+<td style="text-align:center">由操作系统管理基址寄存器，适合多道程序</td>
+<td style="text-align:center">多道程序地址转换</td>
+</tr>
+<tr>
+<td style="text-align:center">变址寻址</td>
+<td style="text-align:center">EA = A + IX（IX为变址寄存器）</td>
+<td style="text-align:center">由用户控制变址寄存器，适合数组循环</td>
+<td style="text-align:center">数组元素访问</td>
+</tr>
+</tbody>
+</table>
+<p>基址寻址与变址寻址的核心区别：基址寻址的基址寄存器由操作系统管理（用于将程序的逻辑地址转换为物理地址），地址码作为位移量；变址寻址的变址寄存器由用户程序控制（用于数组循环），地址码作为固定基址，变址寄存器内容作为可变偏移。</p>
+<h3 id="3-cisc-vs-risc">3. CISC vs RISC</h3>
+<p>CISC（复杂指令集计算机）和RISC（精简指令集计算机）是两种不同的指令集设计哲学。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">对比项</th>
+<th style="text-align:center">CISC</th>
+<th style="text-align:center">RISC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">指令数量</td>
+<td style="text-align:center">多（通常200条以上）</td>
+<td style="text-align:center">少（约50条）</td>
+</tr>
+<tr>
+<td style="text-align:center">指令长度</td>
+<td style="text-align:center">变长</td>
+<td style="text-align:center">定长（便于流水线译码）</td>
+</tr>
+<tr>
+<td style="text-align:center">指令格式</td>
+<td style="text-align:center">复杂多样</td>
+<td style="text-align:center">统一简单</td>
+</tr>
+<tr>
+<td style="text-align:center">寻址方式</td>
+<td style="text-align:center">多（10种以上）</td>
+<td style="text-align:center">少（3~5种常用）</td>
+</tr>
+<tr>
+<td style="text-align:center">通用寄存器数量</td>
+<td style="text-align:center">少</td>
+<td style="text-align:center">多（通常32个以上）</td>
+</tr>
+<tr>
+<td style="text-align:center">访存指令</td>
+<td style="text-align:center">全部指令均可间接访存</td>
+<td style="text-align:center">仅Load/Store指令访存</td>
+</tr>
+<tr>
+<td style="text-align:center">控制方式</td>
+<td style="text-align:center">微程序控制为主</td>
+<td style="text-align:center">硬布线控制为主</td>
+</tr>
+<tr>
+<td style="text-align:center">流水线实现</td>
+<td style="text-align:center">不易实现</td>
+<td style="text-align:center">易于实现</td>
+</tr>
+<tr>
+<td style="text-align:center">典型代表</td>
+<td style="text-align:center">x86（Intel/AMD）</td>
+<td style="text-align:center">ARM、RISC-V、MIPS</td>
+</tr>
+</tbody>
+</table>
+<p>RISC的<strong>Load/Store架构</strong>是其核心特征：只有加载（Load）和存储（Store）两条指令访问内存，其余运算指令的操作数全部来自寄存器，运算结果也写回寄存器。这种设计大幅简化了控制逻辑，有利于流水线实现。</p>
+<blockquote>
+<p><strong>高频题点</strong>：给定指令内容和各寄存器值计算有效地址、基址寻址与变址寻址的异同（关键在于谁控制基址部分）、相对寻址中转移目标地址的计算（注意PC在取指令后已自增）、CISC与RISC的核心区别（重点是指令长度、访存方式、寻址方式数量三个方面）。</p>
+</blockquote>
+<hr>
+<h2 id="heading-5">五、中央处理器（超高频）</h2>
+<h3 id="1-cpu">1. CPU基本结构</h3>
+<p>CPU由<strong>运算器</strong>和<strong>控制器</strong>两大部分组成。运算器包含算术逻辑单元（ALU）和通用寄存器组；控制器包含控制单元（CU）、指令寄存器（IR）、程序计数器（PC）。</p>
+<p>CPU内部的主要寄存器：<strong>PC（程序计数器）</strong>——存放下一条指令的地址；<strong>IR（指令寄存器）</strong>——存放当前正在执行的指令；<strong>MAR（存储器地址寄存器）</strong>——存放CPU要访问的内存地址；<strong>MDR（存储器数据寄存器）</strong>——存放从内存读数或向内存写数的数据；<strong>PSW（程序状态字）</strong>——存放运算结果的状态标志位（如进位CF、零ZF、符号SF、溢出OF）。</p>
+<h3 id="2--3">2. 指令周期</h3>
+<p>一条指令从取指到执行完毕所经历的时间称为<strong>指令周期</strong>。指令周期分为几个子周期：<strong>取指周期</strong>（从内存读取指令到IR）、<strong>间址周期</strong>（若为间接寻址，从内存读取操作数有效地址）、<strong>执行周期</strong>（执行指令）、<strong>中断周期</strong>（若有中断请求，保存断点并转入中断处理程序）。不同指令的指令周期长度不同——简单指令可能只需取指和执行两个周期，而复杂指令可能包含多个间址周期。</p>
+<p>CPU在每个机器周期内的基本工作步骤为：取指令（PC→MAR→读内存→MDR→IR，同时PC+1）→ 译码（控制单元对IR中的操作码译码，产生控制信号）→ 执行（控制信号驱动各部件完成操作）。</p>
+<h3 id="3--1">3. 控制器</h3>
+<p>控制器分为<strong>硬布线控制器</strong>和<strong>微程序控制器</strong>两种实现方式。</p>
+<p>硬布线控制器由组合逻辑电路直接产生控制信号，速度快但设计复杂、修改困难，适用于RISC处理器。</p>
+<p>微程序控制器将每条机器指令对应的控制信号序列以<strong>微程序</strong>形式存储在**控制存储器（CM）**中。相关概念：<strong>微命令</strong>是构成控制信号的最小单位；<strong>微操作</strong>是一条微命令所完成的操作；<strong>微指令</strong>是一个机器周期内发出的多组微命令；<strong>微程序</strong>是一系列微指令的序列（对应一条机器指令）。微程序控制器灵活、可修改，但速度比硬布线慢，适用于CISC处理器。微程序的地址形成方式有计数器方式和下地址字段方式两种。</p>
+<h3 id="4--2">4. 五段式流水线</h3>
+<p>流水线技术利用指令级并行——将一条指令的执行过程分为多个阶段，各阶段并行处理不同的指令，从而提高指令吞吐率。经典的RISC五段流水线分为：</p>
+<ul>
+<li><strong>IF（取指）</strong>：根据PC从指令Cache中取出指令，PC自增指向下一条指令。</li>
+<li><strong>ID（译码）</strong>：对指令操作码译码，从通用寄存器组读取操作数，同时完成控制信号生成。</li>
+<li><strong>EX（执行）</strong>：ALU执行算术/逻辑运算，或计算访存的有效地址。</li>
+<li><strong>MEM（访存）</strong>：对数据Cache进行读写操作（仅Load/Store指令需要此阶段）。</li>
+<li><strong>WB（写回）</strong>：将运算结果写回到通用寄存器。</li>
+</ul>
+<p>在理想情况下，每个时钟周期可完成一条指令，吞吐率大幅提高。k级流水线的理想加速比为k，实际加速比受冒险影响小于k。<strong>吞吐率</strong>指单位时间完成的指令数。</p>
+<p><strong>三类冒险</strong>：</p>
+<ul>
+<li><strong>结构冒险</strong>：硬件资源冲突导致，例如同时访问指令Cache和数据Cache。解决方法是分离指令Cache和数据Cache，或插入空操作（气泡）。</li>
+<li><strong>数据冒险</strong>：后一条指令依赖于前一条指令的计算结果。分为三种类型：RAW（读后写，即真依赖，必须等待前一条写完后一条才能读）、WAR（写后读，在流水线中通常不出现）、WAW（写后写，需避免对同一寄存器的无序写入）。RAW是真正的依赖，解决方法包括<strong>转发（旁路）技术</strong>（将计算结果直接送到后续指令的ALU输入端，绕过寄存器写入后再读取的过程）和插入空操作。</li>
+<li><strong>控制冒险</strong>：转移指令改变程序执行顺序，使流水线中已取出的后续指令无效。解决方法有<strong>分支预测</strong>（静态预测/动态预测，预测失败时清空流水线）和<strong>分支延迟槽</strong>（在转移指令后安排一条无论是否跳转都执行的指令，由编译器完成）。</li>
+</ul>
+<p>有多个解决策略的方案时，转发是数据冒险的首选方案，分支预测是控制冒险的首选方案。</p>
+<blockquote>
+<p><strong>高频题点</strong>：流水线加速比的概念（理想加速比等于流水线级数）、数据冒险中RAW（读后写）是真依赖、分支预测失败的惩罚（预测错误需清空流水线并重新取指）、转发技术与插入气泡的区别。央国企以概念理解为主，不要求深挖流水线硬件细节。</p>
+</blockquote>
+<hr>
+<h2 id="io">六、总线与I/O</h2>
+<h3 id="1--4">1. 总线</h3>
+<p>总线是连接计算机各组件的公共通信线路。按层级分为<strong>片内总线</strong>（CPU芯片内部的总线）和<strong>系统总线</strong>（连接CPU、内存和I/O设备的总线）。系统总线按传输内容分为<strong>数据总线</strong>（双向传输，宽度等于CPU字长）、<strong>地址总线</strong>（单向传输，宽度决定寻址范围）和<strong>控制总线</strong>（传输控制信号、时序信号和中断响应信号）。常见的外部总线标准包括PCI Express（串行点对点，高带宽）、USB（通用串行总线，支持热插拔）和SATA（硬盘接口标准）等，了解其基本分类和用途即可。</p>
+<p>当多个设备同时请求使用总线时，需要<strong>总线仲裁</strong>来决定谁获得总线控制权。集中式仲裁的三种方式：</p>
+<ul>
+<li><strong>链式查询</strong>：请求信号沿设备链顺序传递，先接收到请求的设备获得使用权。优点是线路简单，缺点是优先级固定（离总线控制器越近优先级越高），且单点故障影响全局。</li>
+<li><strong>计数器定时查询</strong>：设备地址计数器循环递增，被查询到的设备可占用总线。优先级可通过设置计数器的起始地址灵活调节。</li>
+<li><strong>独立请求</strong>：每个设备有独立的请求线和仲裁线，控制器独立判断。速度快但线数多、控制逻辑复杂。</li>
+</ul>
+<h3 id="2-io">2. I/O端口编址方式</h3>
+<p>CPU访问I/O设备端口地址的两种方式：</p>
+<ul>
+<li><strong>独立编址</strong>：I/O端口有独立的地址空间（与内存地址空间分开），使用专门的I/O指令（如x86的IN/OUT指令）进行访问。优点是I/O指令和访问内存指令分离，I/O地址空间不占用内存地址空间；缺点是需专门的I/O指令，编程灵活性较低。</li>
+<li><strong>统一编址（内存映射I/O）</strong>：将I/O端口地址映射到内存地址空间的一部分，访问I/O端口时使用普通访存指令即可。优点是不需要专门的I/O指令，编程灵活，I/O操作与内存操作统一；缺点是I/O地址占用了一部分内存地址空间。</li>
+</ul>
+<h3 id="3-io">3. I/O控制方式（高频）</h3>
+<p>CPU管理I/O设备的四种方式，按CPU参与程度从高到低排列：</p>
+<p><strong>程序查询方式</strong>：CPU持续轮询设备状态寄存器，直到设备就绪后才进行数据传送。CPU效率最低——在轮询期间CPU空转等待，无法执行其他任务。</p>
+<p><strong>中断驱动方式</strong>：CPU发起I/O操作后继续执行其他任务，设备完成数据传送后向CPU发送中断请求，CPU响应中断后再进行数据传送。释放了CPU的等待时间，但每传送一个字/字节都需要一次中断，中断次数多、开销大。</p>
+<p><strong>DMA（直接存储器访问）方式</strong>：DMA控制器接管总线控制权，直接在内存和I/O设备之间传送数据块，不占用CPU执行数据搬运。CPU只需在开始前对DMA控制器进行初始化（设置传送方向、内存首地址、传送字节数），传送完成后DMA控制器发起中断通知CPU。DMA通常采用<strong>周期窃取</strong>方式占用一个或多个总线周期。</p>
+<p><strong>通道方式</strong>：通道是一个专门的I/O处理器，可执行通道程序，进一步减轻CPU的I/O管理负担，适用于大型计算机系统。</p>
+<p>这三种方式在CPU占用率上的递进关系为：程序查询 &gt; 中断驱动 &gt; DMA。</p>
+<h3 id="4--3">4. 中断系统</h3>
+<p>中断是指CPU暂时中止当前程序的执行，转去执行中断服务程序（ISR），处理完毕后再返回原程序继续执行的过程。</p>
+<p><strong>中断响应过程</strong>的基本步骤为：关中断（不允许响应新的中断）→ 保护断点（将PC等现场信息压栈）→ 查找中断向量表，获得中断服务程序入口地址 → 保存现场（将通用寄存器等压栈）→ 执行中断服务程序 → 恢复现场 → 开中断 → 返回断点（恢复PC）。</p>
+<p><strong>中断优先级与中断嵌套</strong>：高优先级的中断可以打断低优先级中断服务程序的执行。中断优先级的设定可通过<strong>中断屏蔽字</strong>实现，通过设置中断屏蔽寄存器，可以改变固定的优先级顺序。</p>
+<blockquote>
+<p><strong>高频题点</strong>：中断与DMA的对比（中断每传送一个数据单位均需中断一次，DMA仅在整块数据传送完后中断一次）、程序查询/中断/DMA的CPU占用率由高到低排列、DMA的工作流程三步骤（初始化→周期窃取传送→完成中断）、中断响应过程的正确排序、中断向量的作用（提供中断服务程序的入口地址）、独立编址与统一编址的区别与各自优缺点。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>备考建议</strong>：计算机组成原理在央国企笔试中考察频率低于数据结构和计网，但建行、工行、中行偶有出现。建议按以下优先级掌握：</p>
+<ol>
+<li><strong>数据的表示与运算</strong>——补码与原码/反码的转换、补码加减法溢出判断、IEEE 754单精度浮点数的转换规则（掌握对阶和规格化的概念即可）。</li>
+<li><strong>Cache与主存</strong>——直接映射地址字段划分计算、Cache总容量计算、LRU替换过程模拟、多级Cache的层次结构理解。</li>
+<li><strong>寻址方式</strong>——各寻址方式有效地址的确定规则、基址寻址与变址寻址的区分、相对寻址中转移目标地址的计算。</li>
+<li><strong>I/O控制方式</strong>——中断与DMA的对比、DMA工作流程、各方式CPU占用率比较、端口编址方式的区别。</li>
+<li><strong>CPU性能指标</strong>——CPI、MIPS与执行时间的关系、Amdahl定律的应用。</li>
+<li><strong>CISC vs RISC</strong>——核心区别记忆（指令长度、访存方式、寻址方式数量三个维度）。
+计组不建议花费过多时间深入流水线冒险的硬件细节或超标量等高级技术，重点掌握上述六个方向的计算规则和概念辨析即可。</li>
+</ol>
+</blockquote>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">央国企计算机笔试准备（5 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">计算机组成原理</span>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">数据库与SQL</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/hermes-moa-deep-usage/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">从尝鲜到日常：Hermes Agent 深度使用一个月的新体会</span>
+  </a>
+  
+</nav>
+
+
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/01-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/02-%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/03-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">数据库与SQL</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/05-%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+        <span class="sidebar-post-date">2026-07-12</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>
