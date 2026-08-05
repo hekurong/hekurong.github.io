@@ -231,12 +231,42 @@
 </ul>
 <h3 id="15-">1.5 用户记忆的四种存储格式（怎么存）</h3>
 <p>四种渐进式格式，代表记忆粒度和结构复杂度的递进：</p>
-<p>| 格式 | 特点 | 优势 | 代价 |</p>
-<p>|&mdash;|&mdash;|&mdash;|&mdash;|</p>
-<p>| Simple Notes | 每条记忆是最小不可分事实（&ldquo;用户邮箱：john@example.com&rdquo;） | 极低开销，O(1) 操作 | 信息关联性完全丢失——&ldquo;在 TechCorp 任高级工程师负责推荐系统&quot;被拆成三个孤立事实，需经验规则（关键词重叠）重新拼凑 |</p>
-<p>| Enhanced Notes | 每条记忆保存为含完整上下文的段落（&ldquo;在 TechCorp 任高级软件工程师，专注机器学习三年，领导推荐系统项目，团队 5 人&rdquo;） | 保留叙事结构、语义完整丰富，适合细微理解 | 存储冗余、更新复杂（属性变化需重写多段落）、段落越长向量嵌入越难精确表达核心含义 |</p>
-<p>| JSON Cards | 三层嵌套结构（类别→子类别→键值对，如 personal.contact.email） | 支持部分更新、可预测可扩展 | 刚性结构假设信息可清晰分类——&ldquo;周末用 Python 开发个人项目&quot;涉及时间/技术/活动多维性，强制归单一类别丢失多维性 |</p>
-<p>| Advanced JSON Cards | 每个卡片记录事实 + 来源叙事背景（backstory）+ 主体身份（person）+ 与用户关系（relationship）+ 时间戳 | 解决消歧问题——同一条信息在不同场景含义不同（&ldquo;张医生&quot;可能是用户自己的牙科医生，也可能是父亲的心脏科医生）；&ldquo;帮我安排家人的年度体检&quot;可通过 relationship 识别所有家庭成员 | 生成和维护成本较高 |</p>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>特点</th>
+<th>优势</th>
+<th>代价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Simple Notes</td>
+<td>每条记忆是最小不可分事实（&ldquo;用户邮箱：john@example.com&rdquo;）</td>
+<td>极低开销，O(1) 操作</td>
+<td>信息关联性完全丢失——&ldquo;在 TechCorp 任高级工程师负责推荐系统&quot;被拆成三个孤立事实，需经验规则（关键词重叠）重新拼凑</td>
+</tr>
+<tr>
+<td>Enhanced Notes</td>
+<td>每条记忆保存为含完整上下文的段落（&ldquo;在 TechCorp 任高级软件工程师，专注机器学习三年，领导推荐系统项目，团队 5 人&rdquo;）</td>
+<td>保留叙事结构、语义完整丰富，适合细微理解</td>
+<td>存储冗余、更新复杂（属性变化需重写多段落）、段落越长向量嵌入越难精确表达核心含义</td>
+</tr>
+<tr>
+<td>JSON Cards</td>
+<td>三层嵌套结构（类别→子类别→键值对，如 personal.contact.email）</td>
+<td>支持部分更新、可预测可扩展</td>
+<td>刚性结构假设信息可清晰分类——&ldquo;周末用 Python 开发个人项目&quot;涉及时间/技术/活动多维性，强制归单一类别丢失多维性</td>
+</tr>
+<tr>
+<td>Advanced JSON Cards</td>
+<td>每个卡片记录事实 + 来源叙事背景（backstory）+ 主体身份（person）+ 与用户关系（relationship）+ 时间戳</td>
+<td>解决消歧问题——同一条信息在不同场景含义不同（&ldquo;张医生&quot;可能是用户自己的牙科医生，也可能是父亲的心脏科医生）；&ldquo;帮我安排家人的年度体检&quot;可通过 relationship 识别所有家庭成员</td>
+<td>生成和维护成本较高</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>
 <p><strong>根本张力：简单性与表达力之间的权衡</strong>——Simple Notes 极致简单牺牲语义，Enhanced Notes 叙事完整牺牲结构化，JSON Cards 结构化牺牲灵活性，Advanced JSON Cards 全面性牺牲简单性。没有绝对优劣，取决于场景。</p>
@@ -304,11 +334,32 @@
 </li>
 </ul>
 <h3 id="19--3-1">1.9 三套分类体系（表 3-1）</h3>
-<p>| 分类体系 | 回答的问题 | 具体类别 |</p>
-<p>|&mdash;|&mdash;|&mdash;|</p>
-<p>| 记忆层次 | 存在哪里？ | 轨迹（当前会话）、用户长期记忆（跨会话）、业务状态（任务阶段） |</p>
-<p>| 存储格式 | 怎么存？ | Simple Notes、Enhanced Notes、JSON Cards、Advanced JSON Cards |</p>
-<p>| 认知类型 | 存什么？ | 情景记忆（具体事件）、语义记忆（一般知识）、程序记忆（行为流程） |</p>
+<table>
+<thead>
+<tr>
+<th>分类体系</th>
+<th>回答的问题</th>
+<th>具体类别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>记忆层次</td>
+<td>存在哪里？</td>
+<td>轨迹（当前会话）、用户长期记忆（跨会话）、业务状态（任务阶段）</td>
+</tr>
+<tr>
+<td>存储格式</td>
+<td>怎么存？</td>
+<td>Simple Notes、Enhanced Notes、JSON Cards、Advanced JSON Cards</td>
+</tr>
+<tr>
+<td>认知类型</td>
+<td>存什么？</td>
+<td>情景记忆（具体事件）、语义记忆（一般知识）、程序记忆（行为流程）</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>三套体系是<strong>正交维度，可自由组合</strong>——一条&quot;偏好靠窗座位&quot;的语义记忆可用 Simple Notes 存；一段&quot;先搜直飞→确认座位→用常旅客号&quot;的程序记忆可用 Advanced JSON Cards 存。选格式取决于工程需求（简单性 vs 表达力），选类型取决于业务场景。</li>
 </ul>
@@ -432,13 +483,42 @@
 <ul>
 <li>dense-embedding 项目对比 ANNOY 与 HNSW 两类主流 ANN（Approximate Nearest Neighbor，近似最近邻）算法——海量向量（上百万文档）时逐一算相似度太慢，ANN 用巧妙索引结构实现近似但极快查找。</li>
 </ul>
-<p>| 特性 | ANNOY（基于树） | HNSW（基于图） |</p>
-<p>|&mdash;|&mdash;|&mdash;|</p>
-<p>| 构建速度 | 快 | 较慢 |</p>
-<p>| 内存占用 | 低 | 较高 |</p>
-<p>| 增量更新 | 不支持（需完全重建） | 支持（但长期增量插入后建议定期重建保持精度） |</p>
-<p>| 查询精度 | 较高 | 极高 |</p>
-<p>| 适用场景 | 数据不常变的静态数据集 | 需要实时索引新信息的动态场景 |</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>ANNOY（基于树）</th>
+<th>HNSW（基于图）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>构建速度</td>
+<td>快</td>
+<td>较慢</td>
+</tr>
+<tr>
+<td>内存占用</td>
+<td>低</td>
+<td>较高</td>
+</tr>
+<tr>
+<td>增量更新</td>
+<td>不支持（需完全重建）</td>
+<td>支持（但长期增量插入后建议定期重建保持精度）</td>
+</tr>
+<tr>
+<td>查询精度</td>
+<td>较高</td>
+<td>极高</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>数据不常变的静态数据集</td>
+<td>需要实时索引新信息的动态场景</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>选择索引策略与选择嵌入模型同等重要——直接决定系统性能、成本、可维护性。</li>
 </ul>

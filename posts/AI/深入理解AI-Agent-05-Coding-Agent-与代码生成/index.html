@@ -387,10 +387,27 @@
 <p><strong>为什么 Coding Agent 特别适合 Harness 工程</strong>——任务清晰度 × 验证自动化程度四象限（表 5-1）：</p>
 </li>
 </ul>
-<p>| | 结果可自动验证 | 结果需人工验证 |</p>
-<p>|&mdash;|&mdash;|&mdash;|</p>
-<p>| 目标明确 | <strong>最佳区域</strong>：修复有测试用例的 bug | 吞吐量受限：代码重构需人工审查 |</p>
-<p>| 目标模糊 | 高效地跑偏：用 linter 优化&quot;代码质量&rdquo; | 难以启动：&ldquo;让 UI 更好看&rdquo; |</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>结果可自动验证</th>
+<th>结果需人工验证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>目标明确</td>
+<td><strong>最佳区域</strong>：修复有测试用例的 bug</td>
+<td>吞吐量受限：代码重构需人工审查</td>
+</tr>
+<tr>
+<td>目标模糊</td>
+<td>高效地跑偏：用 linter 优化&quot;代码质量&rdquo;</td>
+<td>难以启动：&ldquo;让 UI 更好看&rdquo;</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>
 <p>Harness 的目标就是把尽可能多的任务推向&quot;目标明确 + 验证自动化&quot;象限。代码编写天然处于核心——测试套件提供验收标准、Linter 和类型检查器提供即时验证、Git 提供完美回退。<strong>这解释了为什么 Coding Agent 是当前成熟度最高的 Agent 类型：不是因为代码生成模型特别强，而是因为软件工程几十年积累的基础设施天然构成了一套强大的 Harness</strong>。</p>

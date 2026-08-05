@@ -172,11 +172,36 @@
 <hr>
 <h2 id="1-agent--llm----">1. 核心公式：Agent = LLM + 上下文 + 工具</h2>
 <p>三者缺一不可。直观说法：<strong>大脑 + 眼睛 + 手脚</strong>。</p>
-<p>| 直觉理解 | 实现组件 | 学术概念（RL，可选） | 含义 |</p>
-<p>|&mdash;|&mdash;|&mdash;|&mdash;|</p>
-<p>| 大脑 | LLM | 策略（Policy） | 决定&quot;下一步做什么&quot;的决策逻辑 |</p>
-<p>| 眼睛 | 上下文 | 观察空间（Observation Space） | Agent 能看到的所有信息 |</p>
-<p>| 手脚 | 工具 | 动作空间（Action Space） | Agent 能做的所有事情的集合 |</p>
+<table>
+<thead>
+<tr>
+<th>直觉理解</th>
+<th>实现组件</th>
+<th>学术概念（RL，可选）</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大脑</td>
+<td>LLM</td>
+<td>策略（Policy）</td>
+<td>决定&quot;下一步做什么&quot;的决策逻辑</td>
+</tr>
+<tr>
+<td>眼睛</td>
+<td>上下文</td>
+<td>观察空间（Observation Space）</td>
+<td>Agent 能看到的所有信息</td>
+</tr>
+<tr>
+<td>手脚</td>
+<td>工具</td>
+<td>动作空间（Action Space）</td>
+<td>Agent 能做的所有事情的集合</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>
 <p><strong>LLM（大脑）</strong>：不只是一组参数，是整个决策内核——理解意图、思考规划、做出判断。能力来自预训练（世界知识与语言能力）+ 后训练（决策策略，第七章展开）。</p>
@@ -209,13 +234,48 @@
 <p>五类 Agent 产品的&quot;眼睛/手脚/策略&quot;对比：</p>
 </li>
 </ul>
-<p>| Agent 产品 | 眼睛（感知） | 手脚（行动） | 策略 |</p>
-<p>|&mdash;|&mdash;|&mdash;|&mdash;|</p>
-<p>| Cursor 等 Coding Agent | 需求文档、代码库、终端环境 | 开放式（思考、代码搜索、文件读写、执行命令） | 增量开发：理解需求→搜索→编辑→测试→调试修复 |</p>
-<p>| Deep Research 等搜索 Agent | 网络资源、学术数据库、本地文件 | 开放式（思考、搜索、网页阅读、摘要生成） | 迭代深化：按已有信息调整搜索方向，综合出报告 |</p>
-<p>| Browser Use 等电脑操控 Agent | 屏幕、浏览器页面、文件系统 | 开放式（思考、点击、输入、滚动、截图、执行代码） | 视觉感知+操作：观察→识别→执行→验证 |</p>
-<p>| 豆包等手机助手 Agent | 手机屏幕、已装 App | 开放式（思考、点击、滑动、输入、打开 App） | 意图理解+App 操控：理解需求→定位 App→执行→确认 |</p>
-<p>| Pine AI 等个人办事 Agent | 用户账户信息、历史账单、服务商知识库 | 开放式（思考、打电话、发邮件、填表单、与用户确认） | 多步骤执行：收集信息→制定策略→联系→谈判→汇报 |</p>
+<table>
+<thead>
+<tr>
+<th>Agent 产品</th>
+<th>眼睛（感知）</th>
+<th>手脚（行动）</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cursor 等 Coding Agent</td>
+<td>需求文档、代码库、终端环境</td>
+<td>开放式（思考、代码搜索、文件读写、执行命令）</td>
+<td>增量开发：理解需求→搜索→编辑→测试→调试修复</td>
+</tr>
+<tr>
+<td>Deep Research 等搜索 Agent</td>
+<td>网络资源、学术数据库、本地文件</td>
+<td>开放式（思考、搜索、网页阅读、摘要生成）</td>
+<td>迭代深化：按已有信息调整搜索方向，综合出报告</td>
+</tr>
+<tr>
+<td>Browser Use 等电脑操控 Agent</td>
+<td>屏幕、浏览器页面、文件系统</td>
+<td>开放式（思考、点击、输入、滚动、截图、执行代码）</td>
+<td>视觉感知+操作：观察→识别→执行→验证</td>
+</tr>
+<tr>
+<td>豆包等手机助手 Agent</td>
+<td>手机屏幕、已装 App</td>
+<td>开放式（思考、点击、滑动、输入、打开 App）</td>
+<td>意图理解+App 操控：理解需求→定位 App→执行→确认</td>
+</tr>
+<tr>
+<td>Pine AI 等个人办事 Agent</td>
+<td>用户账户信息、历史账单、服务商知识库</td>
+<td>开放式（思考、打电话、发邮件、填表单、与用户确认）</td>
+<td>多步骤执行：收集信息→制定策略→联系→谈判→汇报</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>共同特征：开放式动作空间（可生成任意自然语言和代码）、能内部思考（先规划再行动）、能持续交互（根据环境反馈调整策略）。</li>
 </ul>
@@ -337,12 +397,32 @@
 <p><strong>消融实验（实验 1-1 ★★）</strong>——逐一去掉组件验证其作用（系统提示词作基本身份定义不参与消融）：</p>
 </li>
 </ul>
-<p>| 去掉的组件 | 后果 |</p>
-<p>|&mdash;|&mdash;|</p>
-<p>| 工具定义 | Agent 完全丧失行动能力 |</p>
-<p>| 工具执行结果 | 看不到上一步反馈，反复调用同一工具，陷入无限循环 |</p>
-<p>| 思考过程（reasoning） | 前后决策互相矛盾 |</p>
-<p>| 历史消息 | Agent 失忆，从头重复执行已完成步骤 |</p>
+<table>
+<thead>
+<tr>
+<th>去掉的组件</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工具定义</td>
+<td>Agent 完全丧失行动能力</td>
+</tr>
+<tr>
+<td>工具执行结果</td>
+<td>看不到上一步反馈，反复调用同一工具，陷入无限循环</td>
+</tr>
+<tr>
+<td>思考过程（reasoning）</td>
+<td>前后决策互相矛盾</td>
+</tr>
+<tr>
+<td>历史消息</td>
+<td>Agent 失忆，从头重复执行已完成步骤</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>核心洞察：<strong>上下文决定 Agent 能看到什么，而 Agent 只能基于看到的信息做决策。</strong></li>
 </ul>
@@ -391,13 +471,42 @@
 <p>退款例子对比：无 Harness 时模型看不到政策、不知调哪个 API、编造退款结果回复用户、用户发现退款没发生；有 Harness 时政策写入系统提示词（上下文）、调用 query_order/process_refund（工具）、校验退款金额不超订单金额（约束）、校验数据库确认成功（验证）、API 超时自动重试（纠正）。<strong>同一模型，有无 Harness 结果天壤之别。</strong></p>
 </li>
 </ul>
-<p>| Harness 功能 | 一句话职责 | 与上下文/工具的关系 |</p>
-<p>|&mdash;|&mdash;|&mdash;|</p>
-<p>| Context（上下文） | 提供感知信息 | 核心能力 |</p>
-<p>| Tools（工具） | 提供行动手段 | 核心能力 |</p>
-<p>| Constrain（约束） | 设定行为边界 | 安全边界 |</p>
-<p>| Verify（验证） | 自动判断操作结果对错 | 检查机制 |</p>
-<p>| Correct（纠正） | 发现问题自动修正或回退 | 恢复机制 |</p>
+<table>
+<thead>
+<tr>
+<th>Harness 功能</th>
+<th>一句话职责</th>
+<th>与上下文/工具的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Context（上下文）</td>
+<td>提供感知信息</td>
+<td>核心能力</td>
+</tr>
+<tr>
+<td>Tools（工具）</td>
+<td>提供行动手段</td>
+<td>核心能力</td>
+</tr>
+<tr>
+<td>Constrain（约束）</td>
+<td>设定行为边界</td>
+<td>安全边界</td>
+</tr>
+<tr>
+<td>Verify（验证）</td>
+<td>自动判断操作结果对错</td>
+<td>检查机制</td>
+</tr>
+<tr>
+<td>Correct（纠正）</td>
+<td>发现问题自动修正或回退</td>
+<td>恢复机制</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>
 <p>上下文与工具让 Agent&quot;能做事&quot;，约束、验证、纠正让 Agent&quot;不做错事&quot;。早期框架重前者，<strong>生产级 Agent 的重心已转向后者</strong>。</p>
@@ -436,13 +545,48 @@
 </li>
 </ul>
 <h3 id="22-harness-">2.2 Harness 五个功能的核心原则</h3>
-<p>| 功能 | 核心原则 | 实际例子 | 详见 |</p>
-<p>|&mdash;|&mdash;|&mdash;|&mdash;|</p>
-<p>| 上下文 | 信息充分性：每个决策点基于足够信息判断 | 系统提示词、知识库、Agent 状态栏、Sidecar 旁路查询 | 第二、三章 |</p>
-<p>| 工具 | 接口清晰：命名直观、参数有例子、边界有说明 | MCP 工具、代码解释器、搜索工具 | 第四章 |</p>
-<p>| 约束 | 故障安全默认值：能力默认关闭、显式开放（像手机 App 权限管理） | Claude Code 中每个工具默认需用户授权 | 第四章 |</p>
-<p>| 验证 | 输入隔离：安全检查只看结构化数据（如工具返回的 JSON 字段），不信任模型自由生成的文本（防提示注入操纵输出） | Linter、类型系统、工具调用结果校验 | 第五、六章 |</p>
-<p>| 纠正 | 确认无法恢复之前不暴露中间态 | 静默重试、接续生成、连续失败回退人工判断（熔断） | 第二、五章 |</p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>核心原则</th>
+<th>实际例子</th>
+<th>详见</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上下文</td>
+<td>信息充分性：每个决策点基于足够信息判断</td>
+<td>系统提示词、知识库、Agent 状态栏、Sidecar 旁路查询</td>
+<td>第二、三章</td>
+</tr>
+<tr>
+<td>工具</td>
+<td>接口清晰：命名直观、参数有例子、边界有说明</td>
+<td>MCP 工具、代码解释器、搜索工具</td>
+<td>第四章</td>
+</tr>
+<tr>
+<td>约束</td>
+<td>故障安全默认值：能力默认关闭、显式开放（像手机 App 权限管理）</td>
+<td>Claude Code 中每个工具默认需用户授权</td>
+<td>第四章</td>
+</tr>
+<tr>
+<td>验证</td>
+<td>输入隔离：安全检查只看结构化数据（如工具返回的 JSON 字段），不信任模型自由生成的文本（防提示注入操纵输出）</td>
+<td>Linter、类型系统、工具调用结果校验</td>
+<td>第五、六章</td>
+</tr>
+<tr>
+<td>纠正</td>
+<td>确认无法恢复之前不暴露中间态</td>
+<td>静默重试、接续生成、连续失败回退人工判断（熔断）</td>
+<td>第二、五章</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>五功能构成闭环：上下文与工具支撑决策，约束预防错误，验证发现偏差，纠正闭合循环。缺任一环节都有可靠性缺口。</li>
 </ul>
@@ -522,15 +666,68 @@
 <p><strong>主流 Agent 框架对比</strong>：</p>
 </li>
 </ul>
-<p>| 框架/平台 | 核心定位 | 编排模式 | 开发方式 | 适用场景 |</p>
-<p>|&mdash;|&mdash;|&mdash;|&mdash;|&mdash;|</p>
-<p>| OpenAI Agents SDK | 轻量级开发库 | 自主（工具循环） | 代码优先 | 快速原型、单 Agent 应用 |</p>
-<p>| Claude Agent SDK | 生产级开发框架 | 自主（工具循环 + 子 Agent） | 代码优先 | 复杂自主任务、Coding Agent |</p>
-<p>| LangChain / LangGraph | 通用 LLM 应用框架 | 工作流 + 自主 | 代码优先 | 复杂链式思考、多步骤工作流 |</p>
-<p>| n8n | 可视化工作流自动化 | 工作流 + 自主 | 低代码（拖拽） | 业务自动化、非技术团队 |</p>
-<p>| Dify | LLM 应用开发平台 | 工作流 + 对话式 | 低代码（可视化 + API） | 企业级 RAG、知识库应用 |</p>
-<p>| CrewAI | 角色化多 Agent 编排 | Multi-Agent 协作 | 代码优先 | 团队式任务分解与执行 |</p>
-<p>| OpenClaw | 开源全能个人 Agent | 自主 + 事件驱动 | 配置 + 代码（自托管） | 个人助理、Deep Research、Computer Use、多平台消息集成 |</p>
+<table>
+<thead>
+<tr>
+<th>框架/平台</th>
+<th>核心定位</th>
+<th>编排模式</th>
+<th>开发方式</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI Agents SDK</td>
+<td>轻量级开发库</td>
+<td>自主（工具循环）</td>
+<td>代码优先</td>
+<td>快速原型、单 Agent 应用</td>
+</tr>
+<tr>
+<td>Claude Agent SDK</td>
+<td>生产级开发框架</td>
+<td>自主（工具循环 + 子 Agent）</td>
+<td>代码优先</td>
+<td>复杂自主任务、Coding Agent</td>
+</tr>
+<tr>
+<td>LangChain / LangGraph</td>
+<td>通用 LLM 应用框架</td>
+<td>工作流 + 自主</td>
+<td>代码优先</td>
+<td>复杂链式思考、多步骤工作流</td>
+</tr>
+<tr>
+<td>n8n</td>
+<td>可视化工作流自动化</td>
+<td>工作流 + 自主</td>
+<td>低代码（拖拽）</td>
+<td>业务自动化、非技术团队</td>
+</tr>
+<tr>
+<td>Dify</td>
+<td>LLM 应用开发平台</td>
+<td>工作流 + 对话式</td>
+<td>低代码（可视化 + API）</td>
+<td>企业级 RAG、知识库应用</td>
+</tr>
+<tr>
+<td>CrewAI</td>
+<td>角色化多 Agent 编排</td>
+<td>Multi-Agent 协作</td>
+<td>代码优先</td>
+<td>团队式任务分解与执行</td>
+</tr>
+<tr>
+<td>OpenClaw</td>
+<td>开源全能个人 Agent</td>
+<td>自主 + 事件驱动</td>
+<td>配置 + 代码（自托管）</td>
+<td>个人助理、Deep Research、Computer Use、多平台消息集成</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>趋势：&ldquo;模型即 Agent&quot;越深化，框架核心价值越不在&quot;编排 LLM 调用&rdquo;，而在<strong>以最小抽象层让你专注业务逻辑</strong>（上下文管理、工具生态、安全约束、错误恢复）。</li>
 </ul>
@@ -589,17 +786,72 @@
 <ul>
 <li>每一章都在系统性构建 Harness 的某个组件；<strong>安全不是独立话题，而是贯穿全书的横切关注点</strong>（类似日志需渗透每个模块）。</li>
 </ul>
-<p>| Harness 重点 | 对应章节 | 核心内容 | 安全关注点 |</p>
-<p>|&mdash;|&mdash;|&mdash;|&mdash;|</p>
-<p>| 上下文设计 | 第二章（上下文工程） | 提示工程、Agent 状态栏、上下文压缩、Agent Skills | 提示注入与信息泄露 |</p>
-<p>| 上下文扩展（知识持久化） | 第三章（知识库） | 用户记忆、RAG、结构化索引、智能体化 RAG | 敏感信息暴露、隐私保护 |</p>
-<p>| 工具设计与安全约束 | 第四章（工具设计） | 工具分类、权限控制、MCP 标准、异步架构 | 误操作、未授权访问、不可逆操作 |</p>
-<p>| 工具的验证与纠正 | 第五章（代码生成） | Coding Agent 的 Harness、测试驱动、代码化规则 | 身份冒用、责任归属 |</p>
-<p>| 系统级验证 | 第六章（评估） | 评估环境、数据集、自动化评估、可观测性 | — |</p>
-<p>| 模型层面的纠正 | 第七章（后训练） | SFT、强化学习——把 Harness 积累的反馈信号写入模型参数，可看作 Harness 工程的延伸 | 目标偏离、对齐与鲁棒性 |</p>
-<p>| 经验驱动的持续纠正 | 第八章（持续进化） | 轨迹学习信号、知识/指令/程序/参数更新、自我修改、验证与回滚 | 记忆污染、不安全的自我修改、能力漂移 |</p>
-<p>| 多模态上下文与工具 | 第九章（多模态与实时交互） | 语音 Agent、Computer Use、机器人操作 | 多模态输入安全过滤、实时交互权限控制 |</p>
-<p>| 多 Agent 间的约束与纠正 | 第十章（多 Agent 协作） | 协作架构、失败模式、Agent 社会 | Agent 间信任越界、共享资源冲突 |</p>
+<table>
+<thead>
+<tr>
+<th>Harness 重点</th>
+<th>对应章节</th>
+<th>核心内容</th>
+<th>安全关注点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上下文设计</td>
+<td>第二章（上下文工程）</td>
+<td>提示工程、Agent 状态栏、上下文压缩、Agent Skills</td>
+<td>提示注入与信息泄露</td>
+</tr>
+<tr>
+<td>上下文扩展（知识持久化）</td>
+<td>第三章（知识库）</td>
+<td>用户记忆、RAG、结构化索引、智能体化 RAG</td>
+<td>敏感信息暴露、隐私保护</td>
+</tr>
+<tr>
+<td>工具设计与安全约束</td>
+<td>第四章（工具设计）</td>
+<td>工具分类、权限控制、MCP 标准、异步架构</td>
+<td>误操作、未授权访问、不可逆操作</td>
+</tr>
+<tr>
+<td>工具的验证与纠正</td>
+<td>第五章（代码生成）</td>
+<td>Coding Agent 的 Harness、测试驱动、代码化规则</td>
+<td>身份冒用、责任归属</td>
+</tr>
+<tr>
+<td>系统级验证</td>
+<td>第六章（评估）</td>
+<td>评估环境、数据集、自动化评估、可观测性</td>
+<td>—</td>
+</tr>
+<tr>
+<td>模型层面的纠正</td>
+<td>第七章（后训练）</td>
+<td>SFT、强化学习——把 Harness 积累的反馈信号写入模型参数，可看作 Harness 工程的延伸</td>
+<td>目标偏离、对齐与鲁棒性</td>
+</tr>
+<tr>
+<td>经验驱动的持续纠正</td>
+<td>第八章（持续进化）</td>
+<td>轨迹学习信号、知识/指令/程序/参数更新、自我修改、验证与回滚</td>
+<td>记忆污染、不安全的自我修改、能力漂移</td>
+</tr>
+<tr>
+<td>多模态上下文与工具</td>
+<td>第九章（多模态与实时交互）</td>
+<td>语音 Agent、Computer Use、机器人操作</td>
+<td>多模态输入安全过滤、实时交互权限控制</td>
+</tr>
+<tr>
+<td>多 Agent 间的约束与纠正</td>
+<td>第十章（多 Agent 协作）</td>
+<td>协作架构、失败模式、Agent 社会</td>
+<td>Agent 间信任越界、共享资源冲突</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>Anthropic 长时运行 Agent 实践：把复杂任务分解为&rdquo;<strong>初始化 Agent</strong>&quot;（设置环境、分解任务列表）与&quot;<strong>执行 Agent</strong>&quot;（每个会话增量推进、留下清晰交接产物），用结构化 Harness 解决长任务中&quot;上下文耗尽&quot;与&quot;过早声明完成&quot;两个问题。</li>
 </ul>

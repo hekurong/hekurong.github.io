@@ -165,13 +165,48 @@
 <ul>
 <li>用两个特征审视五类工具：<strong>调用方向</strong>（这次交互由谁发起）和<strong>作用对象</strong>（这次交互作用于什么）：</li>
 </ul>
-<p>| 工具类型 | 调用方向 | 作用对象 | 典型例子 |</p>
-<p>|&mdash;|&mdash;|&mdash;|&mdash;|</p>
-<p>| 感知工具 | Agent 主动调用 | 获取信息 | web_search、knowledge_base_search、fetch_url、find_file、grep_file、read_file |</p>
-<p>| 执行工具 | Agent 主动调用 | 改变世界 | shell_exec、code_interpreter、write_file、edit_file、send_email |</p>
-<p>| 协作工具 | Agent 主动调用 | 驱动其他 Agent 或人类 | spawn_subagent、send_message_to_subagent、cancel_subagent、list_agents |</p>
-<p>| 用户沟通工具 | Agent 主动调用 | 向用户传递信息 | reply_to_user、send_card_to_user、send_user_notification |</p>
-<p>| 事件触发工具 | Agent 注册、外部触发 | 驱动 Agent 开始执行 | set_timer、monitor_shell、connect_channel |</p>
+<table>
+<thead>
+<tr>
+<th>工具类型</th>
+<th>调用方向</th>
+<th>作用对象</th>
+<th>典型例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>感知工具</td>
+<td>Agent 主动调用</td>
+<td>获取信息</td>
+<td>web_search、knowledge_base_search、fetch_url、find_file、grep_file、read_file</td>
+</tr>
+<tr>
+<td>执行工具</td>
+<td>Agent 主动调用</td>
+<td>改变世界</td>
+<td>shell_exec、code_interpreter、write_file、edit_file、send_email</td>
+</tr>
+<tr>
+<td>协作工具</td>
+<td>Agent 主动调用</td>
+<td>驱动其他 Agent 或人类</td>
+<td>spawn_subagent、send_message_to_subagent、cancel_subagent、list_agents</td>
+</tr>
+<tr>
+<td>用户沟通工具</td>
+<td>Agent 主动调用</td>
+<td>向用户传递信息</td>
+<td>reply_to_user、send_card_to_user、send_user_notification</td>
+</tr>
+<tr>
+<td>事件触发工具</td>
+<td>Agent 注册、外部触发</td>
+<td>驱动 Agent 开始执行</td>
+<td>set_timer、monitor_shell、connect_channel</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>
 <p>协作需要的最简单原因是并行执行不相关任务（并行调研多位联合创始人）；更复杂的原因是不同任务用不同模型/工具/提示词/上下文执行（第十章）。</p>
@@ -432,13 +467,42 @@
 </ul>
 </li>
 </ul>
-<p>| 维度 | 提议者-审核者 | Sidecar |</p>
-<p>|&mdash;|&mdash;|&mdash;|</p>
-<p>| 执行时机 | 操作前（事前审批）或操作后（事后验证） | 与主模型流式输出并行，门控单次工具调用 |</p>
-<p>| 审查对象 | 操作的合理性或操作的结果 | 操作本身（工具调用） |</p>
-<p>| 审查视角 | 独立模型审批、模态切换验证 | 安全性/可靠性校验 |</p>
-<p>| 输入隔离 | 提议者和审查者看到相似信息 | 刻意隔离主模型的自由文本 |</p>
-<p>| 典型用途 | 不可逆操作审批、文档生成、配置修改 | 权限分类、记忆相关性判断、工具输出摘要 |</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>提议者-审核者</th>
+<th>Sidecar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>执行时机</td>
+<td>操作前（事前审批）或操作后（事后验证）</td>
+<td>与主模型流式输出并行，门控单次工具调用</td>
+</tr>
+<tr>
+<td>审查对象</td>
+<td>操作的合理性或操作的结果</td>
+<td>操作本身（工具调用）</td>
+</tr>
+<tr>
+<td>审查视角</td>
+<td>独立模型审批、模态切换验证</td>
+<td>安全性/可靠性校验</td>
+</tr>
+<tr>
+<td>输入隔离</td>
+<td>提议者和审查者看到相似信息</td>
+<td>刻意隔离主模型的自由文本</td>
+</tr>
+<tr>
+<td>典型用途</td>
+<td>不可逆操作审批、文档生成、配置修改</td>
+<td>权限分类、记忆相关性判断、工具输出摘要</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li>
 <p>Sidecar 另一应用：<strong>上下文丰富</strong>——旁路调用并行筛选用户记忆相关性、摘要大型工具输出、预判可能需要的权限，主模型需要时已准备好。</p>
