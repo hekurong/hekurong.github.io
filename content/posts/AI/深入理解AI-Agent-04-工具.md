@@ -51,18 +51,13 @@ description: "Agent 的“手脚”：MCP 互操作标准、五类工具设计�
 
 
 | 工具类型 | 调用方向 | 作用对象 | 典型例子 |
-
 |---|---|---|---|
-
 | 感知工具 | Agent 主动调用 | 获取信息 | web_search、knowledge_base_search、fetch_url、find_file、grep_file、read_file |
-
 | 执行工具 | Agent 主动调用 | 改变世界 | shell_exec、code_interpreter、write_file、edit_file、send_email |
-
 | 协作工具 | Agent 主动调用 | 驱动其他 Agent 或人类 | spawn_subagent、send_message_to_subagent、cancel_subagent、list_agents |
-
 | 用户沟通工具 | Agent 主动调用 | 向用户传递信息 | reply_to_user、send_card_to_user、send_user_notification |
-
 | 事件触发工具 | Agent 注册、外部触发 | 驱动 Agent 开始执行 | set_timer、monitor_shell、connect_channel |
+
 
 
 
@@ -283,18 +278,13 @@ description: "Agent 的“手脚”：MCP 互操作标准、五类工具设计�
 
 
 | 维度 | 提议者-审核者 | Sidecar |
-
 |---|---|---|
-
 | 执行时机 | 操作前（事前审批）或操作后（事后验证） | 与主模型流式输出并行，门控单次工具调用 |
-
 | 审查对象 | 操作的合理性或操作的结果 | 操作本身（工具调用） |
-
 | 审查视角 | 独立模型审批、模态切换验证 | 安全性/可靠性校验 |
-
 | 输入隔离 | 提议者和审查者看到相似信息 | 刻意隔离主模型的自由文本 |
-
 | 典型用途 | 不可逆操作审批、文档生成、配置修改 | 权限分类、记忆相关性判断、工具输出摘要 |
+
 
 
 
