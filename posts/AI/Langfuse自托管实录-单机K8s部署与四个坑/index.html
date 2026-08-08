@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>Langfuse 自托管实录：单机 K8s 上的 Helm 部署与四个坑 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=17">
+
+
+
+
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">Langfuse 自托管实录：单机 K8s 上的 Helm 部署与四个坑</h1>
+    <div class="article-meta">
+      <time datetime="2026-08-08">2026-08-08</time>
+      <span class="ai-badge" title="AI 辅助生成">AI</span>
+      
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/AI/">AI</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Langfuse/">Langfuse</a>
+      
+      <a class="tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="tag" href="/tags/Helm/">Helm</a>
+      
+      <a class="tag" href="/tags/OpenTelemetry/">OpenTelemetry</a>
+      
+      <a class="tag" href="/tags/LLMObservability/">LLMObservability</a>
+      
+      <a class="tag" href="/tags/%e8%87%aa%e6%89%98%e7%ae%a1/">自托管</a>
+      
+    </div>
+    
+  </header>
+
+  <h2 id="heading">缘起</h2>
+<p>做多 Agent 项目到了一定阶段，光有日志和 JSONL 轨迹已经不够看了——需要一个平台级的评估与观察基础设施：trace 详情、token 用量、LLM-as-Judge 评估、数据集回归。调研了一圈（Langfuse、Opik、Phoenix、AgentOps、OpenLIT 等 15 个平台），最终选定 <strong>Langfuse</strong>：社区最大（33k+ star）、Helm 部署成熟、评估能力全覆盖、OTel 原生接收。本文记录在 Docker Desktop 单机 K8s 上的完整部署过程与四个实打实的坑。</p>
+<h2 id="heading-1">选型与版本决策</h2>
+<p>先说版本决策，这是最容易踩但最容易被忽略的一步。</p>
+<p>Langfuse 最新主版本是 v4（宣传&quot;实时、快 165 倍&quot;），但 <strong>v4 要求 ClickHouse ≥ 25.12</strong>，而官方 Helm chart 捆绑的 ClickHouse 停留在 25.2 附近——官方文档自己都建议现有用户&quot;暂缓迁移&quot;。也就是说：</p>
+<ul>
+<li>直接 <code>helm install</code> 默认 chart → 装出来是 <strong>v3</strong>（app 3.224.1）</li>
+<li>想装 v4 → 必须外接 ClickHouse 25.12+，官方推荐路线是 cert-manager + ClickHouse Operator（3 副本 Keeper + 3 副本 ClickHouse + 100Gi 磁盘），对单机 8GB 内存的本地集群是杀鸡用牛刀</li>
+</ul>
+<p>我的选择：<strong>先装 v3 全家桶</strong>。本地数据量极小，v4 的性能优势无意义；等 chart 捆绑的 ClickHouse 支持 v4 再迁移，有官方迁移脚本兜底。</p>
+<h2 id="heading-2">动手前的前置验证</h2>
+<p>安装是高耗时操作，动手前把能验证的都验证掉，避免装到一半才发现断点：</p>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1"># 1. helm 是否已装？（我机器上没装，先 brew install helm）</span>
+</span></span><span class="line"><span class="cl">brew install helm <span class="o">&amp;&amp;</span> helm version --short
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. chart 仓库可达性</span>
+</span></span><span class="line"><span class="cl">curl -sI https://langfuse.github.io/langfuse-k8s/index.yaml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. 把 chart 下载解压，抠出全部镜像 tag 逐个验证</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#    （这步最关键：chart 会拉 6 个镜像，任何一个 tag 失效都是安装失败）</span>
+</span></span><span class="line"><span class="cl">docker manifest inspect bitnamilegacy/postgresql:17.3.0-debian-12-r1
+</span></span><span class="line"><span class="cl">docker manifest inspect bitnamilegacy/clickhouse:25.2.1-debian-12-r0
+</span></span><span class="line"><span class="cl">docker manifest inspect bitnamilegacy/valkey:8.0.2-debian-12-r2
+</span></span><span class="line"><span class="cl">docker manifest inspect bitnamilegacy/minio:2024.12.18-debian-12-r1
+</span></span><span class="line"><span class="cl">docker manifest inspect langfuse/langfuse:3.224.1
+</span></span><span class="line"><span class="cl">docker manifest inspect langfuse/langfuse-worker:3.224.1
+</span></span></code></pre></div></div><p>一个诊断小坑：macOS 没有 GNU <code>timeout</code> 命令，一开始用 <code>timeout 25 docker manifest inspect ...</code> 探测，全部误报 FAIL，排查半天才发现是 <code>timeout: command not found</code>。先确认命令本身可用，再谈网络问题。</p>
+<h2 id="heading-3">安装步骤</h2>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">helm repo add langfuse https://langfuse.github.io/langfuse-k8s
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">kubectl create namespace langfuse
+</span></span><span class="line"><span class="cl">helm install langfuse langfuse/langfuse -n langfuse --version 1.5.41 -f values.yaml
+</span></span></code></pre></div></div><p>chart 会捆绑部署 Postgres、ClickHouse、Valkey（Redis 开源替代）、MinIO 四个子 chart，一条命令全家桶。release 名必须叫 <code>langfuse</code>（否则要改 Redis hostname）。</p>
+<h3 id="valuesyaml-">values.yaml 关键配置</h3>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="nt">langfuse</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">pullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">IfNotPresent</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">salt</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&lt;openssl rand -hex 32 生成&gt;&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">nextauth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l">http://localhost:3000</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">secret</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&lt;openssl rand -hex 32 生成&gt;&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">web</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">pod</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">additionalEnv</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">NODE_OPTIONS</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;--max-old-space-size=1536&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">requests</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 250m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">512Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="nt">, memory</span><span class="p">:</span><span class="w"> </span><span class="l">2Gi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">worker</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">requests</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 100m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">256Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 500m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">512Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">postgresql</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">auth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&lt;生成&gt;&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">primary</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">requests</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 100m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">256Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 500m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">512Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">persistence</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l">5Gi</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">clickhouse</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">zookeeper</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">auth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&lt;生成&gt;&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">requests</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 250m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">512Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="nt">, memory</span><span class="p">:</span><span class="w"> </span><span class="l">1Gi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">persistence</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l">5Gi</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">redis</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">auth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&lt;生成&gt;&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">primary</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">requests</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 50m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">128Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 250m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">256Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">persistence</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l">2Gi</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">s3</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">auth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">rootUser</span><span class="p">:</span><span class="w"> </span><span class="l">langfuse</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">rootPassword</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&lt;生成&gt;&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">requests</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 100m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">256Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span>{<span class="nt">cpu: 500m, memory</span><span class="p">:</span><span class="w"> </span><span class="l">512Mi}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">persistence</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l">5Gi</span><span class="w">
+</span></span></span></code></pre></div></div><p><code>helm template</code> 本地渲染验证一遍再 install，确认资源、PVC、镜像覆盖都生效。</p>
+<h2 id="heading-4">四个坑</h2>
+<h3 id="bitnami-">坑一：Bitnami 镜像全部失效</h3>
+<p>2025 年 8 月 Bitnami 注册表重组，免费镜像迁移到 <code>bitnamilegacy/*</code>，旧 <code>bitnami/*</code> tag 大量 404。我验证子 chart 默认 tag 时四个镜像全部 FAIL。好在 <strong>chart 顶层 values 已经默认把 repository 覆盖为 <code>bitnamilegacy/*</code></strong>（官方防部署失败的设计），所以默认安装没问题——但如果你用的是旧版 chart 或自己覆盖了镜像，必炸。教训：装 chart 前把每个镜像 tag 都 manifest 验证一遍。</p>
+<h3 id="web--node-oom">坑二：web 容器 Node OOM</h3>
+<p>第一次安装后，<code>langfuse-web</code> 容器反复 CrashLoopBackOff，日志最后是：</p>
+<pre><code>FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+</code></pre>
+<p>我给 web 的 limits 只设了 1Gi，Node 进程启动加载量很大（UI + API + MCP 注册），堆到 500MB 左右就撞顶。修复两件套：</p>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span>{<span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">2Gi}       </span><span class="w"> </span><span class="c"># 给足容器内存</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">additionalEnv</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">NODE_OPTIONS</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;--max-old-space-size=1536&#34;</span><span class="w">   </span><span class="c"># 显式钉 Node 堆，留余量给非堆内存</span><span class="w">
+</span></span></span></code></pre></div></div><h3 id="clickhouse---zookeeper-">坑三：ClickHouse 三副本 + zookeeper 三节点</h3>
+<p>默认 chart 会部署 <strong>3 副本 ClickHouse + 3 节点 zookeeper</strong>（单机 K8s 上纯属浪费，还占内存）。单实例场景压成：</p>
+<div class="code-wrapper" data-lang="yaml"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="nt">clickhouse</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">zookeeper</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span></code></pre></div></div><p>渲染验证 zookeeper 相关资源清零后升级，Pod 数从 9 个降到 6 个。</p>
+<h3 id="otlp-">坑四：OTLP 端点路径藏匿</h3>
+<p>文档说 OTel 接入端点是 <code>/api/public/otel</code>，但部署后 POST 返回 404。从容器里挖真实路由：</p>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kubectl <span class="nb">exec</span> -n langfuse deploy/langfuse-web -- sh -c <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  <span class="s2">&#34;grep -oE &#39;api/public/[a-z_/]+&#39; /app/web/.next/routes-manifest.json | grep otel&#34;</span>
+</span></span></code></pre></div></div><p>真相：v3.224.1 的 OTLP 接收端点是 <strong><code>/api/public/otel/otlp-proto/generated/root</code></strong>（OTLP protobuf 协议）。探测确认路由存活（POST 空 body 返回 500 而不是 404，说明路由存在、只是 protobuf 解析失败）。顺带发现 <code>/api/public/ingestion</code>（SDK JSON 摄入）也活着。</p>
+<h3 id="-eof">附加小坑：镜像拉取偶发 EOF</h3>
+<p>安装中 web 镜像拉取报 <code>short read: expected 685 bytes but got 0: unexpected EOF</code>——网络传输中断的偶发错误。处置：CLI 预拉镜像入本地库（<code>docker pull langfuse/langfuse:3.224.1</code>），配合 <code>pullPolicy: IfNotPresent</code>，Pod 直接复用本地镜像，不再依赖 kubelet 退避重试。</p>
+<h2 id="heading-5">验证</h2>
+<div class="code-wrapper" data-lang="bash"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl">kubectl get pods -n langfuse        <span class="c1"># 6 个 Pod 全 Running</span>
+</span></span><span class="line"><span class="cl">curl localhost:3000/api/public/health   <span class="c1"># {&#34;status&#34;:&#34;OK&#34;,&#34;version&#34;:&#34;3.224.1&#34;}</span>
+</span></span><span class="line"><span class="cl">curl -o /dev/null -w <span class="s2">&#34;%{http_code}&#34;</span> localhost:3000/   <span class="c1"># 200</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># OTLP 端点存活：POST /api/public/otel/otlp-proto/generated/root → 500（非 404）</span>
+</span></span></code></pre></div></div><p>访问方式：<code>kubectl port-forward svc/langfuse-web -n langfuse 3000:3000</code>，浏览器打开 <code>http://localhost:3000</code> 注册账号（首次注册即创建组织）。</p>
+<h2 id="heading-6">使用方式</h2>
+<ul>
+<li><strong>UI</strong>：trace 详情、dashboards、数据集回归、LLM-as-Judge 评估、prompt 版本管理都在界面里</li>
+<li><strong>SDK 接入</strong>：<code>pip install langfuse</code>，配置 <code>LANGFUSE_PUBLIC_KEY</code> / <code>LANGFUSE_SECRET_KEY</code> / <code>LANGFUSE_HOST=http://localhost:3000</code></li>
+<li><strong>OTel 接入</strong>：OTLP exporter 指向 <code>http://localhost:3000/api/public/otel/otlp-proto/generated/root</code>，带 Bearer 认证</li>
+<li><strong>升级策略</strong>：钉 chart 版本（1.5.41），不追新；等捆绑 ClickHouse 支持 v4 后再评估迁移</li>
+</ul>
+<h2 id="heading-7">收尾</h2>
+<p>单机 K8s 自托管 Langfuse 完全可行，最终资源占用约 3-4GB（按需启停的话平时可以 helm uninstall / scale 到 0）。最大的教训是：<strong>生产级 Helm chart 的默认值是为高可用设计的，本地部署必须逐项核资源、核副本、核镜像</strong>——好在这些都发生在安装前的验证和安装后的日志里，没有一个是玄学。</p>
+
+</article>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <div></div>
+  
+  
+  <a class="post-nav-link next" href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-00-%e5%af%bc%e8%af%bb%e4%b8%8e%e5%85%a8%e4%b9%a6%e7%bb%93%e6%9e%84/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">《深入理解 AI Agent》精读：导读与全书结构</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8aKubernetes%e7%bc%96%e7%a8%8b%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《Kubernetes编程》记录</span>
+      <span class="related-card-date">2025-04-09</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/minikube%ef%bc%9aUbuntu%e9%83%a8%e7%bd%b2%e6%9c%ac%e5%9c%b0%e9%9b%86%e7%be%a4%e8%b8%a9%e5%9d%91/">
+      <span class="related-card-title">minikube：Ubuntu部署本地集群踩坑</span>
+      <span class="related-card-date">2025-01-25</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e3%80%8aKubernetes%e5%be%ae%e6%9c%8d%e5%8a%a1%e5%ae%9e%e6%88%98%e3%80%8b%e8%ae%b0%e5%bd%95/">
+      <span class="related-card-title">《Kubernetes微服务实战》记录</span>
+      <span class="related-card-date">2025-01-25</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/Langfuse%e8%87%aa%e6%89%98%e7%ae%a1%e5%ae%9e%e5%bd%95-%e5%8d%95%e6%9c%baK8s%e9%83%a8%e7%bd%b2%e4%b8%8e%e5%9b%9b%e4%b8%aa%e5%9d%91/">Langfuse 自托管实录：单机 K8s 上的 Helm 部署与四个坑</a>
+        <span class="sidebar-post-date">2026-08-08</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-00-%e5%af%bc%e8%af%bb%e4%b8%8e%e5%85%a8%e4%b9%a6%e7%bb%93%e6%9e%84/">《深入理解 AI Agent》精读：导读与全书结构</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-01-AI-Agent-%e5%85%a5%e9%97%a8/">《深入理解 AI Agent》精读：第一章 AI Agent 入门</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-02-%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">《深入理解 AI Agent》精读：第二章 上下文工程</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/AI/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3AI-Agent-03-%e7%94%a8%e6%88%b7%e8%ae%b0%e5%bf%86%e5%92%8c%e7%9f%a5%e8%af%86%e5%ba%93/">《深入理解 AI Agent》精读：第三章 用户记忆和知识库</a>
+        <span class="sidebar-post-date">2026-08-04</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/A2A/">A2A</a>
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Agent/">AI Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/Coding%20Agent/">Coding Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Computer%20Use/">Computer Use</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GGUF/">GGUF</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Helm/">Helm</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/KV%20Cache/">KV Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/Kanban/">Kanban</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM-as-a-Judge/">LLM-as-a-Judge</a>
+      
+      <a class="sidebar-tag" href="/tags/LLMObservability/">LLMObservability</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Langfuse/">Langfuse</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/MCP/">MCP</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/OpenTelemetry/">OpenTelemetry</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RL/">RL</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/ReAct/">ReAct</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SFT/">SFT</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/llama.cpp/">llama.cpp</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/vLLM/">vLLM</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">上下文工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bb%a3%e7%a0%81%e7%94%9f%e6%88%90/">代码生成</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8f%e4%bd%9c%e6%a8%a1%e5%bc%8f/">协作模式</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8e%e8%ae%ad%e7%bb%83/">后训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9aAgent/">多Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9a%e6%a8%a1%e6%80%81/">多模态</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e7%94%a8/">工具调用</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8c%81%e7%bb%ad%e8%bf%9b%e5%8c%96/">持续进化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e5%bc%95%e6%93%8e/">推理引擎</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ac%e5%9c%b0%e6%8e%a8%e7%90%86/">本地推理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9f%a5%e8%af%86%e5%ba%93/">知识库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%88%91%e6%94%b9%e8%bf%9b/">自我改进</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%89%98%e7%ae%a1/">自托管</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%84%e4%bc%b0/">评估</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%ad%e9%9f%b3/">语音</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%bb%e4%b9%a6%e7%ac%94%e8%ae%b0/">读书笔记</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e7%a0%94/">调研</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+      
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>

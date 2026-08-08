@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>/</loc></url>
+  <url><loc>/posts/AI/Langfuse自托管实录-单机K8s部署与四个坑/</loc></url>
   <url><loc>/posts/AI/深入理解AI-Agent-00-导读与全书结构/</loc></url>
   <url><loc>/posts/AI/深入理解AI-Agent-01-AI-Agent-入门/</loc></url>
   <url><loc>/posts/AI/深入理解AI-Agent-02-上下文工程/</loc></url>
@@ -66,10 +67,10 @@
   <url><loc>/posts/DailyDev/golang单元测试与冒烟测试入门/</loc></url>
   <url><loc>/posts/DailyDev/kafka简单入门/</loc></url>
   <url><loc>/posts/DailyDev/xxl-job简单入门/</loc></url>
-  <url><loc>/posts/DailyDev/TCP的三次握手与四次挥手/</loc></url>
-  <url><loc>/posts/DailyDev/sync包详解/</loc></url>
-  <url><loc>/posts/DailyDev/搞懂BIO与AIO/</loc></url>
   <url><loc>/posts/DailyDev/WebSocket面试详解/</loc></url>
+  <url><loc>/posts/DailyDev/sync包详解/</loc></url>
+  <url><loc>/posts/DailyDev/TCP的三次握手与四次挥手/</loc></url>
+  <url><loc>/posts/DailyDev/搞懂BIO与AIO/</loc></url>
   <url><loc>/posts/DailyDev/常见linux命令/</loc></url>
   <url><loc>/posts/DailyDev/pprof指南/</loc></url>
   <url><loc>/posts/PaperNotes/基于大型语言模型的检索增强生成综述_刘雪颖/</loc></url>
