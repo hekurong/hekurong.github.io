@@ -661,3 +661,15 @@
       }
     }
   }
+
+  /* ================================================================ */
+  /*  4. Shortcode tabs: click to switch panels                        */
+  /* ================================================================ */
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    var tabs = btn.closest('[data-tabs]');
+    if (!tabs) return;
+    tabs.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
+    tabs.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-panel') === btn.getAttribute('data-tab')); });
+  });
