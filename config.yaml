@@ -1,6 +1,9 @@
 title: "KurongBlog"
 subtitle: "记录日常"
 description: "技术博客，记录学习与思考"
+baseURL: "https://hekurong.github.io"
+author:
+  name: "Kurong"
 language: "zh-CN"
 copyright: "CC BY-NC-SA 4.0"
 theme: "zhenhai"
