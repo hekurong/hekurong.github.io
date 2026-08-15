@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://hekurong.github.io/</loc></url>
+  <url><loc>https://hekurong.github.io/posts/AI/deepseek-harness-architecture/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/Langfuse自托管实录-单机K8s部署与四个坑/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/DockerDesktop单机K8s实测-能力全不全与能不能代替Docker/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/深入理解AI-Agent-00-导读与全书结构/</loc></url>
@@ -16,14 +17,14 @@
   <url><loc>https://hekurong.github.io/posts/AI/深入理解AI-Agent-10-多-Agent-协作/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/深入理解AI-Agent-11-后记/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/多Agent实操-Kanban与A2A探索/</loc></url>
+  <url><loc>https://hekurong.github.io/posts/AI/llama.cpp-本地推理入门/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/vLLM-推理引擎入门/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/多Agent现状调研-工业界视角/</loc></url>
-  <url><loc>https://hekurong.github.io/posts/AI/llama.cpp-本地推理入门/</loc></url>
+  <url><loc>https://hekurong.github.io/posts/央国企计算机笔试准备/05-计算机组成原理/</loc></url>
+  <url><loc>https://hekurong.github.io/posts/央国企计算机笔试准备/04-数据库与SQL/</loc></url>
   <url><loc>https://hekurong.github.io/posts/央国企计算机笔试准备/03-计算机网络/</loc></url>
   <url><loc>https://hekurong.github.io/posts/央国企计算机笔试准备/02-操作系统/</loc></url>
   <url><loc>https://hekurong.github.io/posts/央国企计算机笔试准备/01-数据结构/</loc></url>
-  <url><loc>https://hekurong.github.io/posts/央国企计算机笔试准备/04-数据库与SQL/</loc></url>
-  <url><loc>https://hekurong.github.io/posts/央国企计算机笔试准备/05-计算机组成原理/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/hermes-moa-deep-usage/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/何府春深前传/</loc></url>
   <url><loc>https://hekurong.github.io/posts/AI/何府春深/</loc></url>
@@ -68,10 +69,10 @@
   <url><loc>https://hekurong.github.io/posts/DailyDev/golang单元测试与冒烟测试入门/</loc></url>
   <url><loc>https://hekurong.github.io/posts/DailyDev/xxl-job简单入门/</loc></url>
   <url><loc>https://hekurong.github.io/posts/DailyDev/kafka简单入门/</loc></url>
-  <url><loc>https://hekurong.github.io/posts/DailyDev/TCP的三次握手与四次挥手/</loc></url>
-  <url><loc>https://hekurong.github.io/posts/DailyDev/sync包详解/</loc></url>
-  <url><loc>https://hekurong.github.io/posts/DailyDev/搞懂BIO与AIO/</loc></url>
   <url><loc>https://hekurong.github.io/posts/DailyDev/WebSocket面试详解/</loc></url>
+  <url><loc>https://hekurong.github.io/posts/DailyDev/sync包详解/</loc></url>
+  <url><loc>https://hekurong.github.io/posts/DailyDev/TCP的三次握手与四次挥手/</loc></url>
+  <url><loc>https://hekurong.github.io/posts/DailyDev/搞懂BIO与AIO/</loc></url>
   <url><loc>https://hekurong.github.io/posts/DailyDev/常见linux命令/</loc></url>
   <url><loc>https://hekurong.github.io/posts/DailyDev/pprof指南/</loc></url>
   <url><loc>https://hekurong.github.io/posts/PaperNotes/基于大型语言模型的检索增强生成综述_刘雪颖/</loc></url>
