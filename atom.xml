@@ -3,12 +3,19 @@
   <title>KurongBlog</title>
   <subtitle>技术博客，记录学习与思考</subtitle>
   <id>https://hekurong.github.io/</id>
-  <updated>2026-08-15T14:02:17Z</updated>
+  <updated>2026-08-17T01:37:09Z</updated>
   <link rel="self" type="application/atom+xml" href="https://hekurong.github.io/atom.xml"></link>
   <link href="https://hekurong.github.io/"></link>
   <author>
     <name>Kurong</name>
   </author>
+  <entry>
+    <title>后端八股复习指南：博客文章索引</title>
+    <id>https://hekurong.github.io/posts/DailyDev/后端八股复习指南：博客文章索引/</id>
+    <updated>2026-08-17T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/DailyDev/后端八股复习指南：博客文章索引/"></link>
+    <summary>写在前面&#xA;博客写了不少东西，但零散分布在各个分类里。趁秋招季，把后端八股相关的文章按主题整理一份索引，方便自己复习时快速定位，也给同路人一个参考。&#xA;按网络 → 数据库 → 缓存/分布式 → 消息队列 → Go 语言 → 中间件/工程化 → 分布式理论的顺序排列，这也是我认为的复习优先级。&#xA;&#xA;网络&#xA;网络是后端八股的地基，面试必问。TCP 握手挥手、IO 模型、HTTP 协议，这几篇覆盖了核心考点。&#xA;&#xA;TCP的三次握手与四次挥手 — 含面试高频考点，SYN/FIN 状态机、TIME_WAIT 原因与调优&#xA;搞懂 BIO 与 AIO — select/poll/epoll 对比，高并发 IO 模型演进…</summary>
+  </entry>
   <entry>
     <title>DeepSeek Harness 架构全解读：两天十万星的一切皆插件</title>
     <id>https://hekurong.github.io/posts/AI/deepseek-harness-architecture/</id>
@@ -141,12 +148,5 @@
     <updated>2026-08-02T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/AI/多Agent现状调研-工业界视角/"></link>
     <summary>以工业界视角（非学术成果）全面调研多Agent/Agentic AI现状：发展到了哪一步、在向哪几个方向发展、是否与2023年的设想走偏、有哪些局限。所有事实均经来源核实。</summary>
-  </entry>
-  <entry>
-    <title>计算机组成原理</title>
-    <id>https://hekurong.github.io/posts/央国企计算机笔试准备/05-计算机组成原理/</id>
-    <updated>2026-07-12T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/央国企计算机笔试准备/05-计算机组成原理/"></link>
-    <summary>计算机组成原理&#xA;&#xA;来源：基于408统考大纲自编（CS-Notes/JavaGuide/hello-algo 均无计组内容）&#xA;央国企考察特点：建设银行、工商银行曾出现计组题目，中行/国网偶有涉及。考察形式以概念辨析、数据表示计算、Cache映射计算、寻址方式判断为主，难度低于408统考但高于教材级概念。广度优先，重点掌握计算规则和概念对比。&#xA;&#xA;&#xA;一、计算机系统概述&#xA;1. 冯·诺依曼结构&#xA;冯·诺依曼结构的核心思想是存储程序——程序和数据以二进制形式存放在存储器中，计算机按指令顺序自动执行。计算机由五大部件组成：**运算器（ALU）**负责算术运算与逻辑运算；控制器负责译码指令、产生控制信号、指挥各…</summary>
   </entry>
 </feed>
