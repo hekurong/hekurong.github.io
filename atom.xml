@@ -3,12 +3,26 @@
   <title>KurongBlog</title>
   <subtitle>技术博客，记录学习与思考</subtitle>
   <id>https://hekurong.github.io/</id>
-  <updated>2026-08-17T01:42:25Z</updated>
+  <updated>2026-08-19T11:31:31Z</updated>
   <link rel="self" type="application/atom+xml" href="https://hekurong.github.io/atom.xml"></link>
   <link href="https://hekurong.github.io/"></link>
   <author>
     <name>Kurong</name>
   </author>
+  <entry>
+    <title>Go 面试八股（一）：语言特质与核心数据结构</title>
+    <id>https://hekurong.github.io/posts/Go面试八股/Go面试八股（一）：语言特质与核心数据结构/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/Go面试八股/Go面试八股（一）：语言特质与核心数据结构/"></link>
+    <summary>Go 面试八股（一）：语言特质与核心数据结构&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：面向技术面试的 Go 语言核心知识梳理，共两篇。本篇覆盖语言特质、面向对象实现、基础语法、数组与切片、Map 与接口。下一篇覆盖并发调度与内存管理。&#xA;&#xA;&#xA;一、语言特质&#xA;1. Go 是面向对象的语言吗&#xA;是，也不是。Go 有类型和方法，允许面向对象的编程风格，但没有类型层次（继承体系）。&#xA;&#xA;面向对象以封装、继承、多态三大特性为核心，Go 三者都沾，但实现方式与传统语言不同&#xA;Go 的接口概念提供了一种非侵入式的组合方式，与经典面向对象语言中的子类不同&#xA;Go 可以…</summary>
+  </entry>
+  <entry>
+    <title>Go 面试八股（二）：并发模型与内存管理</title>
+    <id>https://hekurong.github.io/posts/Go面试八股/Go面试八股（二）：并发模型与内存管理/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/Go面试八股/Go面试八股（二）：并发模型与内存管理/"></link>
+    <summary>Go 面试八股（二）：并发模型与内存管理&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：上篇讲语言与数据结构，本篇进入 Go 最硬核的并发与内存机制，GMP 调度、channel、锁、GC、逃逸分析都是技术面深挖的重灾区。&#xA;&#xA;&#xA;一、进程、线程与协程&#xA;1. 三者的区别（必问）&#xA;&#xA;进程是应用程序的运行实例，每个进程有独立的内存空间，进程间通信靠管道、Socket、共享内存等机制&#xA;线程是进程内的执行单元，是操作系统调度的基本单位，同一进程的线程共享进程资源，通过共享内存通信&#xA;协程是用户态的轻量级线程，不受操作系统调度，由应用自身的调度器把协程调度到线程…</summary>
+  </entry>
   <entry>
     <title>后端八股复习指南：博客文章索引</title>
     <id>https://hekurong.github.io/posts/DailyDev/后端八股复习指南：博客文章索引/</id>
@@ -134,19 +148,5 @@
     <updated>2026-08-02T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/AI/llama.cpp-本地推理入门/"></link>
     <summary>llama.cpp 入门学习笔记：GGUF 格式与量化原理、macOS 本地安装与使用、HTTP 服务与生态，以及与 vLLM 的选型对比。</summary>
-  </entry>
-  <entry>
-    <title>vLLM 推理引擎入门</title>
-    <id>https://hekurong.github.io/posts/AI/vLLM-推理引擎入门/</id>
-    <updated>2026-08-02T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/vLLM-推理引擎入门/"></link>
-    <summary>vLLM 入门学习笔记：它解决什么问题、PagedAttention 与连续批处理等核心机制、快速上手部署与调优路线。</summary>
-  </entry>
-  <entry>
-    <title>多Agent现状调研：工业界的真实进度、方向与局限</title>
-    <id>https://hekurong.github.io/posts/AI/多Agent现状调研-工业界视角/</id>
-    <updated>2026-08-02T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/多Agent现状调研-工业界视角/"></link>
-    <summary>以工业界视角（非学术成果）全面调研多Agent/Agentic AI现状：发展到了哪一步、在向哪几个方向发展、是否与2023年的设想走偏、有哪些局限。所有事实均经来源核实。</summary>
   </entry>
 </feed>
