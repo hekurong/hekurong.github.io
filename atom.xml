@@ -3,25 +3,32 @@
   <title>KurongBlog</title>
   <subtitle>技术博客，记录学习与思考</subtitle>
   <id>https://hekurong.github.io/</id>
-  <updated>2026-08-19T12:23:27Z</updated>
+  <updated>2026-08-19T12:47:36Z</updated>
   <link rel="self" type="application/atom+xml" href="https://hekurong.github.io/atom.xml"></link>
   <link href="https://hekurong.github.io/"></link>
   <author>
     <name>Kurong</name>
   </author>
   <entry>
-    <title>Redis 面试八股（一）：数据类型与底层结构</title>
-    <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/</id>
+    <title>消息队列面试八股（一）：Kafka</title>
+    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/</id>
     <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/"></link>
-    <summary>Redis 面试八股（一）：数据类型与底层结构&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股共两篇。本篇覆盖 Redis 基础、数据类型与底层结构、线程模型、内存管理。下一篇进入持久化、缓存三兄弟、一致性、集群与治理。&#xA;&#xA;&#xA;一、Redis 基础&#xA;1. 什么是 Redis&#xA;Redis 是基于 C 语言开发的开源内存数据库，以键值对形式存储数据。数据常驻内存，读写速度极快，被广泛用于分布式缓存。与传统关系型数据库不同，内存数据库的访问延迟在纳秒级，而磁盘数据库在毫秒级，相差数个数量级。&#xA;Redi…</summary>
+    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/"></link>
+    <summary>消息队列面试八股（一）：Kafka&#xA;&#xA;来源：面试八股资料整理（kafka八股.pdf），结合 Kafka 官方文档口径校正。&#xA;定位：消息队列面试八股第一篇，Kafka 专项。覆盖消息模型、核心概念、副本机制、顺序保证、消息不丢失与重复消费、重试机制。下一篇是 RabbitMQ 专项。&#xA;&#xA;&#xA;一、Kafka 基础&#xA;1. Kafka 是什么&#xA;Kafka 是分布式流式处理平台，兼具三个能力：发布订阅消息流，也就是消息队列功能；容错的持久化存储，消息落盘避免丢失；流式处理，提供完整的流处理类库。&#xA;两大应用场景：一是建实时流数据管道，在系统与应用程序之间可靠搬运数据；二是构建实时流处理程序，对数据流做转换…</summary>
   </entry>
   <entry>
-    <title>Go 面试八股（一）：语言特质与核心数据结构</title>
-    <id>https://hekurong.github.io/posts/Go面试八股/Go面试八股（一）：语言特质与核心数据结构/</id>
+    <title>Redis 面试八股（二）：持久化、缓存与集群</title>
+    <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（二）：持久化、缓存与集群/</id>
     <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/Go面试八股/Go面试八股（一）：语言特质与核心数据结构/"></link>
-    <summary>Go 面试八股（一）：语言特质与核心数据结构&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：面向技术面试的 Go 语言核心知识梳理，共两篇。本篇覆盖语言特质、面向对象实现、基础语法、数组与切片、Map 与接口。下一篇覆盖并发调度与内存管理。&#xA;&#xA;&#xA;一、语言特质&#xA;1. Go 是面向对象的语言吗&#xA;是，也不是。Go 有类型和方法，允许面向对象的编程风格，但没有类型层次（继承体系）。&#xA;&#xA;面向对象以封装、继承、多态三大特性为核心，Go 三者都沾，但实现方式与传统语言不同&#xA;Go 的接口概念提供了一种非侵入式的组合方式，与经典面向对象语言中的子类不同&#xA;Go 可以…</summary>
+    <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（二）：持久化、缓存与集群/"></link>
+    <summary>Redis 面试八股（二）：持久化、缓存与集群&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股第二篇，生产实战向。事务与 Lua、持久化、缓存三兄弟、一致性、热点治理、集群，这些问题是面试中区分是否真正在生产环境用过 Redis 的分水岭。&#xA;&#xA;&#xA;一、Redis 事务与 Lua 脚本&#xA;1. 事务的基本用法&#xA;Redis 事务把多个命令打包，按顺序执行且中途不被其他命令插入。用 MULTI 开启，命令入队，EXEC 执行，DISCARD 取消队列。WATCH 提供乐观锁，事务执行前监听指定 key，…</summary>
+  </entry>
+  <entry>
+    <title>消息队列面试八股（二）：RabbitMQ</title>
+    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/"></link>
+    <summary>消息队列面试八股（二）：RabbitMQ&#xA;&#xA;来源：面试八股资料整理（rabbitmq八股.pdf），结合 RabbitMQ 官方文档口径校正。&#xA;定位：消息队列面试八股第二篇，RabbitMQ 专项。与 Kafka 的分区模型不同，RabbitMQ 是经典的交换器加队列模型，路由灵活、保证机制成熟，在企业级系统里应用广泛。&#xA;&#xA;&#xA;一、RabbitMQ 是什么&#xA;RabbitMQ 是在 AMQP 协议基础上实现的可复用企业消息系统，用 Erlang 编写，天然支持并发生态。它能支撑大型系统模块之间的高可靠通信，易用性、扩展性与高可用性都不错。&#xA;特点概括：&#xA;&#xA;可靠性，通过持久化、传输确认、发布确认等机制…</summary>
   </entry>
   <entry>
     <title>Go 面试八股（二）：并发模型与内存管理</title>
@@ -45,11 +52,18 @@
     <summary>MySQL 面试八股（二）：事务、锁与日志&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql日志八股.pdf、mysql的MVCC实现八股.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股第二篇，管写入与并发侧。事务怎么保证、锁怎么控制、MVCC 怎么实现可见性、三类日志各司其职，是数据库面试含金量最高的部分。&#xA;&#xA;&#xA;一、事务与并发问题&#xA;1. 什么是事务&#xA;事务是逻辑上的一组操作，要么全部执行，要么全部不执行。经典例子是转账，扣减转出方余额与增加转入方余额必须作为一个整体，任何一步失败都要回滚。&#xA;数据库事务有 ACID 四大特性：&#xA;&#xA;原子性，事务是最小的执…</summary>
   </entry>
   <entry>
-    <title>Redis 面试八股（二）：持久化、缓存与集群</title>
-    <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（二）：持久化、缓存与集群/</id>
+    <title>Redis 面试八股（一）：数据类型与底层结构</title>
+    <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/</id>
     <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（二）：持久化、缓存与集群/"></link>
-    <summary>Redis 面试八股（二）：持久化、缓存与集群&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股第二篇，生产实战向。事务与 Lua、持久化、缓存三兄弟、一致性、热点治理、集群，这些问题是面试中区分是否真正在生产环境用过 Redis 的分水岭。&#xA;&#xA;&#xA;一、Redis 事务与 Lua 脚本&#xA;1. 事务的基本用法&#xA;Redis 事务把多个命令打包，按顺序执行且中途不被其他命令插入。用 MULTI 开启，命令入队，EXEC 执行，DISCARD 取消队列。WATCH 提供乐观锁，事务执行前监听指定 key，…</summary>
+    <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/"></link>
+    <summary>Redis 面试八股（一）：数据类型与底层结构&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股共两篇。本篇覆盖 Redis 基础、数据类型与底层结构、线程模型、内存管理。下一篇进入持久化、缓存三兄弟、一致性、集群与治理。&#xA;&#xA;&#xA;一、Redis 基础&#xA;1. 什么是 Redis&#xA;Redis 是基于 C 语言开发的开源内存数据库，以键值对形式存储数据。数据常驻内存，读写速度极快，被广泛用于分布式缓存。与传统关系型数据库不同，内存数据库的访问延迟在纳秒级，而磁盘数据库在毫秒级，相差数个数量级。&#xA;Redi…</summary>
+  </entry>
+  <entry>
+    <title>Go 面试八股（一）：语言特质与核心数据结构</title>
+    <id>https://hekurong.github.io/posts/Go面试八股/Go面试八股（一）：语言特质与核心数据结构/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/Go面试八股/Go面试八股（一）：语言特质与核心数据结构/"></link>
+    <summary>Go 面试八股（一）：语言特质与核心数据结构&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：面向技术面试的 Go 语言核心知识梳理，共两篇。本篇覆盖语言特质、面向对象实现、基础语法、数组与切片、Map 与接口。下一篇覆盖并发调度与内存管理。&#xA;&#xA;&#xA;一、语言特质&#xA;1. Go 是面向对象的语言吗&#xA;是，也不是。Go 有类型和方法，允许面向对象的编程风格，但没有类型层次（继承体系）。&#xA;&#xA;面向对象以封装、继承、多态三大特性为核心，Go 三者都沾，但实现方式与传统语言不同&#xA;Go 的接口概念提供了一种非侵入式的组合方式，与经典面向对象语言中的子类不同&#xA;Go 可以…</summary>
   </entry>
   <entry>
     <title>后端八股复习指南：博客文章索引</title>
@@ -134,19 +148,5 @@
     <updated>2026-08-04T04:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-07-模型后训练/"></link>
     <summary>SFT 记忆、RL 泛化；数据与环境比算法更重要</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第八章 Agent 的持续进化</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-08-Agent-的持续进化/</id>
-    <updated>2026-08-04T03:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-08-Agent-的持续进化/"></link>
-    <summary>把运行经验转化为下一版本能力：学习信号、四种更新载体与安全边界</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第九章 多模态与实时交互</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-09-多模态与实时交互/</id>
-    <updated>2026-08-04T02:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-09-多模态与实时交互/"></link>
-    <summary>从文本世界走向物理世界：语音 Agent、Computer Use 与机器人操作</summary>
   </entry>
 </feed>
