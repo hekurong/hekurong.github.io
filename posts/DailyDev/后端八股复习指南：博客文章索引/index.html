@@ -138,7 +138,10 @@
 
   <h2 id="heading">写在前面</h2>
 <p>博客写了不少东西，但零散分布在各个分类里。趁秋招季，把后端八股相关的文章按主题整理一份索引，方便自己复习时快速定位，也给同路人一个参考。</p>
-<p>按<strong>网络 → 数据库 → 缓存/分布式 → 消息队列 → Go 语言 → 中间件/工程化 → 分布式理论</strong>的顺序排列，这也是我认为的复习优先级。</p>
+<p>按<strong>网络、数据库、缓存/分布式、消息队列、Go 语言、中间件/工程化、分布式理论</strong>的顺序排列，这也是我认为的复习优先级。</p>
+<blockquote>
+<p>2026-08-19 更新：新增 Go / MySQL / Redis / 消息队列 四个「面试八股」系列共八篇，均为系统性整理，覆盖各主题的面试主干考点，标注在各分节最前。</p>
+</blockquote>
 <hr>
 <h2 id="heading-1">网络</h2>
 <p>网络是后端八股的地基，面试必问。TCP 握手挥手、IO 模型、HTTP 协议，这几篇覆盖了核心考点。</p>
@@ -151,6 +154,8 @@
 <h2 id="heading-2">数据库</h2>
 <p>MySQL 是后端面试的重中之重，索引、锁、事务隔离级别几乎必考。PostgreSQL 和 MongoDB 属于加分项。</p>
 <ul>
+<li><a href="/posts/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E6%9E%B6%E6%9E%84%E3%80%81%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B8%8E%E7%B4%A2%E5%BC%95/">MySQL 面试八股（一）：架构、存储引擎与索引</a> — 字段类型速记、SQL 执行流程、InnoDB/MyISAM、B+ 索引全解（覆盖索引/最左前缀/索引下推）</li>
+<li><a href="/posts/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E3%80%81%E9%94%81%E4%B8%8E%E6%97%A5%E5%BF%97/">MySQL 面试八股（二）：事务、锁与日志</a> — 事务隔离级别、三类行锁、redo/binlog/undo、MVCC 可见性</li>
 <li><a href="/posts/DailyDev/Mysql%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">Mysql 必知必会读书笔记</a> — SQL 基础、增删改查、连接查询、子查询</li>
 <li><a href="/posts/DailyDev/%E3%80%8A%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E3%80%8B%E8%AE%B0%E5%BD%95/">《高性能 MySQL》记录</a> — 索引原理、查询优化、锁机制、事务隔离级别</li>
 <li><a href="/posts/DailyDev/%E3%80%8APostgreSQL%E6%8C%87%E5%8D%97%E3%80%8B%E8%AE%B0%E5%BD%95/">《PostgreSQL 指南》记录</a> — PG 特性、与 MySQL 的差异、适用场景</li>
@@ -158,6 +163,8 @@
 <h2 id="heading-3">缓存与分布式</h2>
 <p>Redis 和分布式锁是面试高频中的高频，缓存穿透/击穿/雪崩三连问几乎逃不掉。</p>
 <ul>
+<li><a href="/posts/Redis%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/Redis%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84/">Redis 面试八股（一）：数据类型与底层结构</a> — SDS 底层、跳表选型、线程模型、过期删除与内存淘汰</li>
+<li><a href="/posts/Redis%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/Redis%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%8C%81%E4%B9%85%E5%8C%96%E3%80%81%E7%BC%93%E5%AD%98%E4%B8%8E%E9%9B%86%E7%BE%A4/">Redis 面试八股（二）：持久化、缓存与集群</a> — RDB/AOF/混合持久化、缓存三兄弟、bigkey/hotkey、Sentinel 与 Cluster</li>
 <li><a href="/posts/DailyDev/%E3%80%8A%E9%AB%98%E6%95%88%E4%BD%BF%E7%94%A8Redis%E3%80%8B%E8%AE%B0%E5%BD%95/">《高效使用 Redis》记录</a> — Redis 数据结构、持久化、过期策略</li>
 <li><a href="/posts/DailyDev/%E3%80%8ARedis%E6%B7%B1%E5%BA%A6%E5%8E%86%E9%99%A9%E3%80%8B%E8%AE%B0%E5%BD%95/">《Redis 深度历险》记录</a> — Redis 进阶原理、集群、分布式锁实现</li>
 <li><a href="/posts/DailyDev/%E9%9D%A2%E8%AF%95%E6%BC%AB%E8%B0%88%EF%BC%9A%E7%BC%93%E5%AD%98%E7%9A%84%E4%B8%89%E5%A4%A7%E5%9C%BA%E6%99%AF%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">面试漫谈：缓存的三大场景与分布式锁</a> — 缓存穿透/击穿/雪崩 + 分布式锁方案对比</li>
@@ -165,6 +172,8 @@
 <h2 id="heading-4">消息队列</h2>
 <p>消息队列考察异步解耦、削峰填谷的理解。Kafka 和 RabbitMQ 是两大主流。</p>
 <ul>
+<li><a href="/posts/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AKafka/">消息队列面试八股（一）：Kafka</a> — 消息模型、多副本与 ISR、消息不丢失四件套、重复消费与重试</li>
+<li><a href="/posts/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9ARabbitMQ/">消息队列面试八股（二）：RabbitMQ</a> — 交换器四型、死信与延迟队列、可靠性三段、高可用模式</li>
 <li><a href="/posts/DailyDev/kafka%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8/">Kafka 简单入门</a> — 核心概念、分区与副本、Go 实战、面试高频考点</li>
 <li><a href="/posts/DailyDev/%E3%80%8AKafka%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%E3%80%8B%E8%AE%B0%E5%BD%95/">《Kafka 权威指南》记录</a> — Kafka 深入原理、消费者组、精确一次语义</li>
 <li><a href="/posts/DailyDev/%E3%80%8A%E6%B7%B1%E5%85%A5RabbitMQ%E3%80%8B%E8%AE%B0%E5%BD%95/">《深入 RabbitMQ》记录</a> — RabbitMQ 架构、消息确认、高可用队列</li>
@@ -172,6 +181,8 @@
 <h2 id="go-">Go 语言</h2>
 <p>Go 是主力语言，并发模型和标准库是面试考察重点。sync 包的底层原理、pprof 性能分析，都是展示技术深度的好素材。</p>
 <ul>
+<li><a href="/posts/Go%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/Go%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E8%AF%AD%E8%A8%80%E7%89%B9%E8%B4%A8%E4%B8%8E%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">Go 面试八股（一）：语言特质与核心数据结构</a> — 面向对象、make/new、slice 扩容、map 底层、接口</li>
+<li><a href="/posts/Go%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/Go%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%B9%B6%E5%8F%91%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">Go 面试八股（二）：并发模型与内存管理</a> — GMP 调度、channel、锁、GC 三色标记、逃逸分析</li>
 <li><a href="/posts/DailyDev/sync%E5%8C%85%E8%AF%A6%E8%A7%A3/">sync 包详解</a> — Mutex/RWMutex/Map/Once/Pool，面试要点逐条标注</li>
 <li><a href="/posts/DailyDev/pprof%E6%8C%87%E5%8D%97/">pprof 指南</a> — CPU/内存/Goroutine 泄漏/锁竞争分析</li>
 <li><a href="/posts/DailyDev/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E3%80%8B%E8%AE%B0%E5%BD%95/">《深入理解设计模式》记录</a> — 常用设计模式、Go 实现、面试场景</li>
@@ -195,9 +206,11 @@
 <hr>
 <h2 id="heading-7">推荐复习路线</h2>
 <p>如果时间紧，按这个顺序过一遍核心篇目：</p>
-<p><strong>第一轮（3天）</strong>：TCP 三次握手 → 高性能 MySQL → 缓存三大场景 → Kafka 入门</p>
-<p><strong>第二轮（2天）</strong>：sync 包详解 → epoll 与 BIO → Redis 深度历险 → 分布式共识算法</p>
-<p><strong>第三轮（2天）</strong>：设计模式 → xxl-job/apollo → WebSocket → 微服务实战</p>
+<p><strong>第一轮（4天，系统系列优先）</strong>：Go 八股两篇、MySQL 八股两篇、Redis 八股两篇、消息队列八股两篇</p>
+<p>（系统系列覆盖了后端面试主干，建议优先通读；若时间仍紧，可从中挑薄弱项）</p>
+<p><strong>第二轮（2天）</strong>：TCP 三次握手、高性能 MySQL、缓存三大场景、Kafka 入门</p>
+<p><strong>第三轮（2天）</strong>：sync 包详解、epoll 与 BIO、Redis 深度历险、分布式共识算法</p>
+<p><strong>第四轮（2天）</strong>：设计模式、xxl-job/apollo、WebSocket、微服务实战</p>
 <p>每篇都有面试高频考点标注，重点看标注部分即可。祝各位面试顺利。</p>
 
 </article>
@@ -216,40 +229,56 @@
   
 
   
-  
     
-  
-
-  
-  
-    
-  
-
   
   
     
   
 
   
-  
     
-  
-
-  
-  
-    
-  
-
   
   
     
   
 
   
+    
+  
   
     
   
 
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
   
   
     
@@ -1274,15 +1303,12 @@
 
 <nav class="post-nav">
   
-  <a class="post-nav-link prev" href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e8%af%ad%e8%a8%80%e7%89%b9%e8%b4%a8%e4%b8%8e%e6%a0%b8%e5%bf%83%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">
-    <span class="post-nav-label">Previous</span>
-    <span class="post-nav-title">Go 面试八股（一）：语言特质与核心数据结构</span>
-  </a>
+  <div></div>
   
   
-  <a class="post-nav-link next" href="/posts/AI/deepseek-harness-architecture/">
+  <a class="post-nav-link next" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
     <span class="post-nav-label">Next</span>
-    <span class="post-nav-title">DeepSeek Harness 架构全解读：两天十万星的一切皆插件</span>
+    <span class="post-nav-title">消息队列面试八股（一）：Kafka</span>
   </a>
   
 </nav>
@@ -1324,6 +1350,13 @@
       
       
       <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">后端八股复习指南：博客文章索引</a>
+        <span class="sidebar-post-date">2026-08-17</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">消息队列面试八股（一）：Kafka</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
@@ -1331,7 +1364,7 @@
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e6%8c%81%e4%b9%85%e5%8c%96%e3%80%81%e7%bc%93%e5%ad%98%e4%b8%8e%e9%9b%86%e7%be%a4/">Redis 面试八股（二）：持久化、缓存与集群</a>
+        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       
@@ -1339,13 +1372,6 @@
       
       <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">消息队列面试八股（二）：RabbitMQ</a>
-        <span class="sidebar-post-date">2026-08-19</span>
-      </li>
-      
-      
-      
-      <li class="sidebar-post-item">
-        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       

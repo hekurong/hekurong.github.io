@@ -145,7 +145,8 @@
   <h1 id="redis-">Redis 面试八股（二）：持久化、缓存与集群</h1>
 <blockquote>
 <p>来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。
-定位：Redis 面试八股第二篇，生产实战向。事务与 Lua、持久化、缓存三兄弟、一致性、热点治理、集群，这些问题是面试中区分是否真正在生产环境用过 Redis 的分水岭。</p>
+定位：Redis 面试八股第二篇，生产实战向。事务与 Lua、持久化、缓存三兄弟、一致性、热点治理、集群，这些问题是面试中区分是否真正在生产环境用过 Redis 的分水岭。
+收藏：本系列收录于 <a href="/posts/DailyDev/%E5%90%8E%E7%AB%AF%E5%85%AB%E8%82%A1%E5%A4%8D%E4%B9%A0%E6%8C%87%E5%8D%97%EF%BC%9A%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/">后端八股复习指南</a>。</p>
 </blockquote>
 <hr>
 <h2 id="redis--lua-">一、Redis 事务与 Lua 脚本</h2>
@@ -193,7 +194,7 @@
 <h2 id="heading">二、持久化</h2>
 <p>Redis 是内存数据库，但支持持久化，重启后能恢复数据。有 RDB、AOF 与二者的混合三种方式。</p>
 <h3 id="1-rdb-">1. RDB 快照</h3>
-<p>RDB 把某个时刻的内存数据生成紧凑的二进制快照文件。默认配置按时间与变更次数触发，比如 60 秒内有 1 万次写、900 秒内有 1 次写等。通过 fork 子进程生成快照，正常情况下不阻塞主线程。</p>
+<p>RDB 把某个时刻的内存数据生成紧凑的二进制快照文件。默认配置按时间与变更次数触发，官方默认是三组条件，3600 秒内有 1 次写、300 秒内有 100 次写、60 秒内有 1 万次写，满足任一即触发。通过 fork 子进程生成快照，正常情况下不阻塞主线程。</p>
 <p>优点：文件紧凑、恢复快，适合冷备与全量恢复。缺点：两次快照之间的数据会丢，实时性差，不适合做增量持久化。</p>
 <h3 id="2-aof-">2. AOF 追加文件</h3>
 <p>AOF 以追加方式记录每一条写命令，实时性远好于 RDB。它把写命令追加到内存缓冲区，再由 fsync 刷到磁盘，刷盘策略由 appendfsync 配置：</p>
@@ -215,7 +216,7 @@
 <ul>
 <li>参数校验，不合理的请求直接拒绝</li>
 <li>缓存空对象，查不到也把空值写入缓存并设短过期时间，比如 1 分钟，防止反复穿透。缺点是攻击者不停换 key 会导致缓存塞满无效键，所以空值过期时间要短</li>
-<li>布隆过滤器，把所有可能存在的 key 提前放入位图，请求先过布隆过滤器，不存在直接返回。布隆过滤器用位数组加多个哈希函数，百万级数据只占约百 KB 内存，但存在误判与删除困难两个特性</li>
+<li>布隆过滤器，把所有可能存在的 key 提前放入位图，请求先过布隆过滤器，不存在直接返回。布隆过滤器用位数组加多个哈希函数，内存占用取决于元素量与目标误判率，百万级数据、1% 误判率下约需 1.2 MB，但存在误判与删除困难两个特性</li>
 <li>接口限流，配合黑名单机制限制异常 IP</li>
 </ul>
 <h3 id="2-">2. 缓存击穿</h3>
@@ -247,10 +248,13 @@
 <p>为什么写操作是删缓存而不是更新缓存？更新缓存会引入并发写脏数据与一致性维护的复杂问题，删除缓存让下次读到再从数据库拉最新值，实现简单且正确性更好。</p>
 <p>删除缓存失败怎么办？两种常见处理的思路：</p>
 <ul>
-<li>缩短缓存 TTL 治标不治本，下次过期仍会重新从库加载</li>
+<li>缩短缓存 TTL 治标不治本，下次过期仍会从库重新加载</li>
 <li>引入重试机制，删除失败后把删除消息投递到消息队列，由消费者异步重试直到成功，这是常用且更可靠的方案</li>
 </ul>
+<p>更进一步的方案把删除动作交给数据库侧：延迟双删在更新库后先删一次缓存、稍等片刻再删一次，覆盖并发下的旧值回写窗口；或者订阅数据库 binlog（比如 canal）异步更新缓存，让缓存与数据库的变更同源，是目前比较成熟的思路。</p>
 <p>绝对的强一致通常意味着巨大的复杂度与性能代价，实践中一般在性能与一致性之间找平衡，选择能接受的最终一致即可。</p>
+<hr>
+<p>这里顺带补一个缓存系高频题，分布式锁的正确实现。加锁用 SET key value NX EX 原子操作，解锁用 Lua 比对 value 防止误删别人的锁，配合看门狗续期，Redisson 封装了这些逻辑；Redis 主从下锁也有失效窗口，所以才有 Redlock 这类多节点方案的争议。</p>
 <hr>
 <h2 id="bigkey--hotkey">五、bigkey 与 hotkey</h2>
 <h3 id="1--bigkey">1. 什么是 bigkey</h3>
@@ -275,7 +279,7 @@
 <p>Redis 大部分命令 O(1)，少数 O(n) 命令会成为慢查询元凶：KEYS、HGETALL、LRANGE、SMEMBERS、SINTER、SUNION、SDIFF 等。这些命令并非不能用，但要知道 n 的大小；有遍历需求用 HSCAN、SSCAN、ZSCAN 代替。</p>
 <p>Redis 提供慢查询日志，slowlog-log-slower-than 设置耗时阈值，slowlog-max-len 限制记录条数，SLOWLOG GET 查看、SLOWLOG LEN 统计、SLOWLOG RESET 清空。思路与 MySQL 的慢查询日志一致。</p>
 <h3 id="2--1">2. 内存碎片</h3>
-<p>Redis 内存分配与释放粒度不一致会产生内存碎片，通过 INFO memory 观察 mem_fragmentation_ratio，值偏大说明碎片严重，可开启 activedefrag 自动整理。</p>
+<p>Redis 内存分配与释放粒度不一致会产生内存碎片，通过 INFO memory 观察 mem_fragmentation_ratio，通常大于 1.5 视为碎片偏高，值偏大说明碎片严重，可开启 activedefrag 自动整理。</p>
 <h3 id="3--2">3. 使用规范</h3>
 <ul>
 <li>用连接池，避免频繁建连</li>
@@ -287,6 +291,7 @@
 </ul>
 <hr>
 <h2 id="redis--1">七、Redis 集群</h2>
+<p>主从复制是集群的基础。全量同步在首次连接或复制偏移落后过大时触发，主库生成 RDB 快照发给从库，再补放期间的增量；正常运行时的增量同步按复制偏移持续拉取，代价很小。从库只读，异步接收主库写入，因此存在主从延迟窗口。</p>
 <h3 id="1-redis-sentinel">1. Redis Sentinel</h3>
 <p>Sentinel 哨兵负责监控与自动故障转移，解决主从架构的高可用问题。核心机制：</p>
 <ul>
@@ -353,42 +358,30 @@
   
 
   
+  
     
+  
+
   
   
     
   
 
   
+  
     
+  
+
   
   
     
   
 
   
-    
-  
   
     
   
 
-  
-    
-  
-  
-    
-  
-
-  
-    
-  
-  
-    
-  
-
-  
-    
   
   
     
@@ -1420,15 +1413,15 @@
 
 <nav class="post-nav">
   
-  <a class="post-nav-link prev" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
+  <a class="post-nav-link prev" href="/posts/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b%e4%b8%8e%e5%ba%95%e5%b1%82%e7%bb%93%e6%9e%84/">
     <span class="post-nav-label">Previous</span>
-    <span class="post-nav-title">消息队列面试八股（一）：Kafka</span>
+    <span class="post-nav-title">Redis 面试八股（一）：数据类型与底层结构</span>
   </a>
   
   
-  <a class="post-nav-link next" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">
+  <a class="post-nav-link next" href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e8%af%ad%e8%a8%80%e7%89%b9%e8%b4%a8%e4%b8%8e%e6%a0%b8%e5%bf%83%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">
     <span class="post-nav-label">Next</span>
-    <span class="post-nav-title">消息队列面试八股（二）：RabbitMQ</span>
+    <span class="post-nav-title">Go 面试八股（一）：语言特质与核心数据结构</span>
   </a>
   
 </nav>
@@ -1470,6 +1463,13 @@
       
       
       <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">后端八股复习指南：博客文章索引</a>
+        <span class="sidebar-post-date">2026-08-17</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">消息队列面试八股（一）：Kafka</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
@@ -1477,7 +1477,7 @@
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e6%8c%81%e4%b9%85%e5%8c%96%e3%80%81%e7%bc%93%e5%ad%98%e4%b8%8e%e9%9b%86%e7%be%a4/">Redis 面试八股（二）：持久化、缓存与集群</a>
+        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       
@@ -1485,13 +1485,6 @@
       
       <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">消息队列面试八股（二）：RabbitMQ</a>
-        <span class="sidebar-post-date">2026-08-19</span>
-      </li>
-      
-      
-      
-      <li class="sidebar-post-item">
-        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       

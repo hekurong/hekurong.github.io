@@ -143,7 +143,8 @@
   <h1 id="go-">Go 面试八股（一）：语言特质与核心数据结构</h1>
 <blockquote>
 <p>来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。
-定位：面向技术面试的 Go 语言核心知识梳理，共两篇。本篇覆盖语言特质、面向对象实现、基础语法、数组与切片、Map 与接口。下一篇覆盖并发调度与内存管理。</p>
+定位：面向技术面试的 Go 语言核心知识梳理，共两篇。本篇覆盖语言特质、面向对象实现、基础语法、数组与切片、Map 与接口。下一篇覆盖并发调度与内存管理。
+收藏：本系列收录于 <a href="/posts/DailyDev/%E5%90%8E%E7%AB%AF%E5%85%AB%E8%82%A1%E5%A4%8D%E4%B9%A0%E6%8C%87%E5%8D%97%EF%BC%9A%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/">后端八股复习指南</a>。</p>
 </blockquote>
 <hr>
 <h2 id="heading">一、语言特质</h2>
@@ -152,7 +153,7 @@
 <ul>
 <li>面向对象以封装、继承、多态三大特性为核心，Go 三者都沾，但实现方式与传统语言不同</li>
 <li>Go 的接口概念提供了一种非侵入式的组合方式，与经典面向对象语言中的子类不同</li>
-<li>Go 可以为任意类型定义方法，不局限于结构体，内置类型也可以</li>
+<li>Go 可以为当前包内自定义的命名类型定义方法，包括 type MyInt int 这类派生类型，但内置类型本身不能新增方法</li>
 <li>因为没有类型层次，Go 中的对象比 C++ 或 Java 中的对象更轻巧</li>
 </ul>
 <p>面试回答要点：承认 Go 支持面向对象风格，但要立刻指出它走的是组合优先于继承的路线，接口是隐式实现。</p>
@@ -186,7 +187,7 @@
 <ul>
 <li>错误处理略显繁琐，依赖返回 error 判断失败，代码中 if err != nil 出现频繁</li>
 <li>结构体没有构造与析构函数，资源申请和释放需要手动管理</li>
-<li>右大括号不允许换行，未使用的包与变量会直接编译报错，初学时容易踩坑</li>
+<li>左大括号必须与函数或控制语句同行，未使用的包与变量会直接编译报错，初学时容易踩坑</li>
 <li>早期版本没有泛型，部分场景需要 interface{} 加类型断言兜底，Go 1.18 起已引入泛型</li>
 </ul>
 <hr>
@@ -360,7 +361,7 @@
 </span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">b</span><span class="p">())</span> <span class="c1">// 输出 1
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></div></div><p>执行过程拆解：return i 先把当前 i 的值 0 赋给返回值，然后执行 defer 把返回值自增为 1，最后函数返回 1。</p>
-<p>defer 底层结构：每个 defer 语句对应一个实例，多个实例以指针连接成链表，挂在 goroutine 结构上。每次插入插到链表头部，函数结束时从头部依次取出执行，从而形成后进先出的效果。</p>
+<p>defer 的底层结构随版本演进。Go 1.13 及以前，每个 defer 对应一个实例，多个实例以指针连成链表挂在 goroutine 结构上，头插头取形成后进先出。Go 1.14 起大多数 defer 被编译成栈上的 open-coded defer，不建链表、不分配堆上内存，开销大幅降低，这是常见的版本追问点。</p>
 <h3 id="3--panic-">3. 会触发 panic 的典型场景</h3>
 <ul>
 <li>数组或切片下标越界</li>
@@ -443,7 +444,12 @@
 <li>类型比较。string、int、float 等可比较类型可以直接用 ==，slice、map、struct 中含不可比较字段时用 reflect.DeepEqual</li>
 <li>多返回值。Go 通过栈帧中的寄存器与偏移实现多返回值，函数返回值与参数都存于调用栈帧</li>
 <li>uintptr 与 unsafe.Pointer。unsafe.Pointer 是通用指针，不能直接参与运算，uintptr 是整数类型，可以运算。指针运算需要先把 unsafe.Pointer 转成 uintptr，做完运算再转回，但转成 uintptr 后 Go 不再保证该内存不被 GC 回收，仅在了解底层原理时使用</li>
+<li>string 的底层。string 由指向字节数组的指针与长度两个字段组成，不可变；与 []byte 互转有复制语义，转 []byte 通常会拷贝数据</li>
+<li>结构体内存对齐。字段按对齐规则排布，unsafe.Sizeof 与 unsafe.Alignof 可以查看实际占用，了解字段顺序对内存与并发访问的影响</li>
 </ul>
+<hr>
+<h3 id="8-go-118-">8. 泛型（Go 1.18 起）</h3>
+<p>Go 1.18 起引入泛型，函数与类型可以带类型参数，用方括号声明，约束写成接口。与 interface{} 的关键区别：泛型在编译期做类型检查并保留类型信息，无装箱也无运行期断言开销；interface{} 需要运行期断言并可能装箱。泛型适合容器、通用排序、工具函数，但它不取代接口的定位，二者共存。</p>
 <hr>
 <h2 id="heading-2">四、数组与切片</h2>
 <h3 id="1--1">1. 数组与切片的区别（基本必问）</h3>
@@ -566,7 +572,7 @@
 <li>sync.RWMutex 读写分离。读锁可以共享，多个读并发执行，写锁独占，读多写少的场景性能优于 Mutex</li>
 <li>sync.Map。标准库内置的并发安全 map，专为读多写少场景设计，无需显式加锁，API 与普通 map 不同，使用 Load、Store、Delete</li>
 </ul>
-<p>sync.Map 的原理：内部维护只读字典 read 与读写字典 dirty 两个 map。读操作优先走只读字典，大部分情况下无锁，通过原子操作保证安全。写操作更新 dirty，按需加锁。读操作在只读字典中找不到数据时计数 misses，misses 超过阈值触发一次整体同步，把 dirty 提升为 read。删除条目先从 dirty 删除，同步时才从 read 移除。</p>
+<p>sync.Map 的原理：内部维护只读字典 read 与读写字典 dirty 两个 map。读操作优先走只读字典，大部分情况无锁，靠原子操作保证安全。写操作把新值写入 dirty，dirty 为空时先复制 read 中仍有效的条目；读在 read 中找不到数据时计数 misses，misses 超过阈值触发一次整体同步把 dirty 提升为 read。删除条目先尝试在 read 命中即删，仅当 read 缺失且 dirty 有变更时才加锁修改脏字典，同步后条目才从 read 移除。</p>
 <p>选型建议：写频繁且对并发要求不高用 Mutex，读多写少用 RWMutex 或 sync.Map，追求代码简洁再优先考虑 sync.Map。</p>
 <hr>
 <h2 id="heading-3">六、接口</h2>
@@ -718,8 +724,6 @@
     
   
 
-  
-    
   
   
     
@@ -1744,15 +1748,15 @@
 
 <nav class="post-nav">
   
-  <a class="post-nav-link prev" href="/posts/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b%e4%b8%8e%e5%ba%95%e5%b1%82%e7%bb%93%e6%9e%84/">
+  <a class="post-nav-link prev" href="/posts/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e6%8c%81%e4%b9%85%e5%8c%96%e3%80%81%e7%bc%93%e5%ad%98%e4%b8%8e%e9%9b%86%e7%be%a4/">
     <span class="post-nav-label">Previous</span>
-    <span class="post-nav-title">Redis 面试八股（一）：数据类型与底层结构</span>
+    <span class="post-nav-title">Redis 面试八股（二）：持久化、缓存与集群</span>
   </a>
   
   
-  <a class="post-nav-link next" href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">
+  <a class="post-nav-link next" href="/posts/AI/deepseek-harness-architecture/">
     <span class="post-nav-label">Next</span>
-    <span class="post-nav-title">后端八股复习指南：博客文章索引</span>
+    <span class="post-nav-title">DeepSeek Harness 架构全解读：两天十万星的一切皆插件</span>
   </a>
   
 </nav>
@@ -1794,6 +1798,13 @@
       
       
       <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">后端八股复习指南：博客文章索引</a>
+        <span class="sidebar-post-date">2026-08-17</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">消息队列面试八股（一）：Kafka</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
@@ -1801,7 +1812,7 @@
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e6%8c%81%e4%b9%85%e5%8c%96%e3%80%81%e7%bc%93%e5%ad%98%e4%b8%8e%e9%9b%86%e7%be%a4/">Redis 面试八股（二）：持久化、缓存与集群</a>
+        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       
@@ -1809,13 +1820,6 @@
       
       <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">消息队列面试八股（二）：RabbitMQ</a>
-        <span class="sidebar-post-date">2026-08-19</span>
-      </li>
-      
-      
-      
-      <li class="sidebar-post-item">
-        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       

@@ -145,7 +145,8 @@
   <h1 id="go-">Go 面试八股（二）：并发模型与内存管理</h1>
 <blockquote>
 <p>来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。
-定位：上篇讲语言与数据结构，本篇进入 Go 最硬核的并发与内存机制，GMP 调度、channel、锁、GC、逃逸分析都是技术面深挖的重灾区。</p>
+定位：上篇讲语言与数据结构，本篇进入 Go 最硬核的并发与内存机制，GMP 调度、channel、锁、GC、逃逸分析都是技术面深挖的重灾区。
+收藏：本系列收录于 <a href="/posts/DailyDev/%E5%90%8E%E7%AB%AF%E5%85%AB%E8%82%A1%E5%A4%8D%E4%B9%A0%E6%8C%87%E5%8D%97%EF%BC%9A%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/">后端八股复习指南</a>。</p>
 </blockquote>
 <hr>
 <h2 id="heading">一、进程、线程与协程</h2>
@@ -168,7 +169,7 @@
 <li>新建 goroutine 时，G 先加入当前 P 的本地队列，本地队列容量上限约 256 个，满了才放进全局队列</li>
 <li>每个 M 绑定一个 P，M 从 P 的本地队列取 G 执行</li>
 <li>P 的本地队列空了，M 优先从全局队列取 G，再从其他 P 的本地队列偷取一半 G 到自己的队列，这就是工作窃取</li>
-<li>G 执行遇到阻塞或系统调用时，M 随之阻塞，P 解绑当前 M，交给空闲的 M 或新建 M 继续执行，阻塞结束后原 M 重新找 P 绑定</li>
+<li>G 在 channel、锁上阻塞时只是自身挂起，M 会继续取下一个 G 执行；只有遇到阻塞型系统调用或网络轮询器兜不住的 IO 时 M 才随之阻塞，此时 P 解绑当前 M，交给空闲或新建的 M 继续执行，调用结束后原 M 重新找 P 绑定。这是调度器最常见的考点区分。</li>
 </ul>
 <p>G 的数量理论上受内存限制，可以很多。P 的数量由 GOMAXPROCS 决定，默认等于逻辑 CPU 数量，运行时可以用 runtime.GOMAXPROCS 调整，限制同时并行执行的 goroutine 数量。M 的数量动态伸缩，Go 程序启动时预设上限，默认约 10000，实际很少达到，因为操作系统线程本身有限制，一般 M 的数量会大于 P 的数量。</p>
 <h3 id="3--p">3. 为什么要有 P</h3>
@@ -247,6 +248,7 @@
 <li>超时控制。设置截止时间或超时时长，到期自动触发取消，常用于数据库查询、网络请求防长时间等待</li>
 <li>传递请求范围数据。在调用链中传递请求 ID、用户认证信息等元数据，context 是协程安全的</li>
 </ul>
+<p>最常见的坑是只创建不取消。WithCancel 创建的 context 如果不调用返回的取消函数，Done 通道永远不会关闭，所有在 select 里监听它、等待退出的 goroutine 都会一直挂着，造成泄漏。正确的原则是拿到 context 后立即 defer cancel。</p>
 <h3 id="2--1">2. 常用函数</h3>
 <ul>
 <li>context.Background()，返回空 context，作为根 context 使用</li>
@@ -373,6 +375,7 @@
 </span></span><span class="line"><span class="cl">    <span class="nx">wg</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div></div><p>goroutine 数量需要精确控制或任务量很大时，用协程池，推荐 ants 这类库，避免无限制创建 goroutine 带来的资源压力。</p>
+<p>排查并发问题的标准手段是竞态检测，用 go test -race 运行，它基于 Go 内存模型的 happens-before 关系报告数据竞争，是验证共享变量并发读写是否正确的最直接工具。</p>
 <hr>
 <h2 id="syncpool">五、sync.Pool</h2>
 <p>sync.Pool 是临时对象池，用于复用对象，减少内存分配与 GC 压力。</p>
@@ -414,9 +417,9 @@
 </ul>
 <h3 id="2-go--gc-">2. Go 的 GC 演进</h3>
 <ul>
-<li>Go 1.3 及以前，普通标记清除，全程 STW，停顿明显</li>
+<li>Go 1.3 及以前，标记清除为主，标记阶段需要 STW，停顿明显</li>
 <li>Go 1.5，三色标记法，并发标记，堆上启用写屏障，停顿大幅减少</li>
-<li>Go 1.8，混合写屏障，栈空间全标黑，堆上写屏障，标记与清扫几乎全部并发，停顿降至毫秒级</li>
+<li>Go 1.8，混合写屏障，栈空间全标黑，堆上写屏障，标记与清扫几乎全部并发，停顿降至亚毫秒级</li>
 <li>后续版本持续优化 pacer 节奏、并行清扫、内存分配器，目标是低延迟高吞吐</li>
 </ul>
 <h3 id="3--1">3. 三色标记</h3>
@@ -452,7 +455,7 @@
 <p>Go 的内存泄漏绝大多数是 goroutine 泄漏，goroutine 阻塞在不可能唤醒的状态，无法退出，内存和栈空间永远不释放。常见场景：</p>
 <ul>
 <li>goroutine 阻塞在 channel 或锁上，而对应的写方或解锁方永远不会出现</li>
-<li>time.Ticker 使用后没有调用 Stop，定时器资源持续占用</li>
+<li>time.Ticker 使用后没有调用 Stop，定时器资源持续占用（Go 1.23 起不可达的 timer 会被自动回收，老版本必须显式调 Stop）</li>
 <li>字符串或切片截取保留了过大的底层数组，小切片引用大数组，大数组无法回收</li>
 <li>互斥锁未释放造成死锁</li>
 </ul>
@@ -505,6 +508,8 @@
     
   
 
+  
+    
   
   
     
@@ -1564,15 +1569,15 @@
 
 <nav class="post-nav">
   
-  <a class="post-nav-link prev" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">
+  <a class="post-nav-link prev" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
     <span class="post-nav-label">Previous</span>
-    <span class="post-nav-title">消息队列面试八股（二）：RabbitMQ</span>
+    <span class="post-nav-title">消息队列面试八股（一）：Kafka</span>
   </a>
   
   
-  <a class="post-nav-link next" href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%9e%b6%e6%9e%84%e3%80%81%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e%e4%b8%8e%e7%b4%a2%e5%bc%95/">
+  <a class="post-nav-link next" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">
     <span class="post-nav-label">Next</span>
-    <span class="post-nav-title">MySQL 面试八股（一）：架构、存储引擎与索引</span>
+    <span class="post-nav-title">消息队列面试八股（二）：RabbitMQ</span>
   </a>
   
 </nav>
@@ -1614,6 +1619,13 @@
       
       
       <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">后端八股复习指南：博客文章索引</a>
+        <span class="sidebar-post-date">2026-08-17</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">消息队列面试八股（一）：Kafka</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
@@ -1621,7 +1633,7 @@
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e6%8c%81%e4%b9%85%e5%8c%96%e3%80%81%e7%bc%93%e5%ad%98%e4%b8%8e%e9%9b%86%e7%be%a4/">Redis 面试八股（二）：持久化、缓存与集群</a>
+        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       
@@ -1629,13 +1641,6 @@
       
       <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">消息队列面试八股（二）：RabbitMQ</a>
-        <span class="sidebar-post-date">2026-08-19</span>
-      </li>
-      
-      
-      
-      <li class="sidebar-post-item">
-        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       

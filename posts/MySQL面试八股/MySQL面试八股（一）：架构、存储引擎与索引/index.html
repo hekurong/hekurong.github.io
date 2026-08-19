@@ -143,7 +143,8 @@
   <h1 id="mysql-">MySQL 面试八股（一）：架构、存储引擎与索引</h1>
 <blockquote>
 <p>来源：面试八股资料整理（mysql八股合集.pdf、mysql索引八股.pdf、mysql中sql语句执行过程.pdf），结合 MySQL 官方文档口径校正。
-定位：MySQL 面试八股共两篇。本篇管查询侧，讲清数据怎么存、SQL 怎么跑、索引怎么让查询变快。下一篇管写入与并发侧，讲事务、锁、日志与 MVCC。</p>
+定位：MySQL 面试八股共两篇。本篇管查询侧，讲清数据怎么存、SQL 怎么跑、索引怎么让查询变快。下一篇管写入与并发侧，讲事务、锁、日志与 MVCC。
+收藏：本系列收录于 <a href="/posts/DailyDev/%E5%90%8E%E7%AB%AF%E5%85%AB%E8%82%A1%E5%A4%8D%E4%B9%A0%E6%8C%87%E5%8D%97%EF%BC%9A%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/">后端八股复习指南</a>。</p>
 </blockquote>
 <hr>
 <h2 id="mysql--1">一、MySQL 基础</h2>
@@ -153,11 +154,11 @@
 <h3 id="2-">2. 常用字段类型速记</h3>
 <p>MySQL 字段类型三大类：数值型、字符串型、日期时间型。面试常考的是几个细节：</p>
 <ul>
-<li>UNSIGNED 属性。整数类型加 UNSIGNED 表示不允许负值，正数上限翻倍。TINYINT 范围从 -128 到 127 变成 0 到 255，INT UNSIGNED 可以达到约 42 亿。从 0 开始递增的 ID 列非常适合用 UNSIGNED</li>
+<li>UNSIGNED 属性。整数类型加 UNSIGNED 表示不允许负值，正数上限翻倍。TINYINT 范围从 -128 到 127 变成 0 到 255，INT UNSIGNED 可以达到约 43 亿。从 0 开始递增的 ID 列非常适合用 UNSIGNED</li>
 <li>CHAR 与 VARCHAR。CHAR 定长，存储时右侧补空格，检索时去掉；VARCHAR 变长，额外用 1 或 2 字节记录长度。CHAR 适合长度稳定的数据如 MD5 密码、身份证号，VARCHAR 适合昵称、标题这类长度不定的数据</li>
 <li>VARCHAR(100) 与 VARCHAR(10)。两者存相同的字符串占用相同的磁盘空间，很多人误以为大的更浪费磁盘，其实磁盘占用看实际内容。但 VARCHAR(100) 在内存操作（如排序）时按声明长度分配，会消耗更多内存</li>
 <li>DECIMAL 与 FLOAT/DOUBLE。DECIMAL 是定点数，精确存储小数，适合金额；FLOAT/DOUBLE 是浮点数，只能近似存储。Java 中 DECIMAL 对应 BigDecimal</li>
-<li>为什么不推荐 TEXT 和 BLOB。不能设默认值，无法用内存临时表只能在磁盘建临时表，检索效率低，不能直接建索引需要前缀，且大字段会拖慢表上的 DML 并消耗网络 IO</li>
+<li>为什么不推荐 TEXT 和 BLOB。老版本不能设默认值（MySQL 8.0.13 起才支持表达式默认值），无法用内存临时表只能在磁盘建临时表，检索效率低，不能直接建索引需要前缀，且大字段会拖慢表上的 DML 并消耗网络 IO</li>
 <li>DATETIME 与 TIMESTAMP。DATETIME 8 字节无时区，范围 1000 年到 9999 年；TIMESTAMP 4 字节与时区相关，且范围只到 2038 年</li>
 <li>NULL 与空串。NULL 表示缺失未知，不等于任何值，包括 NULL 自身，判断必须用 IS NULL；空串是已知的空字符串，可以正常比较。聚合函数会忽略 NULL，COUNT(*) 统计全行而 COUNT(列) 统计非空。因此不建议用 NULL 作为列默认值</li>
 <li>布尔值。MySQL 没有真正的布尔类型，用 TINYINT(1) 存 0 或 1 表达</li>
@@ -216,7 +217,7 @@
 <li>聚簇索引。索引结构和数据一起存放。InnoDB 的主键索引就是聚簇索引，表数据文件本身按主键 B+ 树组织，叶子节点存完整行数据。查询快、范围检索快，但数据依赖有序插入，主键更新代价大，所以主键一般不可改</li>
 <li>非聚簇索引。索引与数据分开存放，叶子节点存数据地址或主键值。MyISAM 不管主键还是普通索引都用非聚簇；InnoDB 的辅助索引也属于非聚簇，叶子节点存主键值，查询时先找主键再回表</li>
 </ul>
-<p>InnoDB 表没有显式主键时，会先找唯一非空索引当主键，都没有则隐式生成一个 6 字节的自增主键。建表时建议用不长、单调递增、不随机、含业务意义更好的字段做主键。</p>
+<p>InnoDB 表没有显式主键时，会先找唯一非空索引当主键，都没有则隐式生成一个 6 字节的自增主键。建表时建议主键用与业务无关的代理键，如自增整数或雪花 ID，短且单调递增；避免用身份证、手机号这类业务字段做主键，值长、非递增、可能变更，会让聚簇索引频繁分裂、代价很大。</p>
 <h3 id="4-">4. 索引的分类</h3>
 <p>从应用维度看：</p>
 <ul>
@@ -277,7 +278,7 @@
 <ul>
 <li>给不为 NULL、被频繁查询、常作 WHERE 条件、频繁排序、频繁连接的表字段建索引</li>
 <li>频繁更新的字段慎建索引</li>
-<li>单表索引不建议超过 5 个，索引过多会拖慢插入更新，也增加优化器评估执行计划的开销</li>
+<li>单表索引不建议超过 5 个（社区经验值，MySQL 8.0 是超过 16 个才告警），索引过多会拖慢插入更新，也增加优化器评估执行计划的开销</li>
 <li>尽量用联合索引代替多个单列索引，省空间、提更新效率</li>
 <li>避免冗余索引，(a, b) 与 (a) 重复时保留前者</li>
 <li>字符串用前缀索引代替普通索引</li>
@@ -294,6 +295,9 @@
 </ul>
 <div class="code-wrapper" data-lang="sql"><div class="code-ln"><pre><code>1</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">score</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">cus_order</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">
 </span></span></span></code></pre></div></div><hr>
+<h3 id="11-">11. 分库分表与读写分离（架构级）</h3>
+<p>数据量到单表瓶颈后，架构层面用两类手段。读写分离，把读操作分发到从库、主库专注写入，注意主从延迟问题；分库分表，垂直拆分按业务把字段拆到不同库表，水平拆分按分片键把数据分散到多库多表，分片键选择、扩容方式与分布式事务方案是常考细节。这些手段引入的复杂性与维护成本高，属于最后的选择，面试时按定位慢 SQL、索引与 SQL 优化、再到架构优化这个递进顺序讲。</p>
+<hr>
 <h2 id="heading-2">五、查询缓存（了解即可）</h2>
 <p>MySQL 5.6 起查询缓存默认禁用，8.0 起彻底移除。弃用的原因在前面架构部分讲过：命中条件苛刻、表更新即全量失效、写密集场景净添负担。回答面试题时说明它存在的年代、为什么被移除即可，不必深究配置。</p>
 <hr>
@@ -1401,9 +1405,9 @@
 
 <nav class="post-nav">
   
-  <a class="post-nav-link prev" href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">
+  <a class="post-nav-link prev" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">
     <span class="post-nav-label">Previous</span>
-    <span class="post-nav-title">Go 面试八股（二）：并发模型与内存管理</span>
+    <span class="post-nav-title">消息队列面试八股（二）：RabbitMQ</span>
   </a>
   
   
@@ -1451,6 +1455,13 @@
       
       
       <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">后端八股复习指南：博客文章索引</a>
+        <span class="sidebar-post-date">2026-08-17</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">消息队列面试八股（一）：Kafka</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
@@ -1458,7 +1469,7 @@
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Redis%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e6%8c%81%e4%b9%85%e5%8c%96%e3%80%81%e7%bc%93%e5%ad%98%e4%b8%8e%e9%9b%86%e7%be%a4/">Redis 面试八股（二）：持久化、缓存与集群</a>
+        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       
@@ -1466,13 +1477,6 @@
       
       <li class="sidebar-post-item">
         <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">消息队列面试八股（二）：RabbitMQ</a>
-        <span class="sidebar-post-date">2026-08-19</span>
-      </li>
-      
-      
-      
-      <li class="sidebar-post-item">
-        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
         <span class="sidebar-post-date">2026-08-19</span>
       </li>
       
