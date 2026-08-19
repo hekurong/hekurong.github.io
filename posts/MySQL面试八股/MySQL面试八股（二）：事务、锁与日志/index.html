@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>MySQL 面试八股（二）：事务、锁与日志 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=18">
+
+
+
+
+
+
+
+<link rel="alternate" type="application/atom+xml" title="KurongBlog - 订阅" href="https://hekurong.github.io/atom.xml">
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">MySQL 面试八股（二）：事务、锁与日志</h1>
+    <div class="article-meta">
+      <time datetime="2026-08-19">2026-08-19</time>
+      <span class="ai-badge" title="AI 辅助生成">AI</span>
+      <span class="series-badge" title="系列"><a href="/series/MySQL%20%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/">MySQL 面试八股</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/%e8%ae%a1%e7%ae%97%e6%9c%ba%e5%9f%ba%e7%a1%80/">计算机基础</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="tag" href="/tags/%e5%85%ab%e8%82%a1/">八股</a>
+      
+      <a class="tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="tag" href="/tags/%e9%94%81/">锁</a>
+      
+      <a class="tag" href="/tags/MVCC/">MVCC</a>
+      
+      <a class="tag" href="/tags/redo%20log/">redo log</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="mysql-">MySQL 面试八股（二）：事务、锁与日志</h1>
+<blockquote>
+<p>来源：面试八股资料整理（mysql八股合集.pdf、mysql日志八股.pdf、mysql的MVCC实现八股.pdf），结合 MySQL 官方文档口径校正。
+定位：MySQL 面试八股第二篇，管写入与并发侧。事务怎么保证、锁怎么控制、MVCC 怎么实现可见性、三类日志各司其职，是数据库面试含金量最高的部分。</p>
+</blockquote>
+<hr>
+<h2 id="heading">一、事务与并发问题</h2>
+<h3 id="1-">1. 什么是事务</h3>
+<p>事务是逻辑上的一组操作，要么全部执行，要么全部不执行。经典例子是转账，扣减转出方余额与增加转入方余额必须作为一个整体，任何一步失败都要回滚。</p>
+<p>数据库事务有 ACID 四大特性：</p>
+<ul>
+<li>原子性，事务是最小的执行单位，不允许分割，动作要么全部完成，要么全部不起作用</li>
+<li>一致性，执行事务前后数据保持一致，比如转账前后双方总额不变</li>
+<li>隔离性，并发访问时一个用户的事务不被其他事务干扰，各并发事务相互独立</li>
+<li>持久性，事务提交后对数据的改变是持久的，即使数据库故障也不受影响</li>
+</ul>
+<p>一个值得记住的观点：原子性、隔离性、持久性是数据库的属性，而一致性（ACID 意义上的）是应用的属性。应用依靠数据库的原子性与隔离性来实现一致性，单靠数据库无法包办。所以 A、I、D 是手段，C 是目的。</p>
+<h3 id="2-">2. 并发事务带来的四类问题</h3>
+<p>多个事务并发操作同一批数据会产生四类问题：</p>
+<ul>
+<li>脏读。一个事务读到另一个事务未提交的修改。事务 1 把 A=20 改成 19 尚未提交，事务 2 读到 19，随后事务 1 回滚，事务 2 读到的就是脏数据</li>
+<li>丢失修改。两个事务同时读到同一数据，各自修改后后写者覆盖先写者。事务 1 与事务 2 都读到 A=20，事务 1 改成 19，事务 2 也改成 19，结果仍是 19，事务 1 的修改被覆盖丢失</li>
+<li>不可重复读。一个事务内两次读取同一记录结果不同。原因是有其他事务在两次读取之间修改并提交了该记录</li>
+<li>幻读。一个事务两次执行同一查询，第二次多出一些之前不存在的记录。原因是其他事务在两次查询之间插入了新数据</li>
+</ul>
+<p>不可重复读与幻读的区分：不可重复读针对已有记录的修改或减少，包括 update 和 delete；幻读针对记录的新增，是 insert 造成的结果集扩大。区分二者的意义在于解法不同，修改已有记录可以用记录锁，防插入则需要间隙锁与临键锁。</p>
+<h3 id="3-">3. 并发事务的控制方式</h3>
+<p>MySQL 中控制并发事务只有两种思路：锁与 MVCC。</p>
+<ul>
+<li>锁是悲观控制，默认冲突会发生，先加锁再访问，共享资源靠显式锁保护</li>
+<li>MVCC 多版本并发控制是乐观控制，为每一行维护多个版本，靠事务快照的可见性判断读到哪个版本，不加锁也能隔离</li>
+</ul>
+<hr>
+<h2 id="heading-1">二、事务隔离级别</h2>
+<h3 id="1-sql-">1. SQL 标准的四个隔离级别</h3>
+<p>隔离级别越高，数据一致性越好，并发性能越低。四个级别以及各问题的暴露情况：</p>
+<ul>
+<li>READ UNCOMMITTED 读取未提交。允许读未提交数据，脏读、不可重复读、幻读都防不住，实际很少用</li>
+<li>READ COMMITTED 读取已提交。只能读已提交数据，阻止脏读，仍可能出现不可重复读与幻读，是多数数据库的默认级别</li>
+<li>REPEATABLE READ 可重复读。同一字段多次读取结果一致，除非数据被本事务修改，阻止脏读与不可重复读，幻读在标准下仍可能发生</li>
+<li>SERIALIZABLE 可串行化。事务逐个执行，杜绝一切并发干扰</li>
+</ul>
+<p>各级别的问题对照：读未提交三项都防不住；读已提交只防脏读；可重复读防脏读与不可重复读；可串行化全部防住。</p>
+<h3 id="2--1">2. 隔离级别如何实现</h3>
+<p>MySQL 的隔离级别由锁与 MVCC 共同实现。SERIALIZABLE 通过锁实现；READ COMMITTED 与 REPEATABLE READ 基于 MVCC 实现，但在 REPEATABLE READ 的当前读场景下需要配合加锁读来防止幻读。</p>
+<h3 id="3-innodb-">3. InnoDB 的默认隔离级别</h3>
+<p>InnoDB 默认使用 REPEATABLE READ。与标准的区别在于，InnoDB 在 RR 级别下通过 MVCC 与 Next-Key Lock 把幻读也基本解决了，因此常被作为 InnoDB 的一个卖点。</p>
+<p>查看方式：MySQL 8.0 之前用 SELECT @@tx_isolation，8.0 及以后用 SELECT @@transaction_isolation。</p>
+<div class="code-wrapper" data-lang="sql"><div class="code-ln"><pre><code>1
+2</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">@@</span><span class="n">transaction_isolation</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 输出 REPEATABLE-READ
+</span></span></span></code></pre></div></div><hr>
+<h2 id="heading-2">三、锁</h2>
+<h3 id="1--1">1. 表级锁与行级锁</h3>
+<ul>
+<li>表级锁。锁定粒度最大的锁，针对非索引字段加锁，锁住整张表。实现简单、加锁快、资源消耗少、不会死锁，但锁冲突概率最高，高并发下效率差。表级锁与存储引擎无关，MyISAM 与 InnoDB 都支持</li>
+<li>行级锁。锁定粒度最小的锁，针对索引字段加锁，只锁当前操作的行。并发度高、冲突少，但加锁开销大，可能死锁，且只在引擎层实现，MyISAM 不支持，InnoDB 默认使用</li>
+</ul>
+<p>行级锁的一个高频雷区：UPDATE、DELETE 的 WHERE 条件没有命中唯一索引或者索引失效时，行锁会升级成全表扫描并把所有行都锁上。</p>
+<h3 id="2--2">2. 三种行锁</h3>
+<p>InnoDB 的行锁通过对索引数据页上的记录加锁实现，分三种：</p>
+<ul>
+<li>记录锁，锁单个行记录</li>
+<li>间隙锁，锁一个范围，但不包括记录本身，专门防范围插入</li>
+<li>临键锁，记录锁加间隙锁，锁范围且包含记录本身，主要用途就是解决幻读</li>
+</ul>
+<p>RR 级别下默认使用临键锁。如果操作的索引是唯一索引或主键，InnoDB 会把临键锁优化降级为记录锁，只锁目标记录，不再锁范围。</p>
+<h3 id="3--1">3. 共享锁与排他锁</h3>
+<p>不论表级锁还是行级锁，都分共享锁与排他锁两类：</p>
+<ul>
+<li>共享锁即读锁，事务读记录时获取，多个事务可以同时获取，互相兼容</li>
+<li>排他锁即写锁，事务改记录时获取，与任何其他锁都不兼容</li>
+</ul>
+<p>一句话总结：排他锁与任何锁互斥，共享锁只与共享锁兼容。显式加锁的 SQL：</p>
+<div class="code-wrapper" data-lang="sql"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="c1">-- 排他锁，当前读
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">SELECT</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 共享锁，MySQL 5.7 与 8.0 均可用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">SELECT</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">LOCK</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="k">SHARE</span><span class="w"> </span><span class="k">MODE</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 共享锁，MySQL 8.0 起推荐
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">SELECT</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">SHARE</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div></div><h3 id="4-">4. 意向锁</h3>
+<p>判断能否给整张表加上表级锁前，需要快速知道表里有没有行锁，一行行遍历显然不行，于是有了意向锁。意向锁是表级锁，由引擎自动维护，用户无法手动操作。</p>
+<ul>
+<li>意向共享锁，事务有意向给表中某些记录加共享锁，加共享锁前必须先取得表的意向共享锁</li>
+<li>意向排他锁，事务有意向给表中某些记录加排他锁，加排他锁前必须先取得表的意向排他锁</li>
+</ul>
+<p>意向锁之间互相兼容。意向锁与表级共享锁、排他锁互斥，但不会与行级的共享锁、排他锁冲突。这样表锁与行锁可以共存：给表加锁前，先看表的意向锁，如果存在意向排他锁说明有行锁或即将有行锁，就不能加相冲突的表锁。</p>
+<h3 id="5-">5. 自增锁</h3>
+<p>有 AUTO_INCREMENT 列的表在插入时涉及自增锁，是 InnoDB 内部的一种特殊表级锁。行为由 innodb_autoinc_lock_mode 控制：</p>
+<ul>
+<li>0 传统模式，插入执行完释放表锁</li>
+<li>1 连续模式，MySQL 8.0 之前默认，多条插入语句串联执行，自增值连续</li>
+<li>2 交错模式，MySQL 8.0 起默认，插入语句并发执行，速度快，但不保证自增值连续单调</li>
+</ul>
+<p>注意一个约束：如果主从复制的 binlog 格式是 statement，不能用交错模式，否则并发插入顺序无法在从库复现，会导致主从数据不一致。</p>
+<h3 id="6-">6. 当前读与快照读</h3>
+<ul>
+<li>快照读，即普通 SELECT。InnoDB 基于多版本读一致性快照，读到的是记录的历史版本。即使目标行正被其他事务加排他锁修改，快照读也不会等待，直接读旧版本，不读最新数据。只有读已提交与可重复读两个级别使用一致性非锁定读</li>
+<li>当前读，读取记录的最新版本并加锁。SELECT &hellip; FOR UPDATE、SELECT &hellip; LOCK IN SHARE MODE、INSERT、UPDATE、DELETE 都属于当前读</li>
+</ul>
+<p>快照读适合对一致性要求不高、追求极致性能的场景。快照读与当前读组合起来是 MVCC 与锁协作的核心，下一章展开。</p>
+<hr>
+<h2 id="heading-3">四、日志</h2>
+<h3 id="1-mysql-">1. MySQL 的日志分类</h3>
+<p>MySQL 日志包括错误日志、查询日志、慢查询日志、事务日志与二进制日志。面试重点集中在三类事务相关日志：redo log 重做日志、binlog 归档日志、undo log 回滚日志。</p>
+<h3 id="2-redo-log">2. redo log</h3>
+<p>redo log 是 InnoDB 引擎独有的物理日志，内容形如「表空间号、数据页号、偏移量、修改长度、修改的具体数据」。它的作用是让 InnoDB 拥有崩溃恢复能力，保证事务的持久性。</p>
+<p>InnoDB 以页为单位管理数据，查询时把数据页加载进缓冲池，后续读写优先命中缓冲池，减少磁盘 IO。更新时同样先在缓冲池里改数据页，同时把这次页修改记录到 redo log。理想情况事务提交即刷盘，实际刷盘时机由策略控制：</p>
+<ul>
+<li>事务提交时刷盘，由 innodb_flush_log_at_trx_commit 控制</li>
+<li>重做日志缓存写满约一半时由后台主动刷盘</li>
+<li>检查点执行时，脏页刷盘同时伴随 redo log 刷盘</li>
+<li>后台线程每隔一秒定期刷盘</li>
+<li>MySQL 正常关闭时全部刷盘</li>
+</ul>
+<p>innodb_flush_log_at_trx_commit 的三种取值：</p>
+<ul>
+<li>0，每次事务提交不主动刷盘，性能最高，但 MySQL 崩溃可能丢最近一秒事务</li>
+<li>1，每次提交都刷盘，性能最低但绝不丢数据，是默认值</li>
+<li>2，每次提交只把 redo log 写入文件系统缓存，MySQL 进程崩溃不丢，机器宕机可能丢一秒</li>
+</ul>
+<p>由于后台线程每秒刷一次，未提交事务的 redo log 也可能被刷到磁盘，这部分日志在崩溃后没有对应事务，恢复时自然丢弃。</p>
+<p>redo log 以日志文件组的形式存储，用环形数组循环写入。write pos 是当前写到的位置，checkpoint 是当前要擦除的位置，两者之间的空间可写入新日志。write pos 追上 checkpoint 意味着日志文件组写满，此时必须推进 checkpoint 腾空间。MySQL 8.0.30 起用 innodb_redo_log_capacity 参数替代文件组配置，文件数固定为 32。</p>
+<p>为什么不直接把修改后的数据页刷盘，非要 redo log？因为数据页 16KB，只改了其中几个字节，刷整页是随机写、非常慢；redo log 一条记录只有几十字节，且是顺序写，效率高得多。这就是 WAL 预写式日志的思路，先写日志腾出空间，再异步把脏页合并刷盘。</p>
+<h3 id="3-binlog">3. binlog</h3>
+<p>binlog 是 Server 层的逻辑日志，记录语句的原始逻辑，数据备份、主从同步都靠它。任何存储引擎只要发生了数据更新都会产生 binlog，且顺序写。</p>
+<p>binlog 有三种记录格式：</p>
+<ul>
+<li>statement，记录 SQL 语句原文。从库直接重放语句，但遇到 now()、随机数等非确定性函数，重放结果与原库不一致</li>
+<li>row，记录具体行的变更数据。信息最准确，主从不失真，但占用空间大、同步时更消耗 IO</li>
+<li>mixed，两者的混合，由 MySQL 判断语句是否可能产生不一致，可能就用 row，否则 statement。实践上通常直接用 row</li>
+</ul>
+<p>写入机制：事务执行过程中日志先写进每个线程私有的 binlog cache，事务提交时才统一写入 binlog 文件，保证一个事务的 binlog 不可拆分。write 只是写入文件系统缓存，fsync 才真正落盘，两者由 sync_binlog 控制：0 表示只 write 不控制 fsync，性能好但宕机可能丢日志；1 表示每次提交都 fsync，最安全；N 表示攒够 N 个事务再 fsync，IO 瓶颈场景可以调大 N 权衡性能与丢失风险。</p>
+<h3 id="4-redo-log--binlog-">4. redo log 与 binlog 的两阶段提交</h3>
+<p>redo log 保证引擎层崩溃恢复，binlog 保证集群数据一致性，两者职责互补，但写入时机不同，redo 在事务执行中持续写，binlog 只在提交时写。如果两者各写各的，一旦中间宕机就会不一致，比如 redo 落盘了但 binlog 没落盘，从库和备份就少了这条更新，用 redo 恢复出来的数据和 binlog 对不上。</p>
+<p>两阶段提交把 redo log 的写入拆成 prepare 与 commit 两步，流程是：先写 redo log 到 prepare 状态，再写 binlog，最后把 redo log 改为 commit 状态。崩溃恢复时的处理：</p>
+<ul>
+<li>若 redo log 处于 prepare 且没有对应的 binlog，事务回滚，避免只有本地恢复没有主从同步的不一致</li>
+<li>若 redo log 处于 prepare 且能找到完整的 binlog，事务补完提交，因为 binlog 存在说明两阶段都走完了</li>
+</ul>
+<p>这样无论在哪一步宕机，两份日志的最终状态都能对齐。</p>
+<h3 id="5-undo-log">5. undo log</h3>
+<p>undo log 是逻辑日志，主要两个作用，一是事务回滚时把数据恢复到修改前，二是配合 MVCC 记录历史版本供快照读。</p>
+<p>事务执行一条 DELETE，undo log 就记录一条对应的 INSERT；执行 UPDATE 就记录修改前的旧值。回滚时倒着重放 undo 即可。undo log 自身也要持久化，因此它的信息同样会写进 redo log。</p>
+<p>undo log 分两种：</p>
+<ul>
+<li>insert undo log，insert 产生的记录只对本事务可见，事务提交后即可删除</li>
+<li>update undo log，update 或 delete 产生的记录可能还要给 MVCC 提供历史版本，提交后不能立即删，进入历史列表等待后台 purge 线程清理</li>
+</ul>
+<p>同一行被多个事务或同一事务多次修改时，这些版本的 undo log 由记录行内的回滚指针串联成一条版本链，链首是最新版本，链尾是最早版本。MVCC 就沿着这条链向前找历史版本。</p>
+<hr>
+<h2 id="mvcc">五、MVCC</h2>
+<h3 id="1--mvcc">1. 什么是 MVCC</h3>
+<p>多版本并发控制，为每一行数据维护多个版本，同一记录的多个历史版本通过 undo log 保存。写入时生成新版本，读取时按事务快照的可见性选择合适的版本，从而在并发读写时无需相互阻塞，兼顾一致性与并发性能。</p>
+<h3 id="2--3">2. 三个依赖</h3>
+<p>InnoDB 的 MVCC 依赖隐藏字段、Read View 与 undo log。</p>
+<p>每行数据自带三个隐藏字段：</p>
+<ul>
+<li>DB_TRX_ID，6 字节，最后一次插入或更新该行的事务 ID，delete 在内部视为更新，只是用记录头标志位标记删除</li>
+<li>DB_ROLL_PTR，7 字节，回滚指针，指向该行的 undo log 版本链，未被更新过则为空</li>
+<li>DB_ROW_ID，6 字节，表没有主键且没有唯一非空索引时，用它生成聚簇索引</li>
+</ul>
+<p>Read View 记录创建瞬间与可见性判断相关的信息，核心字段：</p>
+<ul>
+<li>m_low_limit_id，当前出现过的最大的事务 ID 加一，事务 ID 大于等于它的数据版本不可见</li>
+<li>m_up_limit_id，活跃事务列表中最小的事务 ID，小于它的数据版本都可见</li>
+<li>m_ids，创建 Read View 时仍处于活跃状态、尚未提交的其他事务 ID 列表</li>
+<li>m_creator_trx_id，创建该 Read View 的事务 ID</li>
+</ul>
+<h3 id="3--2">3. 可见性判断</h3>
+<p>判断一个数据版本的 DB_TRX_ID 是否对当前事务可见，按顺序比较：</p>
+<ol>
+<li>DB_TRX_ID 小于 m_up_limit_id，说明修改该行的事务在快照生成前已提交，可见</li>
+<li>DB_TRX_ID 大于等于 m_low_limit_id，说明是快照生成之后才修改的，不可见</li>
+<li>若在 m_up_limit_id 与 m_low_limit_id 之间，去活跃事务列表 m_ids 里查，能找到说明修改者尚未提交或自己之后才改，不可见，找不到说明修改者已提交，可见</li>
+<li>不可见则沿回滚指针 DB_ROLL_PTR 取上一个版本，重复以上判断，直到找到可见版本或取完整个链</li>
+</ol>
+<h3 id="4-rc--rr-">4. RC 与 RR 的差异</h3>
+<p>两个隔离级别都用 MVCC，差别只在 Read View 的生成时机：</p>
+<ul>
+<li>读已提交级别下，每次 SELECT 都生成一个新的 Read View，活跃事务列表实时刷新。两个 SELECT 之间若有其他事务提交，后一次查询就会看到新数据，造成不可重复读</li>
+<li>可重复读级别下，只在事务第一次 SELECT 时生成 Read View，之后一直复用，其他事务提交与否都不影响后续读取，从而实现了可重复读</li>
+</ul>
+<p>同样在 RR 下，快照读靠复用一个 Read View 防止了幻读，但当前读每次读到最新数据，仍需加锁防插入，所以要在当前读场景使用 Next-Key Lock 锁住记录及间隙，防止其他事务在范围内插入新记录，彻底解决幻读。</p>
+<h3 id="5--1">5. 与前面知识点的串联</h3>
+<p>串起来看整条线：普通 SELECT 走快照读，靠 MVCC 的隐藏字段、undo 版本链与 Read View 判断可见性；RR 下快照读复用一次 Read View，可重复且有防幻读能力。SELECT &hellip; FOR UPDATE 这类当前读走锁，RR 下默认加临键锁锁范围防止插入。redo log 保证已提交数据不丢，undo log 支撑回滚与多版本，binlog 保障主从一致，两阶段提交把 redo 与 binlog 对齐。这就是 InnoDB 并发与可靠性的完整拼图。</p>
+<hr>
+<h2 id="heading-4">小结</h2>
+<p>本篇收拢了 MySQL 并发侧的全部核心考点。事务章节讲清 ACID 与四类并发问题，注意 A、I、D 是手段、C 是目的的视角。隔离级别章节记住 InnoDB 默认 RR 且能防幻读这个特殊卖点。锁章节掌握表级行级、三类行锁、S/X 与意向锁的分工，牢记当前读与快照读的差别。日志章节吃透 redo 的 WAL 思路与两阶段提交的两种异常处理。MVCC 章节能默写 Read View 的可见性算法和 RC 与 RR 的生成时机差异，就足以应对数据库方向的大多数深挖。</p>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">MySQL 面试八股（2 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%9e%b6%e6%9e%84%e3%80%81%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e%e4%b8%8e%e7%b4%a2%e5%bc%95/">MySQL 面试八股（一）：架构、存储引擎与索引</a>
+      
+    </li>
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">MySQL 面试八股（二）：事务、锁与日志</span>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%9e%b6%e6%9e%84%e3%80%81%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e%e4%b8%8e%e7%b4%a2%e5%bc%95/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">MySQL 面试八股（一）：架构、存储引擎与索引</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">后端八股复习指南：博客文章索引</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%9e%b6%e6%9e%84%e3%80%81%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e%e4%b8%8e%e7%b4%a2%e5%bc%95/">
+      <span class="related-card-title">MySQL 面试八股（一）：架构、存储引擎与索引</span>
+      <span class="related-card-date">2026-08-19</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">
+      <span class="related-card-title">后端八股复习指南：博客文章索引</span>
+      <span class="related-card-date">2026-08-17</span>
+    </a>
+    
+    <a class="related-card" href="/posts/%e5%a4%ae%e5%9b%bd%e4%bc%81%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%ac%94%e8%af%95%e5%87%86%e5%a4%87/04-%e6%95%b0%e6%8d%ae%e5%ba%93%e4%b8%8eSQL/">
+      <span class="related-card-title">数据库与SQL</span>
+      <span class="related-card-date">2026-07-12</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e8%af%ad%e8%a8%80%e7%89%b9%e8%b4%a8%e4%b8%8e%e6%a0%b8%e5%bf%83%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">Go 面试八股（一）：语言特质与核心数据结构</a>
+        <span class="sidebar-post-date">2026-08-19</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
+        <span class="sidebar-post-date">2026-08-19</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%9e%b6%e6%9e%84%e3%80%81%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e%e4%b8%8e%e7%b4%a2%e5%bc%95/">MySQL 面试八股（一）：架构、存储引擎与索引</a>
+        <span class="sidebar-post-date">2026-08-19</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e4%ba%8b%e5%8a%a1%e3%80%81%e9%94%81%e4%b8%8e%e6%97%a5%e5%bf%97/">MySQL 面试八股（二）：事务、锁与日志</a>
+        <span class="sidebar-post-date">2026-08-19</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">后端八股复习指南：博客文章索引</a>
+        <span class="sidebar-post-date">2026-08-17</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/A2A/">A2A</a>
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Agent/">AI Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/B&#43;%e6%a0%91/">B&#43;树</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/Coding%20Agent/">Coding Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Computer%20Use/">Computer Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Cordis/">Cordis</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/DevOps/">DevOps</a>
+      
+      <a class="sidebar-tag" href="/tags/Docker%20Desktop/">Docker Desktop</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GC/">GC</a>
+      
+      <a class="sidebar-tag" href="/tags/GGUF/">GGUF</a>
+      
+      <a class="sidebar-tag" href="/tags/GMP/">GMP</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Harness/">Harness</a>
+      
+      <a class="sidebar-tag" href="/tags/Helm/">Helm</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/KV%20Cache/">KV Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/Kanban/">Kanban</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM-as-a-Judge/">LLM-as-a-Judge</a>
+      
+      <a class="sidebar-tag" href="/tags/LLMObservability/">LLMObservability</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Langfuse/">Langfuse</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/MCP/">MCP</a>
+      
+      <a class="sidebar-tag" href="/tags/MVCC/">MVCC</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/OpenTelemetry/">OpenTelemetry</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RL/">RL</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/ReAct/">ReAct</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SFT/">SFT</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/channel/">channel</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/interface/">interface</a>
+      
+      <a class="sidebar-tag" href="/tags/kind/">kind</a>
+      
+      <a class="sidebar-tag" href="/tags/llama.cpp/">llama.cpp</a>
+      
+      <a class="sidebar-tag" href="/tags/map/">map</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/redo%20log/">redo log</a>
+      
+      <a class="sidebar-tag" href="/tags/slice/">slice</a>
+      
+      <a class="sidebar-tag" href="/tags/vLLM/">vLLM</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">上下文工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bb%a3%e7%a0%81%e7%94%9f%e6%88%90/">代码生成</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%ab%e8%82%a1/">八股</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8f%e4%bd%9c%e6%a8%a1%e5%bc%8f/">协作模式</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%95%e6%9c%ba%e9%83%a8%e7%bd%b2/">单机部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8e%e7%ab%af/">后端</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8e%e8%ae%ad%e7%bb%83/">后训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%8d%e4%b9%a0/">复习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9aAgent/">多Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9a%e6%a8%a1%e6%80%81/">多模态</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e/">存储引擎</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e7%94%a8/">工具调用</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8c%81%e7%bb%ad%e8%bf%9b%e5%8c%96/">持续进化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e5%bc%95%e6%93%8e/">推理引擎</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ac%e5%9c%b0%e6%8e%a8%e7%90%86/">本地推理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9f%a5%e8%af%86%e5%ba%93/">知识库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b4%a2%e5%bc%95/">索引</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%88%91%e6%94%b9%e8%bf%9b/">自我改进</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%89%98%e7%ae%a1/">自托管</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%84%e4%bc%b0/">评估</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%ad%e9%9f%b3/">语音</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%bb%e4%b9%a6%e7%ac%94%e8%ae%b0/">读书笔记</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e7%a0%94/">调研</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%94%81/">锁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+       by Kurong
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://hekurong.github.io/atom.xml" rel="alternate" type="application/atom+xml" title="RSS 订阅">RSS</a>
+      
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>

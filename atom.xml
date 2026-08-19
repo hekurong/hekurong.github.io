@@ -3,7 +3,7 @@
   <title>KurongBlog</title>
   <subtitle>技术博客，记录学习与思考</subtitle>
   <id>https://hekurong.github.io/</id>
-  <updated>2026-08-19T11:44:42Z</updated>
+  <updated>2026-08-19T12:08:54Z</updated>
   <link rel="self" type="application/atom+xml" href="https://hekurong.github.io/atom.xml"></link>
   <link href="https://hekurong.github.io/"></link>
   <author>
@@ -22,6 +22,20 @@
     <updated>2026-08-19T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/Go面试八股/Go面试八股（二）：并发模型与内存管理/"></link>
     <summary>Go 面试八股（二）：并发模型与内存管理&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：上篇讲语言与数据结构，本篇进入 Go 最硬核的并发与内存机制，GMP 调度、channel、锁、GC、逃逸分析都是技术面深挖的重灾区。&#xA;&#xA;&#xA;一、进程、线程与协程&#xA;1. 三者的区别（必问）&#xA;&#xA;进程是应用程序的运行实例，每个进程有独立的内存空间，进程间通信靠管道、Socket、共享内存等机制&#xA;线程是进程内的执行单元，是操作系统调度的基本单位，同一进程的线程共享进程资源，通过共享内存通信&#xA;协程是用户态的轻量级线程，不受操作系统调度，由应用自身的调度器把协程调度到线程…</summary>
+  </entry>
+  <entry>
+    <title>MySQL 面试八股（一）：架构、存储引擎与索引</title>
+    <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（一）：架构、存储引擎与索引/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（一）：架构、存储引擎与索引/"></link>
+    <summary>MySQL 面试八股（一）：架构、存储引擎与索引&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql索引八股.pdf、mysql中sql语句执行过程.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股共两篇。本篇管查询侧，讲清数据怎么存、SQL 怎么跑、索引怎么让查询变快。下一篇管写入与并发侧，讲事务、锁、日志与 MVCC。&#xA;&#xA;&#xA;一、MySQL 基础&#xA;1. 关系型数据库与 MySQL&#xA;关系型数据库建立在关系模型之上，数据以表的行来组织，行与行之间表达一对一、一对多、多对多等联系。主流关系型数据库通过 SQL 操作数据，并普遍支持事务的 ACID 特性。常见…</summary>
+  </entry>
+  <entry>
+    <title>MySQL 面试八股（二）：事务、锁与日志</title>
+    <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（二）：事务、锁与日志/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（二）：事务、锁与日志/"></link>
+    <summary>MySQL 面试八股（二）：事务、锁与日志&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql日志八股.pdf、mysql的MVCC实现八股.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股第二篇，管写入与并发侧。事务怎么保证、锁怎么控制、MVCC 怎么实现可见性、三类日志各司其职，是数据库面试含金量最高的部分。&#xA;&#xA;&#xA;一、事务与并发问题&#xA;1. 什么是事务&#xA;事务是逻辑上的一组操作，要么全部执行，要么全部不执行。经典例子是转账，扣减转出方余额与增加转入方余额必须作为一个整体，任何一步失败都要回滚。&#xA;数据库事务有 ACID 四大特性：&#xA;&#xA;原子性，事务是最小的执…</summary>
   </entry>
   <entry>
     <title>后端八股复习指南：博客文章索引</title>
@@ -134,19 +148,5 @@
     <updated>2026-08-04T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-11-后记/"></link>
     <summary>回到 Agent = LLM + 上下文 + 工具：两朵乌云与模型-Agent 共同演进的飞轮</summary>
-  </entry>
-  <entry>
-    <title>多Agent实操手记：本机 Kanban 与 A2A 的一次完整探索</title>
-    <id>https://hekurong.github.io/posts/AI/多Agent实操-Kanban与A2A探索/</id>
-    <updated>2026-08-03T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/多Agent实操-Kanban与A2A探索/"></link>
-    <summary>把本机多Agent环境完整跑了一遍真实任务：Kanban 与 A2A 的搭建、五种协作模式、一次小论文写作实战，以及从「做对了」到「知道自己为什么对」的认知过程。</summary>
-  </entry>
-  <entry>
-    <title>llama.cpp 本地推理入门</title>
-    <id>https://hekurong.github.io/posts/AI/llama.cpp-本地推理入门/</id>
-    <updated>2026-08-02T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/llama.cpp-本地推理入门/"></link>
-    <summary>llama.cpp 入门学习笔记：GGUF 格式与量化原理、macOS 本地安装与使用、HTTP 服务与生态，以及与 vLLM 的选型对比。</summary>
   </entry>
 </feed>
