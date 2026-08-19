@@ -6,6 +6,7 @@ tags: ["Go", "面试", "八股", "slice", "map", "interface"]
 series: "Go 面试八股"
 toc: true
 weight: 20
+ai_generated: true
 ---
 
 # Go 面试八股（一）：语言特质与核心数据结构

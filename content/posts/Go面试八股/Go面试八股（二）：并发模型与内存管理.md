@@ -6,6 +6,7 @@ tags: ["Go", "面试", "八股", "GMP", "channel", "GC", "内存"]
 series: "Go 面试八股"
 toc: true
 weight: 10
+ai_generated: true
 ---
 
 # Go 面试八股（二）：并发模型与内存管理
