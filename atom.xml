@@ -3,7 +3,7 @@
   <title>KurongBlog</title>
   <subtitle>技术博客，记录学习与思考</subtitle>
   <id>https://hekurong.github.io/</id>
-  <updated>2026-08-19T14:01:30Z</updated>
+  <updated>2026-08-20T12:32:52Z</updated>
   <link rel="self" type="application/atom+xml" href="https://hekurong.github.io/atom.xml"></link>
   <link href="https://hekurong.github.io/"></link>
   <author>
@@ -47,7 +47,7 @@
   <entry>
     <title>Redis 面试八股（一）：数据类型与底层结构</title>
     <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/</id>
-    <updated>2026-08-19T00:00:00Z</updated>
+    <updated>2026-08-20T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/"></link>
     <summary>Redis 面试八股（一）：数据类型与底层结构&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股共两篇。本篇覆盖 Redis 基础、数据类型与底层结构、线程模型、内存管理。下一篇进入持久化、缓存三兄弟、一致性、集群与治理。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Redis 基础&#xA;1. 什么是 Redis&#xA;Redis 是基于 C 语言开发的开源内存数据库，以键值对形式存储数据。数据常驻内存，读写速度极快，被广泛用于分布式缓存。与传统关系型数据库不同，内存读写本身在几十纳秒到亚微秒量级，而…</summary>
   </entry>

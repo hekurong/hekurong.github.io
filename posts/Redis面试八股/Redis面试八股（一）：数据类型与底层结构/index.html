@@ -136,6 +136,8 @@
       
       <a class="tag" href="/tags/%e8%b7%b3%e8%a1%a8/">跳表</a>
       
+      <a class="tag" href="/tags/listpack/">listpack</a>
+      
       <a class="tag" href="/tags/%e7%ba%bf%e7%a8%8b%e6%a8%a1%e5%9e%8b/">线程模型</a>
       
     </div>
@@ -233,8 +235,40 @@
 <hr>
 <h2 id="zset-">五、Zset 与跳表选型</h2>
 <h3 id="1-zset-">1. Zset 的应用</h3>
-<p>Zset 有序集合，每个元素绑一个分值，按分值排序。典型场景是排行榜，直播间送礼排行榜、微信步数榜、话题热度榜。常用命令 ZRANGE 从小到大、ZREVRANGE 从大到小、ZREVRANK 查看排名。它的底层是跳表加哈希表双结构：跳表负责范围查询与排名，哈希表负责按 member 在 O(1) 时间内取出分值，这是最常见的追问点。</p>
-<h3 id="2--zset--b-">2. 为什么 Zset 用跳表而不用平衡树、红黑树或 B+ 树</h3>
+<p>Zset 有序集合，每个元素绑一个分值，按分值排序。典型场景是排行榜，直播间送礼排行榜、微信步数榜、话题热度榜。常用命令 ZRANGE 从小到大、ZREVRANGE 从大到小、ZREVRANK 查看排名。</p>
+<h3 id="2-zset-">2. Zset 的底层：跳表加哈希表双结构</h3>
+<p>Zset 的底层不是单一结构，而是跳表加哈希表组合，这是最常见的追问点。跳表负责按分值排序和范围查询，哈希表负责按 member 快速定位分值，两者互补。</p>
+<p>哈希表（dict）做两件事：</p>
+<ul>
+<li>ZSCORE 按 member 在 O(1) 时间内取分值</li>
+<li>ZADD 时判断 member 是否已存在，避免在跳表里翻找</li>
+<li>键是 member，值是 score</li>
+</ul>
+<p>跳表（skiplist）做两件事：</p>
+<ul>
+<li>全部元素按分值升序串成有序结构，支撑 ZRANGE、ZREVRANGE、ZRANK 等范围与排名命令</li>
+<li>插入时先定位再插入，始终维持有序</li>
+</ul>
+<p>为什么非要双结构：跳表擅长按分值排序与范围查询，但要按 member 找元素是 O(log n)；dict 恰恰相反，O(1) 按 member 取值却无法有序遍历。一个管有序、一个管定位，缺一不可，ZADD 时两处同步更新。</p>
+<h3 id="3--1">3. 跳表是怎么工作的</h3>
+<p>跳表本质是多层有序链表。最底层链表包含全部元素且有序，上面的每一层都是对下一层的加速索引，节点以固定概率出现在更高层，Redis 里晋升概率为 1/4、最高 32 层。查询从最高层起步，向右跳过不需要的节点段，再向下落到更细的层，逐层逼近目标，期望复杂度 O(log n)。</p>
+<p>每个跳表节点的核心字段：</p>
+<ul>
+<li>member 与 score，数据本身</li>
+<li>backward，后退指针，指向前一个节点，支撑 ZREVRANGE 从队尾倒序输出</li>
+<li>level 数组，每个 level 内有 forward 前进指针和 span 跨度</li>
+</ul>
+<p>span 跨度记录该层向后跨越的底层节点个数。排名命令 ZRANK 不用线性数元素，而是沿查询路径把各层 span 累加，所以 O(log n) 就能拿到排名，这是跳表能为排行榜秒出名次的关键。</p>
+<p>两个常被追问的细节：</p>
+<ul>
+<li>分数相同怎么办，按 member 的字节字典序排序，保证同分时顺序稳定</li>
+<li>跳表是概率平衡，插入删除不用像平衡树那样旋转、像红黑树那样变色，实现与维护都简单</li>
+</ul>
+<h3 id="4-listpack">4. 元素少时的内存优化：listpack</h3>
+<p>元素少、分值小的 Zset 不会一上来就用跳表，而是先用紧凑编码 listpack，Redis 7.0 起由 ziplist 迁移而来。listpack 把元素按分值顺序紧排在连续内存里，成员和分值成对存放，省去指针与层数开销，读取时线性扫描即可。升级为跳表的阈值由配置控制：zset-max-listpack-entries 默认 128 个元素，zset-max-listpack-value 默认 64 字节，任一超过就换跳表加哈希表。这个升级不可逆，元素再删回 128 以内也不会降级回 listpack。</p>
+<p>为什么弃用 ziplist：ziplist 每个节点开头记录前一个节点的长度，修改或插入某个节点可能让后续节点的长度头连锁变化，最坏退化成 O(n²)；listpack 让每个元素自带完整长度、正反都能遍历，把这个连锁更新问题整个消掉了。</p>
+<p>面试里可以用 OBJECT ENCODING key 直接查看一个 Zset 当前是 listpack 还是 skiplist，立见真章。</p>
+<h3 id="5--zset--b-">5. 为什么 Zset 用跳表而不用平衡树、红黑树或 B+ 树</h3>
 <ul>
 <li>与平衡树相比，插入删除都需要保证绝对平衡，失衡就要旋转，耗时；跳表用概率平衡，插入删除算法简单得多、更快</li>
 <li>与红黑树相比，实现更简单，不需要旋转变色，且区间查找效率高于红黑树</li>
@@ -260,7 +294,7 @@
 <li>性能瓶颈不在 CPU，而在内存与网络</li>
 <li>多线程带来死锁、上下文切换等问题</li>
 </ul>
-<h3 id="3--1">3. 多线程的演进</h3>
+<h3 id="3--2">3. 多线程的演进</h3>
 <ul>
 <li>Redis 4.0 引入多线程处理异步删除，新增 UNLINK、FLUSHALL ASYNC、FLUSHDB ASYNC，释放大对象不阻塞主线程</li>
 <li>Redis 6.0 引入多线程处理网络数据的读写，这是网络方向的瓶颈；命令执行仍是单线程顺序执行，所以无线程安全问题。默认关闭，需在配置里设置 io-threads 大于 1 才生效</li>
@@ -298,7 +332,7 @@
 <p>volatile 开头的只碰设置了过期时间的 key，allkeys 开头的对全部 key 下手。面试常问的变体是 MySQL 有 2000 万数据、Redis 只能存 20 万，怎么保证缓存里全是热点，答案是把淘汰策略设为 allkeys-lfu，靠访问频率把热点留在内存。</p>
 <hr>
 <h2 id="heading-4">小结</h2>
-<p>本篇把 Redis 的基础打完。先记住为什么快，四个要点里单线程事件循环加 IO 多路复用是理解一切后续问题的钥匙。数据类型部分，String 的 SDS 底层和 Zset 的跳表选型是高频深挖点，要能讲清各自相对 C 字符串和平衡树的取舍。线程模型要分辨命令执行单线程与网络 IO 多线程（6.0）的区别。内存管理记住定期加惰性的删除组合，以及 volatile 与 allkeys 两族淘汰策略。下一篇进入生产侧，持久化、缓存三兄弟、数据一致性和集群是真正决定面试成败的部分。</p>
+<p>本篇把 Redis 的基础打完。先记住为什么快，四个要点里单线程事件循环加 IO 多路复用是理解一切后续问题的钥匙。数据类型部分，String 的 SDS 底层和 Zset 的跳表加哈希双结构、listpack 编码是高频深挖点，要能讲清各自相对 C 字符串和平衡树的取舍。线程模型要分辨命令执行单线程与网络 IO 多线程（6.0）的区别。内存管理记住定期加惰性的删除组合，以及 volatile 与 allkeys 两族淘汰策略。下一篇进入生产侧，持久化、缓存三兄弟、数据一致性和集群是真正决定面试成败的部分。</p>
 
 </article>
 
@@ -2030,6 +2064,8 @@
       <a class="sidebar-tag" href="/tags/interface/">interface</a>
       
       <a class="sidebar-tag" href="/tags/kind/">kind</a>
+      
+      <a class="sidebar-tag" href="/tags/listpack/">listpack</a>
       
       <a class="sidebar-tag" href="/tags/llama.cpp/">llama.cpp</a>
       
