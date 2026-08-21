@@ -3,12 +3,40 @@
   <title>KurongBlog</title>
   <subtitle>技术博客，记录学习与思考</subtitle>
   <id>https://hekurong.github.io/</id>
-  <updated>2026-08-21T04:05:13Z</updated>
+  <updated>2026-08-21T05:03:53Z</updated>
   <link rel="self" type="application/atom+xml" href="https://hekurong.github.io/atom.xml"></link>
   <link href="https://hekurong.github.io/"></link>
   <author>
     <name>Kurong</name>
   </author>
+  <entry>
+    <title>实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</title>
+    <id>https://hekurong.github.io/posts/实习项目面试复习/实习项目·风控变量系统：从Pipeline到DAG的调度重构/</id>
+    <updated>2026-08-21T16:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/实习项目面试复习/实习项目·风控变量系统：从Pipeline到DAG的调度重构/"></link>
+    <summary>实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构&#xA;&#xA;定位：面试复习·实习与项目系列第一篇。这个项目是 Go 后端岗面试最常被追问的来源，把「为什么重构、DAG 怎么调度、并行怎么实现、性能怎么验证」讲透，面试官顺着它深挖并发与系统设计时能接得住。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、项目背景&#xA;风控引擎负责在借贷决策前计算大量风控变量，这些变量的值直接决定预审、戳额等关键接口的放款与额度判断。旧引擎以 Pipeline 链式方式执行变量计算，几千个变量的依赖关系散落在业务代码里，存在两个致命问题：&#xA;&#xA;算得慢。链式串行执行，即使两个变量毫无依赖，也必须排队算完前一个…</summary>
+  </entry>
+  <entry>
+    <title>实习项目·DewuClaw：多 Agent 工具调度与协作工程</title>
+    <id>https://hekurong.github.io/posts/实习项目面试复习/实习项目·DewuClaw：多Agent工具调度与协作工程/</id>
+    <updated>2026-08-21T15:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/实习项目面试复习/实习项目·DewuClaw：多Agent工具调度与协作工程/"></link>
+    <summary>实习项目·DewuClaw：多 Agent 工具调度与协作工程&#xA;&#xA;定位：面试复习·实习与项目系列第二篇。这个项目是 AI 应用方向面试的问答富矿，把「多 Agent 并行怎么防数据竞争、工具太多怎么让 Agent 找得准、隔离怎么做才轻量」三大追问点讲透。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、项目背景&#xA;项目是一款多 Agent 协作框架，多个 Agent 并行处理一条长链路任务，各自调用工具读写文件、执行操作。规模上来后暴露出两个真实的工程痛点：&#xA;&#xA;数据竞争与状态污染。多个 Agent 并行读写同一个文件路径，后写覆盖先写，协作链路的数据一致性被破坏&#xA;工具定位困难。长链路任务里注册…</summary>
+  </entry>
+  <entry>
+    <title>实习项目·工业组态 HMI：协议适配与时序数据</title>
+    <id>https://hekurong.github.io/posts/实习项目面试复习/实习项目·工业组态HMI：协议适配与时序数据/</id>
+    <updated>2026-08-21T14:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/实习项目面试复习/实习项目·工业组态HMI：协议适配与时序数据/"></link>
+    <summary>实习项目·工业组态 HMI：协议适配与时序数据&#xA;&#xA;定位：面试复习·实习与项目系列第三篇。这个项目的价值在于它同时覆盖两块独立的面试面：设计模式里的适配器思想，以及时序数据处理的完整链路。后端岗问到「接入异构协议怎么做、时序数据怎么存、查询慢怎么治」都能从这里取材。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、项目背景&#xA;工业组态 HMI 平台对接工业现场的各类设备，设备通过 Modbus TCP 与 OPC UA 等工业协议上报运行数据，平台负责把这些数据解析、存储并呈现给上层 Web 服务。做工业对接最要命的现实是协议碎片化：Modbus 与 OPC UA 的接口规范、报文格式互不兼容，一…</summary>
+  </entry>
+  <entry>
+    <title>项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测</title>
+    <id>https://hekurong.github.io/posts/实习项目面试复习/项目·电网设备故障辅助诊断系统：多Agent运行时内核与可观测/</id>
+    <updated>2026-08-21T13:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/实习项目面试复习/项目·电网设备故障辅助诊断系统：多Agent运行时内核与可观测/"></link>
+    <summary>项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测&#xA;&#xA;定位：面试复习·实习与项目系列第四篇。这是自己主导的完整项目，面试里分量最重。调度、取证、审核等 Agent 角色协作，把故障识别、根因分析到检修建议的链路自动化。它同时踩中多 Agent 运行时、消息可靠性、MCP 工具集成、可观测性与成本优化四个面，每一面都值得展开。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、项目背景&#xA;面向变电站运维场景，把「识别故障、定位根因、给出检修建议」的人工排查流程自动化。人工方式要翻阅大量规程、逐条比对日志，慢且依赖经验。项目做成多 Agent 协作系统：Manager 负责拆解任务，取…</summary>
+  </entry>
   <entry>
     <title>SQL 优化实战（一）：EXPLAIN 读懂执行计划</title>
     <id>https://hekurong.github.io/posts/SQL优化实战/SQL优化实战（一）：EXPLAIN读懂执行计划/</id>
@@ -45,11 +73,25 @@
     <summary>MySQL 面试八股（四）：三类日志与两阶段提交&#xA;&#xA;来源：面试八股资料整理（mysql日志八股.pdf、mysql八股汇总.pdf、mysql中sql语句执行过程.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股系列第四篇，对第二篇日志一节做深挖。第二篇讲了三类日志各管什么，这一篇把 redo log 的 WAL 思路与刷盘时机、binlog 的三种格式与写入机制、undo log 的两种类型、两阶段提交与崩溃恢复的完整判断逻辑全部展开，并补上主从复制与日志的关系。这是数据库可靠性的另一半拼图，也是「为什么这么设计」最常被追问的一篇。&#xA;收藏：本系列收录于 后端八股复习…</summary>
   </entry>
   <entry>
-    <title>MySQL 面试八股（二）：事务、锁与日志</title>
-    <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（二）：事务、锁与日志/</id>
+    <title>Redis 面试八股（一）：数据类型与底层结构</title>
+    <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/</id>
+    <updated>2026-08-20T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/"></link>
+    <summary>Redis 面试八股（一）：数据类型与底层结构&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股共两篇。本篇覆盖 Redis 基础、数据类型与底层结构、线程模型、内存管理。下一篇进入持久化、缓存三兄弟、一致性、集群与治理。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Redis 基础&#xA;1. 什么是 Redis&#xA;Redis 是基于 C 语言开发的开源内存数据库，以键值对形式存储数据。数据常驻内存，读写速度极快，被广泛用于分布式缓存。与传统关系型数据库不同，内存读写本身在几十纳秒到亚微秒量级，而…</summary>
+  </entry>
+  <entry>
+    <title>消息队列面试八股（二）：RabbitMQ</title>
+    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/</id>
     <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（二）：事务、锁与日志/"></link>
-    <summary>MySQL 面试八股（二）：事务、锁与日志&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql日志八股.pdf、mysql的MVCC实现八股.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股第二篇，管写入与并发侧。事务怎么保证、锁怎么控制、MVCC 怎么实现可见性、三类日志各司其职，是数据库面试含金量最高的部分。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、事务与并发问题&#xA;1. 什么是事务&#xA;事务是逻辑上的一组操作，要么全部执行，要么全部不执行。经典例子是转账，扣减转出方余额与增加转入方余额必须作为一个整体，任何一步失败都要回滚。&#xA;数据库事务有 ACI…</summary>
+    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/"></link>
+    <summary>消息队列面试八股（二）：RabbitMQ&#xA;&#xA;来源：面试八股资料整理（rabbitmq八股.pdf），结合 RabbitMQ 官方文档口径校正。&#xA;定位：消息队列面试八股第二篇，RabbitMQ 专项。与 Kafka 的分区模型不同，RabbitMQ 是经典的交换器加队列模型，路由灵活、保证机制成熟，在企业级系统里应用广泛。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、RabbitMQ 是什么&#xA;RabbitMQ 是在 AMQP 协议基础上实现的可复用企业消息系统，用 Erlang 编写，天然支持并发生态。它能支撑大型系统模块之间的高可靠通信，易用性、扩展性与高可用性都不错。&#xA;特点概括：&#xA;&#xA;可靠…</summary>
+  </entry>
+  <entry>
+    <title>消息队列面试八股（一）：Kafka</title>
+    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/"></link>
+    <summary>消息队列面试八股（一）：Kafka&#xA;&#xA;来源：面试八股资料整理（kafka八股.pdf），结合 Kafka 官方文档口径校正。&#xA;定位：消息队列面试八股第一篇，Kafka 专项。覆盖消息模型、核心概念、副本机制、顺序保证、消息不丢失与重复消费、重试机制。下一篇是 RabbitMQ 专项。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Kafka 基础&#xA;1. Kafka 是什么&#xA;Kafka 是分布式流式处理平台，兼具三个能力：发布订阅消息流，也就是消息队列功能；容错的持久化存储，消息落盘避免丢失；流式处理，提供完整的流处理类库。&#xA;两大应用场景：一是建实时流数据管道，在系统与应用程序之间可靠搬运数据…</summary>
   </entry>
   <entry>
     <title>Redis 面试八股（二）：持久化、缓存与集群</title>
@@ -73,32 +115,18 @@
     <summary>Go 面试八股（二）：并发模型与内存管理&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：上篇讲语言与数据结构，本篇进入 Go 最硬核的并发与内存机制，GMP 调度、channel、锁、GC、逃逸分析都是技术面深挖的重灾区。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、进程、线程与协程&#xA;1. 三者的区别（必问）&#xA;&#xA;进程是应用程序的运行实例，每个进程有独立的内存空间，进程间通信靠管道、Socket、共享内存等机制&#xA;线程是进程内的执行单元，是操作系统调度的基本单位，同一进程的线程共享进程资源，通过共享内存通信&#xA;协程是用户态的轻量级线程，不受操作系统…</summary>
   </entry>
   <entry>
+    <title>MySQL 面试八股（二）：事务、锁与日志</title>
+    <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（二）：事务、锁与日志/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（二）：事务、锁与日志/"></link>
+    <summary>MySQL 面试八股（二）：事务、锁与日志&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql日志八股.pdf、mysql的MVCC实现八股.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股第二篇，管写入与并发侧。事务怎么保证、锁怎么控制、MVCC 怎么实现可见性、三类日志各司其职，是数据库面试含金量最高的部分。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、事务与并发问题&#xA;1. 什么是事务&#xA;事务是逻辑上的一组操作，要么全部执行，要么全部不执行。经典例子是转账，扣减转出方余额与增加转入方余额必须作为一个整体，任何一步失败都要回滚。&#xA;数据库事务有 ACI…</summary>
+  </entry>
+  <entry>
     <title>MySQL 面试八股（一）：架构、存储引擎与索引</title>
     <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（一）：架构、存储引擎与索引/</id>
     <updated>2026-08-19T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（一）：架构、存储引擎与索引/"></link>
     <summary>MySQL 面试八股（一）：架构、存储引擎与索引&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql索引八股.pdf、mysql中sql语句执行过程.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股共两篇。本篇管查询侧，讲清数据怎么存、SQL 怎么跑、索引怎么让查询变快。下一篇管写入与并发侧，讲事务、锁、日志与 MVCC。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、MySQL 基础&#xA;1. 关系型数据库与 MySQL&#xA;关系型数据库建立在关系模型之上，数据以表的行来组织，行与行之间表达一对一、一对多、多对多等联系。主流关系型数据库通过 SQL 操作数据…</summary>
-  </entry>
-  <entry>
-    <title>消息队列面试八股（二）：RabbitMQ</title>
-    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/</id>
-    <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/"></link>
-    <summary>消息队列面试八股（二）：RabbitMQ&#xA;&#xA;来源：面试八股资料整理（rabbitmq八股.pdf），结合 RabbitMQ 官方文档口径校正。&#xA;定位：消息队列面试八股第二篇，RabbitMQ 专项。与 Kafka 的分区模型不同，RabbitMQ 是经典的交换器加队列模型，路由灵活、保证机制成熟，在企业级系统里应用广泛。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、RabbitMQ 是什么&#xA;RabbitMQ 是在 AMQP 协议基础上实现的可复用企业消息系统，用 Erlang 编写，天然支持并发生态。它能支撑大型系统模块之间的高可靠通信，易用性、扩展性与高可用性都不错。&#xA;特点概括：&#xA;&#xA;可靠…</summary>
-  </entry>
-  <entry>
-    <title>消息队列面试八股（一）：Kafka</title>
-    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/</id>
-    <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/"></link>
-    <summary>消息队列面试八股（一）：Kafka&#xA;&#xA;来源：面试八股资料整理（kafka八股.pdf），结合 Kafka 官方文档口径校正。&#xA;定位：消息队列面试八股第一篇，Kafka 专项。覆盖消息模型、核心概念、副本机制、顺序保证、消息不丢失与重复消费、重试机制。下一篇是 RabbitMQ 专项。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Kafka 基础&#xA;1. Kafka 是什么&#xA;Kafka 是分布式流式处理平台，兼具三个能力：发布订阅消息流，也就是消息队列功能；容错的持久化存储，消息落盘避免丢失；流式处理，提供完整的流处理类库。&#xA;两大应用场景：一是建实时流数据管道，在系统与应用程序之间可靠搬运数据…</summary>
-  </entry>
-  <entry>
-    <title>Redis 面试八股（一）：数据类型与底层结构</title>
-    <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/</id>
-    <updated>2026-08-20T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/"></link>
-    <summary>Redis 面试八股（一）：数据类型与底层结构&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股共两篇。本篇覆盖 Redis 基础、数据类型与底层结构、线程模型、内存管理。下一篇进入持久化、缓存三兄弟、一致性、集群与治理。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Redis 基础&#xA;1. 什么是 Redis&#xA;Redis 是基于 C 语言开发的开源内存数据库，以键值对形式存储数据。数据常驻内存，读写速度极快，被广泛用于分布式缓存。与传统关系型数据库不同，内存读写本身在几十纳秒到亚微秒量级，而…</summary>
   </entry>
   <entry>
     <title>后端八股复习指南：博客文章索引</title>
@@ -120,33 +148,5 @@
     <updated>2026-08-08T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/AI/Langfuse自托管实录-单机K8s部署与四个坑/"></link>
     <summary>在 Docker Desktop 单机 K8s 上自托管 Langfuse 的完整实录：选型决策、Helm 安装、values 调优，以及 Bitnami 镜像失效、Node OOM、ClickHouse 副本泛滥、OTLP 路径藏匿四个坑的排查过程。</summary>
-  </entry>
-  <entry>
-    <title>Docker Desktop 单机 K8s 实测：能力全不全，能不能代替 Docker</title>
-    <id>https://hekurong.github.io/posts/AI/DockerDesktop单机K8s实测-能力全不全与能不能代替Docker/</id>
-    <updated>2026-08-08T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/DockerDesktop单机K8s实测-能力全不全与能不能代替Docker/"></link>
-    <summary>实测 Docker Desktop 内置 Kubernetes 的完整能力清单：组件、存储、缺什么、官方边界，以及一个关键结论——K8s 能代替 docker compose，但不能代替 Docker 本身。</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：导读与全书结构</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-00-导读与全书结构/</id>
-    <updated>2026-08-04T11:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-00-导读与全书结构/"></link>
-    <summary>全书导读：核心公式、四层结构、阅读路径与前置知识</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第一章 AI Agent 入门</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-01-AI-Agent-入门/</id>
-    <updated>2026-08-04T10:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-01-AI-Agent-入门/"></link>
-    <summary>全书的概念地图：核心公式 Agent = LLM + 上下文 + 工具、ReAct 循环与编排光谱</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第二章 上下文工程</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-02-上下文工程/</id>
-    <updated>2026-08-04T09:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-02-上下文工程/"></link>
-    <summary>全书最关键的一章：给模型看什么、怎么组织，比模型本身有多聪明更影响最终结果</summary>
   </entry>
 </feed>

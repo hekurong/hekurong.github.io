@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>实习项目·DewuClaw：多 Agent 工具调度与协作工程 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=18">
+
+
+
+
+
+
+
+<link rel="alternate" type="application/atom+xml" title="KurongBlog - 订阅" href="https://hekurong.github.io/atom.xml">
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">实习项目·DewuClaw：多 Agent 工具调度与协作工程</h1>
+    <div class="article-meta">
+      <time datetime="2026-08-21">2026-08-21</time>
+      <span class="ai-badge" title="AI 辅助生成">AI</span>
+      <span class="series-badge" title="系列"><a href="/series/%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0%c2%b7%e5%ae%9e%e4%b9%a0%e4%b8%8e%e9%a1%b9%e7%9b%ae/">面试复习·实习与项目</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/%e8%ae%a1%e7%ae%97%e6%9c%ba%e5%9f%ba%e7%a1%80/">计算机基础</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="tag" href="/tags/%e5%a4%8d%e4%b9%a0/">复习</a>
+      
+      <a class="tag" href="/tags/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae/">实习项目</a>
+      
+      <a class="tag" href="/tags/%e5%a4%9aAgent/">多Agent</a>
+      
+      <a class="tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e5%ba%a6/">工具调度</a>
+      
+      <a class="tag" href="/tags/%e8%af%ad%e4%b9%89%e5%8c%b9%e9%85%8d/">语义匹配</a>
+      
+      <a class="tag" href="/tags/%e9%9a%94%e7%a6%bb/">隔离</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="dewuclaw-agent-">实习项目·DewuClaw：多 Agent 工具调度与协作工程</h1>
+<blockquote>
+<p>定位：面试复习·实习与项目系列第二篇。这个项目是 AI 应用方向面试的问答富矿，把「多 Agent 并行怎么防数据竞争、工具太多怎么让 Agent 找得准、隔离怎么做才轻量」三大追问点讲透。
+收藏：本系列收录于 <a href="/posts/DailyDev/%E5%90%8E%E7%AB%AF%E5%85%AB%E8%82%A1%E5%A4%8D%E4%B9%A0%E6%8C%87%E5%8D%97%EF%BC%9A%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/">后端八股复习指南</a>。</p>
+</blockquote>
+<hr>
+<h2 id="heading">一、项目背景</h2>
+<p>项目是一款多 Agent 协作框架，多个 Agent 并行处理一条长链路任务，各自调用工具读写文件、执行操作。规模上来后暴露出两个真实的工程痛点：</p>
+<ul>
+<li><strong>数据竞争与状态污染</strong>。多个 Agent 并行读写同一个文件路径，后写覆盖先写，协作链路的数据一致性被破坏</li>
+<li><strong>工具定位困难</strong>。长链路任务里注册的工具数量庞大，Agent 选工具时要把全部工具描述过一遍才能找到可用的那个，又慢又容易选错</li>
+</ul>
+<p>两个问题分别对应隔离与调度，是面试官顺着项目必问的两条主线。</p>
+<h2 id="-agent-">二、多 Agent 的并发问题：为什么共享文件路径会出事</h2>
+<p>多 Agent 共享同一套文件系统时，输出文件、临时目录、缓存路径极易撞车。两个 Agent 并行写同一个文件，A 写完 B 又写，A 的结果被覆盖，后读数据的 Agent 拿到的是 B 的内容，产生状态污染。即便同一 Agent 内部，多路并发操作同一个路径也有同样问题。</p>
+<p>根治思路无非两条：</p>
+<ul>
+<li><strong>硬隔离</strong>。上容器级沙箱，每个 Agent 一套独立文件系统。干净彻底，但重：镜像、资源隔离、通信开销都上来，多 Agent 轻量协作场景不划算</li>
+<li><strong>软隔离</strong>。不引入容器，在框架层给每个 Agent 分配独立的逻辑工作目录，把文件读写操作统一重定向</li>
+</ul>
+<p>项目选择软隔离，追求「轻量够用」。</p>
+<h2 id="heading-1">三、软隔离工作区：映射表与读写重定向</h2>
+<p>软隔离的核心设计：为每个 Agent 分配一个独立工作目录作为边界，由上下文管理器维护一张「Agent 到工作目录」的映射表，在框架层统一拦截并重定向该 Agent 的全部文件读写操作。</p>
+<div class="code-wrapper" data-lang="go"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">WorkspaceManager</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">mu</span>     <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">table</span>  <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span> <span class="c1">// agentID -&gt; workdir
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">WorkspaceManager</span><span class="p">)</span> <span class="nf">Assign</span><span class="p">(</span><span class="nx">agentID</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">m</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">m</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">dir</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="err">「</span><span class="nx">workdir</span><span class="o">/%</span><span class="nx">s</span><span class="err">」</span><span class="p">,</span> <span class="nx">agentID</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">m</span><span class="p">.</span><span class="nx">table</span><span class="p">[</span><span class="nx">agentID</span><span class="p">]</span> <span class="p">=</span> <span class="nx">dir</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">dir</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 拦截文件操作：把参数里的路径重定向到 agent 自己的工作目录
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">WorkspaceManager</span><span class="p">)</span> <span class="nf">Resolve</span><span class="p">(</span><span class="nx">agentID</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">m</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">m</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">base</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">m</span><span class="p">.</span><span class="nx">table</span><span class="p">[</span><span class="nx">agentID</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">path</span> <span class="c1">// 未登记，原样返回
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">filepath</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="nx">base</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></div><p>设计要点三条：</p>
+<ul>
+<li><strong>拦截点要统一</strong>。文件读写经过的公共入口全部走 Resolve 重定向，保证没有漏网之鱼直接摸到真实路径</li>
+<li><strong>映射表本身要并发安全</strong>。映射表被所有 Agent 共享读写，用读写锁保护，读多写少时 RWMutex 是合适选择</li>
+<li><strong>未登记的原样放行</strong>。内部系统文件不必重定向，避免过度隔离影响正常执行</li>
+</ul>
+<p>软隔离的收益：不引入容器级沙箱，只在框架层做路径重定向，消除数据竞争，协作链路数据一致，代价是框架层一次统一的路径拦截。面试时这一段的记忆点是「映射表加重定向」，把三要素（独立目录、映射表维护、统一拦截）讲清楚即可。</p>
+<h2 id="-agent--1">四、工具调度：为什么工具多了 Agent 就变笨</h2>
+<p>多工具场景的经典问题：工具描述是长文本，Agent 每一步都要从全部工具描述里找到能用的那个。工具少时遍历一遍可行，工具量上百时，遍历描述的 Token 成本高，且无关工具的描述混入上下文会干扰模型判断，选错工具。</p>
+<p>问题的本质是信息过载：Agent 的注意力被无关工具稀释了。解法的方向是<strong>先收窄候选，再精确匹配</strong>。</p>
+<h2 id="skill-hub">五、Skill Hub：元数据注册与语义匹配</h2>
+<p>项目把工具调度拆成注册中心加匹配器两层。</p>
+<h3 id="1-skill-hub-">1. Skill Hub 独立服务</h3>
+<p>工具不是写死在 Agent 里的，而是向 Skill Hub 注册元数据。Hub 托管全部工具的注册信息：名称、功能描述、参数 Schema、依赖环境。Agent 执行时不再遍历全部工具描述，而是先向 Hub 拉取元数据做语义匹配，收窄候选范围。</p>
+<h3 id="2-">2. 两段式下发</h3>
+<ul>
+<li><strong>第一段，粗筛</strong>。把当前任务意图与工具元数据做语义匹配，只召回候选范围，候选往往只有全量的一个零头</li>
+<li><strong>第二段，精排</strong>。对召回候选按语义相似度排序，把排序靠前的完整 Schema 描述下发给 Agent，执行时动态加载对应实现</li>
+</ul>
+<p>这样 Agent 每步只需处理少量相关工具的完整描述，无关工具根本不进上下文。工具命中率与上下文干净度同时改善。</p>
+<h3 id="3-">3. 在线反馈修正排序权重</h3>
+<p>静态语义匹配有个盲点：语义相似不等于实际可用。两个工具描述都很像，但只有一个是当前环境能跑的。项目引入历史调用反馈：每次工具调用结果的成败写回 Hub，按工具的准确率与历史命中情况对排序权重做在线修正。高频好用的工具权重上浮，常失败的降权，排序逐渐贴近真实可用性。</p>
+<p>这部分面试可以讲到很细：语义匹配定冷启动，反馈修正做热收敛，两者结合让排序权重持续进化。</p>
+<h2 id="heading-2">六、命中率提升的验证</h2>
+<p>上线前后按抽样对比，长链路任务的工具命中率提升约 20%。面试答这个数字时要说清口径：同一条评估集、同样的任务分布，对比优化前后的命中占比，而不是凭感觉说「好用多了」。能讲清评估口径，比数字本身更能体现工程素养。</p>
+<h2 id="heading-3">七、面试追问与答题要点</h2>
+<ul>
+<li><strong>Q：软隔离和硬沙箱怎么选？</strong>
+答：看隔离强度需求。多 Agent 轻量协作、只防路径冲突时软隔离够用且代价小；涉及不可信代码执行、需要强环境隔离时硬沙箱。项目选软隔离是因为场景只需防数据竞争，不想背容器开销。</li>
+<li><strong>Q：路径拦截会不会漏？</strong>
+答：会，这是软隔离的天花板。所以拦截点要收敛到文件读写的统一入口，并给未登记路径留原样放行的兜底。真正要求强隔离时回到硬沙箱方案。</li>
+<li><strong>Q：语义匹配用什么做 Embedding 还是关键词？</strong>
+答：职责匹配用向量语义更稳，冷启动阶段可以语义与关键词双路召回再合并，避免单一信号偏差。</li>
+<li><strong>Q：反馈修正会不会收敛到错误方向？</strong>
+答：可能，所以要给权重设上下限与衰减，避免单次异常调用把某个工具权重拉爆或打沉，长期统计才有说服力。</li>
+<li><strong>Q：如果工具间有隐藏依赖怎么调度？</strong>
+答：和第一个项目异曲同工，工具也能建模成 DAG，按依赖排序执行，先完成前置工具再启用后续工具。</li>
+</ul>
+<hr>
+<h2 id="heading-4">小结</h2>
+<p>这个项目讲的其实是多 Agent 工程的两块基石。隔离解决「能不能并行」，用软隔离工作区加映射表重定向，轻量消除数据竞争。调度解决「并行时能不能做对」，用 Skill Hub 注册元数据，语义匹配粗筛加精排两段式下发，再以在线反馈修正排序权重，命中率提升约 20%。两条线都从真实痛点出发，讲到方案设计与验证口径，是 AI 应用岗面试里的高区分度素材。</p>
+<p>下一篇进入工业组态 HMI 项目，讲协议适配与时序数据。</p>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">面试复习·实习与项目（4 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</a>
+      
+    </li>
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">实习项目·DewuClaw：多 Agent 工具调度与协作工程</span>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e5%b7%a5%e4%b8%9a%e7%bb%84%e6%80%81HMI%ef%bc%9a%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d%e4%b8%8e%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae/">实习项目·工业组态 HMI：协议适配与时序数据</a>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e9%a1%b9%e7%9b%ae%c2%b7%e7%94%b5%e7%bd%91%e8%ae%be%e5%a4%87%e6%95%85%e9%9a%9c%e8%be%85%e5%8a%a9%e8%af%8a%e6%96%ad%e7%b3%bb%e7%bb%9f%ef%bc%9a%e5%a4%9aAgent%e8%bf%90%e8%a1%8c%e6%97%b6%e5%86%85%e6%a0%b8%e4%b8%8e%e5%8f%af%e8%a7%82%e6%b5%8b/">项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测</a>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e5%b7%a5%e4%b8%9a%e7%bb%84%e6%80%81HMI%ef%bc%9a%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d%e4%b8%8e%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">实习项目·工业组态 HMI：协议适配与时序数据</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">
+      <span class="related-card-title">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</span>
+      <span class="related-card-date">2026-08-21</span>
+    </a>
+    
+    <a class="related-card" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e5%b7%a5%e4%b8%9a%e7%bb%84%e6%80%81HMI%ef%bc%9a%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d%e4%b8%8e%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae/">
+      <span class="related-card-title">实习项目·工业组态 HMI：协议适配与时序数据</span>
+      <span class="related-card-date">2026-08-21</span>
+    </a>
+    
+    <a class="related-card" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e9%a1%b9%e7%9b%ae%c2%b7%e7%94%b5%e7%bd%91%e8%ae%be%e5%a4%87%e6%95%85%e9%9a%9c%e8%be%85%e5%8a%a9%e8%af%8a%e6%96%ad%e7%b3%bb%e7%bb%9f%ef%bc%9a%e5%a4%9aAgent%e8%bf%90%e8%a1%8c%e6%97%b6%e5%86%85%e6%a0%b8%e4%b8%8e%e5%8f%af%e8%a7%82%e6%b5%8b/">
+      <span class="related-card-title">项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测</span>
+      <span class="related-card-date">2026-08-21</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">后端八股复习指南：博客文章索引</a>
+        <span class="sidebar-post-date">2026-08-17</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</a>
+        <span class="sidebar-post-date">2026-08-21</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7DewuClaw%ef%bc%9a%e5%a4%9aAgent%e5%b7%a5%e5%85%b7%e8%b0%83%e5%ba%a6%e4%b8%8e%e5%8d%8f%e4%bd%9c%e5%b7%a5%e7%a8%8b/">实习项目·DewuClaw：多 Agent 工具调度与协作工程</a>
+        <span class="sidebar-post-date">2026-08-21</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e5%b7%a5%e4%b8%9a%e7%bb%84%e6%80%81HMI%ef%bc%9a%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d%e4%b8%8e%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae/">实习项目·工业组态 HMI：协议适配与时序数据</a>
+        <span class="sidebar-post-date">2026-08-21</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e9%a1%b9%e7%9b%ae%c2%b7%e7%94%b5%e7%bd%91%e8%ae%be%e5%a4%87%e6%95%85%e9%9a%9c%e8%be%85%e5%8a%a9%e8%af%8a%e6%96%ad%e7%b3%bb%e7%bb%9f%ef%bc%9a%e5%a4%9aAgent%e8%bf%90%e8%a1%8c%e6%97%b6%e5%86%85%e6%a0%b8%e4%b8%8e%e5%8f%af%e8%a7%82%e6%b5%8b/">项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测</a>
+        <span class="sidebar-post-date">2026-08-21</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/A2A/">A2A</a>
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Agent/">AI Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/AMQP/">AMQP</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/B&#43;%e6%a0%91/">B&#43;树</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/Coding%20Agent/">Coding Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Computer%20Use/">Computer Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Cordis/">Cordis</a>
+      
+      <a class="sidebar-tag" href="/tags/DAG/">DAG</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/DevOps/">DevOps</a>
+      
+      <a class="sidebar-tag" href="/tags/Docker%20Desktop/">Docker Desktop</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/EXPLAIN/">EXPLAIN</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GC/">GC</a>
+      
+      <a class="sidebar-tag" href="/tags/GGUF/">GGUF</a>
+      
+      <a class="sidebar-tag" href="/tags/GMP/">GMP</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Harness/">Harness</a>
+      
+      <a class="sidebar-tag" href="/tags/Helm/">Helm</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/InfluxDB/">InfluxDB</a>
+      
+      <a class="sidebar-tag" href="/tags/KV%20Cache/">KV Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/Kanban/">Kanban</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM-as-a-Judge/">LLM-as-a-Judge</a>
+      
+      <a class="sidebar-tag" href="/tags/LLMObservability/">LLMObservability</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Langfuse/">Langfuse</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/MCP/">MCP</a>
+      
+      <a class="sidebar-tag" href="/tags/MVCC/">MVCC</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/OpenTelemetry/">OpenTelemetry</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RL/">RL</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/ReAct/">ReAct</a>
+      
+      <a class="sidebar-tag" href="/tags/Read%20View/">Read View</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SDS/">SDS</a>
+      
+      <a class="sidebar-tag" href="/tags/SFT/">SFT</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL%e4%bc%98%e5%8c%96/">SQL优化</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL%e7%bb%83%e4%b9%a0/">SQL练习</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/bigkey/">bigkey</a>
+      
+      <a class="sidebar-tag" href="/tags/binlog/">binlog</a>
+      
+      <a class="sidebar-tag" href="/tags/channel/">channel</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/interface/">interface</a>
+      
+      <a class="sidebar-tag" href="/tags/kind/">kind</a>
+      
+      <a class="sidebar-tag" href="/tags/listpack/">listpack</a>
+      
+      <a class="sidebar-tag" href="/tags/llama.cpp/">llama.cpp</a>
+      
+      <a class="sidebar-tag" href="/tags/map/">map</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/redo%20log/">redo log</a>
+      
+      <a class="sidebar-tag" href="/tags/slice/">slice</a>
+      
+      <a class="sidebar-tag" href="/tags/undo%20log/">undo log</a>
+      
+      <a class="sidebar-tag" href="/tags/vLLM/">vLLM</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">上下文工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b8%a4%e9%98%b6%e6%ae%b5%e6%8f%90%e4%ba%a4/">两阶段提交</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bb%a3%e7%a0%81%e7%94%9f%e6%88%90/">代码生成</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%ab%e8%82%a1/">八股</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8f%e4%bd%9c%e6%a8%a1%e5%bc%8f/">协作模式</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d/">协议适配</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%95%e6%9c%ba%e9%83%a8%e7%bd%b2/">单机部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%af%e8%a7%82%e6%b5%8b/">可观测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8e%e7%ab%af/">后端</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8e%e8%ae%ad%e7%bb%83/">后训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%8d%e4%b9%a0/">复习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9aAgent/">多Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9a%e6%a8%a1%e6%80%81/">多模态</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e/">存储引擎</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae/">实习项目</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e5%ba%a6/">工具调度</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e7%94%a8/">工具调用</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b9%b6%e5%8f%91/">并发</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%85%a2%e6%9f%a5%e8%af%a2/">慢查询</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%89%a7%e8%a1%8c%e8%ae%a1%e5%88%92/">执行计划</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8c%81%e4%b9%85%e5%8c%96/">持久化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8c%81%e7%bb%ad%e8%bf%9b%e5%8c%96/">持续进化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e5%bc%95%e6%93%8e/">推理引擎</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b/">数据类型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">时序数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ac%e5%9c%b0%e6%8e%a8%e7%90%86/">本地推理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b6%88%e6%81%af%e5%8f%af%e9%9d%a0%e6%80%a7/">消息可靠性</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97/">消息队列</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8a%b6%e6%80%81%e6%9c%ba/">状态机</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9f%a5%e8%af%86%e5%ba%93/">知识库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%aa%97%e5%8f%a3%e5%87%bd%e6%95%b0/">窗口函数</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b4%a2%e5%bc%95/">索引</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ba%bf%e7%a8%8b%e6%a8%a1%e5%9e%8b/">线程模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bc%93%e5%ad%98/">缓存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%88%91%e6%94%b9%e8%bf%9b/">自我改进</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%89%98%e7%ae%a1/">自托管</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%84%e4%bc%b0/">评估</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%ad%e4%b9%89%e5%8c%b9%e9%85%8d/">语义匹配</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%ad%e9%9f%b3/">语音</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%bb%e4%b9%a6%e7%ac%94%e8%ae%b0/">读书笔记</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%ba%a6/">调度</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e7%a0%94/">调研</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b7%b3%e8%a1%a8/">跳表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%90%e8%a1%8c%e6%97%b6/">运行时</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%94%81/">锁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%99%8d%e9%87%87%e6%a0%b7/">降采样</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9a%94%e7%a6%bb/">隔离</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9a%94%e7%a6%bb%e7%ba%a7%e5%88%ab/">隔离级别</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9b%86%e7%be%a4/">集群</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a1%b9%e7%9b%ae/">项目</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+       by Kurong
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://hekurong.github.io/atom.xml" rel="alternate" type="application/atom+xml" title="RSS 订阅">RSS</a>
+      
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>

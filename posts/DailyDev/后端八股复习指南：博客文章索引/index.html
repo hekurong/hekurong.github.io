@@ -141,7 +141,8 @@
 <p>按<strong>网络、数据库、缓存/分布式、消息队列、Go 语言、中间件/工程化、分布式理论</strong>的顺序排列，这也是我认为的复习优先级。</p>
 <blockquote>
 <p>2026-08-19 更新：新增 Go / MySQL / Redis / 消息队列 四个「面试八股」系列共八篇，均为系统性整理，覆盖各主题的面试主干考点，标注在各分节最前。
-2026-08-21 更新：新增 SQL 优化实战系列三篇（EXPLAIN 执行计划、慢 SQL 定位与索引优化、手写 SQL 练习），并为 MySQL 面试八股系列补上 MVCC 与隔离级别、三类日志与两阶段提交两篇深挖，均标注在对应分节。</p>
+2026-08-21 更新：新增 SQL 优化实战系列三篇（EXPLAIN 执行计划、慢 SQL 定位与索引优化、手写 SQL 练习），并为 MySQL 面试八股系列补上 MVCC 与隔离级别、三类日志与两阶段提交两篇深挖，均标注在对应分节。
+2026-08-21 更新：新增「面试复习·实习与项目」系列四篇，按实习与个人项目为背景串起 DAG 调度、工具调度与隔离、协议适配与时序、多 Agent 运行时与可观测四组考点，见「实习与项目」分节。</p>
 </blockquote>
 <hr>
 <h2 id="heading-1">网络</h2>
@@ -209,8 +210,16 @@
 <li><a href="/posts/DailyDev/%E3%80%8A%E6%95%B0%E6%8D%AE%E5%AF%86%E9%9B%86%E5%9E%8B%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E3%80%8B%E8%AE%B0%E5%BD%95/">《数据密集型系统设计》记录</a> — CAP/BASE、数据分片、复制、一致性</li>
 <li><a href="/posts/DailyDev/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E5%88%86%E5%B8%83%E5%BC%8F%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95%E3%80%8B%E8%AE%B0%E5%BD%95/">《深入理解分布式共识算法》记录</a> — Paxos/Raft/ZAB 对比、选主与日志复制</li>
 </ul>
+<h2 id="heading-7">实习与项目</h2>
+<p>面试官深挖简历项目的比例很高，每个项目背后都有一组可展开的技术考点。这套系列按实习与个人项目为背景成文，讲的都是项目真正解决过的工程问题，适合面试前通读建立「项目叙事」的完整逻辑。</p>
+<ul>
+<li><a href="/posts/%E5%AE%9E%E4%B9%A0%E9%A1%B9%E7%9B%AE%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0/%E5%AE%9E%E4%B9%A0%E9%A1%B9%E7%9B%AE%C2%B7%E9%A3%8E%E6%8E%A7%E5%8F%98%E9%87%8F%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%BB%8EPipeline%E5%88%B0DAG%E7%9A%84%E8%B0%83%E5%BA%A6%E9%87%8D%E6%9E%84/">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</a> — 拓扑排序、轮次并行、goroutine 池、并发安全三坑、性能验证</li>
+<li><a href="/posts/%E5%AE%9E%E4%B9%A0%E9%A1%B9%E7%9B%AE%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0/%E5%AE%9E%E4%B9%A0%E9%A1%B9%E7%9B%AE%C2%B7DewuClaw%EF%BC%9A%E5%A4%9AAgent%E5%B7%A5%E5%85%B7%E8%B0%83%E5%BA%A6%E4%B8%8E%E5%8D%8F%E4%BD%9C%E5%B7%A5%E7%A8%8B/">实习项目·DewuClaw：多 Agent 工具调度与协作工程</a> — 软隔离工作区、Skill Hub 语义匹配、两段式下发、在线反馈修正</li>
+<li><a href="/posts/%E5%AE%9E%E4%B9%A0%E9%A1%B9%E7%9B%AE%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0/%E5%AE%9E%E4%B9%A0%E9%A1%B9%E7%9B%AE%C2%B7%E5%B7%A5%E4%B8%9A%E7%BB%84%E6%80%81HMI%EF%BC%9A%E5%8D%8F%E8%AE%AE%E9%80%82%E9%85%8D%E4%B8%8E%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE/">实习项目·工业组态 HMI：协议适配与时序数据</a> — 适配器模式、Modbus TCP/OPC UA、时序库选型、预降采样</li>
+<li><a href="/posts/%E5%AE%9E%E4%B9%A0%E9%A1%B9%E7%9B%AE%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0/%E9%A1%B9%E7%9B%AE%C2%B7%E7%94%B5%E7%BD%91%E8%AE%BE%E5%A4%87%E6%95%85%E9%9A%9C%E8%BE%85%E5%8A%A9%E8%AF%8A%E6%96%AD%E7%B3%BB%E7%BB%9F%EF%BC%9A%E5%A4%9AAgent%E8%BF%90%E8%A1%8C%E6%97%B6%E5%86%85%E6%A0%B8%E4%B8%8E%E5%8F%AF%E8%A7%82%E6%B5%8B/">项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测</a> — 消息信封、五态状态机、SQLite 单写者、Auditor 确定性审核、MCP 工具服务器、KV Cache 成本优化</li>
+</ul>
 <hr>
-<h2 id="heading-7">推荐复习路线</h2>
+<h2 id="heading-8">推荐复习路线</h2>
 <p>如果时间紧，按这个顺序过一遍核心篇目：</p>
 <p><strong>第一轮（4天，系统系列优先）</strong>：Go 八股两篇、MySQL 八股两篇、Redis 八股两篇、消息队列八股两篇</p>
 <p>（系统系列覆盖了后端面试主干，建议优先通读；若时间仍紧，可从中挑薄弱项）</p>
@@ -1340,6 +1349,34 @@
     
   
 
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
 
 
 <nav class="post-nav">
@@ -1347,9 +1384,9 @@
   <div></div>
   
   
-  <a class="post-nav-link next" href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aEXPLAIN%e8%af%bb%e6%87%82%e6%89%a7%e8%a1%8c%e8%ae%a1%e5%88%92/">
+  <a class="post-nav-link next" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">
     <span class="post-nav-label">Next</span>
-    <span class="post-nav-title">SQL 优化实战（一）：EXPLAIN 读懂执行计划</span>
+    <span class="post-nav-title">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</span>
   </a>
   
 </nav>
@@ -1398,30 +1435,38 @@
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aEXPLAIN%e8%af%bb%e6%87%82%e6%89%a7%e8%a1%8c%e8%ae%a1%e5%88%92/">SQL 优化实战（一）：EXPLAIN 读懂执行计划</a>
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</a>
         <span class="sidebar-post-date">2026-08-21</span>
       </li>
       
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e6%85%a2SQL%e5%ae%9a%e4%bd%8d%e4%b8%8e%e7%b4%a2%e5%bc%95%e4%bc%98%e5%8c%96/">SQL 优化实战（二）：慢 SQL 定位与索引优化</a>
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7DewuClaw%ef%bc%9a%e5%a4%9aAgent%e5%b7%a5%e5%85%b7%e8%b0%83%e5%ba%a6%e4%b8%8e%e5%8d%8f%e4%bd%9c%e5%b7%a5%e7%a8%8b/">实习项目·DewuClaw：多 Agent 工具调度与协作工程</a>
         <span class="sidebar-post-date">2026-08-21</span>
       </li>
       
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/MySQL%e9%ab%98%e9%a2%91%e6%89%8b%e5%86%99SQL%e7%bb%83%e4%b9%a0/">MySQL 高频手写 SQL 练习</a>
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e5%b7%a5%e4%b8%9a%e7%bb%84%e6%80%81HMI%ef%bc%9a%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d%e4%b8%8e%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae/">实习项目·工业组态 HMI：协议适配与时序数据</a>
         <span class="sidebar-post-date">2026-08-21</span>
       </li>
       
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%89%ef%bc%89%ef%bc%9aMVCC%e4%b8%8e%e9%9a%94%e7%a6%bb%e7%ba%a7%e5%88%ab%e6%b7%b1%e6%8c%96/">MySQL 面试八股（三）：MVCC 与隔离级别深挖</a>
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e9%a1%b9%e7%9b%ae%c2%b7%e7%94%b5%e7%bd%91%e8%ae%be%e5%a4%87%e6%95%85%e9%9a%9c%e8%be%85%e5%8a%a9%e8%af%8a%e6%96%ad%e7%b3%bb%e7%bb%9f%ef%bc%9a%e5%a4%9aAgent%e8%bf%90%e8%a1%8c%e6%97%b6%e5%86%85%e6%a0%b8%e4%b8%8e%e5%8f%af%e8%a7%82%e6%b5%8b/">项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测</a>
         <span class="sidebar-post-date">2026-08-21</span>
       </li>
+      
+      
+      
+      
+      
+      
+      
+      
       
       
       
@@ -1791,6 +1836,8 @@
       
       <a class="sidebar-tag" href="/tags/Cordis/">Cordis</a>
       
+      <a class="sidebar-tag" href="/tags/DAG/">DAG</a>
+      
       <a class="sidebar-tag" href="/tags/DP/">DP</a>
       
       <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
@@ -1838,6 +1885,8 @@
       <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
       
       <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/InfluxDB/">InfluxDB</a>
       
       <a class="sidebar-tag" href="/tags/KV%20Cache/">KV Cache</a>
       
@@ -2059,6 +2108,8 @@
       
       <a class="sidebar-tag" href="/tags/%e5%8d%8f%e4%bd%9c%e6%a8%a1%e5%bc%8f/">协作模式</a>
       
+      <a class="sidebar-tag" href="/tags/%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d/">协议适配</a>
+      
       <a class="sidebar-tag" href="/tags/%e5%8d%95%e6%9c%ba%e9%83%a8%e7%bd%b2/">单机部署</a>
       
       <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
@@ -2068,6 +2119,8 @@
       <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
       
       <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%af%e8%a7%82%e6%b5%8b/">可观测</a>
       
       <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
       
@@ -2099,11 +2152,17 @@
       
       <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e/">存储引擎</a>
       
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae/">实习项目</a>
+      
       <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
       
       <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
       
+      <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e5%ba%a6/">工具调度</a>
+      
       <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e7%94%a8/">工具调用</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b9%b6%e5%8f%91/">并发</a>
       
       <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
       
@@ -2141,6 +2200,8 @@
       
       <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
       
+      <a class="sidebar-tag" href="/tags/%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">时序数据库</a>
+      
       <a class="sidebar-tag" href="/tags/%e6%9c%ac%e5%9c%b0%e6%8e%a8%e7%90%86/">本地推理</a>
       
       <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
@@ -2172,6 +2233,8 @@
       <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
       
       <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8a%b6%e6%80%81%e6%9c%ba/">状态机</a>
       
       <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
       
@@ -2221,15 +2284,21 @@
       
       <a class="sidebar-tag" href="/tags/%e8%af%84%e4%bc%b0/">评估</a>
       
+      <a class="sidebar-tag" href="/tags/%e8%af%ad%e4%b9%89%e5%8c%b9%e9%85%8d/">语义匹配</a>
+      
       <a class="sidebar-tag" href="/tags/%e8%af%ad%e9%9f%b3/">语音</a>
       
       <a class="sidebar-tag" href="/tags/%e8%af%bb%e4%b9%a6%e7%ac%94%e8%ae%b0/">读书笔记</a>
       
       <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
       
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%ba%a6/">调度</a>
+      
       <a class="sidebar-tag" href="/tags/%e8%b0%83%e7%a0%94/">调研</a>
       
       <a class="sidebar-tag" href="/tags/%e8%b7%b3%e8%a1%a8/">跳表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%90%e8%a1%8c%e6%97%b6/">运行时</a>
       
       <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
       
@@ -2247,6 +2316,10 @@
       
       <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
       
+      <a class="sidebar-tag" href="/tags/%e9%99%8d%e9%87%87%e6%a0%b7/">降采样</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9a%94%e7%a6%bb/">隔离</a>
+      
       <a class="sidebar-tag" href="/tags/%e9%9a%94%e7%a6%bb%e7%ba%a7%e5%88%ab/">隔离级别</a>
       
       <a class="sidebar-tag" href="/tags/%e9%9b%86%e7%be%a4/">集群</a>
@@ -2254,6 +2327,8 @@
       <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
       
       <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a1%b9%e7%9b%ae/">项目</a>
       
       <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
       
