@@ -140,7 +140,8 @@
 <p>博客写了不少东西，但零散分布在各个分类里。趁秋招季，把后端八股相关的文章按主题整理一份索引，方便自己复习时快速定位，也给同路人一个参考。</p>
 <p>按<strong>网络、数据库、缓存/分布式、消息队列、Go 语言、中间件/工程化、分布式理论</strong>的顺序排列，这也是我认为的复习优先级。</p>
 <blockquote>
-<p>2026-08-19 更新：新增 Go / MySQL / Redis / 消息队列 四个「面试八股」系列共八篇，均为系统性整理，覆盖各主题的面试主干考点，标注在各分节最前。</p>
+<p>2026-08-19 更新：新增 Go / MySQL / Redis / 消息队列 四个「面试八股」系列共八篇，均为系统性整理，覆盖各主题的面试主干考点，标注在各分节最前。
+2026-08-21 更新：新增 SQL 优化实战系列三篇（EXPLAIN 执行计划、慢 SQL 定位与索引优化、手写 SQL 练习），并为 MySQL 面试八股系列补上 MVCC 与隔离级别、三类日志与两阶段提交两篇深挖，均标注在对应分节。</p>
 </blockquote>
 <hr>
 <h2 id="heading-1">网络</h2>
@@ -156,6 +157,11 @@
 <ul>
 <li><a href="/posts/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E6%9E%B6%E6%9E%84%E3%80%81%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B8%8E%E7%B4%A2%E5%BC%95/">MySQL 面试八股（一）：架构、存储引擎与索引</a> — 字段类型速记、SQL 执行流程、InnoDB/MyISAM、B+ 索引全解（覆盖索引/最左前缀/索引下推）</li>
 <li><a href="/posts/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E3%80%81%E9%94%81%E4%B8%8E%E6%97%A5%E5%BF%97/">MySQL 面试八股（二）：事务、锁与日志</a> — 事务隔离级别、三类行锁、redo/binlog/undo、MVCC 可见性</li>
+<li><a href="/posts/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AMVCC%E4%B8%8E%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E6%B7%B1%E6%8C%96/">MySQL 面试八股（三）：MVCC 与隔离级别深挖</a> — Read View 可见性五步算法、RC 与 RR 差异逐例推演、Next-Key Lock 防幻读</li>
+<li><a href="/posts/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/MySQL%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E4%B8%89%E7%B1%BB%E6%97%A5%E5%BF%97%E4%B8%8E%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4/">MySQL 面试八股（四）：三类日志与两阶段提交</a> — redo 的 WAL 与刷盘策略、binlog 三种格式、两阶段提交与崩溃恢复</li>
+<li><a href="/posts/SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AEXPLAIN%E8%AF%BB%E6%87%82%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92/">SQL 优化实战（一）：EXPLAIN 读懂执行计划</a> — type/key/Extra 逐列拆解、覆盖索引与 filesort 实战案例</li>
+<li><a href="/posts/SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%85%A2SQL%E5%AE%9A%E4%BD%8D%E4%B8%8E%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96/">SQL 优化实战（二）：慢 SQL 定位与索引优化</a> — 慢查询日志定位、索引设计、七种索引失效场景</li>
+<li><a href="/posts/SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/MySQL%E9%AB%98%E9%A2%91%E6%89%8B%E5%86%99SQL%E7%BB%83%E4%B9%A0/">MySQL 高频手写 SQL 练习</a> — 分组 TopN、连续登录、行转列、留存率、中位数等八道真题题解</li>
 <li><a href="/posts/DailyDev/Mysql%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">Mysql 必知必会读书笔记</a> — SQL 基础、增删改查、连接查询、子查询</li>
 <li><a href="/posts/DailyDev/%E3%80%8A%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E3%80%8B%E8%AE%B0%E5%BD%95/">《高性能 MySQL》记录</a> — 索引原理、查询优化、锁机制、事务隔离级别</li>
 <li><a href="/posts/DailyDev/%E3%80%8APostgreSQL%E6%8C%87%E5%8D%97%E3%80%8B%E8%AE%B0%E5%BD%95/">《PostgreSQL 指南》记录</a> — PG 特性、与 MySQL 的差异、适用场景</li>
@@ -1299,6 +1305,41 @@
     
   
 
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
 
 
 <nav class="post-nav">
@@ -1306,9 +1347,9 @@
   <div></div>
   
   
-  <a class="post-nav-link next" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
+  <a class="post-nav-link next" href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aEXPLAIN%e8%af%bb%e6%87%82%e6%89%a7%e8%a1%8c%e8%ae%a1%e5%88%92/">
     <span class="post-nav-label">Next</span>
-    <span class="post-nav-title">消息队列面试八股（一）：Kafka</span>
+    <span class="post-nav-title">SQL 优化实战（一）：EXPLAIN 读懂执行计划</span>
   </a>
   
 </nav>
@@ -1319,19 +1360,19 @@
   <h3 class="related-title">相关文章</h3>
   <div class="related-grid">
     
-    <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
-      <span class="related-card-title">消息队列面试八股（一）：Kafka</span>
-      <span class="related-card-date">2026-08-19</span>
-    </a>
-    
     <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">
       <span class="related-card-title">消息队列面试八股（二）：RabbitMQ</span>
       <span class="related-card-date">2026-08-19</span>
     </a>
     
-    <a class="related-card" href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%9e%b6%e6%9e%84%e3%80%81%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e%e4%b8%8e%e7%b4%a2%e5%bc%95/">
-      <span class="related-card-title">MySQL 面试八股（一）：架构、存储引擎与索引</span>
+    <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
+      <span class="related-card-title">消息队列面试八股（一）：Kafka</span>
       <span class="related-card-date">2026-08-19</span>
+    </a>
+    
+    <a class="related-card" href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/MySQL%e9%ab%98%e9%a2%91%e6%89%8b%e5%86%99SQL%e7%bb%83%e4%b9%a0/">
+      <span class="related-card-title">MySQL 高频手写 SQL 练习</span>
+      <span class="related-card-date">2026-08-21</span>
     </a>
     
   </div>
@@ -1357,30 +1398,40 @@
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">消息队列面试八股（一）：Kafka</a>
-        <span class="sidebar-post-date">2026-08-19</span>
+        <a href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aEXPLAIN%e8%af%bb%e6%87%82%e6%89%a7%e8%a1%8c%e8%ae%a1%e5%88%92/">SQL 优化实战（一）：EXPLAIN 读懂执行计划</a>
+        <span class="sidebar-post-date">2026-08-21</span>
       </li>
       
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Go%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86/">Go 面试八股（二）：并发模型与内存管理</a>
-        <span class="sidebar-post-date">2026-08-19</span>
+        <a href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e6%85%a2SQL%e5%ae%9a%e4%bd%8d%e4%b8%8e%e7%b4%a2%e5%bc%95%e4%bc%98%e5%8c%96/">SQL 优化实战（二）：慢 SQL 定位与索引优化</a>
+        <span class="sidebar-post-date">2026-08-21</span>
       </li>
       
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">消息队列面试八股（二）：RabbitMQ</a>
-        <span class="sidebar-post-date">2026-08-19</span>
+        <a href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/MySQL%e9%ab%98%e9%a2%91%e6%89%8b%e5%86%99SQL%e7%bb%83%e4%b9%a0/">MySQL 高频手写 SQL 练习</a>
+        <span class="sidebar-post-date">2026-08-21</span>
       </li>
       
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e6%9e%b6%e6%9e%84%e3%80%81%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e%e4%b8%8e%e7%b4%a2%e5%bc%95/">MySQL 面试八股（一）：架构、存储引擎与索引</a>
-        <span class="sidebar-post-date">2026-08-19</span>
+        <a href="/posts/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/MySQL%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%89%ef%bc%89%ef%bc%9aMVCC%e4%b8%8e%e9%9a%94%e7%a6%bb%e7%ba%a7%e5%88%ab%e6%b7%b1%e6%8c%96/">MySQL 面试八股（三）：MVCC 与隔离级别深挖</a>
+        <span class="sidebar-post-date">2026-08-21</span>
       </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       
       
       
@@ -1754,6 +1805,8 @@
       
       <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
       
+      <a class="sidebar-tag" href="/tags/EXPLAIN/">EXPLAIN</a>
+      
       <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
       
       <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
@@ -1884,6 +1937,8 @@
       
       <a class="sidebar-tag" href="/tags/ReAct/">ReAct</a>
       
+      <a class="sidebar-tag" href="/tags/Read%20View/">Read View</a>
+      
       <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
       
       <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
@@ -1893,6 +1948,10 @@
       <a class="sidebar-tag" href="/tags/SFT/">SFT</a>
       
       <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL%e4%bc%98%e5%8c%96/">SQL优化</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL%e7%bb%83%e4%b9%a0/">SQL练习</a>
       
       <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
       
@@ -1924,6 +1983,8 @@
       
       <a class="sidebar-tag" href="/tags/bigkey/">bigkey</a>
       
+      <a class="sidebar-tag" href="/tags/binlog/">binlog</a>
+      
       <a class="sidebar-tag" href="/tags/channel/">channel</a>
       
       <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
@@ -1950,6 +2011,8 @@
       
       <a class="sidebar-tag" href="/tags/slice/">slice</a>
       
+      <a class="sidebar-tag" href="/tags/undo%20log/">undo log</a>
+      
       <a class="sidebar-tag" href="/tags/vLLM/">vLLM</a>
       
       <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
@@ -1967,6 +2030,8 @@
       <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
       
       <a class="sidebar-tag" href="/tags/%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">上下文工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b8%a4%e9%98%b6%e6%ae%b5%e6%8f%90%e4%ba%a4/">两阶段提交</a>
       
       <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
       
@@ -2046,6 +2111,10 @@
       
       <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
       
+      <a class="sidebar-tag" href="/tags/%e6%85%a2%e6%9f%a5%e8%af%a2/">慢查询</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%89%a7%e8%a1%8c%e8%ae%a1%e5%88%92/">执行计划</a>
+      
       <a class="sidebar-tag" href="/tags/%e6%8c%81%e4%b9%85%e5%8c%96/">持久化</a>
       
       <a class="sidebar-tag" href="/tags/%e6%8c%81%e7%bb%ad%e8%bf%9b%e5%8c%96/">持续进化</a>
@@ -2116,6 +2185,8 @@
       
       <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
       
+      <a class="sidebar-tag" href="/tags/%e7%aa%97%e5%8f%a3%e5%87%bd%e6%95%b0/">窗口函数</a>
+      
       <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
       
       <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
@@ -2175,6 +2246,8 @@
       <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
       
       <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9a%94%e7%a6%bb%e7%ba%a7%e5%88%ab/">隔离级别</a>
       
       <a class="sidebar-tag" href="/tags/%e9%9b%86%e7%be%a4/">集群</a>
       

@@ -3,39 +3,46 @@
   <title>KurongBlog</title>
   <subtitle>技术博客，记录学习与思考</subtitle>
   <id>https://hekurong.github.io/</id>
-  <updated>2026-08-20T12:32:52Z</updated>
+  <updated>2026-08-21T04:05:13Z</updated>
   <link rel="self" type="application/atom+xml" href="https://hekurong.github.io/atom.xml"></link>
   <link href="https://hekurong.github.io/"></link>
   <author>
     <name>Kurong</name>
   </author>
   <entry>
-    <title>消息队列面试八股（一）：Kafka</title>
-    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/</id>
-    <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/"></link>
-    <summary>消息队列面试八股（一）：Kafka&#xA;&#xA;来源：面试八股资料整理（kafka八股.pdf），结合 Kafka 官方文档口径校正。&#xA;定位：消息队列面试八股第一篇，Kafka 专项。覆盖消息模型、核心概念、副本机制、顺序保证、消息不丢失与重复消费、重试机制。下一篇是 RabbitMQ 专项。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Kafka 基础&#xA;1. Kafka 是什么&#xA;Kafka 是分布式流式处理平台，兼具三个能力：发布订阅消息流，也就是消息队列功能；容错的持久化存储，消息落盘避免丢失；流式处理，提供完整的流处理类库。&#xA;两大应用场景：一是建实时流数据管道，在系统与应用程序之间可靠搬运数据…</summary>
+    <title>SQL 优化实战（一）：EXPLAIN 读懂执行计划</title>
+    <id>https://hekurong.github.io/posts/SQL优化实战/SQL优化实战（一）：EXPLAIN读懂执行计划/</id>
+    <updated>2026-08-21T11:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/SQL优化实战/SQL优化实战（一）：EXPLAIN读懂执行计划/"></link>
+    <summary>SQL 优化实战（一）：EXPLAIN 读懂执行计划&#xA;&#xA;来源：面试八股资料整理（mysql索引八股.pdf、mysql八股汇总.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：SQL 优化实战系列第一篇。SQL 优化要先会诊断，EXPLAIN 就是那张诊断单。这一篇把执行计划每个字段讲透，配真实案例手推，看完能自己给一条慢 SQL 开方子。下一篇讲慢 SQL 定位与索引优化。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、为什么先学 EXPLAIN&#xA;面试里常被问「你怎么优化一条慢 SQL」，答案的起点几乎都是 EXPLAIN。它不是真的执行语句，而是让查询优化器分析这条 SQL，给出它…</summary>
   </entry>
   <entry>
-    <title>Go 面试八股（二）：并发模型与内存管理</title>
-    <id>https://hekurong.github.io/posts/Go面试八股/Go面试八股（二）：并发模型与内存管理/</id>
-    <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/Go面试八股/Go面试八股（二）：并发模型与内存管理/"></link>
-    <summary>Go 面试八股（二）：并发模型与内存管理&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：上篇讲语言与数据结构，本篇进入 Go 最硬核的并发与内存机制，GMP 调度、channel、锁、GC、逃逸分析都是技术面深挖的重灾区。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、进程、线程与协程&#xA;1. 三者的区别（必问）&#xA;&#xA;进程是应用程序的运行实例，每个进程有独立的内存空间，进程间通信靠管道、Socket、共享内存等机制&#xA;线程是进程内的执行单元，是操作系统调度的基本单位，同一进程的线程共享进程资源，通过共享内存通信&#xA;协程是用户态的轻量级线程，不受操作系统…</summary>
+    <title>SQL 优化实战（二）：慢 SQL 定位与索引优化</title>
+    <id>https://hekurong.github.io/posts/SQL优化实战/SQL优化实战（二）：慢SQL定位与索引优化/</id>
+    <updated>2026-08-21T10:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/SQL优化实战/SQL优化实战（二）：慢SQL定位与索引优化/"></link>
+    <summary>SQL 优化实战（二）：慢 SQL 定位与索引优化&#xA;&#xA;来源：面试八股资料整理（mysql索引八股.pdf、mysql八股汇总.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：SQL 优化实战系列第二篇。上一篇教怎么读懂执行计划，这一篇讲三件事：慢 SQL 从哪来、索引怎么设计与维护、七种索引失效场景怎么破。看完能独立走完「定位慢 SQL 到优化落地」的完整闭环。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、慢 SQL 从哪来&#xA;MySQL 把执行时间超过阈值的语句记录到慢查询日志。第一步是确认慢查询日志开没开、阈值设了多少：&#xA;1&#xA;2&#xA;3&#xA;4-- 查看慢查询日志是否开启、日志文件位置与阈…</summary>
   </entry>
   <entry>
-    <title>消息队列面试八股（二）：RabbitMQ</title>
-    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/</id>
-    <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/"></link>
-    <summary>消息队列面试八股（二）：RabbitMQ&#xA;&#xA;来源：面试八股资料整理（rabbitmq八股.pdf），结合 RabbitMQ 官方文档口径校正。&#xA;定位：消息队列面试八股第二篇，RabbitMQ 专项。与 Kafka 的分区模型不同，RabbitMQ 是经典的交换器加队列模型，路由灵活、保证机制成熟，在企业级系统里应用广泛。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、RabbitMQ 是什么&#xA;RabbitMQ 是在 AMQP 协议基础上实现的可复用企业消息系统，用 Erlang 编写，天然支持并发生态。它能支撑大型系统模块之间的高可靠通信，易用性、扩展性与高可用性都不错。&#xA;特点概括：&#xA;&#xA;可靠…</summary>
+    <title>MySQL 高频手写 SQL 练习</title>
+    <id>https://hekurong.github.io/posts/SQL优化实战/MySQL高频手写SQL练习/</id>
+    <updated>2026-08-21T09:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/SQL优化实战/MySQL高频手写SQL练习/"></link>
+    <summary>MySQL 高频手写 SQL 练习&#xA;&#xA;定位：SQL 优化实战系列终篇，也是「题解式」八股的第一篇。八股背得再熟，手写 SQL 写不出来就露馅，面试官经常现场给一道题让写。这一篇挑了八道最常考的题，每道都给题目、表结构、参考答案和考点讲解。环境默认 MySQL 8.0，窗口函数可用。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;题目一：分组 TopN&#xA;查每个班级成绩排前三的学生。这是 TopN 问题的最常见考法。&#xA;表结构：&#xA;1&#xA;2&#xA;3&#xA;4&#xA;5&#xA;6CREATE TABLE student_score (&#xA;  id INT PRIMARY KEY AUTO_INCREMENT,&#xA;  name VAR…</summary>
   </entry>
   <entry>
-    <title>MySQL 面试八股（一）：架构、存储引擎与索引</title>
-    <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（一）：架构、存储引擎与索引/</id>
-    <updated>2026-08-19T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（一）：架构、存储引擎与索引/"></link>
-    <summary>MySQL 面试八股（一）：架构、存储引擎与索引&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql索引八股.pdf、mysql中sql语句执行过程.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股共两篇。本篇管查询侧，讲清数据怎么存、SQL 怎么跑、索引怎么让查询变快。下一篇管写入与并发侧，讲事务、锁、日志与 MVCC。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、MySQL 基础&#xA;1. 关系型数据库与 MySQL&#xA;关系型数据库建立在关系模型之上，数据以表的行来组织，行与行之间表达一对一、一对多、多对多等联系。主流关系型数据库通过 SQL 操作数据…</summary>
+    <title>MySQL 面试八股（三）：MVCC 与隔离级别深挖</title>
+    <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（三）：MVCC与隔离级别深挖/</id>
+    <updated>2026-08-21T08:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（三）：MVCC与隔离级别深挖/"></link>
+    <summary>MySQL 面试八股（三）：MVCC 与隔离级别深挖&#xA;&#xA;来源：面试八股资料整理（mysql的MVCC实现八股.pdf、mysql八股汇总.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股系列第三篇，对第二篇提到的 MVCC 做深挖。八股（二）讲了 MVCC 是什么、依赖什么、作用在哪，这一篇把 Read View 的四个字段、可见性判断的五步算法、RC 与 RR 的关键差异全部展开，并用完整时间线逐例推演到能默写的程度。这是数据库面试里追问最深的点，也最见功底。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、快速回顾：MVCC 解决什么问题&#xA;并发事务控制只有两条路，…</summary>
+  </entry>
+  <entry>
+    <title>MySQL 面试八股（四）：三类日志与两阶段提交</title>
+    <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（四）：三类日志与两阶段提交/</id>
+    <updated>2026-08-21T07:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（四）：三类日志与两阶段提交/"></link>
+    <summary>MySQL 面试八股（四）：三类日志与两阶段提交&#xA;&#xA;来源：面试八股资料整理（mysql日志八股.pdf、mysql八股汇总.pdf、mysql中sql语句执行过程.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股系列第四篇，对第二篇日志一节做深挖。第二篇讲了三类日志各管什么，这一篇把 redo log 的 WAL 思路与刷盘时机、binlog 的三种格式与写入机制、undo log 的两种类型、两阶段提交与崩溃恢复的完整判断逻辑全部展开，并补上主从复制与日志的关系。这是数据库可靠性的另一半拼图，也是「为什么这么设计」最常被追问的一篇。&#xA;收藏：本系列收录于 后端八股复习…</summary>
   </entry>
   <entry>
     <title>MySQL 面试八股（二）：事务、锁与日志</title>
@@ -43,13 +50,6 @@
     <updated>2026-08-19T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（二）：事务、锁与日志/"></link>
     <summary>MySQL 面试八股（二）：事务、锁与日志&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql日志八股.pdf、mysql的MVCC实现八股.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股第二篇，管写入与并发侧。事务怎么保证、锁怎么控制、MVCC 怎么实现可见性、三类日志各司其职，是数据库面试含金量最高的部分。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、事务与并发问题&#xA;1. 什么是事务&#xA;事务是逻辑上的一组操作，要么全部执行，要么全部不执行。经典例子是转账，扣减转出方余额与增加转入方余额必须作为一个整体，任何一步失败都要回滚。&#xA;数据库事务有 ACI…</summary>
-  </entry>
-  <entry>
-    <title>Redis 面试八股（一）：数据类型与底层结构</title>
-    <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/</id>
-    <updated>2026-08-20T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/"></link>
-    <summary>Redis 面试八股（一）：数据类型与底层结构&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股共两篇。本篇覆盖 Redis 基础、数据类型与底层结构、线程模型、内存管理。下一篇进入持久化、缓存三兄弟、一致性、集群与治理。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Redis 基础&#xA;1. 什么是 Redis&#xA;Redis 是基于 C 语言开发的开源内存数据库，以键值对形式存储数据。数据常驻内存，读写速度极快，被广泛用于分布式缓存。与传统关系型数据库不同，内存读写本身在几十纳秒到亚微秒量级，而…</summary>
   </entry>
   <entry>
     <title>Redis 面试八股（二）：持久化、缓存与集群</title>
@@ -66,11 +66,46 @@
     <summary>Go 面试八股（一）：语言特质与核心数据结构&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：面向技术面试的 Go 语言核心知识梳理，共两篇。本篇覆盖语言特质、面向对象实现、基础语法、数组与切片、Map 与接口。下一篇覆盖并发调度与内存管理。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、语言特质&#xA;1. Go 是面向对象的语言吗&#xA;是，也不是。Go 有类型和方法，允许面向对象的编程风格，但没有类型层次（继承体系）。&#xA;&#xA;面向对象以封装、继承、多态三大特性为核心，Go 三者都沾，但实现方式与传统语言不同&#xA;Go 的接口概念提供了一种非侵入式的组合方式，与…</summary>
   </entry>
   <entry>
+    <title>Go 面试八股（二）：并发模型与内存管理</title>
+    <id>https://hekurong.github.io/posts/Go面试八股/Go面试八股（二）：并发模型与内存管理/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/Go面试八股/Go面试八股（二）：并发模型与内存管理/"></link>
+    <summary>Go 面试八股（二）：并发模型与内存管理&#xA;&#xA;来源：面试八股资料整理（golang语言八股.pdf），结合官方文档与源码口径校正。&#xA;定位：上篇讲语言与数据结构，本篇进入 Go 最硬核的并发与内存机制，GMP 调度、channel、锁、GC、逃逸分析都是技术面深挖的重灾区。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、进程、线程与协程&#xA;1. 三者的区别（必问）&#xA;&#xA;进程是应用程序的运行实例，每个进程有独立的内存空间，进程间通信靠管道、Socket、共享内存等机制&#xA;线程是进程内的执行单元，是操作系统调度的基本单位，同一进程的线程共享进程资源，通过共享内存通信&#xA;协程是用户态的轻量级线程，不受操作系统…</summary>
+  </entry>
+  <entry>
+    <title>MySQL 面试八股（一）：架构、存储引擎与索引</title>
+    <id>https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（一）：架构、存储引擎与索引/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/MySQL面试八股/MySQL面试八股（一）：架构、存储引擎与索引/"></link>
+    <summary>MySQL 面试八股（一）：架构、存储引擎与索引&#xA;&#xA;来源：面试八股资料整理（mysql八股合集.pdf、mysql索引八股.pdf、mysql中sql语句执行过程.pdf），结合 MySQL 官方文档口径校正。&#xA;定位：MySQL 面试八股共两篇。本篇管查询侧，讲清数据怎么存、SQL 怎么跑、索引怎么让查询变快。下一篇管写入与并发侧，讲事务、锁、日志与 MVCC。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、MySQL 基础&#xA;1. 关系型数据库与 MySQL&#xA;关系型数据库建立在关系模型之上，数据以表的行来组织，行与行之间表达一对一、一对多、多对多等联系。主流关系型数据库通过 SQL 操作数据…</summary>
+  </entry>
+  <entry>
+    <title>消息队列面试八股（二）：RabbitMQ</title>
+    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（二）：RabbitMQ/"></link>
+    <summary>消息队列面试八股（二）：RabbitMQ&#xA;&#xA;来源：面试八股资料整理（rabbitmq八股.pdf），结合 RabbitMQ 官方文档口径校正。&#xA;定位：消息队列面试八股第二篇，RabbitMQ 专项。与 Kafka 的分区模型不同，RabbitMQ 是经典的交换器加队列模型，路由灵活、保证机制成熟，在企业级系统里应用广泛。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、RabbitMQ 是什么&#xA;RabbitMQ 是在 AMQP 协议基础上实现的可复用企业消息系统，用 Erlang 编写，天然支持并发生态。它能支撑大型系统模块之间的高可靠通信，易用性、扩展性与高可用性都不错。&#xA;特点概括：&#xA;&#xA;可靠…</summary>
+  </entry>
+  <entry>
+    <title>消息队列面试八股（一）：Kafka</title>
+    <id>https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/消息队列面试八股/消息队列面试八股（一）：Kafka/"></link>
+    <summary>消息队列面试八股（一）：Kafka&#xA;&#xA;来源：面试八股资料整理（kafka八股.pdf），结合 Kafka 官方文档口径校正。&#xA;定位：消息队列面试八股第一篇，Kafka 专项。覆盖消息模型、核心概念、副本机制、顺序保证、消息不丢失与重复消费、重试机制。下一篇是 RabbitMQ 专项。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Kafka 基础&#xA;1. Kafka 是什么&#xA;Kafka 是分布式流式处理平台，兼具三个能力：发布订阅消息流，也就是消息队列功能；容错的持久化存储，消息落盘避免丢失；流式处理，提供完整的流处理类库。&#xA;两大应用场景：一是建实时流数据管道，在系统与应用程序之间可靠搬运数据…</summary>
+  </entry>
+  <entry>
+    <title>Redis 面试八股（一）：数据类型与底层结构</title>
+    <id>https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/</id>
+    <updated>2026-08-20T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/Redis面试八股/Redis面试八股（一）：数据类型与底层结构/"></link>
+    <summary>Redis 面试八股（一）：数据类型与底层结构&#xA;&#xA;来源：面试八股资料整理（redis八股-上.pdf、redis八股-下.pdf），结合 Redis 官方文档口径校正。&#xA;定位：Redis 面试八股共两篇。本篇覆盖 Redis 基础、数据类型与底层结构、线程模型、内存管理。下一篇进入持久化、缓存三兄弟、一致性、集群与治理。&#xA;收藏：本系列收录于 后端八股复习指南。&#xA;&#xA;&#xA;一、Redis 基础&#xA;1. 什么是 Redis&#xA;Redis 是基于 C 语言开发的开源内存数据库，以键值对形式存储数据。数据常驻内存，读写速度极快，被广泛用于分布式缓存。与传统关系型数据库不同，内存读写本身在几十纳秒到亚微秒量级，而…</summary>
+  </entry>
+  <entry>
     <title>后端八股复习指南：博客文章索引</title>
     <id>https://hekurong.github.io/posts/DailyDev/后端八股复习指南：博客文章索引/</id>
     <updated>2026-08-17T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/DailyDev/后端八股复习指南：博客文章索引/"></link>
-    <summary>写在前面&#xA;博客写了不少东西，但零散分布在各个分类里。趁秋招季，把后端八股相关的文章按主题整理一份索引，方便自己复习时快速定位，也给同路人一个参考。&#xA;按网络、数据库、缓存/分布式、消息队列、Go 语言、中间件/工程化、分布式理论的顺序排列，这也是我认为的复习优先级。&#xA;&#xA;2026-08-19 更新：新增 Go / MySQL / Redis / 消息队列 四个「面试八股」系列共八篇，均为系统性整理，覆盖各主题的面试主干考点，标注在各分节最前。&#xA;&#xA;&#xA;网络&#xA;网络是后端八股的地基，面试必问。TCP 握手挥手、IO 模型、HTTP 协议，这几篇覆盖了核心考点。&#xA;&#xA;TCP的三次握手与四次挥手 — 含面试高频…</summary>
+    <summary>写在前面&#xA;博客写了不少东西，但零散分布在各个分类里。趁秋招季，把后端八股相关的文章按主题整理一份索引，方便自己复习时快速定位，也给同路人一个参考。&#xA;按网络、数据库、缓存/分布式、消息队列、Go 语言、中间件/工程化、分布式理论的顺序排列，这也是我认为的复习优先级。&#xA;&#xA;2026-08-19 更新：新增 Go / MySQL / Redis / 消息队列 四个「面试八股」系列共八篇，均为系统性整理，覆盖各主题的面试主干考点，标注在各分节最前。&#xA;2026-08-21 更新：新增 SQL 优化实战系列三篇（EXPLAIN 执行计划、慢 SQL 定位与索引优化、手写 SQL 练习），并为 MySQL 面…</summary>
   </entry>
   <entry>
     <title>DeepSeek Harness 架构全解读：两天十万星的一切皆插件</title>
@@ -80,18 +115,18 @@
     <summary>DeepSeek 官方 agent harness（dsh）架构深度解读。无特权内核、事件溯源会话、能力 Seam、Scope 作用域、Subagent 与 Ralph、持久化与崩溃恢复，逐层拆解两天十万星的设计。</summary>
   </entry>
   <entry>
-    <title>Docker Desktop 单机 K8s 实测：能力全不全，能不能代替 Docker</title>
-    <id>https://hekurong.github.io/posts/AI/DockerDesktop单机K8s实测-能力全不全与能不能代替Docker/</id>
-    <updated>2026-08-08T00:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/DockerDesktop单机K8s实测-能力全不全与能不能代替Docker/"></link>
-    <summary>实测 Docker Desktop 内置 Kubernetes 的完整能力清单：组件、存储、缺什么、官方边界，以及一个关键结论——K8s 能代替 docker compose，但不能代替 Docker 本身。</summary>
-  </entry>
-  <entry>
     <title>Langfuse 自托管实录：单机 K8s 上的 Helm 部署与四个坑</title>
     <id>https://hekurong.github.io/posts/AI/Langfuse自托管实录-单机K8s部署与四个坑/</id>
     <updated>2026-08-08T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/AI/Langfuse自托管实录-单机K8s部署与四个坑/"></link>
     <summary>在 Docker Desktop 单机 K8s 上自托管 Langfuse 的完整实录：选型决策、Helm 安装、values 调优，以及 Bitnami 镜像失效、Node OOM、ClickHouse 副本泛滥、OTLP 路径藏匿四个坑的排查过程。</summary>
+  </entry>
+  <entry>
+    <title>Docker Desktop 单机 K8s 实测：能力全不全，能不能代替 Docker</title>
+    <id>https://hekurong.github.io/posts/AI/DockerDesktop单机K8s实测-能力全不全与能不能代替Docker/</id>
+    <updated>2026-08-08T00:00:00Z</updated>
+    <link href="https://hekurong.github.io/posts/AI/DockerDesktop单机K8s实测-能力全不全与能不能代替Docker/"></link>
+    <summary>实测 Docker Desktop 内置 Kubernetes 的完整能力清单：组件、存储、缺什么、官方边界，以及一个关键结论——K8s 能代替 docker compose，但不能代替 Docker 本身。</summary>
   </entry>
   <entry>
     <title>《深入理解 AI Agent》精读：导读与全书结构</title>
@@ -113,40 +148,5 @@
     <updated>2026-08-04T09:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-02-上下文工程/"></link>
     <summary>全书最关键的一章：给模型看什么、怎么组织，比模型本身有多聪明更影响最终结果</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第三章 用户记忆和知识库</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-03-用户记忆和知识库/</id>
-    <updated>2026-08-04T08:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-03-用户记忆和知识库/"></link>
-    <summary>跨会话持久化知识体系：用户记忆四策略与 RAG 完整技术栈</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第四章 工具</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-04-工具/</id>
-    <updated>2026-08-04T07:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-04-工具/"></link>
-    <summary>Agent 的“手脚”：MCP 互操作标准、五类工具设计原则与执行工具安全机制</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第五章 Coding Agent 与代码生成</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-05-Coding-Agent-与代码生成/</id>
-    <updated>2026-08-04T06:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-05-Coding-Agent-与代码生成/"></link>
-    <summary>Coding Agent + 文件系统是通用 Agent 最核心的技术基础；代码是“元能力”</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第六章 Agent 的评估</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-06-Agent-的评估/</id>
-    <updated>2026-08-04T05:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-06-Agent-的评估/"></link>
-    <summary>科学评估方法论：评估环境、数据集设计、自动化评判与评估驱动决策</summary>
-  </entry>
-  <entry>
-    <title>《深入理解 AI Agent》精读：第七章 模型后训练</title>
-    <id>https://hekurong.github.io/posts/AI/深入理解AI-Agent-07-模型后训练/</id>
-    <updated>2026-08-04T04:00:00Z</updated>
-    <link href="https://hekurong.github.io/posts/AI/深入理解AI-Agent-07-模型后训练/"></link>
-    <summary>SFT 记忆、RL 泛化；数据与环境比算法更重要</summary>
   </entry>
 </feed>
