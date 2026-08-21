@@ -142,7 +142,8 @@
 <blockquote>
 <p>2026-08-19 更新：新增 Go / MySQL / Redis / 消息队列 四个「面试八股」系列共八篇，均为系统性整理，覆盖各主题的面试主干考点，标注在各分节最前。
 2026-08-21 更新：新增 SQL 优化实战系列三篇（EXPLAIN 执行计划、慢 SQL 定位与索引优化、手写 SQL 练习），并为 MySQL 面试八股系列补上 MVCC 与隔离级别、三类日志与两阶段提交两篇深挖，均标注在对应分节。
-2026-08-21 更新：新增「面试复习·实习与项目」系列四篇，按实习与个人项目为背景串起 DAG 调度、工具调度与隔离、协议适配与时序、多 Agent 运行时与可观测四组考点，见「实习与项目」分节。</p>
+2026-08-21 更新：新增「面试复习·实习与项目」系列四篇，按实习与个人项目为背景串起 DAG 调度、工具调度与隔离、协议适配与时序、多 Agent 运行时与可观测四组考点，见「实习与项目」分节。
+2026-08-21 更新：消息队列面试八股系列补上第三篇总纲，跨所有 MQ 归纳不丢失、不重复、保序、积压、延迟五类通用问题与解法。</p>
 </blockquote>
 <hr>
 <h2 id="heading-1">网络</h2>
@@ -181,6 +182,7 @@
 <ul>
 <li><a href="/posts/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AKafka/">消息队列面试八股（一）：Kafka</a> — 消息模型、多副本与 ISR、消息不丢失四件套、重复消费与重试</li>
 <li><a href="/posts/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9ARabbitMQ/">消息队列面试八股（二）：RabbitMQ</a> — 交换器四型、死信与延迟队列、可靠性三段、高可用模式</li>
+<li><a href="/posts/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%B8%8E%E9%80%9A%E7%94%A8%E8%A7%A3%E6%B3%95%E6%80%BB%E7%BA%B2/">消息队列面试八股（三）：常见问题与通用解法总纲</a> — 跨 MQ 通用考点：三段式不丢失、幂等四法、key 分流保序、积压处置、延迟与死信、五性总纲</li>
 <li><a href="/posts/DailyDev/kafka%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8/">Kafka 简单入门</a> — 核心概念、分区与副本、Go 实战、面试高频考点</li>
 <li><a href="/posts/DailyDev/%E3%80%8AKafka%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%E3%80%8B%E8%AE%B0%E5%BD%95/">《Kafka 权威指南》记录</a> — Kafka 深入原理、消费者组、精确一次语义</li>
 <li><a href="/posts/DailyDev/%E3%80%8A%E6%B7%B1%E5%85%A5RabbitMQ%E3%80%8B%E8%AE%B0%E5%BD%95/">《深入 RabbitMQ》记录</a> — RabbitMQ 架构、消息确认、高可用队列</li>
@@ -1377,6 +1379,13 @@
     
   
 
+  
+    
+  
+  
+    
+  
+
 
 
 <nav class="post-nav">
@@ -1397,9 +1406,9 @@
   <h3 class="related-title">相关文章</h3>
   <div class="related-grid">
     
-    <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">
-      <span class="related-card-title">消息队列面试八股（二）：RabbitMQ</span>
-      <span class="related-card-date">2026-08-19</span>
+    <a class="related-card" href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/MySQL%e9%ab%98%e9%a2%91%e6%89%8b%e5%86%99SQL%e7%bb%83%e4%b9%a0/">
+      <span class="related-card-title">MySQL 高频手写 SQL 练习</span>
+      <span class="related-card-date">2026-08-21</span>
     </a>
     
     <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
@@ -1407,9 +1416,9 @@
       <span class="related-card-date">2026-08-19</span>
     </a>
     
-    <a class="related-card" href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/MySQL%e9%ab%98%e9%a2%91%e6%89%8b%e5%86%99SQL%e7%bb%83%e4%b9%a0/">
-      <span class="related-card-title">MySQL 高频手写 SQL 练习</span>
-      <span class="related-card-date">2026-08-21</span>
+    <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">
+      <span class="related-card-title">消息队列面试八股（二）：RabbitMQ</span>
+      <span class="related-card-date">2026-08-19</span>
     </a>
     
   </div>
@@ -1459,6 +1468,8 @@
         <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e9%a1%b9%e7%9b%ae%c2%b7%e7%94%b5%e7%bd%91%e8%ae%be%e5%a4%87%e6%95%85%e9%9a%9c%e8%be%85%e5%8a%a9%e8%af%8a%e6%96%ad%e7%b3%bb%e7%bb%9f%ef%bc%9a%e5%a4%9aAgent%e8%bf%90%e8%a1%8c%e6%97%b6%e5%86%85%e6%a0%b8%e4%b8%8e%e5%8f%af%e8%a7%82%e6%b5%8b/">项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测</a>
         <span class="sidebar-post-date">2026-08-21</span>
       </li>
+      
+      
       
       
       
@@ -2162,6 +2173,8 @@
       
       <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e7%94%a8/">工具调用</a>
       
+      <a class="sidebar-tag" href="/tags/%e5%b9%82%e7%ad%89/">幂等</a>
+      
       <a class="sidebar-tag" href="/tags/%e5%b9%b6%e5%8f%91/">并发</a>
       
       <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
@@ -2217,6 +2230,8 @@
       <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
       
       <a class="sidebar-tag" href="/tags/%e6%b6%88%e6%81%af%e5%8f%af%e9%9d%a0%e6%80%a7/">消息可靠性</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b6%88%e6%81%af%e7%a7%af%e5%8e%8b/">消息积压</a>
       
       <a class="sidebar-tag" href="/tags/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97/">消息队列</a>
       
@@ -2329,6 +2344,8 @@
       <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
       
       <a class="sidebar-tag" href="/tags/%e9%a1%b9%e7%9b%ae/">项目</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a1%ba%e5%ba%8f%e6%80%a7/">顺序性</a>
       
       <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
       
