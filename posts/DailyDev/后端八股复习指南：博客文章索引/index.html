@@ -138,12 +138,13 @@
 
   <h2 id="heading">写在前面</h2>
 <p>博客写了不少东西，但零散分布在各个分类里。趁秋招季，把后端八股相关的文章按主题整理一份索引，方便自己复习时快速定位，也给同路人一个参考。</p>
-<p>按<strong>网络、数据库、缓存/分布式、消息队列、Go 语言、中间件/工程化、分布式理论</strong>的顺序排列，这也是我认为的复习优先级。</p>
+<p>按<strong>网络、数据库、缓存/分布式、消息队列、Go 语言、Python 语言、中间件/工程化、分布式理论</strong>的顺序排列，这也是我认为的复习优先级。</p>
 <blockquote>
 <p>2026-08-19 更新：新增 Go / MySQL / Redis / 消息队列 四个「面试八股」系列共八篇，均为系统性整理，覆盖各主题的面试主干考点，标注在各分节最前。
 2026-08-21 更新：新增 SQL 优化实战系列三篇（EXPLAIN 执行计划、慢 SQL 定位与索引优化、手写 SQL 练习），并为 MySQL 面试八股系列补上 MVCC 与隔离级别、三类日志与两阶段提交两篇深挖，均标注在对应分节。
 2026-08-21 更新：新增「面试复习·实习与项目」系列四篇，按实习与个人项目为背景串起 DAG 调度、工具调度与隔离、协议适配与时序、多 Agent 运行时与可观测四组考点，见「实习与项目」分节。
-2026-08-21 更新：消息队列面试八股系列补上第三篇总纲，跨所有 MQ 归纳不丢失、不重复、保序、积压、延迟五类通用问题与解法。</p>
+2026-08-21 更新：消息队列面试八股系列补上第三篇总纲，跨所有 MQ 归纳不丢失、不重复、保序、积压、延迟五类通用问题与解法。
+2026-08-31 更新：新增 Python 面试八股两篇，覆盖对象模型、核心容器、函数机制、线程/协程/进程选型、GIL 与内存管理，见「Python 语言」分节。</p>
 </blockquote>
 <hr>
 <h2 id="heading-1">网络</h2>
@@ -198,6 +199,12 @@
 <li><a href="/posts/DailyDev/%E3%80%8AGo%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%9E%E6%88%98%E3%80%8B%E8%AE%B0%E5%BD%95/">《Go 微服务实战》记录</a> — 微服务拆分、服务发现、熔断降级</li>
 <li><a href="/posts/DailyDev/%E3%80%8AgRPC%E4%B8%8E%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E3%80%8B%E8%AE%B0%E5%BD%95/">gRPC 与云原生应用开发</a> — RPC 框架、Protobuf、流式通信</li>
 </ul>
+<h2 id="python-">Python 语言</h2>
+<p>Python 面试既会问对象模型、容器和函数语义，也常顺着并发模型与内存管理追问。两篇按语言机制到运行时选型排列，适合在技术面前连读复习。</p>
+<ul>
+<li><a href="/posts/Python%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/Python%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B%E3%80%81%E6%A0%B8%E5%BF%83%E5%AE%B9%E5%99%A8%E4%B8%8E%E5%87%BD%E6%95%B0%E6%9C%BA%E5%88%B6/">Python 面试八股（一）：对象模型、核心容器与函数机制</a> — 名称绑定、可变性、浅深拷贝、list/dict/set、作用域闭包、生成器与 MRO</li>
+<li><a href="/posts/Python%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/Python%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%B9%B6%E5%8F%91%E3%80%81%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/">Python 面试八股（二）：并发、内存管理与工程实践</a> — GIL 边界、线程/协程/进程选型、同步、引用计数与循环 GC、资源治理</li>
+</ul>
 <h2 id="heading-5">中间件与工程化</h2>
 <p>配置中心、任务调度、容器编排，这些是工程能力的体现，也是简历上的亮点。</p>
 <ul>
@@ -223,7 +230,7 @@
 <hr>
 <h2 id="heading-8">推荐复习路线</h2>
 <p>如果时间紧，按这个顺序过一遍核心篇目：</p>
-<p><strong>第一轮（4天，系统系列优先）</strong>：Go 八股两篇、MySQL 八股两篇、Redis 八股两篇、消息队列八股两篇</p>
+<p><strong>第一轮（4天，系统系列优先）</strong>：Go 八股两篇、Python 八股两篇、MySQL 八股两篇、Redis 八股两篇、消息队列八股两篇</p>
 <p>（系统系列覆盖了后端面试主干，建议优先通读；若时间仍紧，可从中挑薄弱项）</p>
 <p><strong>第二轮（2天）</strong>：TCP 三次握手、高性能 MySQL、缓存三大场景、Kafka 入门</p>
 <p><strong>第三轮（2天）</strong>：sync 包详解、epoll 与 BIO、Redis 深度历险、分布式共识算法</p>
@@ -1386,6 +1393,20 @@
     
   
 
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
 
 
 <nav class="post-nav">
@@ -1393,9 +1414,9 @@
   <div></div>
   
   
-  <a class="post-nav-link next" href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">
+  <a class="post-nav-link next" href="/posts/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e5%af%b9%e8%b1%a1%e6%a8%a1%e5%9e%8b%e3%80%81%e6%a0%b8%e5%bf%83%e5%ae%b9%e5%99%a8%e4%b8%8e%e5%87%bd%e6%95%b0%e6%9c%ba%e5%88%b6/">
     <span class="post-nav-label">Next</span>
-    <span class="post-nav-title">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</span>
+    <span class="post-nav-title">Python 面试八股（一）：对象模型、核心容器与函数机制</span>
   </a>
   
 </nav>
@@ -1406,11 +1427,6 @@
   <h3 class="related-title">相关文章</h3>
   <div class="related-grid">
     
-    <a class="related-card" href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/MySQL%e9%ab%98%e9%a2%91%e6%89%8b%e5%86%99SQL%e7%bb%83%e4%b9%a0/">
-      <span class="related-card-title">MySQL 高频手写 SQL 练习</span>
-      <span class="related-card-date">2026-08-21</span>
-    </a>
-    
     <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
       <span class="related-card-title">消息队列面试八股（一）：Kafka</span>
       <span class="related-card-date">2026-08-19</span>
@@ -1419,6 +1435,11 @@
     <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9aRabbitMQ/">
       <span class="related-card-title">消息队列面试八股（二）：RabbitMQ</span>
       <span class="related-card-date">2026-08-19</span>
+    </a>
+    
+    <a class="related-card" href="/posts/SQL%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98/MySQL%e9%ab%98%e9%a2%91%e6%89%8b%e5%86%99SQL%e7%bb%83%e4%b9%a0/">
+      <span class="related-card-title">MySQL 高频手写 SQL 练习</span>
+      <span class="related-card-date">2026-08-21</span>
     </a>
     
   </div>
@@ -1444,6 +1465,20 @@
       
       
       <li class="sidebar-post-item">
+        <a href="/posts/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e5%af%b9%e8%b1%a1%e6%a8%a1%e5%9e%8b%e3%80%81%e6%a0%b8%e5%bf%83%e5%ae%b9%e5%99%a8%e4%b8%8e%e5%87%bd%e6%95%b0%e6%9c%ba%e5%88%b6/">Python 面试八股（一）：对象模型、核心容器与函数机制</a>
+        <span class="sidebar-post-date">2026-08-31</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e3%80%81%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86%e4%b8%8e%e5%b7%a5%e7%a8%8b%e5%ae%9e%e8%b7%b5/">Python 面试八股（二）：并发、内存管理与工程实践</a>
+        <span class="sidebar-post-date">2026-08-31</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
         <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</a>
         <span class="sidebar-post-date">2026-08-21</span>
       </li>
@@ -1457,17 +1492,7 @@
       
       
       
-      <li class="sidebar-post-item">
-        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e5%b7%a5%e4%b8%9a%e7%bb%84%e6%80%81HMI%ef%bc%9a%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d%e4%b8%8e%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae/">实习项目·工业组态 HMI：协议适配与时序数据</a>
-        <span class="sidebar-post-date">2026-08-21</span>
-      </li>
       
-      
-      
-      <li class="sidebar-post-item">
-        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e9%a1%b9%e7%9b%ae%c2%b7%e7%94%b5%e7%bd%91%e8%ae%be%e5%a4%87%e6%95%85%e9%9a%9c%e8%be%85%e5%8a%a9%e8%af%8a%e6%96%ad%e7%b3%bb%e7%bb%9f%ef%bc%9a%e5%a4%9aAgent%e8%bf%90%e8%a1%8c%e6%97%b6%e5%86%85%e6%a0%b8%e4%b8%8e%e5%8f%af%e8%a7%82%e6%b5%8b/">项目·电网设备故障辅助诊断系统：多 Agent 运行时内核与可观测</a>
-        <span class="sidebar-post-date">2026-08-21</span>
-      </li>
       
       
       
@@ -1875,6 +1900,8 @@
       
       <a class="sidebar-tag" href="/tags/GGUF/">GGUF</a>
       
+      <a class="sidebar-tag" href="/tags/GIL/">GIL</a>
+      
       <a class="sidebar-tag" href="/tags/GMP/">GMP</a>
       
       <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
@@ -2041,11 +2068,15 @@
       
       <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
       
+      <a class="sidebar-tag" href="/tags/asyncio/">asyncio</a>
+      
       <a class="sidebar-tag" href="/tags/bigkey/">bigkey</a>
       
       <a class="sidebar-tag" href="/tags/binlog/">binlog</a>
       
       <a class="sidebar-tag" href="/tags/channel/">channel</a>
+      
+      <a class="sidebar-tag" href="/tags/dict/">dict</a>
       
       <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
       
@@ -2054,6 +2085,8 @@
       <a class="sidebar-tag" href="/tags/interface/">interface</a>
       
       <a class="sidebar-tag" href="/tags/kind/">kind</a>
+      
+      <a class="sidebar-tag" href="/tags/list/">list</a>
       
       <a class="sidebar-tag" href="/tags/listpack/">listpack</a>
       
@@ -2113,6 +2146,8 @@
       
       <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
       
+      <a class="sidebar-tag" href="/tags/%e5%87%bd%e6%95%b0/">函数</a>
+      
       <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
       
       <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
@@ -2153,11 +2188,15 @@
       
       <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
       
+      <a class="sidebar-tag" href="/tags/%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6/">垃圾回收</a>
+      
       <a class="sidebar-tag" href="/tags/%e5%a4%8d%e4%b9%a0/">复习</a>
       
       <a class="sidebar-tag" href="/tags/%e5%a4%9aAgent/">多Agent</a>
       
       <a class="sidebar-tag" href="/tags/%e5%a4%9a%e6%a8%a1%e6%80%81/">多模态</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9a%e8%bf%9b%e7%a8%8b/">多进程</a>
       
       <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
       
@@ -2166,6 +2205,8 @@
       <a class="sidebar-tag" href="/tags/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae/">实习项目</a>
       
       <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%b9%e8%b1%a1%e6%a8%a1%e5%9e%8b/">对象模型</a>
       
       <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
       

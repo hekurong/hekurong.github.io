@@ -1,0 +1,2884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="技术博客，记录学习与思考">
+<meta name="theme-color" content="#1a1d2e">
+<meta name="color-scheme" content="dark light">
+<title>Python 面试八股（一）：对象模型、核心容器与函数机制 - KurongBlog</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<script>
+(function(){var m=localStorage.getItem('zhenhai-color-mode');if(!m){m='dark';}if(m==='auto'){m=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}if(m==='dark'){document.documentElement.classList.add('dark');}})();
+</script>
+
+<link rel="preload" as="image" href="/images/zhenhai/xingtai/1200px-镇海改造日服预告.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/assets/css/style.css?v=18">
+
+
+
+
+
+
+
+<link rel="alternate" type="application/atom+xml" title="KurongBlog - 订阅" href="https://hekurong.github.io/atom.xml">
+
+</head>
+<body>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-brand" href="/">KurongBlog</a>
+
+    <nav class="header-nav">
+      
+      <a href="/">首页</a>
+      
+      <a href="/archives/">归档</a>
+      
+      <a href="/categories/">分类</a>
+      
+      <a href="/tags/">标签</a>
+      
+      <a href="/about/">关于</a>
+      
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-btn search-open-btn" aria-label="Search" title="Search (Ctrl+K)">&#128269;</button>
+      <button class="header-btn theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">&#9790;</button>
+      <button id="settings-btn" class="header-btn settings-btn" title="阅读设置" aria-label="阅读设置">⚙</button>
+      <button id="hamburger-btn" class="header-btn hamburger-btn" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<div id="reading-progress-bar" class="reading-progress-bar"></div>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-menu-panel" class="mobile-menu-panel">
+  <button id="mobile-menu-close" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    
+    <a href="/">首页</a>
+    
+    <a href="/archives/">归档</a>
+    
+    <a href="/categories/">分类</a>
+    
+    <a href="/tags/">标签</a>
+    
+    <a href="/about/">关于</a>
+    
+  </nav>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-header">
+    <span class="search-modal-icon">&#128269;</span>
+    <div class="search-modal-input-wrap">
+      <input id="search-input" class="search-modal-input" type="text" placeholder="输入关键词搜索..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-modal-actions">
+      <span class="search-modal-hint">Esc</span>
+      <button id="search-modal-close" class="search-modal-close" aria-label="关闭搜索">&times;</button>
+    </div>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<main class="page-main">
+  <div class="content-area">
+    
+
+
+<nav id="floating-toc" class="floating-toc">
+  <div class="floating-toc-title">Contents</div>
+  <ul class="floating-toc-list" id="floating-toc-list"></ul>
+</nav>
+
+
+
+
+<article class="article-content">
+  <header class="article-header">
+    <h1 class="article-title">Python 面试八股（一）：对象模型、核心容器与函数机制</h1>
+    <div class="article-meta">
+      <time datetime="2026-08-31">2026-08-31</time>
+      <span class="ai-badge" title="AI 辅助生成">AI</span>
+      <span class="series-badge" title="系列"><a href="/series/Python%20%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/">Python 面试八股</a></span>
+      
+      <span class="separator">|</span>
+      <span>in <a href="/categories/%e8%ae%a1%e7%ae%97%e6%9c%ba%e5%9f%ba%e7%a1%80/">计算机基础</a></span>
+      
+    </div>
+    
+    <div class="post-card-tags" style="margin-top: 0.6rem;">
+      
+      <a class="tag" href="/tags/Python/">Python</a>
+      
+      <a class="tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="tag" href="/tags/%e5%85%ab%e8%82%a1/">八股</a>
+      
+      <a class="tag" href="/tags/%e5%af%b9%e8%b1%a1%e6%a8%a1%e5%9e%8b/">对象模型</a>
+      
+      <a class="tag" href="/tags/list/">list</a>
+      
+      <a class="tag" href="/tags/dict/">dict</a>
+      
+      <a class="tag" href="/tags/%e5%87%bd%e6%95%b0/">函数</a>
+      
+    </div>
+    
+  </header>
+
+  <h1 id="python-">Python 面试八股（一）：对象模型、核心容器与函数机制</h1>
+<blockquote>
+<p>来源：依据 Python 3 官方语言参考与标准库文档整理，代码示例按 Python 3.9+ 语法验证。
+定位：Python 面试八股共两篇。本篇先打语言基本盘，覆盖对象模型、可变性、复制、list/dict/set、函数传参与作用域、迭代器与生成器、类与 MRO。下一篇进入并发、内存管理与工程实践。
+收藏：本系列收录于 <a href="/posts/DailyDev/%E5%90%8E%E7%AB%AF%E5%85%AB%E8%82%A1%E5%A4%8D%E4%B9%A0%E6%8C%87%E5%8D%97%EF%BC%9A%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/">后端八股复习指南</a>。</p>
+</blockquote>
+<hr>
+<h2 id="heading">一、先把对象模型讲对</h2>
+<h3 id="1-python-">1. Python 里变量到底是什么</h3>
+<p>Python 中一切数据都以对象形式存在。对象有身份、类型和值三项属性。</p>
+<ul>
+<li><strong>身份</strong>用 <code>is</code> 判断，<code>id()</code> 返回对象身份对应的整数。CPython 中它通常等同于内存地址，但这是实现细节，业务代码不能依赖。</li>
+<li><strong>类型</strong>决定对象支持哪些操作。变量名本身不固定携带类型，名称只是绑定到某个对象；同一个名称稍后可以重新绑定到另一种类型的对象。</li>
+<li><strong>值</strong>是否可变由对象类型决定。数字、字符串、元组通常不可变，列表、字典、集合可变。</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">alias</span> <span class="o">=</span> <span class="n">value</span>
+</span></span><span class="line"><span class="cl"><span class="n">alias</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">value</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">alias</span> <span class="ow">is</span> <span class="n">value</span>
+</span></span></code></pre></div></div><p>这里没有发生列表复制，<code>value</code> 和 <code>alias</code> 只是同一对象的两个名字。面试回答不要说 Python 是传引用，也不要说 Python 是纯值传递。更准确的口径是：<strong>名称绑定对象，函数调用传递对象引用所代表的绑定关系。</strong></p>
+<h3 id="2-is---">2. <code>is</code> 和 <code>==</code> 的区别</h3>
+<p><code>==</code> 比较值是否相等，必要时会调用对象的 <code>__eq__</code>；<code>is</code> 比较是不是同一个对象，不能被重载。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span> <span class="o">=</span> <span class="n">a</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">a</span> <span class="ow">is</span> <span class="n">c</span>
+</span></span></code></pre></div></div><p>判断单例值时用 <code>is</code>，最典型的是 <code>value is None</code>。不要用 <code>is</code> 比较普通整数或字符串，即使某次运行碰巧为真，也可能只是解释器复用了不可变对象，并非语言保证。</p>
+<h3 id="3-">3. 可变与不可变最容易失分的地方</h3>
+<p>可变对象可以原地修改，例如 <code>list.append()</code>、<code>dict.update()</code>；不可变对象的修改会创建新对象并把名称重新绑定过去。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;go&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">old_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;lang&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">text</span> <span class="o">==</span> <span class="s1">&#39;golang&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="nb">id</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">!=</span> <span class="n">old_id</span>
+</span></span></code></pre></div></div><p>元组不可变，不代表它所引用的一切对象都不可变。一个元组可以保存列表，不能替换这个列表的位置，却仍可修改列表自身：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">item</span> <span class="o">=</span> <span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;fixed&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">item</span> <span class="o">==</span> <span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;fixed&#39;</span><span class="p">)</span>
+</span></span></code></pre></div></div><p>面试里可用一句话收束：<strong>不可变约束的是容器中直接保存的引用关系，不会递归冻结它引用的可变对象。</strong></p>
+<h3 id="4-">4. 可变默认参数为什么是坑</h3>
+<p>函数默认值在函数定义时计算一次，之后多次调用会复用同一对象。默认值若是列表或字典，状态就会跨调用累积。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">wrong_append</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="p">[]):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bucket</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">bucket</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">wrong_append</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">wrong_append</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
+</span></span></code></pre></div></div><p>正确做法是把 <code>None</code> 作为哨兵值，在函数体内再创建对象：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">append_item</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">bucket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bucket</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bucket</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">bucket</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">append_item</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">append_item</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+</span></span></code></pre></div></div><p>这里不能写 <code>if not bucket</code>，因为调用方显式传入空列表也是合法语义。应当用 <code>is None</code> 区分未传参数和传了一个空容器。</p>
+<hr>
+<h2 id="heading-1">二、赋值、浅拷贝与深拷贝</h2>
+<h3 id="1-">1. 赋值从来不是复制</h3>
+<p>赋值语句只创建名称到对象的绑定。对可变嵌套结构，若希望两个变量彼此独立，必须明确选择复制策略。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">copy</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">original</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">alias</span> <span class="o">=</span> <span class="n">original</span>
+</span></span><span class="line"><span class="cl"><span class="n">shallow</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">deep</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">alias</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">shallow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">deep</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span></code></pre></div></div><h3 id="2-">2. 三种操作分别复制到哪里</h3>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>外层容器</th>
+<th>内层可变对象</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>b = a</code></td>
+<td>不复制</td>
+<td>不复制</td>
+<td>明确需要共享同一对象</td>
+</tr>
+<tr>
+<td><code>a.copy()</code> 或 <code>copy.copy(a)</code></td>
+<td>新建外层</td>
+<td>继续共享</td>
+<td>内层不修改，或共享就是预期</td>
+</tr>
+<tr>
+<td><code>copy.deepcopy(a)</code></td>
+<td>递归复制</td>
+<td>递归复制</td>
+<td>需要完整隔离的嵌套配置或数据快照</td>
+</tr>
+</tbody>
+</table>
+<p><code>deepcopy</code> 不是默认答案。它会递归复制内容，可能复制过多，也可能破坏本应共享的对象关系。标准库会用 <code>memo</code> 记录已复制对象，避免循环引用无限递归；实际工程中仍应先明确哪些层级需要隔离，再决定是否深拷贝。</p>
+<hr>
+<h2 id="heading-2">三、核心容器题</h2>
+<h3 id="1-list--tuple-">1. list 和 tuple 怎么选</h3>
+<p><code>list</code> 是可变序列，适合追加、删除、排序等会修改集合本身的场景。<code>tuple</code> 是不可变序列，适合表达固定结构的记录、函数多返回值和可作为字典键的值对象。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>list</th>
+<th>tuple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是否可原地修改</td>
+<td>可以</td>
+<td>不可以</td>
+</tr>
+<tr>
+<td>常见用途</td>
+<td>动态任务队列、收集结果</td>
+<td>固定坐标、不可变配置、解包返回值</td>
+</tr>
+<tr>
+<td>能否作为 dict 的键</td>
+<td>不可以</td>
+<td>元素全部可哈希时可以</td>
+</tr>
+<tr>
+<td>表达的业务语义</td>
+<td>这批元素会变</td>
+<td>这组位置和结构固定</td>
+</tr>
+</tbody>
+</table>
+<p>不要把 CPython 的底层动态数组实现当作 Python 语言规范来背。面试若追问实现，可以补一句：CPython 的 list 采用连续存储并为扩容预留空间，但跨解释器或跨版本的性能结论应以实测为准。</p>
+<h3 id="2-list-">2. list 的三个常见陷阱</h3>
+<p>切片会创建一个新的外层列表，但其中元素仍是原引用：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">rows</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">part</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[:]</span>
+</span></span><span class="line"><span class="cl"><span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">rows</span> <span class="o">==</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">part</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">rows</span>
+</span></span></code></pre></div></div><p>列表乘法复制的是元素引用，不是递归复制。下面写法会让三行指向同一列表：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">wrong_grid</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+</span></span><span class="line"><span class="cl"><span class="n">wrong_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">wrong_grid</span> <span class="o">==</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+</span></span></code></pre></div></div><p>正确写法用推导式，每次循环创建一行：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">grid</span> <span class="o">==</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+</span></span></code></pre></div></div><p>另外，<code>list.sort()</code> 原地排序并返回 <code>None</code>，<code>sorted()</code> 返回新列表。把 <code>items = items.sort()</code> 写进生产代码会得到 <code>None</code>，是常见笔试坑。</p>
+<h3 id="3-dict-">3. dict 的关键不是背哈希表，而是哈希约束</h3>
+<p>字典是键到值的映射。键必须可哈希，含义是对象的哈希值在生命周期内保持不变，并且两个相等对象必须有相同哈希值。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">scores</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;alice&#39;</span><span class="p">:</span> <span class="mi">90</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bob&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">scores</span><span class="p">[</span><span class="s1">&#39;bob&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">pass</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;缺失键应当抛出 KeyError&#39;</span><span class="p">)</span>
+</span></span></code></pre></div></div><p><code>dict[key]</code> 适合键不存在就是异常的场景，<code>dict.get(key, default)</code> 适合键缺失可被默认值吸收的场景。二者不能机械互换。</p>
+<p>常见可哈希键有字符串、整数，以及元素全部可哈希的元组；列表、字典、集合本身不可哈希。自定义类若覆写 <code>__eq__</code>，还要审视 <code>__hash__</code> 的一致性，否则实例可能不能安全用作字典键或集合元素。</p>
+<p>当前 Python 保证字典按插入顺序迭代。更新已有键不会改变位置，删除后重新插入会出现在末尾。它保证的是插入顺序，不是键大小顺序。</p>
+<h3 id="4-set-">4. set 适合什么问题</h3>
+<p>集合保存不重复的可哈希元素，适合成员判定、去重、交并差等问题：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">seen</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">seen</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="s1">&#39;b&#39;</span> <span class="ow">in</span> <span class="n">seen</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">}</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">}</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">}</span>
+</span></span></code></pre></div></div><p>空集合必须写 <code>set()</code>，<code>{}</code> 表示空字典。面试手写题里，这个细节很常被用来卡人。</p>
+<h3 id="5-defaultdict--dictsetdefault-">5. <code>defaultdict</code> 和 <code>dict.setdefault</code> 的取舍</h3>
+<p>分组、计数是字典的高频实战场景。键不存在时，<code>collections.defaultdict</code> 可以自动构造默认值：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">groups</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">city</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;alice&#39;</span><span class="p">,</span> <span class="s1">&#39;beijing&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;bob&#39;</span><span class="p">,</span> <span class="s1">&#39;beijing&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;carl&#39;</span><span class="p">,</span> <span class="s1">&#39;shanghai&#39;</span><span class="p">)]:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">groups</span><span class="p">[</span><span class="n">city</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">groups</span><span class="p">[</span><span class="s1">&#39;beijing&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;alice&#39;</span><span class="p">,</span> <span class="s1">&#39;bob&#39;</span><span class="p">]</span>
+</span></span></code></pre></div></div><p>只有少量分支时，<code>setdefault</code> 也能写；循环中反复分组则优先 <code>defaultdict</code>，语义更直白。若读取一个不存在的键不应改变字典，使用 <code>get</code>，不要误用 <code>defaultdict[key]</code>。</p>
+<hr>
+<h2 id="heading-3">四、函数、作用域与闭包</h2>
+<h3 id="1-python--1">1. Python 的参数传递怎么讲</h3>
+<p>函数拿到的是对象绑定。函数内原地修改传入的可变对象，调用方可见；函数内把局部变量重新绑定到新对象，调用方原来的名称不受影响。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">mutate_and_rebind</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;seen&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">items</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">source</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">mutate_and_rebind</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">source</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;seen&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span>
+</span></span></code></pre></div></div><p>标准答法是：<strong>Python 传的是对象引用的绑定，修改对象会外溢，重绑局部名称不会外溢。</strong> 这比简单说引用传递更严谨。</p>
+<h3 id="2-legb--globalnonlocal">2. LEGB 与 <code>global</code>、<code>nonlocal</code></h3>
+<p>名称查找遵循 LEGB 次序，依次经过局部作用域、闭包所在的外层作用域、模块全局作用域和内建作用域。</p>
+<ul>
+<li>给函数内名称赋值，默认创建局部变量。</li>
+<li><code>global name</code> 表示后续赋值绑定模块级名称。</li>
+<li><code>nonlocal name</code> 表示后续赋值绑定最近一层外部函数中的名称，不能指向模块全局。</li>
+</ul>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">make_counter</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">increase</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="k">nonlocal</span> <span class="n">count</span>
+</span></span><span class="line"><span class="cl">        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">count</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">increase</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">counter</span> <span class="o">=</span> <span class="n">make_counter</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">counter</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">counter</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
+</span></span></code></pre></div></div><p><code>nonlocal</code> 是闭包状态更新的关键。少了它，<code>count += 1</code> 会被当作对局部变量赋值，并抛出 <code>UnboundLocalError</code>。</p>
+<h3 id="3--1">3. 闭包循环变量为什么常出错</h3>
+<p>闭包捕获的是名称，不是创建闭包那一刻的快照。循环结束后，多个函数可能都去读取同一个最终值。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="n">wrong</span> <span class="o">=</span> <span class="p">[</span><span class="k">lambda</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="p">[</span><span class="n">func</span><span class="p">()</span> <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">wrong</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">right</span> <span class="o">=</span> <span class="p">[</span><span class="k">lambda</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="p">[</span><span class="n">func</span><span class="p">()</span> <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">right</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span></span></code></pre></div></div><p>右边写法把当前 <code>i</code> 放进 lambda 的默认参数，使每个函数保存独立值。面试中说清捕获的是变量绑定而非立即值，便能答到根上。</p>
+<h3 id="4--1">4. 装饰器的本质</h3>
+<p>装饰器接收可调用对象，返回一个可调用对象。<code>@decorator</code> 只是把函数定义后的结果重新绑定：</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">logged</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;calling </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">wrapper</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@logged</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">add</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;add&#39;</span>
+</span></span></code></pre></div></div><p><code>functools.wraps</code> 不是装饰。它把原函数的名称、文档等元数据拷回包装函数，方便日志、调试、路由注册和测试框架正确识别被装饰对象。</p>
+<hr>
+<h2 id="heading-4">五、迭代器、生成器与类</h2>
+<h3 id="1-iterableiteratorgenerator-">1. iterable、iterator、generator 三者关系</h3>
+<p>可迭代对象能传给 <code>iter()</code>，例如列表、字符串、字典。迭代器额外支持 <code>next()</code>，每次产出一个元素，耗尽时抛出 <code>StopIteration</code>。生成器是由生成器函数或生成器表达式创建的一类迭代器。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code>1
+2
+3
+4
+5
+6
+7</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">read_batches</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">),</span> <span class="n">size</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">yield</span> <span class="n">items</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">start</span> <span class="o">+</span> <span class="n">size</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">batches</span> <span class="o">=</span> <span class="n">read_batches</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="nb">next</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">]]</span>
+</span></span></code></pre></div></div><p>生成器按需产出数据，适合流式读取和大批量处理。它通常只能完整消费一次，不能把已经耗尽的生成器当作可重复使用的列表。</p>
+<h3 id="2-super--mro">2. <code>super()</code> 与 MRO</h3>
+<p>多继承场景中，<code>super()</code> 不是简单调用直接父类，而是按照方法解析顺序寻找下一个实现。Python 使用 C3 线性化确定 MRO。</p>
+<div class="code-wrapper" data-lang="python"><div class="code-ln"><pre><code> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</code></pre></div><div class="code-body"><pre class="chroma" tabindex="0"><code><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">D</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">D</span><span class="o">.</span><span class="vm">__mro__</span> <span class="o">==</span> <span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
+</span></span></code></pre></div></div><p>菱形继承里若每层都用 <code>super()</code> 并遵守协作式调用约定，共同祖先只会按 MRO 链执行一次。直接写 <code>Parent.method(self)</code> 容易跳过链路或重复调用，通常只在明确需要绕过协作式继承时才用。</p>
+<hr>
+<h2 id="heading-5">六、面试答题总纲</h2>
+<table>
+<thead>
+<tr>
+<th>题目</th>
+<th>先给结论</th>
+<th>再补机制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>is</code> 和 <code>==</code></td>
+<td>前者比身份，后者比值</td>
+<td><code>is</code> 常用于 <code>None</code>，不要依赖小整数或字符串驻留</td>
+</tr>
+<tr>
+<td>Python 怎么传参</td>
+<td>传对象绑定</td>
+<td>原地修改外溢，局部重绑不外溢</td>
+</tr>
+<tr>
+<td>浅拷贝和深拷贝</td>
+<td>浅拷外层，深拷嵌套对象</td>
+<td>先确认共享关系，不把 <code>deepcopy</code> 当万能药</td>
+</tr>
+<tr>
+<td>dict 的键为什么要可哈希</td>
+<td>查找依赖稳定哈希与相等性</td>
+<td>相等对象必须同哈希，可变容器不能做键</td>
+</tr>
+<tr>
+<td>默认参数为什么不能写 <code>[]</code></td>
+<td>默认值只在定义时创建一次</td>
+<td>多次调用复用同一列表，<code>None</code> 是常用哨兵</td>
+</tr>
+<tr>
+<td>生成器有什么价值</td>
+<td>惰性生产，降低峰值内存</td>
+<td>可流式处理，耗尽后不能重放</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="heading-6">小结</h2>
+<p>Python 基础题看起来散，真正的主线只有一条：对象与名称的关系。理解名称绑定对象，就能自然解释赋值不复制、可变参数外溢、浅深拷贝和 <code>is</code> 与 <code>==</code>；理解哈希与相等性的契约，就能解释 dict 与 set 的限制；理解 LEGB 和闭包捕获的是名称，就能避开默认参数和循环 lambda 两类经典坑。下一篇把这条主线延伸到运行时，讲清 GIL、线程、协程、进程、垃圾回收和资源管理。</p>
+<h2 id="heading-7">参考资料</h2>
+<ul>
+<li><a href="https://docs.python.org/3/reference/datamodel.html">Python 语言参考：数据模型</a></li>
+<li><a href="https://docs.python.org/3/library/stdtypes.html#mapping-types-dict">Python 标准类型与映射类型 dict</a></li>
+<li><a href="https://docs.python.org/3/library/copy.html">copy：浅拷贝与深拷贝</a></li>
+<li><a href="https://docs.python.org/3/tutorial/datastructures.html">Python 教程：数据结构</a></li>
+</ul>
+
+</article>
+
+
+<section class="series-playlist">
+  <h3 class="series-playlist-title">Python 面试八股（2 篇）</h3>
+  <ol class="series-playlist-list">
+    
+    <li class="series-playlist-item current">
+      
+      <span class="series-playlist-text">Python 面试八股（一）：对象模型、核心容器与函数机制</span>
+      
+    </li>
+    
+    <li class="series-playlist-item">
+      
+      <a class="series-playlist-link" href="/posts/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e3%80%81%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86%e4%b8%8e%e5%b7%a5%e7%a8%8b%e5%ae%9e%e8%b7%b5/">Python 面试八股（二）：并发、内存管理与工程实践</a>
+      
+    </li>
+    
+  </ol>
+</section>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+  
+    
+  
+  
+    
+  
+
+
+
+<nav class="post-nav">
+  
+  <a class="post-nav-link prev" href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">
+    <span class="post-nav-label">Previous</span>
+    <span class="post-nav-title">后端八股复习指南：博客文章索引</span>
+  </a>
+  
+  
+  <a class="post-nav-link next" href="/posts/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e3%80%81%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86%e4%b8%8e%e5%b7%a5%e7%a8%8b%e5%ae%9e%e8%b7%b5/">
+    <span class="post-nav-label">Next</span>
+    <span class="post-nav-title">Python 面试八股（二）：并发、内存管理与工程实践</span>
+  </a>
+  
+</nav>
+
+
+
+<section class="related-posts">
+  <h3 class="related-title">相关文章</h3>
+  <div class="related-grid">
+    
+    <a class="related-card" href="/posts/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e3%80%81%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86%e4%b8%8e%e5%b7%a5%e7%a8%8b%e5%ae%9e%e8%b7%b5/">
+      <span class="related-card-title">Python 面试八股（二）：并发、内存管理与工程实践</span>
+      <span class="related-card-date">2026-08-31</span>
+    </a>
+    
+    <a class="related-card" href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">
+      <span class="related-card-title">后端八股复习指南：博客文章索引</span>
+      <span class="related-card-date">2026-08-17</span>
+    </a>
+    
+    <a class="related-card" href="/posts/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9aKafka/">
+      <span class="related-card-title">消息队列面试八股（一）：Kafka</span>
+      <span class="related-card-date">2026-08-19</span>
+    </a>
+    
+  </div>
+</section>
+
+
+  </div>
+  
+<aside class="sidebar-area">
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Recent Posts</h3>
+    <ul class="sidebar-post-list">
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/DailyDev/%e5%90%8e%e7%ab%af%e5%85%ab%e8%82%a1%e5%a4%8d%e4%b9%a0%e6%8c%87%e5%8d%97%ef%bc%9a%e5%8d%9a%e5%ae%a2%e6%96%87%e7%ab%a0%e7%b4%a2%e5%bc%95/">后端八股复习指南：博客文章索引</a>
+        <span class="sidebar-post-date">2026-08-17</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%b8%80%ef%bc%89%ef%bc%9a%e5%af%b9%e8%b1%a1%e6%a8%a1%e5%9e%8b%e3%80%81%e6%a0%b8%e5%bf%83%e5%ae%b9%e5%99%a8%e4%b8%8e%e5%87%bd%e6%95%b0%e6%9c%ba%e5%88%b6/">Python 面试八股（一）：对象模型、核心容器与函数机制</a>
+        <span class="sidebar-post-date">2026-08-31</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1/Python%e9%9d%a2%e8%af%95%e5%85%ab%e8%82%a1%ef%bc%88%e4%ba%8c%ef%bc%89%ef%bc%9a%e5%b9%b6%e5%8f%91%e3%80%81%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86%e4%b8%8e%e5%b7%a5%e7%a8%8b%e5%ae%9e%e8%b7%b5/">Python 面试八股（二）：并发、内存管理与工程实践</a>
+        <span class="sidebar-post-date">2026-08-31</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7%e9%a3%8e%e6%8e%a7%e5%8f%98%e9%87%8f%e7%b3%bb%e7%bb%9f%ef%bc%9a%e4%bb%8ePipeline%e5%88%b0DAG%e7%9a%84%e8%b0%83%e5%ba%a6%e9%87%8d%e6%9e%84/">实习项目·风控变量系统：从 Pipeline 到 DAG 的调度重构</a>
+        <span class="sidebar-post-date">2026-08-21</span>
+      </li>
+      
+      
+      
+      <li class="sidebar-post-item">
+        <a href="/posts/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%e9%9d%a2%e8%af%95%e5%a4%8d%e4%b9%a0/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae%c2%b7DewuClaw%ef%bc%9a%e5%a4%9aAgent%e5%b7%a5%e5%85%b7%e8%b0%83%e5%ba%a6%e4%b8%8e%e5%8d%8f%e4%bd%9c%e5%b7%a5%e7%a8%8b/">实习项目·DewuClaw：多 Agent 工具调度与协作工程</a>
+        <span class="sidebar-post-date">2026-08-21</span>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+  
+
+  
+  
+  
+  <div class="sidebar-widget">
+    <h3 class="sidebar-widget-title">Tags</h3>
+    <div class="sidebar-tag-list">
+      
+      <a class="sidebar-tag" href="/tags/A2A/">A2A</a>
+      
+      <a class="sidebar-tag" href="/tags/ACL/">ACL</a>
+      
+      <a class="sidebar-tag" href="/tags/AI/">AI</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Agent/">AI Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%20Native/">AI Native</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%b0%8f%e8%af%b4/">AI小说</a>
+      
+      <a class="sidebar-tag" href="/tags/AI%e5%ba%94%e7%94%a8/">AI应用</a>
+      
+      <a class="sidebar-tag" href="/tags/AKShare/">AKShare</a>
+      
+      <a class="sidebar-tag" href="/tags/AMQP/">AMQP</a>
+      
+      <a class="sidebar-tag" href="/tags/Abstract/">Abstract</a>
+      
+      <a class="sidebar-tag" href="/tags/Agent/">Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Apollo/">Apollo</a>
+      
+      <a class="sidebar-tag" href="/tags/Architecture/">Architecture</a>
+      
+      <a class="sidebar-tag" href="/tags/B&#43;%e6%a0%91/">B&#43;树</a>
+      
+      <a class="sidebar-tag" href="/tags/BackTracking/">BackTracking</a>
+      
+      <a class="sidebar-tag" href="/tags/COLING/">COLING</a>
+      
+      <a class="sidebar-tag" href="/tags/CPU/">CPU</a>
+      
+      <a class="sidebar-tag" href="/tags/CS224N/">CS224N</a>
+      
+      <a class="sidebar-tag" href="/tags/Cache/">Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Chenhai/">Chenhai</a>
+      
+      <a class="sidebar-tag" href="/tags/Cloud%20Native/">Cloud Native</a>
+      
+      <a class="sidebar-tag" href="/tags/Coding%20Agent/">Coding Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/Computer%20Use/">Computer Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Cordis/">Cordis</a>
+      
+      <a class="sidebar-tag" href="/tags/DAG/">DAG</a>
+      
+      <a class="sidebar-tag" href="/tags/DP/">DP</a>
+      
+      <a class="sidebar-tag" href="/tags/Daily%20Dev/">Daily Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/DeepSeek/">DeepSeek</a>
+      
+      <a class="sidebar-tag" href="/tags/Design%20Pattern/">Design Pattern</a>
+      
+      <a class="sidebar-tag" href="/tags/DevOps/">DevOps</a>
+      
+      <a class="sidebar-tag" href="/tags/Docker%20Desktop/">Docker Desktop</a>
+      
+      <a class="sidebar-tag" href="/tags/EMNLP/">EMNLP</a>
+      
+      <a class="sidebar-tag" href="/tags/EXPLAIN/">EXPLAIN</a>
+      
+      <a class="sidebar-tag" href="/tags/FastAPI/">FastAPI</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot/">Few-Shot</a>
+      
+      <a class="sidebar-tag" href="/tags/Few-Shot%20Learning/">Few-Shot Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/GC/">GC</a>
+      
+      <a class="sidebar-tag" href="/tags/GGUF/">GGUF</a>
+      
+      <a class="sidebar-tag" href="/tags/GIL/">GIL</a>
+      
+      <a class="sidebar-tag" href="/tags/GMP/">GMP</a>
+      
+      <a class="sidebar-tag" href="/tags/GPT/">GPT</a>
+      
+      <a class="sidebar-tag" href="/tags/Go/">Go</a>
+      
+      <a class="sidebar-tag" href="/tags/Golang/">Golang</a>
+      
+      <a class="sidebar-tag" href="/tags/Graph/">Graph</a>
+      
+      <a class="sidebar-tag" href="/tags/HTTP/">HTTP</a>
+      
+      <a class="sidebar-tag" href="/tags/Harness/">Harness</a>
+      
+      <a class="sidebar-tag" href="/tags/Helm/">Helm</a>
+      
+      <a class="sidebar-tag" href="/tags/Hermes%20Agent/">Hermes Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/I/O/">I/O</a>
+      
+      <a class="sidebar-tag" href="/tags/IO/">IO</a>
+      
+      <a class="sidebar-tag" href="/tags/InfluxDB/">InfluxDB</a>
+      
+      <a class="sidebar-tag" href="/tags/KV%20Cache/">KV Cache</a>
+      
+      <a class="sidebar-tag" href="/tags/Kafka/">Kafka</a>
+      
+      <a class="sidebar-tag" href="/tags/Kanban/">Kanban</a>
+      
+      <a class="sidebar-tag" href="/tags/KnowledgeGraph/">KnowledgeGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Kubernetes/">Kubernetes</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM/">LLM</a>
+      
+      <a class="sidebar-tag" href="/tags/LLM-as-a-Judge/">LLM-as-a-Judge</a>
+      
+      <a class="sidebar-tag" href="/tags/LLMObservability/">LLMObservability</a>
+      
+      <a class="sidebar-tag" href="/tags/LRU/">LRU</a>
+      
+      <a class="sidebar-tag" href="/tags/LangChain/">LangChain</a>
+      
+      <a class="sidebar-tag" href="/tags/LangGraph/">LangGraph</a>
+      
+      <a class="sidebar-tag" href="/tags/Langfuse/">Langfuse</a>
+      
+      <a class="sidebar-tag" href="/tags/Leetcode/">Leetcode</a>
+      
+      <a class="sidebar-tag" href="/tags/Linked%20List/">Linked List</a>
+      
+      <a class="sidebar-tag" href="/tags/Linux/">Linux</a>
+      
+      <a class="sidebar-tag" href="/tags/LlamaIndex/">LlamaIndex</a>
+      
+      <a class="sidebar-tag" href="/tags/LoRA/">LoRA</a>
+      
+      <a class="sidebar-tag" href="/tags/MCP/">MCP</a>
+      
+      <a class="sidebar-tag" href="/tags/MVCC/">MVCC</a>
+      
+      <a class="sidebar-tag" href="/tags/Meta%20Learning/">Meta Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/Micro%20Service/">Micro Service</a>
+      
+      <a class="sidebar-tag" href="/tags/Mixture%20of%20Agents/">Mixture of Agents</a>
+      
+      <a class="sidebar-tag" href="/tags/MoA/">MoA</a>
+      
+      <a class="sidebar-tag" href="/tags/Mock%20Testing/">Mock Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/MongoDB/">MongoDB</a>
+      
+      <a class="sidebar-tag" href="/tags/MultiAgent/">MultiAgent</a>
+      
+      <a class="sidebar-tag" href="/tags/MySQL/">MySQL</a>
+      
+      <a class="sidebar-tag" href="/tags/NAACL/">NAACL</a>
+      
+      <a class="sidebar-tag" href="/tags/NER/">NER</a>
+      
+      <a class="sidebar-tag" href="/tags/NLP/">NLP</a>
+      
+      <a class="sidebar-tag" href="/tags/NN/">NN</a>
+      
+      <a class="sidebar-tag" href="/tags/Neo4j/">Neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/OpenTelemetry/">OpenTelemetry</a>
+      
+      <a class="sidebar-tag" href="/tags/PaperNotes/">PaperNotes</a>
+      
+      <a class="sidebar-tag" href="/tags/Paxos/">Paxos</a>
+      
+      <a class="sidebar-tag" href="/tags/PostgreSQL/">PostgreSQL</a>
+      
+      <a class="sidebar-tag" href="/tags/Practise/">Practise</a>
+      
+      <a class="sidebar-tag" href="/tags/Project%20Dev/">Project Dev</a>
+      
+      <a class="sidebar-tag" href="/tags/Prompt/">Prompt</a>
+      
+      <a class="sidebar-tag" href="/tags/Python/">Python</a>
+      
+      <a class="sidebar-tag" href="/tags/Qwen/">Qwen</a>
+      
+      <a class="sidebar-tag" href="/tags/RAG/">RAG</a>
+      
+      <a class="sidebar-tag" href="/tags/RE/">RE</a>
+      
+      <a class="sidebar-tag" href="/tags/RL/">RL</a>
+      
+      <a class="sidebar-tag" href="/tags/RNN/">RNN</a>
+      
+      <a class="sidebar-tag" href="/tags/RPC/">RPC</a>
+      
+      <a class="sidebar-tag" href="/tags/RabbitMQ/">RabbitMQ</a>
+      
+      <a class="sidebar-tag" href="/tags/Raft/">Raft</a>
+      
+      <a class="sidebar-tag" href="/tags/ReAct/">ReAct</a>
+      
+      <a class="sidebar-tag" href="/tags/Read%20View/">Read View</a>
+      
+      <a class="sidebar-tag" href="/tags/Redis/">Redis</a>
+      
+      <a class="sidebar-tag" href="/tags/Regular%20Expression/">Regular Expression</a>
+      
+      <a class="sidebar-tag" href="/tags/SDS/">SDS</a>
+      
+      <a class="sidebar-tag" href="/tags/SFT/">SFT</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL/">SQL</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL%e4%bc%98%e5%8c%96/">SQL优化</a>
+      
+      <a class="sidebar-tag" href="/tags/SQL%e7%bb%83%e4%b9%a0/">SQL练习</a>
+      
+      <a class="sidebar-tag" href="/tags/Self-Supervision%20Learning/">Self-Supervision Learning</a>
+      
+      <a class="sidebar-tag" href="/tags/System%20Design/">System Design</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/">TCP</a>
+      
+      <a class="sidebar-tag" href="/tags/TCP/IP/">TCP/IP</a>
+      
+      <a class="sidebar-tag" href="/tags/TTS/">TTS</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Calling/">Tool Calling</a>
+      
+      <a class="sidebar-tag" href="/tags/Tool%20Use/">Tool Use</a>
+      
+      <a class="sidebar-tag" href="/tags/Transformer/">Transformer</a>
+      
+      <a class="sidebar-tag" href="/tags/Tree/">Tree</a>
+      
+      <a class="sidebar-tag" href="/tags/Unit%20Testing/">Unit Testing</a>
+      
+      <a class="sidebar-tag" href="/tags/WeChat/">WeChat</a>
+      
+      <a class="sidebar-tag" href="/tags/WebSocket/">WebSocket</a>
+      
+      <a class="sidebar-tag" href="/tags/Website/">Website</a>
+      
+      <a class="sidebar-tag" href="/tags/WeeklyWorking/">WeeklyWorking</a>
+      
+      <a class="sidebar-tag" href="/tags/asyncio/">asyncio</a>
+      
+      <a class="sidebar-tag" href="/tags/bigkey/">bigkey</a>
+      
+      <a class="sidebar-tag" href="/tags/binlog/">binlog</a>
+      
+      <a class="sidebar-tag" href="/tags/channel/">channel</a>
+      
+      <a class="sidebar-tag" href="/tags/dict/">dict</a>
+      
+      <a class="sidebar-tag" href="/tags/epoll/">epoll</a>
+      
+      <a class="sidebar-tag" href="/tags/golang/">golang</a>
+      
+      <a class="sidebar-tag" href="/tags/interface/">interface</a>
+      
+      <a class="sidebar-tag" href="/tags/kind/">kind</a>
+      
+      <a class="sidebar-tag" href="/tags/list/">list</a>
+      
+      <a class="sidebar-tag" href="/tags/listpack/">listpack</a>
+      
+      <a class="sidebar-tag" href="/tags/llama.cpp/">llama.cpp</a>
+      
+      <a class="sidebar-tag" href="/tags/map/">map</a>
+      
+      <a class="sidebar-tag" href="/tags/minikube/">minikube</a>
+      
+      <a class="sidebar-tag" href="/tags/neo4j/">neo4j</a>
+      
+      <a class="sidebar-tag" href="/tags/pprof/">pprof</a>
+      
+      <a class="sidebar-tag" href="/tags/redo%20log/">redo log</a>
+      
+      <a class="sidebar-tag" href="/tags/slice/">slice</a>
+      
+      <a class="sidebar-tag" href="/tags/undo%20log/">undo log</a>
+      
+      <a class="sidebar-tag" href="/tags/vLLM/">vLLM</a>
+      
+      <a class="sidebar-tag" href="/tags/word2vec/">word2vec</a>
+      
+      <a class="sidebar-tag" href="/tags/xxl-job/">xxl-job</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%86%e3%81%a9%e3%82%93/">うどん</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%99%e3%81%8d%e7%84%bc%e3%81%8d/">すき焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a0%e3%81%97/">だし</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%81%a8%e3%82%93%e3%81%8b%e3%81%a4/">とんかつ</a>
+      
+      <a class="sidebar-tag" href="/tags/%e3%82%ab%e3%83%84%e4%b8%bc/">カツ丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b8%8a%e4%b8%8b%e6%96%87%e5%b7%a5%e7%a8%8b/">上下文工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b8%a4%e9%98%b6%e6%ae%b5%e6%8f%90%e4%ba%a4/">两阶段提交</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%b9%8c%e5%86%ac%e9%9d%a2/">乌冬面</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%8b%e5%8a%a1/">事务</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%ba%b2%e5%ad%90%e4%b8%bc/">亲子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bb%a3%e7%a0%81%e7%94%9f%e6%88%90/">代码生成</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bc%a0%e8%be%93%e5%b1%82/">传输层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e4%bd%95%e5%ba%b7/">何康</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%a5%e9%97%a8/">入门</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%85%ab%e8%82%a1/">八股</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%86%85%e5%ad%98/">内存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%ba%e6%b1%81/">出汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%87%bd%e6%95%b0/">函数</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%88%9d%e5%ad%a6%e8%80%85/">初学者</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8a%e6%88%90%e5%93%81/">半成品</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8f%e4%bd%9c%e6%a8%a1%e5%bc%8f/">协作模式</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%8f%e8%ae%ae%e9%80%82%e9%85%8d/">协议适配</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%95%e6%9c%ba%e9%83%a8%e7%bd%b2/">单机部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%9a%e5%ae%a2/">博客</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8d%b5%e7%84%bc%e3%81%8d/">卵焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8e%9a%e8%9b%8b%e7%83%a7/">厚蛋烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%a4%e9%a3%8e/">古风</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%8f%af%e8%a7%82%e6%b5%8b/">可观测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8c%e4%ba%ba/">同人</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8e%e7%ab%af/">后端</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%8e%e8%ae%ad%e7%bb%83/">后训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%90%91%e9%87%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">向量数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c/">味噌</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%81/">味噌汁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%91%b3%e5%99%8c%e6%b1%a4/">味噌汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%93%88%e5%b8%8c%e8%a1%a8/">哈希表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9b%be/">图</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9c%a8%e5%ae%b6%e5%81%9a%e9%a5%ad/">在家做饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6/">垃圾回收</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%8d%e4%b9%a0/">复习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9aAgent/">多Agent</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9a%e6%a8%a1%e6%80%81/">多模态</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%a4%9a%e8%bf%9b%e7%a8%8b/">多进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%99%a8/">存储器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ad%98%e5%82%a8%e5%bc%95%e6%93%8e/">存储引擎</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e4%b9%a0%e9%a1%b9%e7%9b%ae/">实习项目</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ae%9e%e6%88%98/">实战</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%b9%e8%b1%a1%e6%a8%a1%e5%9e%8b/">对象模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%af%bf%e5%96%9c%e7%83%a7/">寿喜烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e5%ba%a6/">工具调度</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b7%a5%e5%85%b7%e8%b0%83%e7%94%a8/">工具调用</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b9%82%e7%ad%89/">幂等</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%b9%b6%e5%8f%91/">并发</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%ba%94%e7%91%9e/">应瑞</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%bc%80%e5%8f%91%e6%a1%86%e6%9e%b6/">开发框架</a>
+      
+      <a class="sidebar-tag" href="/tags/%e5%be%ae%e8%b0%83/">微调</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%85%a2%e6%9f%a5%e8%af%a2/">慢查询</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%89%a7%e8%a1%8c%e8%ae%a1%e5%88%92/">执行计划</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8c%81%e4%b9%85%e5%8c%96/">持久化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8c%81%e7%bb%ad%e8%bf%9b%e5%8c%96/">持续进化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e4%bc%98%e5%8c%96/">推理优化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%a8%e7%90%86%e5%bc%95%e6%93%8e/">推理引擎</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8f%90%e7%a4%ba%e5%b7%a5%e7%a8%8b/">提示工程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f/">操作系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e5%ad%a6%e5%9f%ba%e7%a1%80/">数学基础</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e5%ba%93/">数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b/">数据类型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84/">数据结构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f/">文件系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%a5%e6%96%99/">日料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%97%b6%e5%ba%8f%e6%95%b0%e6%8d%ae%e5%ba%93/">时序数据库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ac%e5%9c%b0%e6%8e%a8%e7%90%86/">本地推理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0/">机器学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%9e%b6%e6%9e%84/">架构</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a0%91/">树</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%a3%80%e7%b4%a2%e5%a2%9e%e5%bc%ba/">检索增强</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b2%aa%e6%b7%b1300/">沪深300</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b5%81%e6%b0%b4%e7%ba%bf/">流水线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b6%88%e6%81%af%e5%8f%af%e9%9d%a0%e6%80%a7/">消息可靠性</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b6%88%e6%81%af%e7%a7%af%e5%8e%8b/">消息积压</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b6%88%e6%81%af%e9%98%9f%e5%88%97/">消息队列</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0/">深度学习</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%b8%a9%e6%b3%89%e8%9b%8b/">温泉蛋</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%81%ab%e9%94%85/">火锅</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%82%b8%e7%8c%aa%e6%8e%92/">炸猪排</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e3%82%8a%e7%84%bc%e3%81%8d/">照り焼き</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%85%a7%e7%83%a7/">照烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%89%9b%e8%82%89/">牛肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8a%b6%e6%80%81%e6%9c%ba/">状态机</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8c%aa%e6%8e%92%e9%a5%ad/">猪排饭</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%8e%89%e5%ad%90%e7%83%a7/">玉子烧</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%99%be%e7%a7%91/">百科</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9c%9f%e9%a2%98/">真题</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%9f%a5%e8%af%86%e5%ba%93/">知识库</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%a2%a7%e8%93%9d%e8%88%aa%e7%ba%bf/">碧蓝航线</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%aa%97%e5%8f%a3%e5%87%bd%e6%95%b0/">窗口函数</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ad%96%e7%95%a5%e5%9b%9e%e6%b5%8b/">策略回测</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ae%97%e6%b3%95/">算法</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1/">系统设计</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%b4%a2%e5%bc%95/">索引</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%ba%bf%e7%a8%8b%e6%a8%a1%e5%9e%8b/">线程模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bc%93%e5%ad%98/">缓存</a>
+      
+      <a class="sidebar-tag" href="/tags/%e7%bd%91%e7%bb%9c%e5%b1%82/">网络层</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%82%87%e5%92%8c/">肇和</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%88%91%e6%94%b9%e8%bf%9b/">自我改进</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%87%aa%e6%89%98%e7%ae%a1/">自托管</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a6%aa%e5%ad%90%e4%b8%bc/">親子丼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%a7%86%e8%a7%89%e6%a8%a1%e5%9e%8b/">视觉模型</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bb%84%e6%88%90%e5%8e%9f%e7%90%86/">计算机组成原理</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%bd%91%e7%bb%9c/">计算机网络</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%ad%e7%bb%83/">训练</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%ae%b0%e5%bf%86%e7%b3%bb%e7%bb%9f/">记忆系统</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%84%e4%bc%b0/">评估</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%ad%e4%b9%89%e5%8c%b9%e9%85%8d/">语义匹配</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%ad%e9%9f%b3/">语音</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%af%bb%e4%b9%a6%e7%ac%94%e8%ae%b0/">读书笔记</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%91%b3%e6%96%99/">调味料</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e5%ba%a6/">调度</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b0%83%e7%a0%94/">调研</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%b7%b3%e8%a1%a8/">跳表</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%90%e8%a1%8c%e6%97%b6/">运行时</a>
+      
+      <a class="sidebar-tag" href="/tags/%e8%bf%9b%e7%a8%8b/">进程</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%80%b8%e4%bb%99/">逸仙</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%83%a8%e7%bd%b2/">部署</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96/">量化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%87%8f%e5%8c%96%e4%ba%a4%e6%98%93/">量化交易</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%94%81/">锁</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%95%87%e6%b5%b7/">镇海</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%98%bf%e9%87%8c%e4%ba%91%e7%99%be%e7%82%bc/">阿里云百炼</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%99%8d%e9%87%87%e6%a0%b7/">降采样</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9a%94%e7%a6%bb/">隔离</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9a%94%e7%a6%bb%e7%ba%a7%e5%88%ab/">隔离级别</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9b%86%e7%be%a4/">集群</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e7%94%9f%e6%88%90%e5%99%a8/">静态网站生成器</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%9d%a2%e8%af%95/">面试</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a1%b9%e7%9b%ae/">项目</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a1%ba%e5%ba%8f%e6%80%a7/">顺序性</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a2%84%e5%88%b6%e8%8f%9c/">预制菜</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%a3%9f%e8%b0%b1/">食谱</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%ab%98%e6%b1%a4/">高汤</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%82%89/">鸡肉</a>
+      
+      <a class="sidebar-tag" href="/tags/%e9%b8%a1%e8%9b%8b/">鸡蛋</a>
+      
+    </div>
+  </div>
+  
+</aside>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      &copy; CC BY-NC-SA 4.0
+       by Kurong
+    </div>
+    <div class="footer-social">
+      
+      <a href="https://hekurong.github.io/atom.xml" rel="alternate" type="application/atom+xml" title="RSS 订阅">RSS</a>
+      
+      
+      <a href="https://github.com/KurongTohsaka" target="_blank" rel="noopener">GitHub</a>
+      
+      
+      
+    </div>
+    <div class="footer-badge">Powered by Chenhai &middot; Zhenhai</div>
+  </div>
+</footer>
+
+
+<script defer src="/assets/js/main.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script defer src="/assets/js/search.js"></script>
+<button id="back-to-top" class="back-to-top" aria-label="回到顶部">↑</button>
+
+
+<div id="settings-panel" class="settings-panel" aria-hidden="true">
+  <div class="settings-panel-header">
+    <span>阅读设置</span>
+    <button id="settings-close" class="settings-close" aria-label="关闭">×</button>
+  </div>
+  <div class="settings-panel-body">
+    <div class="settings-group">
+      <label>字号</label>
+      <div class="settings-options" data-setting="font-size">
+        <button data-value="small" class="setting-option">小</button>
+        <button data-value="medium" class="setting-option active">中</button>
+        <button data-value="large" class="setting-option">大</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <label>阅读宽度</label>
+      <div class="settings-options" data-setting="reading-width">
+        <button data-value="narrow" class="setting-option active">窄栏</button>
+        <button data-value="wide" class="setting-option">宽栏</button>
+      </div>
+    </div>
+    <div class="settings-group" id="dark-level-group">
+      <label>暗色深度</label>
+      <div class="settings-options" data-setting="dark-level">
+        <button data-value="soft" class="setting-option active">柔和</button>
+        <button data-value="medium" class="setting-option">适中</button>
+        <button data-value="deep" class="setting-option">深邃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-panel" class="shortcuts-panel" aria-hidden="true">
+  <div class="shortcuts-panel-inner">
+    <h3>键盘快捷键</h3>
+    <table><tbody>
+      <tr><td><kbd>J</kbd></td><td>下一篇</td></tr>
+      <tr><td><kbd>K</kbd></td><td>上一篇</td></tr>
+      <tr><td><kbd>Ctrl+K</kbd></td><td>搜索</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示/隐藏快捷键</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭面板</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>H</kbd></td><td>回到首页</td></tr>
+      <tr><td><kbd>G</kbd> <kbd>T</kbd></td><td>回到顶部</td></tr>
+    </tbody></table>
+    <p style="margin-top:1rem;font-size:0.8rem;color:var(--color-text-secondary)">在非输入区域按下 <kbd>?</kbd> 即可唤出此面板</p>
+  </div>
+</div>
+</body>
+</html>
