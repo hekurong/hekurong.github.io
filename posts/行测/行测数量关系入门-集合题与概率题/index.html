@@ -6,7 +6,7 @@
 <meta name="description" content="技术博客，记录学习与思考">
 <meta name="theme-color" content="#1a1d2e">
 <meta name="color-scheme" content="dark light">
-<title>行测数量关系入门：集合题与概率题 - KurongBlog</title>
+<title>行测数量关系入门：集合题与排列组合概率题 - KurongBlog</title>
 
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <article class="article-content">
   <header class="article-header">
-    <h1 class="article-title">行测数量关系入门：集合题与概率题</h1>
+    <h1 class="article-title">行测数量关系入门：集合题与排列组合概率题</h1>
     <div class="article-meta">
       <time datetime="2026-09-24">2026-09-24</time>
       <span class="ai-badge" title="AI 辅助生成">AI</span>
@@ -148,12 +148,14 @@ document.addEventListener("DOMContentLoaded", function() {
       
       <a class="tag" href="/tags/%e6%a6%82%e7%8e%87/">概率</a>
       
+      <a class="tag" href="/tags/%e6%8e%92%e5%88%97%e7%bb%84%e5%90%88/">排列组合</a>
+      
     </div>
     
   </header>
 
   <p>集合题和概率题容易让人卡在同一个地方：题目读懂了，却不知道该把哪些数加起来、减下去，或者分母该取什么。</p>
-<p>先记住一个总思路：集合题在数有多少对象落进不同范围，概率题在算有利结果占全部可能结果的多少。读题时先圈出条件，再判断是否有重复计数，最后看题目问的是至少、恰好、同时还是都不。</p>
+<p>先记住一个总思路：集合题在数有多少对象落进不同范围，核心是处理重叠；概率题常常要先用分类分步、排列 A、组合 C 或错排 D 数出有利结果，再除以全部等可能结果。读题时先判断顺序、重复和限制条件，最后看题目问的是至少、恰好还是都不。</p>
 <h2 id="heading">集合题：重叠部分只能算一次</h2>
 <p>用 <span class="math inline">$A$</span> 和 <span class="math inline">$B$</span> 表示满足两种条件的人群。<span class="math inline">$A\cup B$</span> 表示满足至少一种条件，<span class="math inline">$A\cap B$</span> 表示两种条件都满足。</p>
 <p>两类条件的核心公式是：</p>
@@ -185,80 +187,109 @@ $$</span></p>
 <p><span class="math display">$$30+20+25-3\times 10=45
 $$</span></p>
 <p>要特别留意题目给的交集口径。若给的是只使用阅读和听书两种的人数，已经排除了三种都用的人，就不能再把三者交集重复扣除。</p>
-<h2 id="heading-2">概率题：分母是全部可能结果</h2>
-<p>只有在每种结果出现机会相同的情况下，才能直接用：</p>
+<h2 id="-ac--d">概率题：先数样本空间，再选 A、C 或 D</h2>
+<p>当所有基本结果出现机会相同时，概率可以写成：</p>
 <p><span class="math display">$$P(E)=\frac{\text{有利结果数}}{\text{全部可能结果数}}
 $$</span></p>
-<p>分母不是题目里随手出现的总数，而是按同一种抽取规则列出的全部可能结果。先确认结果是否等可能，再数分子和分母。</p>
-<h3 id="heading-3">至少发生一次：先看反面更省事</h3>
-<p>事件 <span class="math inline">$E$</span> 和它的反面合起来覆盖全部可能，所以：</p>
-<p><span class="math display">$$P(E)=1-P(\text{E 不发生})
+<p>行测里不少概率题，难点不在最后相除，而在于怎样数清分子和分母。先把完整样本空间定好，再用同一种计数口径分别数有利结果与全部结果。</p>
+<h3 id="a--c">A 和 C：顺序算不算不同</h3>
+<p>从 <span class="math inline">$n$</span> 个不同元素中取 <span class="math inline">$m$</span> 个，若顺序不同就算不同结果，用排列：</p>
+<p><span class="math display">$$A_n^m=\frac{n!}{(n-m)!}
 $$</span></p>
-<p>看到至少一次、至少一个，先试着算一次也没有的概率，再用 1 减去它。这个办法尤其适合多次抽取或多次尝试。</p>
-<p><strong>例题</strong>：袋中有 3 个红球和 2 个蓝球，不放回地连续取出 2 个。取到至少 1 个红球的概率是多少？</p>
-<p>反面是两个都为蓝球：第一次取蓝球的概率为 <span class="math inline">$2/5$</span>，取走一个蓝球后，第二次再取蓝球的概率为 <span class="math inline">$1/4$</span>。因此：</p>
-<p><span class="math display">$$P(\text{至少一个红球})=1-\frac{2}{5}\times\frac{1}{4}=\frac{9}{10}
+<p>若只看选出了哪几个，顺序不重要，用组合：</p>
+<p><span class="math display">$$C_n^m=\frac{n!}{m!(n-m)!}
 $$</span></p>
-<h3 id="heading-4">同时发生：不放回时，第二次概率会变</h3>
-<p>同一个袋子里，连续不放回取球，两次都取到红球的概率是：</p>
-<p><span class="math display">$$\frac{3}{5}\times\frac{2}{4}=\frac{3}{10}
+<p>选班委中的班长和副班长，职位不同，适合用排列；选出两名代表组成小组，不分职位，适合用组合。判断时看最终结果是否因换顺序而改变，不要只看题目是不是分几步完成。</p>
+<p>如果每个位置都能重复选择，且位置有先后，<span class="math inline">$m$</span> 个位置各有 <span class="math inline">$n$</span> 种选法，总数为 <span class="math inline">$n^m$</span>。若是从 <span class="math inline">$n$</span> 种相同类型的物品中重复取 <span class="math inline">$m$</span> 个，只看各类型的数量，则可用 <span class="math inline">$C_{n+m-1}^m$</span>。遇到重复条件，先辨清对象是否相同、是否放回，再套公式。</p>
+<h3 id="heading-2">抽取题：组合数乘起来，再除以总组合数</h3>
+<p><strong>例题</strong>：袋中有 4 个红球、3 个白球，不放回取出 3 个，恰好 2 个红球的概率是多少？</p>
+<p>总取法不计顺序，为 <span class="math inline">$C_7^3$</span>。有利取法是从 4 个红球中选 2 个，再从 3 个白球中选 1 个，为 <span class="math inline">$C_4^2C_3^1$</span>。所以：</p>
+<p><span class="math display">$$P(\text{恰好2个红球})=\frac{C_4^2C_3^1}{C_7^3}=\frac{18}{35}
 $$</span></p>
-<p>第二次取红球的概率是 <span class="math inline">$2/4$</span>，因为第一次已经取走一个红球。若每次取完都放回，第二次的红球概率仍是 <span class="math inline">$3/5$</span>，两次都红的概率就变成：</p>
-<p><span class="math display">$$\frac{3}{5}\times\frac{3}{5}=\frac{9}{25}
+<p>若问至少有 1 个红球，直接算反面更快。反面是 3 个全为白球：</p>
+<p><span class="math display">$$P(\text{至少1个红球})=1-\frac{C_3^3}{C_7^3}=\frac{34}{35}
 $$</span></p>
-<p>一般情况下，同时发生用乘法，但后一步要根据前一步发生后的条件重新计算：</p>
-<p><span class="math display">$$P(A\cap B)=P(A)P(B|A)
+<p>这类不放回抽取若按顺序逐次算，也可以使用条件概率；若用组合数，就要让分子和分母都按不计顺序的方式计算，不能一边按顺序、一边不按顺序。</p>
+<h3 id="heading-3">排列受限制：先分情况，别忘了零不能打头</h3>
+<p><strong>例题</strong>：用数字 0、1、2、3、4 组成没有重复数字的三位偶数，随机从所有符合条件的三位数中选一个，选中偶数的概率是多少？</p>
+<p>全部三位数的百位不能是 0，因此总数是 <span class="math inline">$4\times4\times3=48$</span>。</p>
+<p>按个位分情况。个位为 0 时，百位有 4 种选法，十位有 3 种，得到 <span class="math inline">$4\times3=12$</span> 个；个位为 2 或 4 时，个位有 2 种选法，百位有 3 种，十位有 3 种，得到 <span class="math inline">$2\times3\times3=18$</span> 个。符合条件的偶数共 30 个，所以：</p>
+<p><span class="math display">$$P(\text{偶数})=\frac{12+18}{48}=\frac{5}{8}
 $$</span></p>
-<p>只有两件事相互独立，也就是一件事发生不会改变另一件事的概率时，才能简写成 <span class="math inline">$P(A\cap B)=P(A)P(B)$</span>。不放回抽取通常会改变后续概率，不能直接当作独立事件。</p>
-<h3 id="heading-5">发生其一：有重叠就要减一次</h3>
-<p>概率也有和集合相同的去重逻辑：</p>
-<p><span class="math display">$$P(A\cup B)=P(A)+P(B)-P(A\cap B)
+<p>这里不能直接用 <span class="math inline">$A_5^3$</span> 当总数，因为它会把百位为 0 的情形也算进去。排列公式负责计数，题目限制仍要逐条落实。</p>
+<h3 id="heading-4">独立重复试验：组合数乘每种结果的概率</h3>
+<p>同一种试验独立重复 <span class="math inline">$n$</span> 次，每次成功概率都是 <span class="math inline">$p$</span>，恰好成功 <span class="math inline">$k$</span> 次的概率为：</p>
+<p><span class="math display">$$C_n^k p^k(1-p)^{n-k}
 $$</span></p>
-<p>“发生 A 或 B”通常包括两者同时发生，所以交集会被加两次，需要减去一次。若 A 和 B 不能同时发生，交集概率为 0，这时才可以直接相加。</p>
-<p>相互排斥和相互独立不是一回事。相互排斥表示两件事不能同时发生；相互独立表示知道一件事发生与否，不会改变另一件事的概率。做题时不要把这两个词混用。</p>
-<h2 id="heading-6">做题时的快速判断</h2>
+<p><span class="math inline">$C_n^k$</span> 用来选择哪 <span class="math inline">$k$</span> 次成功，后面的概率乘积对应其中一种具体排列。它只适用于试验次数固定、各次相互独立、成功概率相同的情形。</p>
+<p><strong>例题</strong>：公平硬币抛 4 次，恰好 3 次正面朝上的概率是：</p>
+<p><span class="math display">$$C_4^3\left(\frac12\right)^3\left(\frac12\right)=\frac14
+$$</span></p>
+<p>至少出现 1 次正面，可以用补集：<span class="math inline">$1-(1/2)^4=15/16$</span>。不放回取球时，各次概率会改变，不能不加判断地套独立重复试验公式。</p>
+<h3 id="-d">错排 D：每个对象都没有回到原位</h3>
+<p>随机把 <span class="math inline">$n$</span> 封信装进对应的 <span class="math inline">$n$</span> 个信封，若要求每封信都装错，符合条件的排列数称为错排数。本文记作 <span class="math inline">$D_n$</span>，常用递推式为：</p>
+<p><span class="math display">$$D_0=1,\quad D_1=0,\quad D_n=(n-1)(D_{n-1}+D_{n-2})
+$$</span></p>
+<p>行测常见的小值为 <span class="math inline">$D_2=1$</span>、<span class="math inline">$D_3=2$</span>、<span class="math inline">$D_4=9$</span>、<span class="math inline">$D_5=44$</span>。</p>
+<p><strong>例题</strong>：3 封信随机装入 3 个信封，恰好没有一封装对的概率是多少？全部排列有 <span class="math inline">$3!=6$</span> 种，全错的有 <span class="math inline">$D_3=2$</span> 种，因此概率为：</p>
+<p><span class="math display">$$\frac{D_3}{3!}=\frac{2}{6}=\frac13
+$$</span></p>
+<p>若问 <span class="math inline">$n$</span> 件物品中恰好有 <span class="math inline">$r$</span> 件在正确位置，先选出这 <span class="math inline">$r$</span> 件，再把剩余物品全部错排：</p>
+<p><span class="math display">$$P(\text{恰好 }r\text{ 件正确})=\frac{C_n^rD_{n-r}}{n!}
+$$</span></p>
+<p>例如 4 封信恰好有 1 封装对，概率为 <span class="math inline">$C_4^1D_3/4!=1/3$</span>。这类题把组合 <span class="math inline">$C$</span> 和错排 <span class="math inline">$D$</span> 连在了一起。</p>
+<h3 id="heading-5">题面线索与常用模型</h3>
 <table>
 <thead>
 <tr>
-<th>题目问法</th>
-<th>优先想到</th>
+<th>题面线索</th>
+<th>先想到的计数方法</th>
+<th>容易漏掉的条件</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>至少属于一类、满足几种条件</td>
-<td>容斥，检查重复交集</td>
+<td>选若干人组成小组</td>
+<td>组合 <span class="math inline">$C$</span></td>
+<td>是否分职位、是否有先后</td>
 </tr>
 <tr>
-<td>两类都不满足</td>
-<td>总数减去至少满足一类的人数</td>
+<td>排座位、分名次、组成有序数字</td>
+<td>排列 <span class="math inline">$A$</span> 或分步相乘</td>
+<td>零能否打头，元素能否重复</td>
 </tr>
 <tr>
-<td>至少发生一次</td>
-<td>用 1 减去一次也没发生的概率</td>
+<td>不放回抽取，恰好有 <span class="math inline">$k$</span> 个某类</td>
+<td>有利组合数除以总组合数</td>
+<td>两类选择要相乘，样本空间口径一致</td>
 </tr>
 <tr>
-<td>两件事同时发生</td>
-<td>连乘，并检查后一步概率是否改变</td>
+<td>固定次数的独立试验，恰好成功 <span class="math inline">$k$</span> 次</td>
+<td><span class="math inline">$C_n^k p^k(1-p)^{n-k}$</span></td>
+<td>各次是否独立、成功率是否相同</td>
 </tr>
 <tr>
-<td>A 或 B 发生</td>
-<td>两项概率相加，再减去共同发生的部分</td>
+<td>随机分配，任何对象都不在原位</td>
+<td><span class="math inline">$D_n/n!$</span></td>
+<td>全部结果数是 <span class="math inline">$n!$</span></td>
 </tr>
 <tr>
-<td>给定某个条件后再求概率</td>
-<td>缩小样本范围，使用条件概率</td>
+<td>至少出现一个</td>
+<td><span class="math inline">$1-P(\text{一个也没有})$</span></td>
+<td>反面是否更容易计算</td>
 </tr>
 </tbody>
 </table>
-<h2 id="heading-7">两道小练习</h2>
-<p><strong>集合题</strong>：80 人中，46 人喜欢阅读，38 人喜欢运动，17 人两者都喜欢。两者都不喜欢的人数是多少？</p>
-<p><strong>概率题</strong>：袋中有 4 个红球和 3 个白球，不放回取出 2 个。两球都为白球的概率是多少？至少有一个白球的概率是多少？</p>
-<p>集合题先算至少喜欢一项的人数，结果为 <span class="math inline">$46+38-17=67$</span>，所以都不喜欢的有 <span class="math inline">$80-67=13$</span> 人。</p>
-<p>两球都白的概率为 <span class="math inline">$\binom{3}{2}/\binom{7}{2}=1/7$</span>。至少一个白球可以用补集，结果为 <span class="math inline">$1-\binom{4}{2}/\binom{7}{2}=5/7$</span>。</p>
-<p>做完后用两个问题检查自己：交集有没有被重复计算？概率分母是不是覆盖了同一规则下的全部可能结果？这两处不出错，集合题和概率题就有了稳定的落笔顺序。</p>
+<p>做题时还要区分相互独立和不放回抽取。若分步计算，通常写成 <span class="math inline">$P(A\cap B)=P(A)P(B|A)$</span>；只有前一步不会改变后一步概率时，才可直接用 <span class="math inline">$P(A)P(B)$</span>。例如 3 红 2 白不放回抽 2 球，两球都红可以算成 <span class="math inline">$C_3^2/C_5^2=3/10$</span>，也可以算成 <span class="math inline">$3/5\times2/4=3/10$</span>。</p>
+<h2 id="heading-6">两道小练习</h2>
+<p><strong>抽取题</strong>：袋中有 5 个红球和 3 个白球，不放回取出 3 个，恰好 2 个红球的概率是多少？</p>
+<p><strong>错排题</strong>：4 封信随机装入 4 个信封，恰好 1 封装对的概率是多少？</p>
+<p>抽取题的答案为 <span class="math inline">$C_5^2C_3^1/C_8^3=15/28$</span>。错排题的答案为 <span class="math inline">$C_4^1D_3/4!=1/3$</span>。</p>
+<p><strong>重复试验题</strong>：公平硬币抛 5 次，恰好 3 次正面朝上的概率是多少？</p>
+<p>答案为 <span class="math inline">$C_5^3(1/2)^5=5/16$</span>。</p>
+<p>概率题的稳定顺序是先明确实验和样本空间，再判断顺序与重复，接着用分类分步、<span class="math inline">$A$</span>、<span class="math inline">$C$</span> 或 <span class="math inline">$D$</span> 数出分子和分母，最后处理至少、恰好等限制。公式不是第一步，数清楚题目里的结果才是。</p>
 <blockquote>
-<p>公式核对参考 OpenStax《Introductory Statistics 2e》第三章，以及俄亥俄州立大学 Ximera《Combinatorics》的容斥原理章节；文中数字均为自编例题。</p>
+<p>计数与排列组合概率公式参考 OpenStax《Contemporary Mathematics》第 7.6 节和第 7.10 节；错排计数参考俄亥俄州立大学 Ximera《Combinatorics》第二章。文中数字均为自编例题。</p>
 </blockquote>
 
 </article>
@@ -1475,7 +1506,7 @@ $$</span></p>
       
       
       <li class="sidebar-post-item">
-        <a href="/posts/%e8%a1%8c%e6%b5%8b/%e8%a1%8c%e6%b5%8b%e6%95%b0%e9%87%8f%e5%85%b3%e7%b3%bb%e5%85%a5%e9%97%a8-%e9%9b%86%e5%90%88%e9%a2%98%e4%b8%8e%e6%a6%82%e7%8e%87%e9%a2%98/">行测数量关系入门：集合题与概率题</a>
+        <a href="/posts/%e8%a1%8c%e6%b5%8b/%e8%a1%8c%e6%b5%8b%e6%95%b0%e9%87%8f%e5%85%b3%e7%b3%bb%e5%85%a5%e9%97%a8-%e9%9b%86%e5%90%88%e9%a2%98%e4%b8%8e%e6%a6%82%e7%8e%87%e9%a2%98/">行测数量关系入门：集合题与排列组合概率题</a>
         <span class="sidebar-post-date">2026-09-24</span>
       </li>
       
@@ -2243,6 +2274,8 @@ $$</span></p>
       <a class="sidebar-tag" href="/tags/%e6%8c%81%e4%b9%85%e5%8c%96/">持久化</a>
       
       <a class="sidebar-tag" href="/tags/%e6%8c%81%e7%bb%ad%e8%bf%9b%e5%8c%96/">持续进化</a>
+      
+      <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%88%97%e7%bb%84%e5%90%88/">排列组合</a>
       
       <a class="sidebar-tag" href="/tags/%e6%8e%92%e5%ba%8f/">排序</a>
       

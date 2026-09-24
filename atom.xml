@@ -3,18 +3,18 @@
   <title>KurongBlog</title>
   <subtitle>技术博客，记录学习与思考</subtitle>
   <id>https://hekurong.github.io/</id>
-  <updated>2026-09-24T07:01:03Z</updated>
+  <updated>2026-09-24T07:29:45Z</updated>
   <link rel="self" type="application/atom+xml" href="https://hekurong.github.io/atom.xml"></link>
   <link href="https://hekurong.github.io/"></link>
   <author>
     <name>Kurong</name>
   </author>
   <entry>
-    <title>行测数量关系入门：集合题与概率题</title>
+    <title>行测数量关系入门：集合题与排列组合概率题</title>
     <id>https://hekurong.github.io/posts/行测/行测数量关系入门-集合题与概率题/</id>
     <updated>2026-09-24T00:00:00Z</updated>
     <link href="https://hekurong.github.io/posts/行测/行测数量关系入门-集合题与概率题/"></link>
-    <summary>从容斥、补集和条件概率入手，用具体例题拆解行测集合题与概率题的常见思路。</summary>
+    <summary>从集合容斥到排列A、组合C、错排D，拆解行测概率题的计数模型与常见陷阱。</summary>
   </entry>
   <entry>
     <title>Python 面试八股（一）：对象模型、核心容器与函数机制</title>
